@@ -4,9 +4,11 @@ import { expectAccessible } from './axe';
 
 // Build task 5, done criterion 2. A scripted run of the AT-5 task (SPEC.md Sec. 12.5) on a
 // fictitious company, from an empty browser to the printed decision record, in under 10
-// minutes. The catalogue risk of the task waits for open question Q3, so all 5 risks are own.
+// minutes. The positive risk comes from the catalogue picker, and the other 4 are own risks.
 interface RiskInput {
   readonly description: string;
+  // The id of a catalogue template. The description is then the template text.
+  readonly template?: string;
   readonly positive?: boolean;
   readonly owner: string;
   readonly objective: 'OBJ-1' | 'OBJ-2';
@@ -15,11 +17,38 @@ interface RiskInput {
 }
 
 const RISKS: readonly RiskInput[] = [
-  { description: 'If ransomware encrypts the order system, then deliveries stop for days.', owner: 'IT lead', objective: 'OBJ-1', frequency: [0.05, 0.3], impact: [40_000, 600_000] },
+  {
+    description: 'If ransomware encrypts the order system, then deliveries stop for days.',
+    owner: 'IT lead',
+    objective: 'OBJ-1',
+    frequency: [0.05, 0.3],
+    impact: [40_000, 600_000],
+  },
   { description: 'If the payment provider fails, then card orders stop.', owner: 'Finance lead', objective: 'OBJ-1', frequency: [0.2, 1], impact: [2_000, 30_000] },
-  { description: 'If a phishing mail changes a supplier bank account, then we pay a fraudster.', owner: 'Finance lead', objective: 'OBJ-2', frequency: [0.1, 0.6], impact: [5_000, 80_000] },
-  { description: 'If customer data leaks from the web shop, then the authority fines us.', owner: 'Managing director', objective: 'OBJ-2', frequency: [0.02, 0.2], impact: [10_000, 250_000] },
-  { description: 'If we offer online pre-orders, then we win new wholesale customers.', positive: true, owner: 'Sales lead', objective: 'OBJ-1', frequency: [0.5, 2], impact: [3_000, 20_000] },
+  {
+    description: 'If a phishing mail changes a supplier bank account, then we pay a fraudster.',
+    owner: 'Finance lead',
+    objective: 'OBJ-2',
+    frequency: [0.1, 0.6],
+    impact: [5_000, 80_000],
+  },
+  {
+    description: 'If customer data leaks from the web shop, then the authority fines us.',
+    owner: 'Managing director',
+    objective: 'OBJ-2',
+    frequency: [0.02, 0.2],
+    impact: [10_000, 250_000],
+  },
+  {
+    description:
+      'Adopting a new cloud-based authentication platform introduces moderate implementation risks but presents a high-likelihood opportunity to reduce credential-based incidents by 40 % and improve user access efficiency.',
+    template: 'OPP-3',
+    positive: true,
+    owner: 'IT lead',
+    objective: 'OBJ-1',
+    frequency: [0.5, 2],
+    impact: [3_000, 20_000],
+  },
 ];
 
 async function saved(page: Page): Promise<void> {
@@ -28,9 +57,14 @@ async function saved(page: Page): Promise<void> {
 
 async function addRisk(page: Page, n: number, risk: RiskInput): Promise<void> {
   const id = `risk-R-${String(n)}`;
-  await page.getByLabel('Risk description').fill(risk.description);
-  await page.locator('#new-risk-polarity').selectOption(risk.positive === true ? 'positive' : 'negative');
-  await page.getByRole('button', { name: /^Add risk to / }).click();
+  if (risk.template === undefined) {
+    await page.getByLabel('Risk description').fill(risk.description);
+    await page.locator('#new-risk-polarity').selectOption(risk.positive === true ? 'positive' : 'negative');
+    await page.getByRole('button', { name: /^Add risk to / }).click();
+  } else {
+    await page.getByLabel('Template', { exact: true }).selectOption(risk.template);
+    await page.getByRole('button', { name: /^Add the template to / }).click();
+  }
   await expect(page.getByRole('heading', { level: 2, name: `Risk R-${String(n)}` })).toBeVisible();
   await page.getByRole('tab', { name: 'Scenario' }).click();
   await page.locator(`#${id}-owner`).fill(risk.owner);
@@ -107,6 +141,10 @@ test('AT-5 task from an empty browser to the printed decision record in under 10
   await page.getByLabel('Method').selectOption('quantitative');
   await saved(page);
   for (const [i, risk] of RISKS.entries()) await addRisk(page, i + 1, risk);
+  // The template gave the text, the polarity and the category of R-5.
+  const r5 = page.getByRole('row').filter({ hasText: 'cloud-based authentication platform' });
+  await expect(r5).toContainText('Opportunity');
+  await expect(r5).toContainText('ict.identity');
 
   // 1 driver with 2 links.
   await page.getByRole('button', { name: 'Add a driver' }).click();

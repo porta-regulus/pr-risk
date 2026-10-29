@@ -3,6 +3,7 @@
 import { useState } from 'preact/hooks';
 import type { Register, Risk, RiskDocument } from '../schema/types';
 import { NOT_ESTIMATED, numbersSource } from './analysis';
+import { CATALOGUE, fromCatalogue } from './catalogue';
 import { formatNumber } from './distribution';
 import { nextId, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
@@ -201,6 +202,8 @@ function RegisterPanel({ doc, update, selected, onSelect }: { readonly doc: Risk
 function RiskTable({ doc, update, register, selected, onSelect }: { readonly doc: RiskDocument; readonly update: Update; readonly register: Register; readonly selected: string | undefined; readonly onSelect: (id: string) => void }) {
   const [description, setDescription] = useState('');
   const [polarity, setPolarity] = useState<Risk['polarity']>('negative');
+  const [entryId, setEntryId] = useState<string>();
+  const entry = CATALOGUE.find((item) => item.id === entryId);
   const risks = doc.risks.filter((risk) => risk.registerId === register.id);
   const currency = doc.document.currency;
   return (
@@ -287,6 +290,29 @@ function RiskTable({ doc, update, register, selected, onSelect }: { readonly doc
           onSelect(risk.riskId);
         }}>
         Add risk to {register.title}
+      </button>
+      <h3>Add a risk from the catalogue</h3>
+      <p class="hint">A template gives the text and the category. You still give the frequency, the impact and the owner.</p>
+      <div class="field-row">
+        <div class="field wide">
+          <SelectField
+            id="catalogue-entry"
+            label="Template"
+            emptyLabel="Select a template"
+            value={entryId}
+            options={CATALOGUE.map((entry) => [entry.id, `${entry.text} (${entry.source})`] as const)}
+            onChange={setEntryId}
+          />
+        </div>
+      </div>
+      <button type="button" disabled={entry === undefined} onClick={() => {
+          if (entry === undefined) return;
+          const risk = fromCatalogue(newRisk(doc, register.id, entry.text, entry.polarity), entry);
+          update((current) => ({ ...current, risks: [...current.risks, risk] }));
+          setEntryId(undefined);
+          onSelect(risk.riskId);
+        }}>
+        Add the template to {register.title}
       </button>
     </section>
   );

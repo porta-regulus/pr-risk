@@ -2,7 +2,9 @@
 import { describe, expect, it } from 'vitest';
 import { priorityNumbers } from '../src/engine';
 import { documentErrors, type ResponseOption, type RiskDocument } from '../src/schema';
+import { CATALOGUE, fromCatalogue } from '../src/ui/catalogue';
 import { documentChanges, withChangeLog } from '../src/ui/edit';
+import { newRisk } from '../src/ui/identify';
 import { proposedPriorities, simulationKey } from '../src/ui/prioritize';
 import { residualRisks } from '../src/ui/record';
 import { TABLE_2, templateStatement } from '../src/ui/templates';
@@ -80,5 +82,20 @@ describe('S2 templates of SP 800-221r1 Table 2 (SPEC.md Sec. 6.5 item 4)', () =>
       current = { ...current, appetite: { ...current.appetite, statements: [...statements, added] } };
     }
     expect(documentErrors(current)).toEqual([]);
+  });
+});
+
+describe('S3 catalogue picker (SPEC.md Sec. 6.7.1 item 3)', () => {
+  it('a template gives text, polarity and category, and never numbers (hard rule 2)', () => {
+    for (const entry of CATALOGUE) {
+      const risk = fromCatalogue(newRisk(doc, 'CORP', entry.text, entry.polarity), entry);
+      expect(risk.riskDescription).toBe(entry.text);
+      expect(risk.estimate).toBeUndefined();
+      expect([risk.riskLikelihood, risk.riskImpact, risk.exposureRating]).toEqual([0, 0, 0]);
+      expect(risk.defaultedFields).toEqual(['/riskLikelihood', '/riskImpact', '/exposureRating']);
+      expect(risk.catalogueRef).toEqual({ catalogue: entry.catalogue, id: entry.id });
+      const qualitative: RiskDocument = { ...doc, registers: doc.registers.map((register) => ({ ...register, method: 'qualitative' })) as RiskDocument['registers'] };
+      expect(documentErrors({ ...qualitative, risks: [...qualitative.risks, risk] })).toEqual([]);
+    }
   });
 });
