@@ -263,7 +263,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
         {current !== undefined && (
           <>
             <p class="muted">
-              Selected: <strong>{current.title}</strong>. Lint shows {warnings} {warnings === 1 ? 'warning' : 'warnings'}. Screens S4 to S7 come in the next build tasks.
+              Selected: <strong>{current.title}</strong>. Lint shows {warnings} {warnings === 1 ? 'warning' : 'warnings'}. Screens S6 and S7 come in the next build tasks.
             </p>
             <div class="button-row">
               <button type="button" onClick={() => {
@@ -275,6 +275,16 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                   onOpen(current.id, 'identify');
                 }} disabled={busy}>
                 Identify and analyze
+              </button>
+              <button type="button" onClick={() => {
+                  onOpen(current.id, 'prioritize');
+                }} disabled={busy}>
+                Prioritize
+              </button>
+              <button type="button" onClick={() => {
+                  onOpen(current.id, 'respond');
+                }} disabled={busy}>
+                Respond and optimize
               </button>
             </div>
           </>

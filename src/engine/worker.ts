@@ -1,6 +1,8 @@
 // The engine Web Worker. One worker per job, so that cancel is terminate().
+import { decisionRecord } from './decision';
 import { numbersOf } from './numbers';
 import { fiscal, measure, optimize } from './optimize';
+import { priorityNumbers } from './prioritize';
 import type { EngineRequest, EngineResponse } from './protocol';
 import { summarize } from './summary';
 
@@ -27,6 +29,17 @@ addEventListener('message', (event: MessageEvent<EngineRequest>) => {
         },
       });
       post({ kind: 'optimize', result: { ...result, marginal: Object.fromEntries(result.marginal) } });
+    } else if (request.kind === 'prioritize') {
+      post({ kind: 'prioritize', result: priorityNumbers(request.doc, request.trials, request.seed) });
+    } else if (request.kind === 'decision') {
+      const result = decisionRecord(request.doc, {
+        budget: request.budget,
+        seed: request.seed,
+        onProgress: (done, total) => {
+          post({ kind: 'progress', done, total });
+        },
+      });
+      post({ kind: 'decision', result });
     } else if (request.kind === 'riskNumbers') {
       post({ kind: 'riskNumbers', result: numbersOf(request.doc, request.riskIds) });
     } else {

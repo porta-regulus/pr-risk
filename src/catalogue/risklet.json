@@ -1,0 +1,606 @@
+{
+ "catalogue": "Risklet",
+ "licence": "CC-BY-4.0",
+ "attribution": "Risklet catalogue, copyright 2026 PortaRegulus, licensed under CC BY 4.0",
+ "source": {
+  "file": "Risklet Risks.xlsx",
+  "sha256": "30def58346d7a40634927fd5630788ee2aeed3e4ea7fe54433b47fb8e4ee8e8a"
+ },
+ "entries": [
+  {
+   "id": "1",
+   "name": "Lack of Sufficient IT/Security Staffing",
+   "label": "Staffing"
+  },
+  {
+   "id": "2",
+   "name": "Single Points of Failure in Infrastructure",
+   "label": "Infrastructure"
+  },
+  {
+   "id": "3",
+   "name": "Aging Infrastructure Risks",
+   "label": "Infrastructure"
+  },
+  {
+   "id": "4",
+   "name": "Legacy Operating Systems and Applications",
+   "label": "Systems"
+  },
+  {
+   "id": "5",
+   "name": "SSL Certificate Private Key Exposure",
+   "label": "Security"
+  },
+  {
+   "id": "6",
+   "name": "DDoS Attack",
+   "label": "Security"
+  },
+  {
+   "id": "7",
+   "name": "Misconfigured Cloud Services",
+   "label": "Cloud"
+  },
+  {
+   "id": "8",
+   "name": "Accidental Data Disclosure",
+   "label": "Data"
+  },
+  {
+   "id": "9",
+   "name": "Source Code Exposure",
+   "label": "Source Code"
+  },
+  {
+   "id": "10",
+   "name": "Unapproved Software Installation",
+   "label": "Endpoint"
+  },
+  {
+   "id": "11",
+   "name": "Insider Privilege Escalation",
+   "label": "Access"
+  },
+  {
+   "id": "12",
+   "name": "Commodity/Drive-by Malware",
+   "label": "Malware"
+  },
+  {
+   "id": "13",
+   "name": "Third Party Code Compromise",
+   "label": "Supply Chain"
+  },
+  {
+   "id": "14",
+   "name": "Developer Spear Phishing",
+   "label": "Security"
+  },
+  {
+   "id": "15",
+   "name": "Back-office User Phishing",
+   "label": "Security"
+  },
+  {
+   "id": "16",
+   "name": "Unauthorized Physical Access",
+   "label": "Physical"
+  },
+  {
+   "id": "17",
+   "name": "Developer Laptop Loss/Theft",
+   "label": "Endpoint"
+  },
+  {
+   "id": "18",
+   "name": "Ransomware Infection",
+   "label": "Malware"
+  },
+  {
+   "id": "19",
+   "name": "Web-facing Vulnerability Exploitation",
+   "label": "Security"
+  },
+  {
+   "id": "20",
+   "name": "Cloud Provider Service Outage",
+   "label": "Infrastructure"
+  },
+  {
+   "id": "21",
+   "name": "Database Corruption",
+   "label": "Data"
+  },
+  {
+   "id": "22",
+   "name": "Misconfigured Backup Systems",
+   "label": "Backup"
+  },
+  {
+   "id": "23",
+   "name": "Network Segmentation Failure",
+   "label": "Network"
+  },
+  {
+   "id": "24",
+   "name": "API Gateway Compromise",
+   "label": "API"
+  },
+  {
+   "id": "25",
+   "name": "Compromised Service Account",
+   "label": "Access"
+  },
+  {
+   "id": "26",
+   "name": "Failed Identity Provider",
+   "label": "Identity"
+  },
+  {
+   "id": "27",
+   "name": "Expired Domain Controller Certificates",
+   "label": "Infrastructure"
+  },
+  {
+   "id": "28",
+   "name": "Privilege Creep",
+   "label": "Access"
+  },
+  {
+   "id": "29",
+   "name": "Compromised Password Manager",
+   "label": "Security"
+  },
+  {
+   "id": "30",
+   "name": "CI/CD Pipeline Compromise",
+   "label": "DevOps"
+  },
+  {
+   "id": "31",
+   "name": "Dependency Supply Chain Attack",
+   "label": "Supply Chain"
+  },
+  {
+   "id": "32",
+   "name": "Development Environment Compromise",
+   "label": "Development"
+  },
+  {
+   "id": "33",
+   "name": "Container Image Compromise",
+   "label": "Container"
+  },
+  {
+   "id": "34",
+   "name": "Code Repository Breach",
+   "label": "Source Code"
+  },
+  {
+   "id": "35",
+   "name": "BGP Route Hijacking",
+   "label": "Network"
+  },
+  {
+   "id": "36",
+   "name": "VPN Concentrator Failure",
+   "label": "Network"
+  },
+  {
+   "id": "37",
+   "name": "DNS Cache Poisoning",
+   "label": "Network"
+  },
+  {
+   "id": "38",
+   "name": "Email Gateway Failure",
+   "label": "Email"
+  },
+  {
+   "id": "39",
+   "name": "Wireless Network Compromise",
+   "label": "Network"
+  },
+  {
+   "id": "40",
+   "name": "Storage Array Failure",
+   "label": "Storage"
+  },
+  {
+   "id": "41",
+   "name": "Encryption Key Loss",
+   "label": "Security"
+  },
+  {
+   "id": "42",
+   "name": "Data Classification Error",
+   "label": "Data"
+  },
+  {
+   "id": "43",
+   "name": "Archive System Failure",
+   "label": "Storage"
+  },
+  {
+   "id": "44",
+   "name": "Unauthorized Data Transfer",
+   "label": "Data"
+  },
+  {
+   "id": "45",
+   "name": "Change Control Bypass",
+   "label": "Change"
+  },
+  {
+   "id": "46",
+   "name": "CMDB Corruption",
+   "label": "Configuration"
+  },
+  {
+   "id": "47",
+   "name": "Automated Provisioning Failure",
+   "label": "Automation"
+  },
+  {
+   "id": "48",
+   "name": "Security Tool Misconfiguration",
+   "label": "Security"
+  },
+  {
+   "id": "49",
+   "name": "Policy Enforcement Point Failure",
+   "label": "Security"
+  },
+  {
+   "id": "50",
+   "name": "Vendor Remote Access Compromise",
+   "label": "Vendor"
+  },
+  {
+   "id": "51",
+   "name": "Cloud Service Provider API Change",
+   "label": "Cloud"
+  },
+  {
+   "id": "52",
+   "name": "Managed Service Provider Breach",
+   "label": "Vendor"
+  },
+  {
+   "id": "53",
+   "name": "Third Party Software Update Compromise",
+   "label": "Supply Chain"
+  },
+  {
+   "id": "54",
+   "name": "Vendor Bankruptcy/Closure",
+   "label": "Vendor"
+  },
+  {
+   "id": "55",
+   "name": "Data Center Power Event",
+   "label": "Physical"
+  },
+  {
+   "id": "56",
+   "name": "Natural Disaster Impact",
+   "label": "Physical"
+  },
+  {
+   "id": "57",
+   "name": "HVAC System Failure",
+   "label": "Physical"
+  },
+  {
+   "id": "58",
+   "name": "Fire Suppression System Discharge",
+   "label": "Physical"
+  },
+  {
+   "id": "59",
+   "name": "Physical Security System Failure",
+   "label": "Physical"
+  },
+  {
+   "id": "60",
+   "name": "Audit Finding Non-remediation",
+   "label": "Compliance"
+  },
+  {
+   "id": "61",
+   "name": "Privacy Regulation Violation",
+   "label": "Compliance"
+  },
+  {
+   "id": "62",
+   "name": "Data Sovereignty Violation",
+   "label": "Compliance"
+  },
+  {
+   "id": "63",
+   "name": "Export Control Violation",
+   "label": "Compliance"
+  },
+  {
+   "id": "64",
+   "name": "License Compliance Violation",
+   "label": "Compliance"
+  },
+  {
+   "id": "65",
+   "name": "AI Model Poisoning",
+   "label": "Emerging Tech"
+  },
+  {
+   "id": "66",
+   "name": "Quantum Computing Threat",
+   "label": "Emerging Tech"
+  },
+  {
+   "id": "67",
+   "name": "IoT Device Compromise",
+   "label": "IoT"
+  },
+  {
+   "id": "68",
+   "name": "Smart Contract Vulnerability",
+   "label": "Blockchain"
+  },
+  {
+   "id": "69",
+   "name": "5G Infrastructure Exploitation",
+   "label": "Network"
+  },
+  {
+   "id": "70",
+   "name": "Password Hash Leak",
+   "label": "Authentication"
+  },
+  {
+   "id": "71",
+   "name": "OAuth Token Exposure",
+   "label": "Authentication"
+  },
+  {
+   "id": "72",
+   "name": "Session Token Hijacking",
+   "label": "Authentication"
+  },
+  {
+   "id": "73",
+   "name": "SAML Certificate Expiration",
+   "label": "Authentication"
+  },
+  {
+   "id": "74",
+   "name": "Directory Service Sync Failure",
+   "label": "Identity"
+  },
+  {
+   "id": "75",
+   "name": "Container Orchestration Platform Compromise",
+   "label": "Cloud"
+  },
+  {
+   "id": "76",
+   "name": "Cloud Storage Bucket Enumeration",
+   "label": "Cloud"
+  },
+  {
+   "id": "77",
+   "name": "Serverless Function Injection",
+   "label": "Cloud"
+  },
+  {
+   "id": "78",
+   "name": "Cloud IAM Role Misconfiguration",
+   "label": "Cloud"
+  },
+  {
+   "id": "79",
+   "name": "Cloud Network ACL Bypass",
+   "label": "Network"
+  },
+  {
+   "id": "80",
+   "name": "SIEM System Failure",
+   "label": "Security"
+  },
+  {
+   "id": "81",
+   "name": "Log Aggregation System Overflow",
+   "label": "Security"
+  },
+  {
+   "id": "82",
+   "name": "Security Tool Alert Fatigue",
+   "label": "Security"
+  },
+  {
+   "id": "83",
+   "name": "Monitoring System False Positives",
+   "label": "Security"
+  },
+  {
+   "id": "84",
+   "name": "Network Sensor Blind Spots",
+   "label": "Network"
+  },
+  {
+   "id": "85",
+   "name": "API Rate Limiting Bypass",
+   "label": "API"
+  },
+  {
+   "id": "86",
+   "name": "GraphQL Query Depth Attack",
+   "label": "API"
+  },
+  {
+   "id": "87",
+   "name": "Web Application Cache Poisoning",
+   "label": "Web"
+  },
+  {
+   "id": "88",
+   "name": "Client-Side Template Injection",
+   "label": "Web"
+  },
+  {
+   "id": "89",
+   "name": "Service Worker Hijacking",
+   "label": "Web"
+  },
+  {
+   "id": "90",
+   "name": "Database Connection Pool Exhaustion",
+   "label": "Database"
+  },
+  {
+   "id": "91",
+   "name": "Time-Series Database Overflow",
+   "label": "Database"
+  },
+  {
+   "id": "92",
+   "name": "Database Replication Lag",
+   "label": "Database"
+  },
+  {
+   "id": "93",
+   "name": "NoSQL Injection",
+   "label": "Database"
+  },
+  {
+   "id": "94",
+   "name": "Database Schema Poisoning",
+   "label": "Database"
+  },
+  {
+   "id": "95",
+   "name": "SDN Controller Compromise",
+   "label": "Network"
+  },
+  {
+   "id": "96",
+   "name": "Load Balancer Configuration Drift",
+   "label": "Network"
+  },
+  {
+   "id": "97",
+   "name": "Network Device Firmware Compromise",
+   "label": "Network"
+  },
+  {
+   "id": "98",
+   "name": "SSL/TLS Version Deprecation",
+   "label": "Security"
+  },
+  {
+   "id": "99",
+   "name": "Network Time Protocol Attack",
+   "label": "Network"
+  },
+  {
+   "id": "100",
+   "name": "Infrastructure as Code Template Poisoning",
+   "label": "DevOps"
+  },
+  {
+   "id": "101",
+   "name": "Container Base Image Compromise",
+   "label": "Container"
+  },
+  {
+   "id": "102",
+   "name": "Artifact Repository Compromise",
+   "label": "DevOps"
+  },
+  {
+   "id": "103",
+   "name": "Development Tool Chain Breach",
+   "label": "DevOps"
+  },
+  {
+   "id": "104",
+   "name": "Configuration Management Tool Compromise",
+   "label": "Configuration"
+  },
+  {
+   "id": "105",
+   "name": "Mobile Device Management Bypass",
+   "label": "Mobile"
+  },
+  {
+   "id": "106",
+   "name": "Endpoint Protection Failure",
+   "label": "Endpoint"
+  },
+  {
+   "id": "107",
+   "name": "BYOD Policy Violation",
+   "label": "Mobile"
+  },
+  {
+   "id": "108",
+   "name": "Remote Desktop Protocol Exposure",
+   "label": "Remote Access"
+  },
+  {
+   "id": "109",
+   "name": "Local Administrator Rights Abuse",
+   "label": "Endpoint"
+  },
+  {
+   "id": "110",
+   "name": "Automated Payment System Compromise",
+   "label": "Business"
+  },
+  {
+   "id": "111",
+   "name": "Business Email Compromise",
+   "label": "Business"
+  },
+  {
+   "id": "112",
+   "name": "Document Management System Breach",
+   "label": "Document"
+  },
+  {
+   "id": "113",
+   "name": "Customer Support System Compromise",
+   "label": "Business"
+  },
+  {
+   "id": "114",
+   "name": "HR System Data Breach",
+   "label": "HR"
+  },
+  {
+   "id": "115",
+   "name": "Machine Learning Model Extraction",
+   "label": "AI"
+  },
+  {
+   "id": "116",
+   "name": "Deep Fake Authentication Bypass",
+   "label": "AI"
+  },
+  {
+   "id": "117",
+   "name": "Edge Computing Node Compromise",
+   "label": "Edge Computing"
+  },
+  {
+   "id": "118",
+   "name": "Digital Twin Manipulation",
+   "label": "IoT"
+  },
+  {
+   "id": "119",
+   "name": "Zero-Trust Architecture Bypass",
+   "label": "Security"
+  }
+ ]
+}

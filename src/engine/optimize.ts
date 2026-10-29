@@ -55,11 +55,11 @@ export function annualizedCost(option: ResponseOption, run?: Run): number {
   return cost;
 }
 
-function targetsOf(option: ResponseOption): Set<string> {
+export function targetsOf(option: ResponseOption): Set<string> {
   return new Set(option.effects.map((effect) => `${effect.targetKind}|${effect.targetId}`));
 }
 
-function conflicts(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
+export function conflicts(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
   for (const target of a) if (b.has(target)) return true;
   return false;
 }
@@ -161,26 +161,28 @@ export function compareRank(a: Evaluation, b: Evaluation): number {
   return a.ids.join(',') < b.ids.join(',') ? -1 : a.ids.join(',') > b.ids.join(',') ? 1 : 0;
 }
 
-// Batch-means SE of net(a) - net(b), with paired trials. Costs are constants.
-export function pairedSe(a: Evaluation, b: Evaluation): number {
-  const ma = a.measured;
-  const mb = b.measured;
-  if (ma === undefined || mb === undefined) throw new Error('pairedSe needs the measured runs');
-  const n = ma.loss.length;
+// Batch-means standard error of the mean of per-trial values, with 10 consecutive batches.
+export function batchSe(n: number, value: (t: number) => number): number {
   const means: number[] = [];
   let start = 0;
   for (let k = 0; k < BATCHES; k++) {
     const size = Math.floor(n / BATCHES) + (k < n % BATCHES ? 1 : 0);
     let sum = 0;
-    for (let t = start; t < start + size; t++) {
-      sum += (mb.loss[t] ?? 0) - (ma.loss[t] ?? 0) + ((ma.gain[t] ?? 0) - (mb.gain[t] ?? 0));
-    }
+    for (let t = start; t < start + size; t++) sum += value(t);
     means.push(size > 0 ? sum / size : 0);
     start += size;
   }
   const m = means.reduce((x, y) => x + y, 0) / BATCHES;
   const variance = means.reduce((x, y) => x + (y - m) ** 2, 0) / (BATCHES - 1);
   return Math.sqrt(variance) / Math.sqrt(BATCHES);
+}
+
+// Batch-means SE of net(a) - net(b), with paired trials. Costs are constants.
+export function pairedSe(a: Evaluation, b: Evaluation): number {
+  const ma = a.measured;
+  const mb = b.measured;
+  if (ma === undefined || mb === undefined) throw new Error('pairedSe needs the measured runs');
+  return batchSe(ma.loss.length, (t) => (mb.loss[t] ?? 0) - (ma.loss[t] ?? 0) + ((ma.gain[t] ?? 0) - (mb.gain[t] ?? 0)));
 }
 
 export interface Marginal {
@@ -287,7 +289,7 @@ export function optimize(doc: RiskDocument, options: OptimizeOptions): Optimizat
     confirmed.push(check);
     if (confirmed.length === 2) break;
   }
-  notes.push(`Confirmed at ${String(confirmTrials)} trials.`);
+  notes.push(`Confirmed at ${confirmTrials.toLocaleString('en')} trials.`);
   if (dropped.length > 0) notes.push(`Dropped for a breach at confirmation: ${dropped.map((ids) => ids.join('+')).join(', ')}.`);
 
   let tooCloseToCall = false;

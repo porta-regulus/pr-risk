@@ -42,6 +42,12 @@ These are the only packages that reach the user's browser.
 
 `tools/requirements-docs.txt` pins `jsonschema`, `referencing` and `numpy` and their dependencies with SHA-256 hashes for Python 3.12 on Linux x86_64. CI installs them with `--require-hashes`.
 
+## Maintainer tools (not in CI)
+
+| Tool | Version | Licence | Why |
+|---|---|---|---|
+| openpyxl | 3.1.5 | MIT | `tools/risklet_catalogue.py` reads `Risklet Risks.xlsx` of the product owner and writes `src/catalogue/risklet.json`. Run by hand when the catalogue changes. |
+
 ## Planned
 
 None.
