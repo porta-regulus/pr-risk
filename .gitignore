@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.venv/
+*.cdx.json
+*.tar.gz
+SHA256SUMS*
+infra/gcp/.terraform/
+infra/gcp/*.tfstate*
+infra/gcp/terraform.tfvars
+.DS_Store
