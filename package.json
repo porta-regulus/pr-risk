@@ -1,0 +1,46 @@
+{
+  "name": "pr-risk",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Free, open-source, local-first risk register for the risk components of NIST SP 800-221r1.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "gen:schema": "node scripts/gen-schema.mjs",
+    "check:schema": "node scripts/gen-schema.mjs --check",
+    "test": "vitest run --project node",
+    "test:browser": "vitest run --project browser",
+    "test:performance": "PERF=1 vitest run --project node test/engine-performance.test.ts",
+    "test:e2e": "playwright test",
+    "check:docs": "python3 -I docs/schema/validate.py && python3 -I docs/reference/sim_reference.py docs/schema/examples/example-2-sme-quantitative.json --budget=60000",
+    "sbom": "cyclonedx-npm --omit dev --spec-version 1.6 --output-format JSON --output-reproducible --output-file pr-risk.cdx.json"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "preact": "11.1.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "devDependencies": {
+    "@cyclonedx/cyclonedx-npm": "6.0.1",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
+    "@types/node": "24.19.2",
+    "@vitest/browser-playwright": "5.0.5",
+    "eslint": "10.13.0",
+    "fast-check": "4.10.2",
+    "globals": "17.13.0",
+    "json-schema-to-typescript": "16.0.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}

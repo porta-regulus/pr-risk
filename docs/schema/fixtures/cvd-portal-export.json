@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "companyId": "cmp_example",
+    "count": 3,
+    "capped": false,
+    "timestamp": "2026-10-27T08:00:00.000Z"
+  },
+  "data": [
+    {
+      "id": "sub_ex_001",
+      "productName": "Gateway X1",
+      "productIdentifier": "gw-x1",
+      "vulnerabilityType": "SQL_INJECTION",
+      "severity": "HIGH",
+      "description": "(not imported)",
+      "stepsToReproduce": "(not imported)",
+      "impact": "(not imported)",
+      "status": "IN_PROGRESS",
+      "createdAt": "2026-09-02T10:00:00.000Z",
+      "updatedAt": "2026-10-01T10:00:00.000Z",
+      "acknowledgedAt": "2026-09-03T09:00:00.000Z",
+      "resolvedAt": null
+    },
+    {
+      "id": "sub_ex_002",
+      "productName": "Gateway X1",
+      "productIdentifier": "gw-x1",
+      "vulnerabilityType": "SQL_INJECTION",
+      "severity": "MEDIUM",
+      "description": "(not imported)",
+      "stepsToReproduce": "(not imported)",
+      "impact": "(not imported)",
+      "status": "RESOLVED",
+      "createdAt": "2026-06-11T10:00:00.000Z",
+      "updatedAt": "2026-07-20T10:00:00.000Z",
+      "acknowledgedAt": "2026-06-12T09:00:00.000Z",
+      "resolvedAt": "2026-07-20T10:00:00.000Z"
+    },
+    {
+      "id": "sub_ex_003",
+      "productName": "Gateway X1",
+      "productIdentifier": "gw-x1",
+      "vulnerabilityType": "AUTH_BYPASS",
+      "severity": "CRITICAL",
+      "description": "(not imported)",
+      "stepsToReproduce": "(not imported)",
+      "impact": "(not imported)",
+      "status": "ACKNOWLEDGED",
+      "createdAt": "2026-10-20T10:00:00.000Z",
+      "updatedAt": "2026-10-21T10:00:00.000Z",
+      "acknowledgedAt": "2026-10-21T09:00:00.000Z",
+      "resolvedAt": null
+    }
+  ]
+}

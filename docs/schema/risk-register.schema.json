@@ -1,0 +1,2269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.portaregulus.com/schema/risk-register/1.0.0/risk-register.schema.json",
+  "title": "PortaRegulus risk register exchange document",
+  "description": "One file holds the risk components of NIST SP 800-221r1 ipd for one enterprise: context, governance roles, strategy, appetite, assets, registers, drivers, risks, responses and the forecast log. Each risk entry is a valid NIST IR 8286 Rev. 1 risk register entry (allOf). The risk detail uses NIST IR 8286 Rev. 1 risk detail record property definitions. Amounts are in the document currency. Probabilities are fractions from 0 to 1. Section numbers in descriptions refer to SP 800-221r1 ipd.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "document",
+    "registers",
+    "risks"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "document": {
+      "$ref": "#/$defs/documentInfo"
+    },
+    "context": {
+      "$ref": "#/$defs/context"
+    },
+    "governance": {
+      "$ref": "#/$defs/governance"
+    },
+    "strategy": {
+      "$ref": "#/$defs/strategy"
+    },
+    "registers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/register"
+      }
+    },
+    "appetite": {
+      "$ref": "#/$defs/appetite"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/asset"
+      }
+    },
+    "drivers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/driver"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/risk"
+      }
+    },
+    "responses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/responseOption"
+      }
+    },
+    "forecasts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/forecast"
+      }
+    },
+    "simulation": {
+      "$ref": "#/$defs/simulationSettings"
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/provenanceRecord"
+      }
+    },
+    "changeLog": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/changeLogEntry"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "description": "Stable local identifier. Unique per kind in one document.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "money": {
+      "description": "Amount in the document currency (document.currency).",
+      "type": "number",
+      "minimum": 0
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "documentInfo": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "currency",
+        "createdOn"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "organization": {
+          "type": "string"
+        },
+        "currency": {
+          "description": "ISO 4217 code. One currency per document. NIST IR 8286 fields marked ($) hold amounts in this currency.",
+          "type": "string",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "createdOn": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "updatedOn": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "tool": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "scaleBand": {
+      "type": "object",
+      "required": [
+        "label",
+        "lower",
+        "upper",
+        "representative"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "lower": {
+          "type": "number",
+          "minimum": 0
+        },
+        "upper": {
+          "type": "number",
+          "minimum": 0
+        },
+        "representative": {
+          "description": "Number written to the NIST numeric field when only the label is known.",
+          "type": "number",
+          "minimum": 0
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "register": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "level",
+        "timeframeMonths",
+        "asOf",
+        "method"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "description": "SP 800-221r1 Fig. 1 level.",
+          "enum": [
+            "system",
+            "organization",
+            "enterprise"
+          ]
+        },
+        "parentRegisterId": {
+          "$ref": "#/$defs/identifier"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "timeframeMonths": {
+          "description": "Window for riskLikelihood. SP 800-221r1 lines 1010 to 1011 ask for one consistent timeframe.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60
+        },
+        "asOf": {
+          "$ref": "#/$defs/date"
+        },
+        "method": {
+          "enum": [
+            "qualitative",
+            "semi-quantitative",
+            "quantitative"
+          ]
+        },
+        "reportableEventThreshold": {
+          "description": "Smallest single-event impact that counts as an event for forecasts and outcomes.",
+          "$ref": "#/$defs/money"
+        },
+        "kind": {
+          "description": "Sec. 3.8. An opportunity register holds positive risks only.",
+          "enum": [
+            "risk",
+            "opportunity"
+          ]
+        }
+      }
+    },
+    "distribution": {
+      "description": "lognormal takes a calibrated 90 percent interval (lower, upper). pert takes min, mode and max (standard PERT, lambda 4). constant takes one value.",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "lognormal",
+            "pert",
+            "constant"
+          ]
+        },
+        "lower": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "upper": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "confidence": {
+          "const": 0.9
+        },
+        "min": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max": {
+          "type": "number",
+          "minimum": 0
+        },
+        "value": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "lognormal"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "lower",
+              "upper",
+              "confidence"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "min"
+                  ]
+                },
+                {
+                  "required": [
+                    "mode"
+                  ]
+                },
+                {
+                  "required": [
+                    "max"
+                  ]
+                },
+                {
+                  "required": [
+                    "value"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "pert"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "min",
+              "mode",
+              "max"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "lower"
+                  ]
+                },
+                {
+                  "required": [
+                    "upper"
+                  ]
+                },
+                {
+                  "required": [
+                    "confidence"
+                  ]
+                },
+                {
+                  "required": [
+                    "value"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "constant"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "value"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "lower"
+                  ]
+                },
+                {
+                  "required": [
+                    "upper"
+                  ]
+                },
+                {
+                  "required": [
+                    "confidence"
+                  ]
+                },
+                {
+                  "required": [
+                    "min"
+                  ]
+                },
+                {
+                  "required": [
+                    "mode"
+                  ]
+                },
+                {
+                  "required": [
+                    "max"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "estimate": {
+      "description": "Quantitative estimate. frequency is events per year that are NOT caused through the linked drivers. impactPerEvent is the loss (negative polarity) or gain (positive polarity) of one event.",
+      "type": "object",
+      "required": [
+        "frequency",
+        "impactPerEvent",
+        "method",
+        "rationale"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "frequency": {
+          "$ref": "#/$defs/distribution"
+        },
+        "impactPerEvent": {
+          "$ref": "#/$defs/distribution"
+        },
+        "method": {
+          "enum": [
+            "expert-calibrated",
+            "data-derived",
+            "mixed"
+          ]
+        },
+        "rationale": {
+          "description": "SP 800-221r1 Sec. 2.4.3. No estimate without a reason.",
+          "type": "string",
+          "minLength": 10
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "estimatedBy": {
+          "type": "string"
+        },
+        "estimatedOn": {
+          "$ref": "#/$defs/date"
+        },
+        "secondaryImpacts": {
+          "description": "Sec. 3.3.2 cascading risks and Sec. 3.4.2 secondary loss events. Each secondary impact happens with its probability after each primary event.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "description",
+              "probability",
+              "impactPerEvent"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "probability": {
+                "$ref": "#/$defs/probability"
+              },
+              "impactPerEvent": {
+                "$ref": "#/$defs/distribution"
+              }
+            }
+          }
+        }
+      }
+    },
+    "driverLink": {
+      "type": "object",
+      "required": [
+        "driverId",
+        "triggerProbability"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "driverId": {
+          "$ref": "#/$defs/identifier"
+        },
+        "triggerProbability": {
+          "description": "Probability that one driver event causes one event of this risk in the same year.",
+          "$ref": "#/$defs/probability"
+        },
+        "rationale": {
+          "type": "string"
+        }
+      }
+    },
+    "driver": {
+      "description": "A shared cause. One driver event can cause events in several risks in the same simulated year (common shock).",
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "name",
+        "frequency",
+        "rationale"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": [
+            "supplier",
+            "control",
+            "asset",
+            "threat",
+            "other"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "frequency": {
+          "description": "Driver events per year. For a control driver, one event is one failure of the control.",
+          "$ref": "#/$defs/distribution"
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 10
+        }
+      }
+    },
+    "impactRating": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "amount": {
+          "$ref": "#/$defs/money"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "impacts": {
+      "description": "SP 800-221r1 Table 6 ERR impact split, plus safety (SP 800-221r1 line 344).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "financial": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "opex": {
+              "$ref": "#/$defs/impactRating"
+            },
+            "capex": {
+              "$ref": "#/$defs/impactRating"
+            }
+          }
+        },
+        "reputation": {
+          "$ref": "#/$defs/impactRating"
+        },
+        "mission": {
+          "$ref": "#/$defs/impactRating"
+        },
+        "safety": {
+          "$ref": "#/$defs/impactRating"
+        }
+      }
+    },
+    "category": {
+      "description": "Controlled category for aggregation across any risk source. The cause domain, not the consequence.",
+      "type": "object",
+      "required": [
+        "code"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "ict",
+            "financial",
+            "legal",
+            "operational",
+            "strategic",
+            "safety",
+            "reputation"
+          ]
+        },
+        "subcode": {
+          "type": "string",
+          "pattern": "^(ict|financial|legal|operational|strategic|safety|reputation)\\.[a-z0-9-]+$"
+        }
+      }
+    },
+    "sourceRef": {
+      "description": "SP 800-221r1 Sec. 5.2.1 traceability, for example System A risk 1 tagged A-1.",
+      "type": "object",
+      "required": [
+        "registerId",
+        "riskId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "registerId": {
+          "$ref": "#/$defs/identifier"
+        },
+        "riskId": {
+          "$ref": "#/$defs/identifier"
+        },
+        "label": {
+          "type": "string"
+        }
+      }
+    },
+    "threePointValue": {
+      "type": "object",
+      "required": [
+        "optimistic",
+        "mostLikely",
+        "pessimistic"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "optimistic": {
+          "type": "number",
+          "minimum": 0
+        },
+        "mostLikely": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pessimistic": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "rollUp": {
+      "description": "SP 800-221r1 lines 1637 to 1641 three-point roll-up of the source values.",
+      "type": "object",
+      "required": [
+        "method",
+        "disparityLayout"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": [
+            "nist-three-point",
+            "manual"
+          ]
+        },
+        "disparityLayout": {
+          "description": "Table 10 Resolve risk register disparities. one-row-per-response or one-row-all-responses.",
+          "enum": [
+            "one-row-per-response",
+            "one-row-all-responses"
+          ]
+        },
+        "likelihood": {
+          "$ref": "#/$defs/threePointValue"
+        },
+        "impact": {
+          "$ref": "#/$defs/threePointValue"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "kind",
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "cvd-portal-submission",
+            "audit-finding",
+            "incident",
+            "kev",
+            "epss",
+            "document",
+            "other"
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        }
+      }
+    },
+    "riskDetail": {
+      "description": "The NIST IR 8286 Rev. 1 risk detail record fields that the register entry does not already hold. The export builds the full RDR from these fields plus the register fields (SPEC.md Sec. 7.4).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "systemAffected": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/systemAffected"
+        },
+        "organizationOrBusinessUnit": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/organizationOrBusinessUnit"
+        },
+        "riskScenarioDescription": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/riskScenarioDescription"
+        },
+        "assetsAffected": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/assetsAffected"
+        },
+        "threatSourcesActors": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/threatSourcesActors"
+        },
+        "threatVectors": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/threatVectors"
+        },
+        "threatEvents": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/threatEvents"
+        },
+        "vulnerabilityPredisposingConditions": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/vulnerabilityPredisposingConditions"
+        },
+        "primaryAdverseImpact": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/primaryAdverseImpact"
+        },
+        "secondaryAdverseImpacts": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/secondaryAdverseImpacts"
+        },
+        "otherScenarioDetails": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/otherScenarioDetails"
+        },
+        "currentRiskAnalysis": {
+          "description": "Required by the NIST RDR schema but not defined there. Fig. 15 row Current risk analysis.",
+          "type": "string"
+        },
+        "resourceRequirementsForPlannedRisk": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/resourceRequirementsForPlannedRisk"
+        },
+        "dateOfRiskIdentification": {
+          "$ref": "#/$defs/date"
+        },
+        "sourceOfRiskInformation": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/sourceOfRiskInformation"
+        },
+        "currentStatusDate": {
+          "$ref": "#/$defs/date"
+        },
+        "dependencies": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/dependencies"
+        },
+        "followUpDate": {
+          "$ref": "#/$defs/date"
+        },
+        "comments": {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json#/properties/comments"
+        },
+        "residualResponseAsImplemented": {
+          "description": "Fig. 15 row Residual risk response as implemented. Not in the NIST JSON schema.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "Accept",
+              "Avoid",
+              "Transfer",
+              "Mitigate",
+              "Realize",
+              "Share",
+              "Enhance"
+            ]
+          }
+        },
+        "planned": {
+          "description": "Expected values after the planned response (RDR likelihoodAfterControlsWillBe, impactAfterControls, expectedExposureRating). For quantitative risks the engine writes them at export.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "likelihood": {
+              "$ref": "#/$defs/probability"
+            },
+            "impact": {
+              "$ref": "#/$defs/money"
+            },
+            "exposureRating": {
+              "$ref": "#/$defs/money"
+            },
+            "likelihoodLabel": {
+              "type": "string"
+            },
+            "impactLabel": {
+              "type": "string"
+            },
+            "exposureRatingLabel": {
+              "type": "string"
+            }
+          }
+        },
+        "measured": {
+          "description": "Values measured after the response is in place. Empty until then.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "actualResponseCost": {
+              "$ref": "#/$defs/money"
+            },
+            "likelihood": {
+              "$ref": "#/$defs/probability"
+            },
+            "impact": {
+              "$ref": "#/$defs/money"
+            },
+            "exposureRating": {
+              "$ref": "#/$defs/money"
+            },
+            "measuredOn": {
+              "$ref": "#/$defs/date"
+            },
+            "likelihoodLabel": {
+              "type": "string"
+            },
+            "impactLabel": {
+              "type": "string"
+            },
+            "exposureRatingLabel": {
+              "type": "string"
+            }
+          }
+        },
+        "implementedResponseDescription": {
+          "description": "Response already in place (Fig. 11 Current Risk Response).",
+          "type": "string"
+        }
+      }
+    },
+    "risk": {
+      "description": "One risk register entry. allOf the NIST IR 8286 Rev. 1 risk register schema, so every entry is a valid IR 8286 entry. riskLikelihood is P(at least one event in the register timeframe). riskImpact is the mean annual impact given at least one event. exposureRating is riskLikelihood times riskImpact, which equals the expected annual loss or gain.",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "https://csrc.nist.gov/csrc/media/schema/olir/risk_register.v2.schema.json"
+        },
+        {
+          "if": {
+            "properties": {
+              "polarity": {
+                "const": "negative"
+              }
+            },
+            "required": [
+              "polarity"
+            ]
+          },
+          "then": {
+            "properties": {
+              "riskResponseType": {
+                "items": {
+                  "enum": [
+                    "Accept",
+                    "Avoid",
+                    "Transfer",
+                    "Mitigate"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "polarity": {
+                "const": "positive"
+              }
+            },
+            "required": [
+              "polarity"
+            ]
+          },
+          "then": {
+            "properties": {
+              "riskResponseType": {
+                "items": {
+                  "enum": [
+                    "Realize",
+                    "Share",
+                    "Enhance",
+                    "Accept"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ],
+      "required": [
+        "registerId",
+        "polarity",
+        "category",
+        "responseDecision"
+      ],
+      "properties": {
+        "riskId": {
+          "$ref": "#/$defs/identifier"
+        },
+        "riskDescription": {
+          "type": "string",
+          "minLength": 1
+        },
+        "riskCategory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "riskLikelihood": {
+          "$ref": "#/$defs/probability"
+        },
+        "riskImpact": {
+          "$ref": "#/$defs/money"
+        },
+        "exposureRating": {
+          "$ref": "#/$defs/money"
+        },
+        "riskResponseCost": {
+          "$ref": "#/$defs/money"
+        },
+        "riskOwnerPointOfContact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "Open",
+            "In treatment",
+            "Monitored",
+            "Accepted",
+            "Review needed",
+            "Closed"
+          ]
+        },
+        "registerId": {
+          "$ref": "#/$defs/identifier"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "polarity": {
+          "description": "SP 800-221r1 Sec. 2.4.6 and 3.8. negative is a threat. positive is an opportunity.",
+          "enum": [
+            "negative",
+            "positive"
+          ]
+        },
+        "category": {
+          "$ref": "#/$defs/category"
+        },
+        "riskLikelihoodLabel": {
+          "type": "string"
+        },
+        "riskImpactLabel": {
+          "type": "string"
+        },
+        "exposureRatingLabel": {
+          "type": "string"
+        },
+        "impacts": {
+          "$ref": "#/$defs/impacts"
+        },
+        "responseDecision": {
+          "description": "pending means no response is decided yet. The NIST fields then hold an explicit interim Accept with cost 0.",
+          "enum": [
+            "pending",
+            "decided"
+          ]
+        },
+        "estimate": {
+          "$ref": "#/$defs/estimate"
+        },
+        "driverLinks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/driverLink"
+          }
+        },
+        "detail": {
+          "$ref": "#/$defs/riskDetail"
+        },
+        "sourceRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          }
+        },
+        "rollUp": {
+          "$ref": "#/$defs/rollUp"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "catalogueRef": {
+          "type": "object",
+          "required": [
+            "catalogue",
+            "id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "catalogue": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        "reviewDue": {
+          "$ref": "#/$defs/date"
+        },
+        "defaultedFields": {
+          "description": "JSON Pointers (relative to this risk) of fields that an importer filled because the source did not hold them.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^/"
+          }
+        },
+        "objectiveIds": {
+          "description": "Sec. 2.4.4 and 4.1. Enterprise objectives this risk affects.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "assetIds": {
+          "description": "Sec. 3.3.1.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "horizon": {
+          "description": "Sec. 3.3. Emerging and horizon risks trigger a review of appetite and tolerance.",
+          "enum": [
+            "current",
+            "emerging",
+            "horizon"
+          ]
+        },
+        "threatSourceType": {
+          "description": "Sec. 3.3.2, SP 800-30r1 Table D-2.",
+          "enum": [
+            "adversarial",
+            "accidental",
+            "structural",
+            "environmental"
+          ]
+        },
+        "linkedRisks": {
+          "description": "Sec. 3.3.2 cascades and combinations, Sec. 5.4.3 trade-off between a positive risk and its negative risks.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "riskId",
+              "relation"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "riskId": {
+                "$ref": "#/$defs/identifier"
+              },
+              "relation": {
+                "enum": [
+                  "trade-off",
+                  "cascades-to",
+                  "combination-of"
+                ]
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "onlyWithResponse": {
+          "description": "Sec. 3.6 lines 1072 to 1074. This risk exists only if the named response is funded. It is new risk caused by a response.",
+          "$ref": "#/$defs/identifier"
+        },
+        "previousAssessment": {
+          "description": "Sec. 4.3 Fig. 11 Last column and Table 7 Previous Period.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "asOf": {
+              "$ref": "#/$defs/date"
+            },
+            "riskLikelihood": {
+              "$ref": "#/$defs/probability"
+            },
+            "riskImpact": {
+              "$ref": "#/$defs/money"
+            },
+            "exposureRating": {
+              "$ref": "#/$defs/money"
+            },
+            "riskLikelihoodLabel": {
+              "type": "string"
+            },
+            "riskImpactLabel": {
+              "type": "string"
+            },
+            "exposureRatingLabel": {
+              "type": "string"
+            }
+          }
+        },
+        "priorityOverride": {
+          "description": "Sec. 5.3.1, 5.3.3 and 5.4.4. A priority set by leadership, with the reason.",
+          "type": "object",
+          "required": [
+            "priority",
+            "setBy",
+            "setOn",
+            "reason"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "priority": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "setBy": {
+              "type": "string",
+              "minLength": 1
+            },
+            "setOn": {
+              "$ref": "#/$defs/date"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "factors": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "mission",
+                  "financial",
+                  "reputation",
+                  "legal-requirement",
+                  "shareholder-sentiment",
+                  "merger-or-valuation",
+                  "quick-win",
+                  "leadership-priority"
+                ]
+              }
+            }
+          }
+        },
+        "acceptance": {
+          "description": "Sec. 5.1.1 and 5.1.2. Record that the risk, or an exception to a tolerance, is accepted.",
+          "type": "object",
+          "required": [
+            "kind",
+            "acceptedBy",
+            "acceptedOn",
+            "rationale"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "acceptance",
+                "tolerance-exception"
+              ]
+            },
+            "acceptedBy": {
+              "type": "string",
+              "minLength": 1
+            },
+            "acceptedOn": {
+              "$ref": "#/$defs/date"
+            },
+            "validUntil": {
+              "$ref": "#/$defs/date"
+            },
+            "rationale": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "unevaluatedProperties": false
+    },
+    "responseEffect": {
+      "description": "The estimate of one target after the response is in place. Only the given parts change.",
+      "type": "object",
+      "required": [
+        "targetKind",
+        "targetId",
+        "rationale"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "targetKind": {
+          "enum": [
+            "risk",
+            "driver"
+          ]
+        },
+        "targetId": {
+          "$ref": "#/$defs/identifier"
+        },
+        "frequency": {
+          "$ref": "#/$defs/distribution"
+        },
+        "impactPerEvent": {
+          "$ref": "#/$defs/distribution"
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 10
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "frequency"
+          ]
+        },
+        {
+          "required": [
+            "impactPerEvent"
+          ]
+        }
+      ]
+    },
+    "responseOption": {
+      "description": "A candidate risk response that competes for budget.",
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "responseType",
+        "costs",
+        "status",
+        "effects"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "responseType": {
+          "enum": [
+            "Accept",
+            "Avoid",
+            "Transfer",
+            "Mitigate",
+            "Realize",
+            "Share",
+            "Enhance"
+          ]
+        },
+        "costs": {
+          "type": "object",
+          "required": [
+            "oneOff",
+            "annual",
+            "lifetimeYears"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "oneOff": {
+              "$ref": "#/$defs/money"
+            },
+            "annual": {
+              "$ref": "#/$defs/money"
+            },
+            "lifetimeYears": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 20
+            },
+            "reserveAmount": {
+              "description": "Sec. 3.6 and 3.7.1 risk reserve. Set aside in year 1 and released if the target risk does not occur.",
+              "$ref": "#/$defs/money"
+            }
+          }
+        },
+        "status": {
+          "enum": [
+            "candidate",
+            "selected",
+            "rejected",
+            "implemented"
+          ]
+        },
+        "effects": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/responseEffect"
+          }
+        },
+        "bundleOf": {
+          "description": "Ids of options that this option combines. The effects of a bundle replace the effects of its parts.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "owner": {
+          "type": "string"
+        },
+        "decision": {
+          "type": "object",
+          "required": [
+            "decidedOn",
+            "decidedBy",
+            "rationale"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "decidedOn": {
+              "$ref": "#/$defs/date"
+            },
+            "decidedBy": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rationale": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "controlTypes": {
+          "description": "Sec. 3.6.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "preventative",
+              "deterrent",
+              "detective",
+              "corrective",
+              "compensating"
+            ]
+          }
+        },
+        "informativeReferences": {
+          "description": "Sec. 3.6. For example a CSF 2.0 subcategory or an SP 800-53 control id.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "introducesRisks": {
+          "description": "Sec. 3.6 lines 1072 to 1074. Risks with onlyWithResponse set to this option.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "forced": {
+          "description": "Sec. 5.3.2 operational optimization and mandatory requirements. require funds first, exclude never funds.",
+          "type": "object",
+          "required": [
+            "action",
+            "reason",
+            "by"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "enum": [
+                "require",
+                "exclude"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "by": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "required": [
+        "metric",
+        "operator",
+        "threshold"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operator": {
+          "enum": [
+            "<",
+            "<=",
+            ">",
+            ">=",
+            "==",
+            "!="
+          ]
+        },
+        "threshold": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string"
+        }
+      }
+    },
+    "trigger": {
+      "description": "The state in which a tolerance is breached or an indicator fires.",
+      "type": "object",
+      "required": [
+        "combine",
+        "conditions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "combine": {
+          "enum": [
+            "all",
+            "any"
+          ]
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "interpretationNote": {
+          "type": "string"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "required": [
+        "observedOn",
+        "values"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "observedOn": {
+          "$ref": "#/$defs/date"
+        },
+        "values": {
+          "description": "Metric name to observed value.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "tolerance": {
+      "type": "object",
+      "required": [
+        "id",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "breachWhen": {
+          "$ref": "#/$defs/trigger"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        }
+      }
+    },
+    "indicator": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": [
+            "kpi",
+            "leading-kri",
+            "lagging-kri"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "firesWhen": {
+          "$ref": "#/$defs/trigger"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        }
+      }
+    },
+    "appetiteStatement": {
+      "description": "One column of SP 800-221r1 Table 9. Appetite, tolerances, controls, KPIs and KRIs.",
+      "type": "object",
+      "required": [
+        "id",
+        "appetite"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "title": {
+          "type": "string"
+        },
+        "appetite": {
+          "type": "string",
+          "minLength": 1
+        },
+        "categoryCodes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "ict",
+              "financial",
+              "legal",
+              "operational",
+              "strategic",
+              "safety",
+              "reputation"
+            ]
+          }
+        },
+        "tolerances": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tolerance"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "indicators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/indicator"
+          }
+        }
+      }
+    },
+    "toleranceCurvePoint": {
+      "type": "object",
+      "required": [
+        "loss",
+        "maxExceedanceProbability"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "loss": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxExceedanceProbability": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "appetite": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "capacity": {
+          "type": "object",
+          "required": [
+            "amount",
+            "rationale"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "amount": {
+              "$ref": "#/$defs/money"
+            },
+            "rationale": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "toleranceCurve": {
+          "description": "Maximum acceptable annual probability that total loss exceeds each amount. Loss ascending, probability strictly descending.",
+          "type": "object",
+          "required": [
+            "points"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "points": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/toleranceCurvePoint"
+              }
+            },
+            "approvedBy": {
+              "type": "string"
+            },
+            "approvedOn": {
+              "$ref": "#/$defs/date"
+            }
+          }
+        },
+        "statements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/appetiteStatement"
+          }
+        },
+        "history": {
+          "description": "Sec. 5.4.2. Earlier tolerance curves with the reason for each change.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "changedOn",
+              "changedBy",
+              "reason",
+              "points"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "changedOn": {
+                "$ref": "#/$defs/date"
+              },
+              "changedBy": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "points": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "$ref": "#/$defs/toleranceCurvePoint"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "forecast": {
+      "description": "A frozen prediction and its later outcome, for the Brier score.",
+      "type": "object",
+      "required": [
+        "id",
+        "riskId",
+        "createdOn",
+        "windowStart",
+        "windowEnd",
+        "eventDefinition",
+        "eventThreshold",
+        "probability",
+        "engineVersion",
+        "seed",
+        "trials",
+        "inputsSha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "riskId": {
+          "$ref": "#/$defs/identifier"
+        },
+        "createdOn": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "windowStart": {
+          "$ref": "#/$defs/date"
+        },
+        "windowEnd": {
+          "$ref": "#/$defs/date"
+        },
+        "eventDefinition": {
+          "type": "string",
+          "minLength": 10
+        },
+        "eventThreshold": {
+          "$ref": "#/$defs/money"
+        },
+        "probability": {
+          "$ref": "#/$defs/probability"
+        },
+        "annualImpactInterval90": {
+          "type": "object",
+          "required": [
+            "lower",
+            "upper"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "lower": {
+              "$ref": "#/$defs/money"
+            },
+            "upper": {
+              "$ref": "#/$defs/money"
+            }
+          }
+        },
+        "engineVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "trials": {
+          "type": "integer",
+          "minimum": 1000
+        },
+        "inputsSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "outcome": {
+          "type": "object",
+          "required": [
+            "occurred",
+            "recordedOn"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "occurred": {
+              "type": "boolean"
+            },
+            "recordedOn": {
+              "$ref": "#/$defs/date"
+            },
+            "observedAnnualImpact": {
+              "$ref": "#/$defs/money"
+            },
+            "evidence": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "simulationSettings": {
+      "type": "object",
+      "required": [
+        "seed",
+        "trials",
+        "engineVersion"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "trials": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 1000000
+        },
+        "engineVersion": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "provenanceRecord": {
+      "type": "object",
+      "required": [
+        "id",
+        "importedOn",
+        "format",
+        "sha256",
+        "recordCount"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "importedOn": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "format": {
+          "enum": [
+            "native",
+            "ir8286-json",
+            "csv",
+            "xlsx",
+            "cvd-portal-json",
+            "oscal-poam"
+          ]
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "recordCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "columnMapping": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "changeLogEntry": {
+      "type": "object",
+      "required": [
+        "at",
+        "entityKind",
+        "entityId",
+        "path"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "actor": {
+          "type": "string"
+        },
+        "entityKind": {
+          "enum": [
+            "context",
+            "strategy",
+            "asset",
+            "register",
+            "risk",
+            "driver",
+            "response",
+            "appetite",
+            "forecast"
+          ]
+        },
+        "entityId": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "before": {},
+        "after": {}
+      }
+    },
+    "context": {
+      "description": "Sec. 1.1 and 3.1. Mission, objectives, internal and external context, mission-critical functions.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mission": {
+          "type": "string"
+        },
+        "objectives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "kind",
+              "statement"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "kind": {
+                "description": "Sec. 2.3 and 4.1. The four enterprise objectives of the ERP.",
+                "enum": [
+                  "strategic",
+                  "operations",
+                  "reporting",
+                  "compliance"
+                ]
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "functions": {
+          "description": "Sec. 5.1.1. Mission- and business-critical functions. Assets inherit their criticality.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "criticality"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/identifier"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "criticality": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "externalContext": {
+          "type": "string"
+        },
+        "internalContext": {
+          "type": "string"
+        },
+        "stakeholders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "disciplines": {
+          "description": "Sec. 1.1. ICT risk disciplines in scope, for example cybersecurity, privacy, supply chain, OT, IoT, AI.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "governance": {
+      "description": "Sec. 3.1.1 and Table 1. Who holds which risk role at which level.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "role",
+              "level"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "role": {
+                "type": "string",
+                "minLength": 1
+              },
+              "level": {
+                "enum": [
+                  "enterprise-oversight",
+                  "enterprise-governance",
+                  "enterprise-management",
+                  "organization",
+                  "system"
+                ]
+              },
+              "holder": {
+                "type": "string"
+              },
+              "responsibilities": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "strategy": {
+      "description": "Sec. 3.2.2. Common scales, reporting cycle, budget ceilings, thresholds and the optimization method.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scales": {
+          "description": "Sec. 2.4.2. One scale set for every register in the document.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "likelihood": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/scaleBand"
+              }
+            },
+            "impact": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/scaleBand"
+              }
+            },
+            "exposure": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/scaleBand"
+              }
+            }
+          }
+        },
+        "reviewFrequencyMonths": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 36
+        },
+        "reportingFrequencyMonths": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 36
+        },
+        "budget": {
+          "description": "Sec. 3.2.2 ceilings for CapEx and OpEx. The funding rule uses firstYearCash.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "firstYearCash": {
+              "$ref": "#/$defs/money"
+            },
+            "capexCeiling": {
+              "$ref": "#/$defs/money"
+            },
+            "opexCeiling": {
+              "$ref": "#/$defs/money"
+            },
+            "fiscalYearStart": {
+              "$ref": "#/$defs/date"
+            }
+          }
+        },
+        "inclusionThreshold": {
+          "description": "Sec. 3.5. Risks with exposure below this amount need not stay in the register.",
+          "$ref": "#/$defs/money"
+        },
+        "escalationThreshold": {
+          "description": "Sec. 5.2.2 and 5.3.3. Risks with exposure at or above this amount must appear in the parent register.",
+          "$ref": "#/$defs/money"
+        },
+        "optimizationMethod": {
+          "description": "Sec. 5.3.2.",
+          "enum": [
+            "algorithmic",
+            "fiscal",
+            "operational"
+          ]
+        }
+      }
+    },
+    "asset": {
+      "description": "Sec. 3.3.1. Mission-supporting asset with valuation. External assets are allowed.",
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "information",
+            "software",
+            "hardware",
+            "service",
+            "people",
+            "facility",
+            "process"
+          ]
+        },
+        "external": {
+          "type": "boolean"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "criticality": {
+          "type": "string"
+        },
+        "sensitivity": {
+          "type": "string"
+        },
+        "supportsFunctionIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "value": {
+          "type": "object",
+          "required": [
+            "amount",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "amount": {
+              "$ref": "#/$defs/money"
+            },
+            "basis": {
+              "enum": [
+                "replacement-cost",
+                "revenue-dependency",
+                "contract-penalty",
+                "regulatory",
+                "other"
+              ]
+            },
+            "rationale": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

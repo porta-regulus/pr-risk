@@ -1,0 +1,412 @@
+{
+  "$schema": "../risk-register.schema.json",
+  "schemaVersion": "1.0.0",
+  "document": {
+    "id": "EXAMPLE-IMPORTS",
+    "title": "Import adapters and SP 800-221r1 Table 10 normalization",
+    "organization": "Notional business unit",
+    "currency": "USD",
+    "createdOn": "2026-10-27T09:00:00Z",
+    "tool": {
+      "name": "manual fixture",
+      "version": "1"
+    },
+    "notes": "Golden fixture for G3 (Table 10) and for the IR 8286 and CVD Portal import adapters. Currency is USD because the NIST RDR example uses dollars. One document holds one currency."
+  },
+  "registers": [
+    {
+      "id": "ORG",
+      "title": "Business unit risk register",
+      "level": "organization",
+      "owner": "Business unit risk manager",
+      "timeframeMonths": 12,
+      "asOf": "2026-10-27",
+      "method": "semi-quantitative"
+    },
+    {
+      "id": "SYS-A",
+      "title": "Merger project file share",
+      "level": "system",
+      "parentRegisterId": "ORG",
+      "timeframeMonths": 12,
+      "asOf": "2026-10-27",
+      "method": "semi-quantitative"
+    },
+    {
+      "id": "SYS-B",
+      "title": "Sales department systems",
+      "level": "system",
+      "parentRegisterId": "ORG",
+      "timeframeMonths": 12,
+      "asOf": "2026-10-27",
+      "method": "semi-quantitative"
+    },
+    {
+      "id": "SYS-C",
+      "title": "Legal Affairs document system",
+      "level": "system",
+      "parentRegisterId": "ORG",
+      "timeframeMonths": 12,
+      "asOf": "2026-10-27",
+      "method": "semi-quantitative"
+    },
+    {
+      "id": "CSP",
+      "title": "Customer Service Portal",
+      "level": "system",
+      "parentRegisterId": "ORG",
+      "timeframeMonths": 12,
+      "asOf": "2021-04-15",
+      "method": "semi-quantitative"
+    },
+    {
+      "id": "GW",
+      "title": "Gateway X1 product",
+      "level": "system",
+      "parentRegisterId": "ORG",
+      "timeframeMonths": 12,
+      "asOf": "2026-10-27",
+      "method": "semi-quantitative"
+    }
+  ],
+  "risks": [
+    {
+      "riskId": "A-1",
+      "registerId": "SYS-A",
+      "polarity": "negative",
+      "riskDescription": "An external attacker deploys a remote access tool and uses it to exfiltrate the plans for the company’s upcoming merger.",
+      "riskCategory": "Information disclosure",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.data-exfiltration"
+      },
+      "riskLikelihood": 0.1,
+      "riskImpact": 2000000,
+      "exposureRating": 200000,
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Response per system owner. Detail not in the source CSV.",
+      "riskOwnerPointOfContact": "Merger project lead",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskCategory",
+        "/category",
+        "/riskResponseCost",
+        "/riskResponseDescription",
+        "/status"
+      ],
+      "notes": "Description from SP 800-221r1 Table 10. Numbers are fixture values. NIST gives none."
+    },
+    {
+      "riskId": "B-1",
+      "registerId": "SYS-B",
+      "polarity": "negative",
+      "riskDescription": "External threat actors steal information about marketing plans through malicious code deployed in the sales department.",
+      "riskCategory": "Information disclosure",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.data-exfiltration"
+      },
+      "riskLikelihood": 0.3,
+      "riskImpact": 400000,
+      "exposureRating": 120000,
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Response per system owner. Detail not in the source CSV.",
+      "riskOwnerPointOfContact": "Head of sales",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskCategory",
+        "/category",
+        "/riskResponseCost",
+        "/riskResponseDescription",
+        "/status"
+      ],
+      "notes": "Description from SP 800-221r1 Table 10. Numbers are fixture values. NIST gives none."
+    },
+    {
+      "riskId": "C-1",
+      "registerId": "SYS-C",
+      "polarity": "negative",
+      "riskDescription": "Malicious parties plant a web shell in an external site that enables them to access documents stored in the Legal Affairs shared document folder, resulting in the loss of critical corporate information.",
+      "riskCategory": "Information disclosure",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.data-exfiltration"
+      },
+      "riskLikelihood": 0.2,
+      "riskImpact": 800000,
+      "exposureRating": 160000,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Response per system owner. Detail not in the source CSV.",
+      "riskOwnerPointOfContact": "General counsel",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskCategory",
+        "/category",
+        "/riskResponseCost",
+        "/riskResponseDescription",
+        "/status"
+      ],
+      "notes": "Description from SP 800-221r1 Table 10. Numbers are fixture values. NIST gives none."
+    },
+    {
+      "riskId": "ORG-1",
+      "registerId": "ORG",
+      "priority": 1,
+      "polarity": "negative",
+      "riskDescription": "External malicious party uses malicious code to exfiltrate sensitive business-related documents.",
+      "riskCategory": "Information disclosure",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.data-exfiltration"
+      },
+      "riskLikelihood": 0.2,
+      "riskImpact": 800000,
+      "exposureRating": 160000,
+      "riskResponseType": [
+        "Mitigate",
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Two system owners mitigate. One system owner accepts. Disparity resolved as one row with all responses (Table 10).",
+      "riskOwnerPointOfContact": "Business unit risk manager",
+      "status": "Open",
+      "responseDecision": "decided",
+      "sourceRefs": [
+        {
+          "registerId": "SYS-A",
+          "riskId": "A-1",
+          "label": "A-1"
+        },
+        {
+          "registerId": "SYS-B",
+          "riskId": "B-1",
+          "label": "B-1"
+        },
+        {
+          "registerId": "SYS-C",
+          "riskId": "C-1",
+          "label": "C-1"
+        }
+      ],
+      "rollUp": {
+        "method": "nist-three-point",
+        "disparityLayout": "one-row-all-responses",
+        "likelihood": {
+          "optimistic": 0.1,
+          "mostLikely": 0.2,
+          "pessimistic": 0.3
+        },
+        "impact": {
+          "optimistic": 400000,
+          "mostLikely": 800000,
+          "pessimistic": 2000000
+        }
+      },
+      "notes": "Combined description quoted from SP 800-221r1 lines 1624 to 1625. riskLikelihood and riskImpact take the mostLikely values."
+    },
+    {
+      "riskId": "17",
+      "registerId": "CSP",
+      "polarity": "negative",
+      "riskDescription": "A natural disaster disrupts communications circuits impeding customer access.",
+      "riskCategory": "Contingency Planning",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.availability"
+      },
+      "riskLikelihood": 0.1,
+      "riskImpact": 1500000,
+      "exposureRating": 150000,
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 250000,
+      "riskResponseDescription": "Having identified that the key vulnerability is to overhead communications wiring, these circuits will be buried underground.",
+      "riskOwnerPointOfContact": "Mark Winters <WintersMX@example.com>",
+      "status": "Open",
+      "responseDecision": "decided",
+      "detail": {
+        "systemAffected": "Customer Service Portal",
+        "organizationOrBusinessUnit": "Northeast Region Support Center",
+        "riskScenarioDescription": "A natural disaster disrupts communications circuits impeding customer access.",
+        "assetsAffected": "DMZ Router; Core_Switch_1; Fiber_Circuit_Bldg3_to_HQ; ",
+        "threatSourcesActors": "Natural Disaster - Hurricane",
+        "threatVectors": "Physical Connectivity Disruption",
+        "threatEvents": "",
+        "vulnerabilityPredisposingConditions": "Outdoor/Exposed Infrastructure",
+        "primaryAdverseImpact": "Loss of communications to communcations center",
+        "secondaryAdverseImpacts": "Customers unable to access service portal may be disgruntled; SLAs may be jeopardized",
+        "otherScenarioDetails": "Not Applicable",
+        "resourceRequirementsForPlannedRisk": "Network architecture staff to plan and design the new infrastructure (existing labor budget). Contract to install underground fiber-optic cabling between headquarters and the communications center including necessary permits, trench construction, conduit materials, and new communications equipment.",
+        "dateOfRiskIdentification": "2021-03-20",
+        "sourceOfRiskInformation": "Contingency Planning Annual Exercise",
+        "currentStatusDate": "2021-04-15",
+        "dependencies": "Availability of Construction Contractor",
+        "followUpDate": "2021-05-31",
+        "comments": "Still need to evaluate other potential issues from natural disasters (e.g., flooding) that may impact this system.",
+        "planned": {
+          "likelihood": 0,
+          "impact": 1500000,
+          "exposureRating": 0
+        },
+        "measured": {
+          "actualResponseCost": 245000,
+          "likelihood": 0,
+          "impact": 1500000,
+          "exposureRating": 0
+        }
+      },
+      "defaultedFields": [
+        "/polarity",
+        "/category",
+        "/status"
+      ],
+      "notes": "Imported from the NIST IR 8286 Rev. 1 RDR example. Export adds currentRiskAnalysis, which the NIST schema requires."
+    },
+    {
+      "riskId": "GW-1",
+      "registerId": "GW",
+      "polarity": "negative",
+      "riskDescription": "If an attacker exploits a reported authentication bypass vulnerability in Gateway X1, then customer data or device control is compromised. Evidence 1 reports, 1 open.",
+      "riskCategory": "Product vulnerability",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.vulnerability"
+      },
+      "riskLikelihood": 0,
+      "riskImpact": 0,
+      "exposureRating": 0,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending estimate and decision.",
+      "riskOwnerPointOfContact": "Unassigned",
+      "status": "Open",
+      "responseDecision": "pending",
+      "evidence": [
+        {
+          "kind": "cvd-portal-submission",
+          "ref": "cvdp:sub_ex_003",
+          "summary": "AUTH_BYPASS CRITICAL",
+          "severity": "CRITICAL",
+          "status": "ACKNOWLEDGED",
+          "date": "2026-10-20"
+        }
+      ],
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskOwnerPointOfContact"
+      ],
+      "notes": "Not estimated. The numeric NIST fields are placeholders until the owner enters estimates (rule E-02)."
+    },
+    {
+      "riskId": "GW-2",
+      "registerId": "GW",
+      "polarity": "negative",
+      "riskDescription": "If an attacker exploits a reported SQL injection vulnerability in Gateway X1, then customer data or device control is compromised. Evidence 2 reports, 1 open.",
+      "riskCategory": "Product vulnerability",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.vulnerability"
+      },
+      "riskLikelihood": 0,
+      "riskImpact": 0,
+      "exposureRating": 0,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending estimate and decision.",
+      "riskOwnerPointOfContact": "Unassigned",
+      "status": "Open",
+      "responseDecision": "pending",
+      "evidence": [
+        {
+          "kind": "cvd-portal-submission",
+          "ref": "cvdp:sub_ex_001",
+          "summary": "SQL_INJECTION HIGH",
+          "severity": "HIGH",
+          "status": "IN_PROGRESS",
+          "date": "2026-09-02"
+        },
+        {
+          "kind": "cvd-portal-submission",
+          "ref": "cvdp:sub_ex_002",
+          "summary": "SQL_INJECTION MEDIUM",
+          "severity": "MEDIUM",
+          "status": "RESOLVED",
+          "date": "2026-06-11"
+        }
+      ],
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskOwnerPointOfContact"
+      ],
+      "notes": "Not estimated. The numeric NIST fields are placeholders until the owner enters estimates (rule E-02)."
+    }
+  ],
+  "provenance": [
+    {
+      "id": "PV-T10",
+      "importedOn": "2026-10-27T09:00:00Z",
+      "format": "csv",
+      "fileName": "fixtures/table10-system-registers.csv",
+      "sha256": "4fef848c3b7e42a6298f7e08624ccf336ff533fde19dc13e7184b8c6805824e2",
+      "recordCount": 3,
+      "columnMapping": {
+        "Register": "/registerId",
+        "Risk Id": "/riskId",
+        "Risk Description": "/riskDescription",
+        "Risk Likelihood": "/riskLikelihood",
+        "Risk Impact": "/riskImpact",
+        "Risk Response Type": "/riskResponseType",
+        "Risk Owner Point Of Contact": "/riskOwnerPointOfContact"
+      },
+      "warnings": [
+        "Header cells start with a space, as in the NIST XLSX template. Headers are trimmed.",
+        "Risk Id prefixed with the system letter to keep ids unique (A-1, B-1, C-1)."
+      ]
+    },
+    {
+      "id": "PV-NIST",
+      "importedOn": "2026-10-27T09:00:00Z",
+      "format": "ir8286-json",
+      "fileName": "vendor/nist-ir8286r1/risk_detail_record_example.json",
+      "sha256": "8b7a5630c60df9bc696a479a4d12785bd20987cfe0bc6345d9a58b060fc427da",
+      "recordCount": 1,
+      "warnings": [
+        "The source fails the NIST RDR schema. currentRiskAnalysis is required but not defined.",
+        "Status, polarity and category are not in the RDR and are defaulted."
+      ]
+    },
+    {
+      "id": "PV-CVD",
+      "importedOn": "2026-10-27T09:00:00Z",
+      "format": "cvd-portal-json",
+      "fileName": "fixtures/cvd-portal-export.json",
+      "sha256": "b55ef1cb65fefbbfd9bd57eeb29fa2a5b032fa865f7b567fb43319243634cda0",
+      "recordCount": 3,
+      "warnings": [
+        "description, stepsToReproduce and impact were not imported (data minimization).",
+        "meta.capped is false, so the export is complete."
+      ]
+    }
+  ]
+}

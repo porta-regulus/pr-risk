@@ -1,0 +1,1118 @@
+{
+  "$schema": "../risk-register.schema.json",
+  "schemaVersion": "1.0.0",
+  "document": {
+    "id": "SP800-221R1-FIG10",
+    "title": "SP 800-221r1 ipd golden fixtures, Fig. 10 ERR, Fig. 11 ERP and Table 9 MEA examples",
+    "organization": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+    "currency": "USD",
+    "createdOn": "2026-10-27T09:00:00Z",
+    "tool": {
+      "name": "manual transcription",
+      "version": "1"
+    },
+    "notes": "Golden fixture for G1 (Fig. 10), G2 (Table 9) and G5 (Fig. 11). Text is transcribed exactly from the figures and the table. Numeric NIST fields come from the scale representatives in strategy.scales, because both figures are qualitative and the IR 8286 schema requires numbers. The impact and exposure amounts are illustrative. NIST gives none. The timeframe of 12 months is an assumption."
+  },
+  "context": {
+    "objectives": [
+      {
+        "id": "OBJ-F11-1",
+        "kind": "operations",
+        "statement": "Manage the Risks of a Remote Workforce"
+      },
+      {
+        "id": "OBJ-F11-2",
+        "kind": "reporting",
+        "statement": "Privacy Policies Must Accurately Describe Organizational Handling of PII"
+      },
+      {
+        "id": "OBJ-F11-3",
+        "kind": "operations",
+        "statement": "Manage the Risk of Sudden Interruptions in the Supply Chain"
+      }
+    ]
+  },
+  "strategy": {
+    "scales": {
+      "likelihood": [
+        {
+          "label": "Low",
+          "aliases": [
+            "L"
+          ],
+          "lower": 0,
+          "upper": 0.2,
+          "representative": 0.1,
+          "source": "NIST SP 800-30r1 Table G-3, Very Low merged into Low and Very High merged into High"
+        },
+        {
+          "label": "Mod",
+          "aliases": [
+            "Moderate",
+            "M",
+            "Medium"
+          ],
+          "lower": 0.21,
+          "upper": 0.79,
+          "representative": 0.5,
+          "source": "NIST SP 800-30r1 Table G-3, Very Low merged into Low and Very High merged into High"
+        },
+        {
+          "label": "High",
+          "aliases": [
+            "H"
+          ],
+          "lower": 0.8,
+          "upper": 1,
+          "representative": 0.9,
+          "source": "NIST SP 800-30r1 Table G-3, Very Low merged into Low and Very High merged into High"
+        }
+      ],
+      "impact": [
+        {
+          "label": "Low",
+          "aliases": [
+            "L"
+          ],
+          "lower": 0,
+          "upper": 250000,
+          "representative": 100000,
+          "source": "Illustrative. Fig. 10 gives no amounts."
+        },
+        {
+          "label": "Mod",
+          "aliases": [
+            "Moderate",
+            "M",
+            "Medium"
+          ],
+          "lower": 250000,
+          "upper": 2500000,
+          "representative": 1000000,
+          "source": "Illustrative. Fig. 10 gives no amounts."
+        },
+        {
+          "label": "High",
+          "aliases": [
+            "H"
+          ],
+          "lower": 2500000,
+          "upper": 25000000,
+          "representative": 10000000,
+          "source": "Illustrative. Fig. 10 gives no amounts."
+        }
+      ],
+      "exposure": [
+        {
+          "label": "Low",
+          "aliases": [
+            "L"
+          ],
+          "lower": 0,
+          "upper": 100000,
+          "representative": 50000,
+          "source": "Illustrative. Fig. 10 gives no amounts."
+        },
+        {
+          "label": "Mod",
+          "aliases": [
+            "Moderate",
+            "M",
+            "Medium"
+          ],
+          "lower": 100000,
+          "upper": 1000000,
+          "representative": 500000,
+          "source": "Illustrative. Fig. 10 gives no amounts."
+        },
+        {
+          "label": "High",
+          "aliases": [
+            "H"
+          ],
+          "lower": 1000000,
+          "upper": 10000000,
+          "representative": 5000000,
+          "source": "Illustrative. Fig. 10 gives no amounts."
+        }
+      ]
+    }
+  },
+  "registers": [
+    {
+      "id": "ERR",
+      "title": "Notional Enterprise Risk Register",
+      "level": "enterprise",
+      "timeframeMonths": 12,
+      "asOf": "2026-10-22",
+      "method": "qualitative"
+    },
+    {
+      "id": "ERP11",
+      "title": "Notional enterprise risk profile (SP 800-221r1 Fig. 11)",
+      "level": "enterprise",
+      "timeframeMonths": 12,
+      "asOf": "2026-10-22",
+      "method": "qualitative"
+    }
+  ],
+  "appetite": {
+    "statements": [
+      {
+        "id": "T9-EX1",
+        "title": "Table 9 Example 1",
+        "appetite": "Mission-critical systems must be protected from known cybersecurity vulnerabilities.",
+        "categoryCodes": [
+          "ict"
+        ],
+        "tolerances": [
+          {
+            "id": "T9-EX1-TOL",
+            "text": "Systems designated as mission-critical must be patched against critical software vulnerabilities (severity score of 10) within 14 days of discovery.",
+            "breachWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "mission_critical_systems_unpatched_cvss10_over_14_days",
+                  "operator": ">",
+                  "threshold": 0,
+                  "unit": "count"
+                }
+              ],
+              "interpretationNote": "Start event is discovery. The KRIs do not name the start event."
+            }
+          }
+        ],
+        "controls": [
+          "Periodic vulnerability assessments",
+          "Patch deployment capabilities"
+        ],
+        "indicators": [
+          {
+            "id": "T9-EX1-KPI",
+            "kind": "kpi",
+            "text": "Percentage of vulnerabilities patched"
+          },
+          {
+            "id": "T9-EX1-LKRI",
+            "kind": "leading-kri",
+            "text": "Number of computers with critical vulnerabilities (CVSS score of 10) that have not been patched in 10 days",
+            "firesWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "computers_unpatched_cvss10_over_10_days",
+                  "operator": ">",
+                  "threshold": 0,
+                  "unit": "count"
+                }
+              ]
+            }
+          },
+          {
+            "id": "T9-EX1-GKRI",
+            "kind": "lagging-kri",
+            "text": "Number of computers with critical vulnerabilities that have not been patched in 15 days",
+            "firesWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "computers_unpatched_cvss10_over_15_days",
+                  "operator": ">",
+                  "threshold": 0,
+                  "unit": "count"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "T9-EX2",
+        "title": "Table 9 Example 2",
+        "appetite": "In keeping with the enterprise designation as a data processor, all personal data are kept confidential, as described in the GDPR (European Union General Data Protection Regulation).",
+        "categoryCodes": [
+          "ict",
+          "legal"
+        ],
+        "tolerances": [
+          {
+            "id": "T9-EX2-TOL",
+            "text": "While there may be some tolerance for limited low-risk corporate information disclosures, there is zero tolerance for the disclosure of personally identifiable information (PII).",
+            "breachWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "pii_disclosures",
+                  "operator": ">",
+                  "threshold": 0,
+                  "unit": "count"
+                }
+              ]
+            }
+          }
+        ],
+        "controls": [
+          "Authentication method",
+          "PII processing and transparency policy",
+          "Authority to process PII",
+          "Audit log alerting/evaluation"
+        ],
+        "indicators": [
+          {
+            "id": "T9-EX2-KPI",
+            "kind": "kpi",
+            "text": "Days without a loss of PII"
+          },
+          {
+            "id": "T9-EX2-LKRI1",
+            "kind": "leading-kri",
+            "text": "Failed facility reviews for unprotected physical records",
+            "firesWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "failed_facility_reviews_unprotected_records",
+                  "operator": ">",
+                  "threshold": 0,
+                  "unit": "count"
+                }
+              ],
+              "interpretationNote": "Table 9 gives no threshold. This file uses more than 0."
+            }
+          },
+          {
+            "id": "T9-EX2-LKRI2",
+            "kind": "leading-kri",
+            "text": "Audit log records showing violation of requirements for separation of duties",
+            "firesWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "audit_records_separation_of_duties_violation",
+                  "operator": ">",
+                  "threshold": 0,
+                  "unit": "count"
+                }
+              ],
+              "interpretationNote": "Table 9 gives no threshold. This file uses more than 0."
+            }
+          },
+          {
+            "id": "T9-EX2-GKRI",
+            "kind": "lagging-kri",
+            "text": "One or more violation indications from data loss prevention tools",
+            "firesWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "dlp_violation_indications",
+                  "operator": ">=",
+                  "threshold": 1,
+                  "unit": "count"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "T9-EX3",
+        "title": "Table 9 Example 3",
+        "appetite": "Our customers associate reliability with our company’s performance, so outsourced hosting services must minimize outages for any customer-facing websites.",
+        "categoryCodes": [
+          "ict",
+          "operational"
+        ],
+        "tolerances": [
+          {
+            "id": "T9-EX3-TOL",
+            "text": "Regional managers may permit website outages by supply chain partners, but the outages must not exceed two hours and may affect no more than 5 % of customers.",
+            "breachWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "outage_hours",
+                  "operator": ">",
+                  "threshold": 2,
+                  "unit": "hours"
+                },
+                {
+                  "metric": "customers_affected_percent",
+                  "operator": ">",
+                  "threshold": 5,
+                  "unit": "percent"
+                }
+              ],
+              "interpretationNote": "The text allows two readings, all or any. This file uses all. Under any, leading KRI 2 is already a breach. An outage that affects exactly 5 percent fires no KRI."
+            }
+          }
+        ],
+        "controls": [
+          "Service-level agreements",
+          "Redundant provider circuits",
+          "Web load balancers",
+          "Web servers"
+        ],
+        "indicators": [
+          {
+            "id": "T9-EX3-KPI",
+            "kind": "kpi",
+            "text": "Outage time in hours"
+          },
+          {
+            "id": "T9-EX3-LKRI1",
+            "kind": "leading-kri",
+            "text": "Outages that have lasted over 1.5 hours and affect more than 5 % of customers",
+            "firesWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "outage_hours",
+                  "operator": ">",
+                  "threshold": 1.5,
+                  "unit": "hours"
+                },
+                {
+                  "metric": "customers_affected_percent",
+                  "operator": ">",
+                  "threshold": 5,
+                  "unit": "percent"
+                }
+              ]
+            }
+          },
+          {
+            "id": "T9-EX3-LKRI2",
+            "kind": "leading-kri",
+            "text": "Outages that have lasted over two hours and affect fewer than 5 % of customers",
+            "firesWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "outage_hours",
+                  "operator": ">",
+                  "threshold": 2,
+                  "unit": "hours"
+                },
+                {
+                  "metric": "customers_affected_percent",
+                  "operator": "<",
+                  "threshold": 5,
+                  "unit": "percent"
+                }
+              ]
+            }
+          },
+          {
+            "id": "T9-EX3-GKRI",
+            "kind": "lagging-kri",
+            "text": "Current outages that have lasted over two hours and affect more than 5 % of customers",
+            "firesWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "outage_hours",
+                  "operator": ">",
+                  "threshold": 2,
+                  "unit": "hours"
+                },
+                {
+                  "metric": "customers_affected_percent",
+                  "operator": ">",
+                  "threshold": 5,
+                  "unit": "percent"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "risks": [
+    {
+      "riskId": "1",
+      "registerId": "ERR",
+      "priority": 5,
+      "polarity": "negative",
+      "riskDescription": "Retiring staff lead to personnel shortages",
+      "riskCategory": "Operational Risk",
+      "category": {
+        "code": "operational"
+      },
+      "riskLikelihood": 0.5,
+      "riskImpact": 1000000,
+      "exposureRating": 500000,
+      "riskLikelihoodLabel": "Mod",
+      "exposureRatingLabel": "Mod",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "M"
+          },
+          "capex": {
+            "label": "L"
+          }
+        },
+        "reputation": {
+          "label": "Low"
+        },
+        "mission": {
+          "label": "Mod"
+        }
+      },
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Improve hiring diversity; Improve employee benefits per recent survey and discussions",
+      "riskOwnerPointOfContact": "Dwayne Rhodes (Human Resources Department)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 1. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10."
+    },
+    {
+      "riskId": "2",
+      "registerId": "ERR",
+      "priority": 6,
+      "polarity": "positive",
+      "riskDescription": "A strategic opportunity to hire a famous technologist to establish a new satellite communications initiative.",
+      "riskCategory": "Operational Risk",
+      "category": {
+        "code": "operational"
+      },
+      "riskLikelihood": 0.5,
+      "riskImpact": 1000000,
+      "exposureRating": 500000,
+      "riskLikelihoodLabel": "Mod",
+      "exposureRatingLabel": "Mod",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "M"
+          },
+          "capex": {
+            "label": "L"
+          }
+        },
+        "reputation": {
+          "label": "High"
+        },
+        "mission": {
+          "label": "Mod"
+        }
+      },
+      "riskResponseType": [
+        "Realize"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Allocate funds for compensation package; Initiate strategic recruiting plan",
+      "riskOwnerPointOfContact": "Dwayne Rhodes (Human Resources Department)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 2. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10. Positive risk per SP 800-221r1 line 1321."
+    },
+    {
+      "riskId": "3",
+      "registerId": "ERR",
+      "priority": 1,
+      "polarity": "negative",
+      "riskDescription": "A social engineering attack on enterprise workforce leads staff to wire transfer significant funds.",
+      "riskCategory": "Operational Risk",
+      "category": {
+        "code": "operational"
+      },
+      "riskLikelihood": 0.9,
+      "riskImpact": 5555556,
+      "exposureRating": 5000000,
+      "riskLikelihoodLabel": "High",
+      "exposureRatingLabel": "High",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "M"
+          },
+          "capex": {
+            "label": "L"
+          }
+        },
+        "reputation": {
+          "label": "High"
+        },
+        "mission": {
+          "label": "Mod"
+        }
+      },
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Update corporate IT security training; Implement phishing training service; Update email security products per recommendations from IT Risk Council",
+      "riskOwnerPointOfContact": "Carly Franklin (CISO)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 3. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10."
+    },
+    {
+      "riskId": "4",
+      "registerId": "ERR",
+      "priority": 3,
+      "polarity": "negative",
+      "riskDescription": "An employee of a third-party partner steals customer information.",
+      "riskCategory": "Operational Risk",
+      "category": {
+        "code": "operational"
+      },
+      "riskLikelihood": 0.5,
+      "riskImpact": 10000000,
+      "exposureRating": 5000000,
+      "riskLikelihoodLabel": "Mod",
+      "exposureRatingLabel": "High",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "H"
+          },
+          "capex": {
+            "label": "M"
+          }
+        },
+        "reputation": {
+          "label": "High"
+        },
+        "mission": {
+          "label": "High"
+        }
+      },
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "CFO and CEO to agree on plans for likely secondary financial impact from reputational risk impact.; Update procurement contract requirements to include clauses per 11/3/2019 report from Legal Dept; Implement 3rd Party Partner Assmt. for Tier 1 providers per CIO & CISO recommendations",
+      "riskOwnerPointOfContact": "Ernest Woods (Procurement)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 4. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10."
+    },
+    {
+      "riskId": "5",
+      "registerId": "ERR",
+      "priority": 7,
+      "polarity": "negative",
+      "riskDescription": "Sales reduction due to tariffs leads to reduced revenues.",
+      "riskCategory": "Financial Risk",
+      "category": {
+        "code": "financial"
+      },
+      "riskLikelihood": 0.1,
+      "riskImpact": 500000,
+      "exposureRating": 50000,
+      "riskLikelihoodLabel": "Low",
+      "exposureRatingLabel": "Low",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "M"
+          },
+          "capex": {
+            "label": "L"
+          }
+        },
+        "reputation": {
+          "label": "Low"
+        },
+        "mission": {
+          "label": "Low"
+        }
+      },
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Increase marketing in target areas; Ensure competitive pricing in target markets",
+      "riskOwnerPointOfContact": "Elaine Kim (VP Sales)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 5. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10."
+    },
+    {
+      "riskId": "6",
+      "registerId": "ERR",
+      "priority": 8,
+      "polarity": "negative",
+      "riskDescription": "Customer budget tightening results in reduced revenue and profits.",
+      "riskCategory": "Financial Risk",
+      "category": {
+        "code": "financial"
+      },
+      "riskLikelihood": 0.5,
+      "riskImpact": 1000000,
+      "exposureRating": 500000,
+      "riskLikelihoodLabel": "Mod",
+      "exposureRatingLabel": "Mod",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "M"
+          },
+          "capex": {
+            "label": "L"
+          }
+        },
+        "reputation": {
+          "label": "Low"
+        },
+        "mission": {
+          "label": "Low"
+        }
+      },
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Implement customer surveys to better forecast purchasing changes; Use cost-cutting measures to offset reductions and maintain profitability",
+      "riskOwnerPointOfContact": "Elaine Kim (VP Sales)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 6. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10."
+    },
+    {
+      "riskId": "7",
+      "registerId": "ERR",
+      "priority": 9,
+      "polarity": "negative",
+      "riskDescription": "Failure to innovate results in market share erosion.",
+      "riskCategory": "Strategic Risk",
+      "category": {
+        "code": "strategic"
+      },
+      "riskLikelihood": 0.5,
+      "riskImpact": 100000,
+      "exposureRating": 50000,
+      "riskLikelihoodLabel": "Mod",
+      "exposureRatingLabel": "Low",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "M"
+          },
+          "capex": {
+            "label": "M"
+          }
+        },
+        "reputation": {
+          "label": "Mod"
+        },
+        "mission": {
+          "label": "Low"
+        }
+      },
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Approve CIO proposal to increase internal R&D funding by 10% to spur internal innovation; Update technical training to include design thinking methodologies; Implement customer surveys in target marketing areas",
+      "riskOwnerPointOfContact": "Sharika Grigsby (VP, Product Development)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 7. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10. Lint L-03 flags this row against row 6. Row 7 rates every input equal or higher than row 6, but its exposure is lower."
+    },
+    {
+      "riskId": "8",
+      "registerId": "ERR",
+      "priority": 2,
+      "polarity": "negative",
+      "riskDescription": "Company intellectual property data is disclosed through employee error or malicious act.",
+      "riskCategory": "Operational Risk",
+      "category": {
+        "code": "operational"
+      },
+      "riskLikelihood": 0.5,
+      "riskImpact": 1000000,
+      "exposureRating": 500000,
+      "riskLikelihoodLabel": "Mod",
+      "exposureRatingLabel": "Mod",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "M"
+          },
+          "capex": {
+            "label": "M"
+          }
+        },
+        "reputation": {
+          "label": "High"
+        },
+        "mission": {
+          "label": "High"
+        }
+      },
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Review and update (if needed) background screening controls; Update corporate security training to reinforce the need for diligence; Implement data loss prevention tools per CISO recommendation",
+      "riskOwnerPointOfContact": "Carly Franklin (CISO)",
+      "status": "Closed",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 8. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10."
+    },
+    {
+      "riskId": "9",
+      "registerId": "ERR",
+      "priority": 10,
+      "polarity": "negative",
+      "riskDescription": "A flaw in product quality leads to reputational damage, reducing sales.",
+      "riskCategory": "Strategic Risk",
+      "category": {
+        "code": "strategic"
+      },
+      "riskLikelihood": 0.1,
+      "riskImpact": 500000,
+      "exposureRating": 50000,
+      "riskLikelihoodLabel": "Low",
+      "exposureRatingLabel": "Low",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "M"
+          },
+          "capex": {
+            "label": "M"
+          }
+        },
+        "reputation": {
+          "label": "High"
+        },
+        "mission": {
+          "label": "High"
+        }
+      },
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Update continuous improvement process; Implement Baldrige Framework; Update external provider quality standards and monitoring",
+      "riskOwnerPointOfContact": "Sharika Grigsby (VP, Product Development)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 9. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10."
+    },
+    {
+      "riskId": "10",
+      "registerId": "ERR",
+      "priority": 4,
+      "polarity": "negative",
+      "riskDescription": "Failure to implement California Consumer Privacy Act (CCPA) provisions exposes the company to fines, penalties, and legal fees.",
+      "riskCategory": "Compliance Risk",
+      "category": {
+        "code": "legal"
+      },
+      "riskLikelihood": 0.5,
+      "riskImpact": 1000000,
+      "exposureRating": 500000,
+      "riskLikelihoodLabel": "Mod",
+      "exposureRatingLabel": "Mod",
+      "impacts": {
+        "financial": {
+          "opex": {
+            "label": "H"
+          },
+          "capex": {
+            "label": "L"
+          }
+        },
+        "reputation": {
+          "label": "Mod"
+        },
+        "mission": {
+          "label": "Mod"
+        }
+      },
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Create & maintain a centralized register of compliance requirements; Update employee training based on updated privacy requirements; Review business impact assessment (BIA) templates to ensure ICT criteria are included.",
+      "riskOwnerPointOfContact": "Zoe Davidson (Chief Privacy Officer)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "defaultedFields": [
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/category"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 10 row 10. Numbers come from the register scale representatives (riskImpact = exposureRating / riskLikelihood). Response type and cost are not in Fig. 10."
+    },
+    {
+      "riskId": "F11-1",
+      "registerId": "ERP11",
+      "polarity": "negative",
+      "riskDescription": "A global pandemic may necessitate a remote workforce where Agency X could face: • a forced reliance on potentially insecure networks; • a reduction in managerial oversight; and • a deterioration of Agency culture.",
+      "riskCategory": "Not stated in Fig. 11",
+      "category": {
+        "code": "operational",
+        "subcode": "operational.people"
+      },
+      "riskLikelihood": 0.1,
+      "riskImpact": 1000000,
+      "exposureRating": 100000,
+      "riskLikelihoodLabel": "Low",
+      "riskImpactLabel": "Medium",
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Agency X will begin allowing employees to work remotely one day per week and closely monitor employee productivity.",
+      "riskOwnerPointOfContact": "Primary - Chief Operating Officer (COO)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "objectiveIds": [
+        "OBJ-F11-1"
+      ],
+      "previousAssessment": {
+        "riskLikelihood": 0.1,
+        "riskImpact": 10000000,
+        "exposureRating": 1000000,
+        "riskLikelihoodLabel": "Low",
+        "riskImpactLabel": "High"
+      },
+      "detail": {
+        "implementedResponseDescription": "REDUCTION: Agency X has: • Facilitated secure remote access via the setup of a Virtual Private Network (VPN) • Modified existing standard operating procedures to include formal mechanisms for increased transparency and self-reporting. • Established a formal remote/telework policy including means of social interaction (e.g., virtual gatherings, campfire sessions, etc.) to foster team building.",
+        "planned": {
+          "likelihood": 0.1,
+          "impact": 1000000,
+          "exposureRating": 100000,
+          "likelihoodLabel": "Low",
+          "impactLabel": "Medium"
+        }
+      },
+      "defaultedFields": [
+        "/riskCategory",
+        "/category",
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/status"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 11 (p. 42, line 1382). Fig. 11 has no exposure column, so exposureRating is riskLikelihood times riskImpact (rule D-Q3). Fig. 11 names the response type REDUCTION, which is Mitigate in Table 4."
+    },
+    {
+      "riskId": "F11-2",
+      "registerId": "ERP11",
+      "polarity": "negative",
+      "riskDescription": "Agency X's privacy policies and disclosures are found to inaccurately describe its collection, use, storage, and disclosure of personally identifiable information (PII).",
+      "riskCategory": "Not stated in Fig. 11",
+      "category": {
+        "code": "legal",
+        "subcode": "legal.privacy"
+      },
+      "riskLikelihood": 0.5,
+      "riskImpact": 10000000,
+      "exposureRating": 5000000,
+      "riskLikelihoodLabel": "Medium",
+      "riskImpactLabel": "High",
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Agency X will establish a quarterly audit of PII processing and develop a privacy-specific change management plan for inclusion of any necessary updates.",
+      "riskOwnerPointOfContact": "Primary - Chief Privacy Officer (CPO)",
+      "status": "Open",
+      "responseDecision": "decided",
+      "objectiveIds": [
+        "OBJ-F11-2"
+      ],
+      "previousAssessment": {
+        "riskLikelihood": 0.5,
+        "riskImpact": 10000000,
+        "exposureRating": 5000000,
+        "riskLikelihoodLabel": "Medium",
+        "riskImpactLabel": "High"
+      },
+      "detail": {
+        "implementedResponseDescription": "REDUCTION: Agency X has begun an assessment of existing methods of PII processing to ensure they align with existing policies and are within the bounds of all applicable regulatory requirements.",
+        "planned": {
+          "likelihood": 0.1,
+          "impact": 1000000,
+          "exposureRating": 100000,
+          "likelihoodLabel": "Low",
+          "impactLabel": "Medium"
+        }
+      },
+      "defaultedFields": [
+        "/riskCategory",
+        "/category",
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/status"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 11 (p. 42, line 1382). Fig. 11 has no exposure column, so exposureRating is riskLikelihood times riskImpact (rule D-Q3). Fig. 11 names the response type REDUCTION, which is Mitigate in Table 4. Fig. 11 prints Medum for the residual impact. This file stores Medium."
+    },
+    {
+      "riskId": "F11-3",
+      "registerId": "ERP11",
+      "polarity": "negative",
+      "riskDescription": "A key supplier of Agency X has abruptly gone bankrupt.",
+      "riskCategory": "Not stated in Fig. 11",
+      "category": {
+        "code": "operational",
+        "subcode": "operational.supplier"
+      },
+      "riskLikelihood": 0.5,
+      "riskImpact": 10000000,
+      "exposureRating": 5000000,
+      "riskLikelihoodLabel": "Medium",
+      "riskImpactLabel": "High",
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Agency X is seeking to ensure redundancy within their supply chain by identifying backup/alternative suppliers and seeking to reduce the potential time needed to transition to a new supplier.",
+      "riskOwnerPointOfContact": "Primary - Logistics Coordinator",
+      "status": "Open",
+      "responseDecision": "decided",
+      "objectiveIds": [
+        "OBJ-F11-3"
+      ],
+      "previousAssessment": {
+        "riskLikelihood": 0.5,
+        "riskImpact": 10000000,
+        "exposureRating": 5000000,
+        "riskLikelihoodLabel": "Medium",
+        "riskImpactLabel": "High"
+      },
+      "detail": {
+        "implementedResponseDescription": "REDUCTION: Agency X has begun to formally analyze downstream demand and other market variables to have a better understanding of their current suppliers' ability to handle the dynamic nature of demand.",
+        "planned": {
+          "likelihood": 0.5,
+          "impact": 1000000,
+          "exposureRating": 500000,
+          "likelihoodLabel": "Medium",
+          "impactLabel": "Medium"
+        }
+      },
+      "defaultedFields": [
+        "/riskCategory",
+        "/category",
+        "/riskLikelihood",
+        "/riskImpact",
+        "/exposureRating",
+        "/riskResponseType",
+        "/riskResponseCost",
+        "/status"
+      ],
+      "notes": "Source SP 800-221r1 ipd Fig. 11 (p. 42, line 1382). Fig. 11 has no exposure column, so exposureRating is riskLikelihood times riskImpact (rule D-Q3). Fig. 11 names the response type REDUCTION, which is Mitigate in Table 4."
+    }
+  ],
+  "provenance": [
+    {
+      "id": "PV-1",
+      "importedOn": "2026-10-27T09:00:00Z",
+      "format": "csv",
+      "fileName": "fixtures/sp800-221r1-fig10.csv",
+      "sha256": "7fe5b9aef65453bb458783f7ef2dc567f586fe31f0ab7481dc115292eaf1a147",
+      "recordCount": 10,
+      "columnMapping": {
+        "ID": "/riskId",
+        "Pri.": "/priority",
+        "Risk Description": "/riskDescription",
+        "Risk Category": "/riskCategory",
+        "Financial Impact": "/impacts/financial",
+        "Reputation Impact": "/impacts/reputation/label",
+        "Mission Impact": "/impacts/mission/label",
+        "Likelihood": "/riskLikelihoodLabel",
+        "Exposure Rating": "/exposureRatingLabel",
+        "Risk Response": "/riskResponseDescription",
+        "Risk Owner": "/riskOwnerPointOfContact",
+        "Status": "/status"
+      },
+      "warnings": [
+        "Fig. 10 has no Risk Response Type and no Risk Response Cost column. Both are defaulted.",
+        "Row 2 is positive per SP 800-221r1 line 1321. The figure has no polarity column."
+      ]
+    }
+  ]
+}

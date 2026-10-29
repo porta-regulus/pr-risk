@@ -1,0 +1,248 @@
+:root {
+  --text: #14181f;
+  --muted: #566070;
+  --background: #f7f8fa;
+  --surface: #ffffff;
+  --border: #d6dbe3;
+  --accent: #2a62d1;
+  --accent-text: #ffffff;
+  --warn-bg: #fbf1d8;
+  --warn-text: #5e4300;
+  --error-bg: #fde8e3;
+  --error-text: #8a2410;
+  --ok-bg: #e5f4ec;
+  --ok-text: #155a3a;
+  --danger: #c23b17;
+  color-scheme: light;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e9edf2;
+    --muted: #a4adbb;
+    --background: #111419;
+    --surface: #181c22;
+    --border: #2c333d;
+    --accent: #7aa3f4;
+    --accent-text: #0b1220;
+    --warn-bg: #2b2414;
+    --warn-text: #f1d189;
+    --error-bg: #3a1a12;
+    --error-text: #ffb4a0;
+    --ok-bg: #12291e;
+    --ok-text: #8fe0b5;
+    --danger: #f07a52;
+    color-scheme: dark;
+  }
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--background);
+}
+
+main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2rem max(16px, env(safe-area-inset-right, 0px)) 2rem max(16px, env(safe-area-inset-left, 0px));
+  display: grid;
+  gap: 1.25rem;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: 1.9rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+}
+
+h3 {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+p {
+  margin: 0;
+}
+
+.lede {
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+.muted,
+.sub {
+  color: var(--muted);
+}
+
+.sub {
+  display: block;
+  font-size: 0.875rem;
+}
+
+.screen-head {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: 1.25rem;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  min-width: 0;
+}
+
+.table-box {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+td {
+  padding: 0.6rem 0.75rem 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+tr[aria-current='true'] td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
+  padding-left: 0.6rem;
+}
+
+.actions,
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+input {
+  font: inherit;
+  color: var(--text);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  min-width: 0;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+  cursor: pointer;
+  justify-self: start;
+}
+
+button.quiet {
+  background: transparent;
+  color: var(--accent);
+}
+
+button.danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.banner,
+.message {
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.banner {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.message-ok {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+
+.message-error,
+.errors {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.preview {
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.errors,
+.warnings {
+  margin: 0;
+  padding: 0.5rem 0.75rem 0.5rem 1.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.warnings {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.screen-foot {
+  color: var(--muted);
+  font-size: 0.85rem;
+}

@@ -1,0 +1,59 @@
+{
+    "$id": "https://csrc.nist.gov/csrc/media/schema/olir/risk_register.v2.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "The use of cybersecurity risk registers provides consistency in capturing and communicating risk-related information (including risk response) throughout the ERM process. It provides a framework for organizing and communicating risk information from the individual system level up through the organizational level and finally to the highest enterprise level. The risk registers used at each level convey information about risk assessments, evaluation decisions, responses, and monitoring activities.",
+    "title": "Risk Register",
+    "type": "object",
+    "properties": {
+        "riskId": {
+            "description": "Risk ID",
+            "type": "string"
+        },
+        "riskDescription": {
+            "description": "Risk Description",
+            "type": "string"
+        },
+        "riskCategory": {
+            "description": "Risk Category",
+            "type": "string"
+        },
+        "riskLikelihood": {
+            "description": "Current Assessment: Likelihood (%)",
+            "type": "number"
+        },
+        "riskImpact": {
+            "description": "Current Assessment: Impact ($)",
+            "type": "number"
+        },
+        "exposureRating": {
+            "description": "Current Assessment: Exposure Rating ($)",
+            "type": "number"
+        },
+        "riskResponseType": {
+            "description": "Planned Risk Response",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "enum": [ "Accept", "Avoid", "Transfer", "Mitigate", "Realize", "Share", "Enhance" ]
+            },
+            "uniqueItems": true
+          },
+        "riskResponseCost": {
+            "description": "Risk Response Cost ($)",
+            "type": "number"
+        },
+        "riskResponseDescription": {
+            "description": "Planned Risk Response Description",
+            "type": "string"
+        },
+        "riskOwnerPointOfContact": {
+            "description": "Risk owner(s) / point(s) of contact",
+            "type": "string"
+        },
+        "status": {
+            "description": "Status",
+            "type": "string"
+        }
+    },
+    "required": [ "riskId", "riskDescription", "riskCategory", "riskLikelihood", "riskImpact", "exposureRating", "riskResponseType", "riskResponseCost", "riskResponseDescription", "riskOwnerPointOfContact", "status" ]
+}
