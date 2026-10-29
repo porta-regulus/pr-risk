@@ -16,6 +16,8 @@ export {
   toleranceAt,
 } from './metrics';
 export type { RiskStats, TolerancePoint, ToleranceResult } from './metrics';
+export { DEFAULT_TRIALS, numbersOf, riskNumbers } from './numbers';
+export type { RiskNumbers } from './numbers';
 export { normalQuantile } from './normal';
 export {
   annualizedCost,

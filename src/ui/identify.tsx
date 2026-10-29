@@ -2,7 +2,7 @@
 // table, risk editor and asset inventory. Saving comes from the shared frame in editor.tsx.
 import { useState } from 'preact/hooks';
 import type { Register, Risk, RiskDocument } from '../schema/types';
-import { NOT_ESTIMATED } from './analysis';
+import { NOT_ESTIMATED, numbersSource } from './analysis';
 import { formatNumber } from './distribution';
 import { nextId, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
@@ -227,7 +227,7 @@ function RiskTable({ doc, update, register, selected, onSelect }: { readonly doc
             </thead>
             <tbody>
               {risks.map((risk) => {
-                const placeholder = (risk.defaultedFields ?? []).includes('/exposureRating');
+                const source = numbersSource(doc, risk);
                 return (
                   <tr key={risk.riskId} aria-current={risk.riskId === selected ? 'true' : undefined}>
                     <td>{risk.riskId}</td>
@@ -238,7 +238,16 @@ function RiskTable({ doc, update, register, selected, onSelect }: { readonly doc
                     <td>{risk.category.subcode ?? risk.category.code}</td>
                     <td>{risk.status}</td>
                     <td>{risk.riskOwnerPointOfContact}</td>
-                    <td>{placeholder ? <span class="muted">Not estimated</span> : formatNumber(risk.exposureRating)}</td>
+                    <td>
+                      {source === 'placeholder' ? (
+                        <span class="muted">Not estimated</span>
+                      ) : (
+                        <>
+                          {formatNumber(risk.exposureRating)}
+                          {source === 'labels' && <span class="sub">From labels</span>}
+                        </>
+                      )}
+                    </td>
                     <td>
                       <button type="button" class="quiet" aria-pressed={risk.riskId === selected} onClick={() => {
                           onSelect(risk.riskId);

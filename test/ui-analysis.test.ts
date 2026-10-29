@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { riskStats, simulate } from '../src/engine';
 import { documentErrors, type Risk, type RiskDocument } from '../src/schema';
-import { feedback, labelNumbers, NOT_ESTIMATED, riskNumbers, withNistNumbers, withNumbersFrom, withSimulationSettings } from '../src/ui/analysis';
+import { feedback, labelNumbers, NOT_ESTIMATED, numbersSource, riskNumbers, simulationTargets, withNistNumbers, withNumbersFrom, withSimulationSettings } from '../src/ui/analysis';
 import { prepareSave } from '../src/ui/editor';
 import { newRisk, registerTree } from '../src/ui/identify';
 import { example, EXAMPLE_1, EXAMPLE_2 } from './schema-helpers';
@@ -130,5 +130,51 @@ describe('labels give the numbers of a risk without an estimate (rules D-Q1 and 
   it('an unrelated save leaves every risk of example 1 as it is', () => {
     const draft = { ...doc1, context: { ...doc1.context, mission: 'Test' } };
     expect(withNistNumbers(doc1, draft).risks).toBe(draft.risks);
+  });
+});
+
+describe('removing an estimate, and where numbers come from', () => {
+  const doc1 = example(EXAMPLE_1);
+  const risk1 = doc1.risks[0] as Risk;
+  const estimated: Risk = {
+    ...risk1,
+    estimate: { frequency: { type: 'lognormal', lower: 0.01, upper: 0.2, confidence: 0.9 }, impactPerEvent: { type: 'lognormal', lower: 10, upper: 100, confidence: 0.9 }, method: 'expert-calibrated', rationale: 'Test estimate for the removal case.' },
+  };
+  const savedWithEstimate = withNistNumbers(doc1, withRisk(doc1, estimated));
+
+  it('the estimate gives simulated numbers', () => {
+    expect((savedWithEstimate.risks[0] as Risk).exposureRating).toBeLessThan(100);
+    expect(numbersSource(savedWithEstimate, savedWithEstimate.risks[0] as Risk)).toBe('simulation');
+  });
+
+  it('removing it brings back the numbers of the labels (D-Q1)', () => {
+    const { estimate: _drop, ...without } = savedWithEstimate.risks[0] as Risk;
+    const result = withNistNumbers(savedWithEstimate, withRisk(savedWithEstimate, without));
+    const after = result.risks[0] as Risk;
+    expect([after.riskLikelihood, after.riskImpact, after.exposureRating]).toEqual([0.5, 1_000_000, 500_000]);
+    expect(numbersSource(result, after)).toBe('labels');
+  });
+
+  it('removing it from a risk without labels gives the placeholders of D-Q2', () => {
+    const { estimate: _drop, riskLikelihoodLabel: _l, exposureRatingLabel: _e, riskImpactLabel: _i, ...without } = savedWithEstimate.risks[0] as Risk;
+    const result = withNistNumbers(savedWithEstimate, withRisk(savedWithEstimate, without));
+    const after = result.risks[0] as Risk;
+    expect([after.riskLikelihood, after.riskImpact, after.exposureRating]).toEqual([0, 0, 0]);
+    expect(numbersSource(result, after)).toBe('placeholder');
+    expect(documentErrors(result)).toEqual([]);
+  });
+
+  it('simulationTargets lists only changed estimates', () => {
+    expect(simulationTargets(doc, doc)).toEqual([]);
+    const r1 = doc.risks[0] as Risk;
+    const estimate = r1.estimate;
+    if (estimate === undefined) throw new Error('example 2 risk 1 has an estimate');
+    expect(simulationTargets(doc, withRisk(doc, { ...r1, estimate: { ...estimate, rationale: 'A changed rationale of the estimate.' } }))).toEqual([r1.riskId]);
+  });
+
+  it('numbersSource tells labels, simulation and placeholders apart', () => {
+    expect(numbersSource(doc1, risk1)).toBe('labels');
+    expect(numbersSource(doc, doc.risks[0] as Risk)).toBe('simulation');
+    expect(numbersSource(doc, newRisk(doc, 'CORP', 'If X occurs, then Y happens.', 'negative'))).toBe('placeholder');
   });
 });

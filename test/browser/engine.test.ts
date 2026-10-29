@@ -3,6 +3,7 @@
 import { expect, it } from 'vitest';
 import doc from '../../docs/schema/examples/example-2-sme-quantitative.json';
 import { CancelledError, runJob } from '../../src/engine/client';
+import { numbersOf } from '../../src/engine/numbers';
 import type { RiskDocument } from '../../src/schema';
 import { differences } from '../close';
 import stored from '../fixtures/engine-summary.json';
@@ -30,4 +31,10 @@ it('a running job stops within 200 ms of cancel', async () => {
   job.cancel();
   await expect(job.result).rejects.toBeInstanceOf(CancelledError);
   expect(performance.now() - start).toBeLessThan(200);
+}, 60_000);
+
+it('the worker gives the NIST numbers of a direct run of each risk, bit for bit', async () => {
+  const ids = example.risks.filter((risk) => risk.estimate !== undefined).map((risk) => risk.riskId);
+  const job = runJob({ kind: 'riskNumbers', doc: example, riskIds: ids });
+  expect(await job.result).toEqual(numbersOf(example, ids));
 }, 60_000);

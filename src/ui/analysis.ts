@@ -1,46 +1,18 @@
 // NIST numbers and live feedback for a risk (SPEC.md Sec. 5 estimate words, 7.3 and 8.8).
-// With an estimate, riskLikelihood, riskImpact and exposureRating come from the simulation. Each risk has its own random streams (Sec. 8.6 item 7), so a run of one risk
-// with its drivers gives exactly the numbers that a run of the whole document gives.
+// With an estimate, riskLikelihood, riskImpact and exposureRating come from the simulation
+// of that risk with its drivers (src/engine/numbers.ts). The screens run it in the engine
+// worker, so a long run never blocks the page.
+import { ENGINE_VERSION } from '../engine/index';
+import { DEFAULT_TRIALS, numbersOf, riskNumbers, type RiskNumbers } from '../engine/numbers';
+import { sampler } from '../engine/sample';
 import { canonicalize } from '../schema/canonical';
 import type { Distribution, Risk, RiskDocument } from '../schema/types';
-import { ENGINE_VERSION } from '../engine/index';
-import { mean, shareAtLeastOne } from '../engine/metrics';
-import { sampler } from '../engine/sample';
-import { simulate } from '../engine/simulate';
 
-export const DEFAULT_TRIALS = 100_000;
+export { DEFAULT_TRIALS, riskNumbers, type RiskNumbers };
+
 const NUMERIC = ['/riskLikelihood', '/riskImpact', '/exposureRating'];
 // Rule D-Q2 writes this text for a risk without estimates.
 export const NOT_ESTIMATED = 'Not estimated. Numeric fields are placeholders.';
-
-export interface RiskNumbers {
-  readonly probability: number;
-  readonly expectedAnnual: number;
-  readonly riskLikelihood: number;
-  readonly riskImpact: number;
-  readonly exposureRating: number;
-}
-
-// Sec. 8.8 and 7.3. Likelihood with 4 decimals, impact and exposure in whole currency units,
-// exposure as the product of the stored likelihood and impact (rule V-07).
-export function riskNumbers(doc: RiskDocument, riskId: string): RiskNumbers | undefined {
-  const risk = doc.risks.find((item) => item.riskId === riskId);
-  if (risk?.estimate === undefined || (risk.sourceRefs ?? []).length > 0) return undefined;
-  const linked = new Set((risk.driverLinks ?? []).map((link) => link.driverId));
-  const alone: RiskDocument = { ...doc, risks: [risk], drivers: (doc.drivers ?? []).filter((driver) => linked.has(driver.id)) };
-  const run = simulate(alone, {
-    trials: doc.simulation?.trials ?? DEFAULT_TRIALS,
-    seed: doc.simulation?.seed ?? 0,
-    active: risk.onlyWithResponse === undefined ? [] : [risk.onlyWithResponse],
-  });
-  const result = run.risks.get(riskId);
-  if (result === undefined) return undefined;
-  const probability = shareAtLeastOne(result.counts);
-  const expectedAnnual = mean(result.annual);
-  const riskLikelihood = Math.round(probability * 10_000) / 10_000;
-  const riskImpact = probability > 0 ? Math.round(expectedAnnual / probability) : 0;
-  return { probability, expectedAnnual, riskLikelihood, riskImpact, exposureRating: Math.round(riskLikelihood * riskImpact) };
-}
 
 // A document with an estimate needs a seed. A new seed is random, and it is stored, so every
 // later run of the document gives the same numbers.
@@ -107,25 +79,62 @@ export function labelNumbers(doc: RiskDocument, risk: Risk): Numbers | undefined
 const labelInputs = (doc: RiskDocument, risk: Risk): string =>
   canonicalize([risk.riskLikelihoodLabel ?? null, risk.riskImpactLabel ?? null, risk.exposureRatingLabel ?? null, doc.strategy?.scales ?? null]);
 
-// Sets the NIST numbers of every risk whose inputs differ from the saved version, or whose
-// numbers are still placeholders (rule D-Q2). A risk with an estimate takes the simulation,
-// in any register, because a register moves to quantitative risk by risk (Sec. 6.8). A
-// risk without an estimate takes its labels (D-Q1, D-Q3). Numbers that labels cannot give
-// stay as they are, so nothing typed or imported is lost.
-export function withNistNumbers(saved: RiskDocument, draft: RiskDocument): RiskDocument {
+const isPlaceholder = (risk: Risk): boolean => (risk.defaultedFields ?? []).some((field) => NUMERIC.includes(field));
+
+// The risks with an estimate whose simulation inputs differ from the saved version, or whose
+// numbers are still placeholders (rule D-Q2). The save runs these in the engine worker.
+export function simulationTargets(saved: RiskDocument, draft: RiskDocument): string[] {
+  return draft.risks
+    .filter((risk) => {
+      if (risk.estimate === undefined) return false;
+      const before = saved.risks.find((item) => item.riskId === risk.riskId);
+      return isPlaceholder(risk) || before === undefined || inputsOf(saved, before) !== inputsOf(draft, risk);
+    })
+    .map((risk) => risk.riskId);
+}
+
+// Rule D-Q2 for a risk whose estimate is gone and whose labels give no numbers.
+function withPlaceholders(risk: Risk): Risk {
+  const listed = risk.defaultedFields ?? [];
+  return {
+    ...risk,
+    riskLikelihood: 0,
+    riskImpact: 0,
+    exposureRating: 0,
+    defaultedFields: [...NUMERIC.filter((field) => !listed.includes(field)), ...listed],
+    detail: { ...risk.detail, currentRiskAnalysis: risk.detail?.currentRiskAnalysis ?? NOT_ESTIMATED },
+  };
+}
+
+// Sets the NIST numbers of the draft. A risk with an estimate takes the simulation, in any
+// register, because a register moves to quantitative risk by risk (Sec. 6.8). The caller
+// passes the results of the engine worker for the simulationTargets, or they run here.
+// A risk without an estimate takes its labels (D-Q1, D-Q3) when they or the scales change.
+// When its estimate is removed, the simulated numbers go too: the labels give new ones, or
+// the numbers become placeholders (D-Q2). Other numbers stay, so nothing imported is lost.
+export function withNistNumbers(saved: RiskDocument, draft: RiskDocument, simulated?: Readonly<Record<string, RiskNumbers>>): RiskDocument {
+  const results = simulated ?? numbersOf(draft, simulationTargets(saved, draft));
   const risks = draft.risks.map((risk) => {
     const before = saved.risks.find((item) => item.riskId === risk.riskId);
     if (risk.estimate === undefined) {
-      if (before !== undefined && labelInputs(saved, before) === labelInputs(draft, risk)) return risk;
+      const estimateRemoved = before?.estimate !== undefined;
+      if (!estimateRemoved && before !== undefined && labelInputs(saved, before) === labelInputs(draft, risk)) return risk;
       const numbers = labelNumbers(draft, risk);
-      return numbers === undefined ? risk : withNumbers(risk, numbers, true);
+      if (numbers !== undefined) return withNumbers(risk, numbers, true);
+      return estimateRemoved ? withPlaceholders(risk) : risk;
     }
-    const placeholder = (risk.defaultedFields ?? []).some((field) => NUMERIC.includes(field));
-    if (!placeholder && before !== undefined && inputsOf(saved, before) === inputsOf(draft, risk)) return risk;
-    const numbers = riskNumbers(draft, risk.riskId);
+    const numbers = results[risk.riskId];
     return numbers === undefined ? risk : withNumbers(risk, numbers);
   });
   return risks.some((risk, i) => risk !== draft.risks[i]) ? { ...draft, risks } : draft;
+}
+
+// Where the numbers of a risk come from, for the risk table. Numbers from labels are listed
+// as defaulted too, so the list alone does not tell a placeholder.
+export function numbersSource(doc: RiskDocument, risk: Risk): 'simulation' | 'labels' | 'placeholder' | 'given' {
+  if (risk.estimate !== undefined && !isPlaceholder(risk)) return 'simulation';
+  if (!isPlaceholder(risk)) return 'given';
+  return risk.estimate === undefined && labelNumbers(doc, risk) !== undefined ? 'labels' : 'placeholder';
 }
 
 // True when the numbers of the distribution allow a simulation (rules V-10 and V-13 aside).
@@ -152,8 +161,9 @@ const median = (distribution: Distribution): number | undefined => {
   return undefined;
 };
 
-// Live feedback under the estimate fields (SPEC.md Sec. 5 item 5).
-export function feedback(doc: RiskDocument, riskId: string): Feedback | undefined {
+// Live feedback under the estimate fields (SPEC.md Sec. 5 item 5), without the simulation.
+// The screen gets the simulated numbers from the engine worker.
+export function feedbackBasics(doc: RiskDocument, riskId: string): Omit<Feedback, 'numbers'> | undefined {
   const risk = doc.risks.find((item) => item.riskId === riskId);
   const estimate = risk?.estimate;
   if (risk === undefined || estimate === undefined || !usable(estimate.frequency) || !usable(estimate.impactPerEvent)) return undefined;
@@ -164,16 +174,22 @@ export function feedback(doc: RiskDocument, riskId: string): Feedback | undefine
     return driver === undefined ? sum : sum + link.triggerProbability * sampler(driver.frequency).mean;
   }, 0);
   const secondary = (estimate.secondaryImpacts ?? []).reduce((sum, item) => sum + item.probability * sampler(item.impactPerEvent).mean, 0);
-  const numbers = riskNumbers(doc, riskId);
   const medianFrequency = median(estimate.frequency);
   const medianImpact = median(estimate.impactPerEvent);
   return {
-    ...(numbers === undefined ? {} : { numbers }),
     totalFrequency: sampler(estimate.frequency).mean + viaDrivers,
     ...(medianFrequency === undefined ? {} : { medianFrequency }),
     ...(medianImpact === undefined ? {} : { medianImpact }),
     meanImpact: sampler(estimate.impactPerEvent).mean + secondary,
   };
+}
+
+// The feedback with the simulated numbers, run here. For tests and scripts.
+export function feedback(doc: RiskDocument, riskId: string): Feedback | undefined {
+  const basics = feedbackBasics(doc, riskId);
+  if (basics === undefined) return undefined;
+  const numbers = riskNumbers(doc, riskId);
+  return numbers === undefined ? basics : { ...basics, numbers };
 }
 
 const sameInputs = (a: RiskDocument, riskA: Risk, b: RiskDocument, riskB: Risk): boolean =>

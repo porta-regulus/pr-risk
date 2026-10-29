@@ -2,7 +2,9 @@
 // Detail (RDR), Evidence and Links, in the order of Sec. 5.
 import { useEffect, useState } from 'preact/hooks';
 import type { Distribution, Risk, RiskDocument } from '../schema/types';
-import { type Feedback, feedback } from './analysis';
+import { CancelledError, runJob } from '../engine/client';
+import type { RiskNumbers } from '../engine/numbers';
+import { feedbackBasics } from './analysis';
 import { DistributionField, formatNumber } from './distribution';
 import { DriverLinksTab } from './drivers';
 import { draftList, withValue } from './edit';
@@ -105,21 +107,36 @@ const replaceAt = <T,>(items: readonly T[], index: number, item: T | undefined):
   item === undefined ? items.filter((_, i) => i !== index) : items.map((old, i) => (i === index ? item : old));
 
 function FeedbackBox({ doc, risk }: { readonly doc: RiskDocument; readonly risk: Risk }) {
-  const [result, setResult] = useState<Feedback>();
+  const [numbers, setNumbers] = useState<RiskNumbers>();
+  const [running, setRunning] = useState(false);
   const currency = doc.document.currency;
   const months = doc.registers.find((register) => register.id === risk.registerId)?.timeframeMonths ?? 12;
-  // A run of one risk takes some milliseconds, so it waits for a pause in typing.
+  const result = feedbackBasics(doc, risk.riskId);
+  // The run of the risk goes to the engine worker after a pause in typing. A newer edit
+  // cancels the older run, so the page never waits for a stale result.
   useEffect(() => {
+    setNumbers(undefined);
+    if (feedbackBasics(doc, risk.riskId) === undefined) return undefined;
+    let job: ReturnType<typeof runJob<{ kind: 'riskNumbers'; doc: RiskDocument; riskIds: readonly string[] }>> | undefined;
     const timer = setTimeout(() => {
-      setResult(feedback(doc, risk.riskId));
+      setRunning(true);
+      job = runJob({ kind: 'riskNumbers', doc, riskIds: [risk.riskId] });
+      job.result
+        .then((found) => {
+          setNumbers(found[risk.riskId]);
+          setRunning(false);
+        })
+        .catch((error: unknown) => {
+          if (!(error instanceof CancelledError)) setRunning(false);
+        });
     }, 300);
     return () => {
       clearTimeout(timer);
+      job?.cancel();
     };
   }, [doc, risk]);
   if (result === undefined) return <p class="hint">Fill in the frequency and the impact to see what they mean.</p>;
   const word = risk.polarity === 'positive' ? 'gain' : 'loss';
-  const numbers = result.numbers;
   return (
     <div class="feedback" role="status" aria-live="polite">
       <h4>What the estimate means</h4>
@@ -139,6 +156,7 @@ function FeedbackBox({ doc, risk }: { readonly doc: RiskDocument; readonly risk:
         <li>
           Mean {word} per event with secondary impacts {formatNumber(result.meanImpact)} {currency}.
         </li>
+        {numbers === undefined && running && <li>The simulation runs.</li>}
         {numbers !== undefined && (
           <>
             <li>
