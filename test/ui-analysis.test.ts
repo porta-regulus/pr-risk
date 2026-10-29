@@ -1,6 +1,6 @@
 // NIST numbers from the simulation (SPEC.md Sec. 7.3) and the S3 helpers.
 import { describe, expect, it } from 'vitest';
-import { riskStats, simulate } from '../src/engine';
+import { numbersOf, riskStats, simulate } from '../src/engine';
 import { documentErrors, type Risk, type RiskDocument } from '../src/schema';
 import { feedback, labelNumbers, NOT_ESTIMATED, numbersSource, riskNumbers, simulationTargets, withNistNumbers, withNumbersFrom, withSimulationSettings } from '../src/ui/analysis';
 import { prepareSave } from '../src/ui/editor';
@@ -176,5 +176,13 @@ describe('removing an estimate, and where numbers come from', () => {
     expect(numbersSource(doc1, risk1)).toBe('labels');
     expect(numbersSource(doc, doc.risks[0] as Risk)).toBe('simulation');
     expect(numbersSource(doc, newRisk(doc, 'CORP', 'If X occurs, then Y happens.', 'negative'))).toBe('placeholder');
+  });
+});
+
+describe('numbersOf', () => {
+  it('ignores unknown ids and never writes a prototype', () => {
+    const result = numbersOf(doc, ['__proto__', 'constructor', 'R-01']);
+    expect(Object.keys(result)).toEqual(['R-01']);
+    expect(Object.getPrototypeOf(result)).toBe(Object.prototype);
   });
 });

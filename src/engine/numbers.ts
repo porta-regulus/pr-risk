@@ -36,11 +36,13 @@ export function riskNumbers(doc: RiskDocument, riskId: string): RiskNumbers | un
   return { probability, expectedAnnual, riskLikelihood, riskImpact, exposureRating: Math.round(riskLikelihood * riskImpact) };
 }
 
+// The ids come from a worker message, so the result is built with Object.fromEntries, which
+// defines own properties. A key such as __proto__ cannot reach a prototype (CodeQL).
 export function numbersOf(doc: RiskDocument, riskIds: readonly string[]): Record<string, RiskNumbers> {
-  const out: Record<string, RiskNumbers> = {};
+  const entries: [string, RiskNumbers][] = [];
   for (const id of riskIds) {
     const numbers = riskNumbers(doc, id);
-    if (numbers !== undefined) out[id] = numbers;
+    if (numbers !== undefined) entries.push([id, numbers]);
   }
-  return out;
+  return Object.fromEntries(entries);
 }
