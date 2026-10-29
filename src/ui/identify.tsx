@@ -7,6 +7,7 @@ import { formatNumber } from './distribution';
 import { nextId, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
 import { Checkboxes, NumberField, SelectField, TextField } from './fields';
+import { DriverPanel } from './drivers';
 import { RiskEditor } from './risk-editor';
 
 type Asset = NonNullable<RiskDocument['assets']>[number];
@@ -442,7 +443,10 @@ function IdentifyBody({ doc, update }: { readonly doc: RiskDocument; readonly up
             setRiskId(undefined);
           }} />
       )}
-      <AssetPanel doc={doc} update={update} />
+      <div class="grid">
+        <AssetPanel doc={doc} update={update} />
+        <DriverPanel doc={doc} update={update} />
+      </div>
     </>
   );
 }

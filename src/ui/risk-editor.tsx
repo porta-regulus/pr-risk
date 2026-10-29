@@ -1,9 +1,10 @@
-// The S3 risk editor (SPEC.md Sec. 5, 6.7 and 6.8). Tabs Scenario, Estimate, Links and
-// Detail. Drivers and Evidence follow in the next step of build task 5.
+// The S3 risk editor (SPEC.md Sec. 5, 6.7 and 6.8). Tabs Scenario, Estimate, Drivers,
+// Detail (RDR), Evidence and Links, in the order of Sec. 5.
 import { useEffect, useState } from 'preact/hooks';
 import type { Distribution, Risk, RiskDocument } from '../schema/types';
 import { type Feedback, feedback } from './analysis';
 import { DistributionField, formatNumber } from './distribution';
+import { DriverLinksTab } from './drivers';
 import { draftList, withValue } from './edit';
 import type { Update } from './editor';
 import { Checkboxes, LinesField, NumberField, SelectField, TextField } from './fields';
@@ -13,6 +14,35 @@ type Secondary = NonNullable<Estimate['secondaryImpacts']>[number];
 type Detail = NonNullable<Risk['detail']>;
 type Link = NonNullable<Risk['linkedRisks']>[number];
 type CategoryCode = Risk['category']['code'];
+type Evidence = NonNullable<Risk['evidence']>[number];
+type Impacts = NonNullable<Risk['impacts']>;
+type Rating = NonNullable<Impacts['reputation']>;
+type Band = NonNullable<NonNullable<NonNullable<RiskDocument['strategy']>['scales']>['impact']>[number];
+
+const EVIDENCE_KINDS: readonly (readonly [Evidence['kind'], string])[] = [
+  ['cvd-portal-submission', 'CVD Portal submission'],
+  ['audit-finding', 'Audit finding'],
+  ['incident', 'Incident'],
+  ['kev', 'Known exploited vulnerability (KEV)'],
+  ['epss', 'EPSS score'],
+  ['document', 'Document'],
+  ['other', 'Other'],
+];
+
+// The Table 6 split (Sec. 6.7.5), with safety from Sec. 2.1.
+const IMPACT_ROWS: readonly (readonly [string, string])[] = [
+  ['opex', 'Financial, operating expenses (OpEx)'],
+  ['capex', 'Financial, capital expenses (CapEx)'],
+  ['reputation', 'Reputation'],
+  ['mission', 'Mission'],
+  ['safety', 'Safety'],
+];
+
+const labelOptions = (bands: readonly Band[] | undefined, current: string | undefined): (readonly [string, string])[] => {
+  const options: (readonly [string, string])[] = (bands ?? []).map((band) => [band.label, band.label] as const);
+  if (current !== undefined && !options.some(([key]) => key === current)) options.push([current, `${current} (not on the scale)`]);
+  return options;
+};
 
 // SPEC.md Sec. 6.7.7. The schema accepts other subcodes, and the editor keeps them.
 export const SUBCODES: Readonly<Record<CategoryCode, readonly string[]>> = {
@@ -68,7 +98,7 @@ const DETAIL_DATES: readonly (readonly [keyof Detail, string])[] = [
   ['followUpDate', 'Follow-up date'],
 ];
 
-const TABS = ['Scenario', 'Estimate', 'Links', 'Detail'] as const;
+const TABS = ['Scenario', 'Estimate', 'Drivers', 'Detail', 'Evidence', 'Links'] as const;
 type Tab = (typeof TABS)[number];
 
 const replaceAt = <T,>(items: readonly T[], index: number, item: T | undefined): T[] =>
@@ -129,9 +159,39 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
   const estimate = risk.estimate;
   const register = doc.registers.find((item) => item.id === risk.registerId);
   const word = risk.polarity === 'positive' ? 'gain' : 'loss';
+  const scales = doc.strategy?.scales;
+  const ratingId = `risk-${risk.riskId}-rating`;
+  const rating = (
+    <fieldset class="scenario">
+      <legend>Rating on the common scale</legend>
+      {scales === undefined ? (
+        <p class="hint">No scales yet. Add them on the screen Context and strategy.</p>
+      ) : (
+        <>
+          <p class="hint">Without an estimate, the labels give the NIST numbers. An exposure label wins over an impact label (rules D-Q1 and D-Q3). With an estimate, the simulation gives the numbers.</p>
+          <div class="field-row">
+            {(
+              [
+                ['riskLikelihoodLabel', 'Likelihood', scales.likelihood],
+                ['riskImpactLabel', 'Impact', scales.impact],
+                ['exposureRatingLabel', 'Exposure', scales.exposure],
+              ] as const
+            ).map(([key, label, bands]) => (
+              <div class="field" key={key}>
+                <SelectField id={`${ratingId}-${key}`} label={`${label} label`} emptyLabel="Not rated" value={risk[key]} options={labelOptions(bands, risk[key])} onChange={(value) => {
+                    setRisk((current) => withValue(current, key, value));
+                  }} />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </fieldset>
+  );
   if (estimate === undefined) {
     return (
       <div class="tab-body">
+        {rating}
         <p class="muted">
           No estimate yet. {register?.method === 'quantitative' ? 'This register is quantitative, so the risk needs an estimate before it can be saved (rule V-08).' : 'A qualitative register can take estimates risk by risk (Sec. 6.8).'}
         </p>
@@ -154,6 +214,7 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
   const id = `risk-${risk.riskId}`;
   return (
     <div class="tab-body">
+      {rating}
       <DistributionField
         id={`${id}-frequency`}
         legend="Frequency"
@@ -254,6 +315,109 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
         </button>
       )}
     </div>
+  );
+}
+
+function EvidenceTab({ risk, setRisk }: { readonly risk: Risk; readonly setRisk: (change: (risk: Risk) => Risk) => void }) {
+  const items = risk.evidence ?? [];
+  const id = `risk-${risk.riskId}-evidence`;
+  const setItems = (next: Evidence[]): void => {
+    setRisk((current) => withValue(current, 'evidence', next));
+  };
+  return (
+    <div class="tab-body">
+      <p class="hint">What supports the condition or the estimate, such as a CVD Portal submission, an audit finding or an incident (Sec. 3.3.3). New evidence sets the status to "Review needed" (Sec. 6.11).</p>
+      {items.map((item, i) => (
+        <div class="sub-editor" key={i}>
+          <div class="field-row">
+            <div class="field">
+              <SelectField id={`${id}-${String(i)}-kind`} label={`Evidence ${String(i + 1)} kind`} value={item.kind} options={EVIDENCE_KINDS} onChange={(kind) => {
+                  setItems(replaceAt(items, i, { ...item, kind: kind ?? 'other' }));
+                }} />
+            </div>
+            <div class="field wide">
+              <TextField id={`${id}-${String(i)}-ref`} label={`Evidence ${String(i + 1)} reference`} hint="An ID, a file name or a link text." value={item.ref} onChange={(ref) => {
+                  setItems(replaceAt(items, i, { ...item, ref }));
+                }} />
+            </div>
+          </div>
+          <TextField id={`${id}-${String(i)}-summary`} label={`Evidence ${String(i + 1)} summary`} multiline value={item.summary} onChange={(summary) => {
+              setItems(replaceAt(items, i, withValue(item, 'summary', summary)));
+            }} />
+          <div class="field-row">
+            <div class="field">
+              <TextField id={`${id}-${String(i)}-severity`} label="Severity" value={item.severity} onChange={(severity) => {
+                  setItems(replaceAt(items, i, withValue(item, 'severity', severity)));
+                }} />
+            </div>
+            <div class="field">
+              <TextField id={`${id}-${String(i)}-status`} label="Status of the evidence" value={item.status} onChange={(status) => {
+                  setItems(replaceAt(items, i, withValue(item, 'status', status)));
+                }} />
+            </div>
+            <div class="field">
+              <TextField id={`${id}-${String(i)}-date`} label="Date" type="date" value={item.date} onChange={(date) => {
+                  setItems(replaceAt(items, i, withValue(item, 'date', date)));
+                }} />
+            </div>
+          </div>
+          <button type="button" class="quiet" onClick={() => {
+              setItems(replaceAt(items, i, undefined));
+            }}>
+            Remove evidence {i + 1}
+          </button>
+        </div>
+      ))}
+      <button type="button" class="quiet" onClick={() => {
+          // The reference comes from the user. Rule of Sec. 6.7.4: the risk needs a review.
+          setRisk((current) => ({ ...current, status: 'Review needed', evidence: [...(current.evidence ?? []), { kind: 'document', ref: '' }] }));
+        }}>
+        Add evidence
+      </button>
+    </div>
+  );
+}
+
+function ImpactsFieldset({ doc, risk, setRisk }: { readonly doc: RiskDocument; readonly risk: Risk; readonly setRisk: (change: (risk: Risk) => Risk) => void }) {
+  const impacts: Impacts = risk.impacts ?? {};
+  const bands = doc.strategy?.scales?.impact;
+  const currency = doc.document.currency;
+  const id = `risk-${risk.riskId}-impacts`;
+  const ratingOf = (key: string): Rating | undefined => (key === 'opex' || key === 'capex' ? impacts.financial?.[key] : impacts[key as 'reputation' | 'mission' | 'safety']);
+  const setRating = (key: string, rating: Rating): void => {
+    setRisk((current) => {
+      const now: Impacts = current.impacts ?? {};
+      const next = key === 'opex' || key === 'capex' ? withValue(now, 'financial', withValue(now.financial, key, rating)) : withValue(now, key as 'reputation' | 'mission' | 'safety', rating);
+      return withValue(current, 'impacts', next);
+    });
+  };
+  return (
+    <fieldset class="scenario">
+      <legend>Consequences by kind (Table 6)</legend>
+      <p class="hint">A label on the impact scale for each kind of consequence, with an optional amount. The category is the cause. These are the effects (Sec. 6.7.7).</p>
+      {IMPACT_ROWS.map(([key, label]) => {
+        const rating: Rating = ratingOf(key) ?? {};
+        return (
+          <div class="field-row" key={key}>
+            <div class="field">
+              <SelectField id={`${id}-${key}-label`} label={`${label}, label`} emptyLabel="Not rated" value={rating.label} options={labelOptions(bands, rating.label)} onChange={(value) => {
+                  setRating(key, withValue(rating, 'label', value));
+                }} />
+            </div>
+            <div class="field">
+              <NumberField id={`${id}-${key}-amount`} label={`${label}, amount (${currency})`} min={0} value={rating.amount} onChange={(amount) => {
+                  setRating(key, withValue(rating, 'amount', amount));
+                }} />
+            </div>
+            <div class="field">
+              <TextField id={`${id}-${key}-note`} label={`${label}, note`} value={rating.note} onChange={(note) => {
+                  setRating(key, withValue(rating, 'note', note));
+                }} />
+            </div>
+          </div>
+        );
+      })}
+    </fieldset>
   );
 }
 
@@ -411,10 +575,15 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
                   }} />
               ))}
             </fieldset>
+            <ImpactsFieldset doc={doc} risk={risk} setRisk={setRisk} />
           </div>
         )}
 
         {tab === 'Estimate' && <EstimateTab doc={doc} risk={risk} setRisk={setRisk} />}
+
+        {tab === 'Drivers' && <DriverLinksTab doc={doc} risk={risk} setRisk={setRisk} />}
+
+        {tab === 'Evidence' && <EvidenceTab risk={risk} setRisk={setRisk} />}
 
         {tab === 'Links' && (
           <div class="tab-body">

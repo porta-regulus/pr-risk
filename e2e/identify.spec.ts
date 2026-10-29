@@ -60,6 +60,29 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
   await page.getByLabel('A-1 Web shop').check();
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
 
+  // A driver in the panel, linked on the tab Drivers (Sec. 8.7).
+  await page.getByRole('button', { name: 'Add a driver' }).click();
+  await page.getByText(/^D-1 New driver/).click();
+  await page.locator('#driver-0-name').fill('Hosting provider outage');
+  await page.locator('#driver-0-kind').selectOption('supplier');
+  await page.locator('#driver-0-frequency-lower').fill('0.1');
+  await page.locator('#driver-0-frequency-upper').fill('0.5');
+  await page.locator('#driver-0-rationale').fill('The provider reported two regional outages in four years.');
+  await page.getByRole('tab', { name: 'Drivers' }).click();
+  await page.getByRole('button', { name: 'Link a driver' }).click();
+  await page.getByLabel('Trigger probability (0 to 1)').fill('0.5');
+  await expect(page.getByText('A driver with fewer than 2 links')).toBeVisible();
+  await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
+  await expectAccessible(page, 'S3 with the drivers tab open');
+
+  // New evidence sets the status to Review needed (Sec. 6.7.4).
+  await page.getByRole('tab', { name: 'Evidence' }).click();
+  await page.getByRole('button', { name: 'Add evidence' }).click();
+  await page.getByLabel('Evidence 1 reference').fill('Incident 2026-07-14');
+  await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
+  await expect(page.getByRole('row').filter({ hasText: 'R-1' })).toContainText('Review needed');
+  await expectAccessible(page, 'S3 with the evidence tab open');
+
   // The table shows the simulated exposure, not a placeholder.
   const row = page.getByRole('row').filter({ hasText: 'R-1' });
   await expect(row).not.toContainText('Not estimated');

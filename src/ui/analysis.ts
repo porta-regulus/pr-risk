@@ -1,6 +1,5 @@
 // NIST numbers and live feedback for a risk (SPEC.md Sec. 5 estimate words, 7.3 and 8.8).
-// In a quantitative register, riskLikelihood, riskImpact and exposureRating come from the
-// simulation. Each risk has its own random streams (Sec. 8.6 item 7), so a run of one risk
+// With an estimate, riskLikelihood, riskImpact and exposureRating come from the simulation. Each risk has its own random streams (Sec. 8.6 item 7), so a run of one risk
 // with its drivers gives exactly the numbers that a run of the whole document gives.
 import { canonicalize } from '../schema/canonical';
 import type { Distribution, Risk, RiskDocument } from '../schema/types';
@@ -66,28 +65,65 @@ const inputsOf = (doc: RiskDocument, risk: Risk): string => {
   ]);
 };
 
-// Sets the NIST numbers of every risk in a quantitative register whose simulation inputs
-// differ from the saved version, or whose numbers are still placeholders (rule D-Q2).
+type Numbers = Pick<RiskNumbers, 'riskLikelihood' | 'riskImpact' | 'exposureRating'>;
+
+// The risk with these numbers. Simulated numbers are no longer defaulted. Numbers from
+// labels stay listed in defaultedFields, as the importer lists them (Sec. 9.4). The list
+// keeps its order, and missing numeric fields go first.
+function withNumbers(risk: Risk, numbers: Numbers, fromLabels = false): Risk {
+  const listed = risk.defaultedFields ?? [];
+  const defaulted = fromLabels ? [...NUMERIC.filter((field) => !listed.includes(field)), ...listed] : listed.filter((field) => !NUMERIC.includes(field));
+  const { defaultedFields: _defaulted, ...rest } = risk;
+  const detail = risk.detail?.currentRiskAnalysis === NOT_ESTIMATED ? (({ currentRiskAnalysis: _text, ...other }) => other)(risk.detail) : risk.detail;
+  return {
+    ...rest,
+    riskLikelihood: numbers.riskLikelihood,
+    riskImpact: numbers.riskImpact,
+    exposureRating: numbers.exposureRating,
+    ...(defaulted.length === 0 ? {} : { defaultedFields: defaulted }),
+    ...(detail === undefined || Object.keys(detail).length === 0 ? {} : { detail }),
+  };
+}
+
+// Rules D-Q1 and D-Q3 of SPEC.md Sec. 7.3 for a risk without an estimate. The likelihood is
+// the representative of its label. An exposure label gives the exposure (D-Q1), else an
+// impact label gives the impact (D-Q3). Without enough labels there is no result.
+export function labelNumbers(doc: RiskDocument, risk: Risk): Numbers | undefined {
+  const scales = doc.strategy?.scales;
+  type Band = NonNullable<NonNullable<typeof scales>['likelihood']>[number];
+  const band = (bands: readonly Band[] | undefined, label: string | undefined): Band | undefined =>
+    label === undefined ? undefined : bands?.find((item) => item.label === label || (item.aliases ?? []).includes(label));
+  const likelihood = band(scales?.likelihood, risk.riskLikelihoodLabel)?.representative;
+  if (likelihood === undefined) return undefined;
+  const exposure = band(scales?.exposure, risk.exposureRatingLabel)?.representative;
+  if (exposure !== undefined) {
+    const impact = likelihood > 0 ? Math.round(exposure / likelihood) : 0;
+    return { riskLikelihood: likelihood, riskImpact: impact, exposureRating: likelihood > 0 ? exposure : 0 };
+  }
+  const impact = band(scales?.impact, risk.riskImpactLabel)?.representative;
+  return impact === undefined ? undefined : { riskLikelihood: likelihood, riskImpact: impact, exposureRating: Math.round(likelihood * impact) };
+}
+
+const labelInputs = (doc: RiskDocument, risk: Risk): string =>
+  canonicalize([risk.riskLikelihoodLabel ?? null, risk.riskImpactLabel ?? null, risk.exposureRatingLabel ?? null, doc.strategy?.scales ?? null]);
+
+// Sets the NIST numbers of every risk whose inputs differ from the saved version, or whose
+// numbers are still placeholders (rule D-Q2). A risk with an estimate takes the simulation,
+// in any register, because a register moves to quantitative risk by risk (Sec. 6.8). A
+// risk without an estimate takes its labels (D-Q1, D-Q3). Numbers that labels cannot give
+// stay as they are, so nothing typed or imported is lost.
 export function withNistNumbers(saved: RiskDocument, draft: RiskDocument): RiskDocument {
-  const quantitative = new Set(draft.registers.filter((register) => register.method === 'quantitative').map((register) => register.id));
   const risks = draft.risks.map((risk) => {
-    if (!quantitative.has(risk.registerId) || risk.estimate === undefined) return risk;
     const before = saved.risks.find((item) => item.riskId === risk.riskId);
+    if (risk.estimate === undefined) {
+      if (before !== undefined && labelInputs(saved, before) === labelInputs(draft, risk)) return risk;
+      const numbers = labelNumbers(draft, risk);
+      return numbers === undefined ? risk : withNumbers(risk, numbers, true);
+    }
     const placeholder = (risk.defaultedFields ?? []).some((field) => NUMERIC.includes(field));
     if (!placeholder && before !== undefined && inputsOf(saved, before) === inputsOf(draft, risk)) return risk;
     const numbers = riskNumbers(draft, risk.riskId);
-    if (numbers === undefined) return risk;
-    const defaulted = (risk.defaultedFields ?? []).filter((field) => !NUMERIC.includes(field));
-    const { defaultedFields: _defaulted, ...rest } = risk;
-    const detail = risk.detail?.currentRiskAnalysis === NOT_ESTIMATED ? (({ currentRiskAnalysis: _text, ...other }) => other)(risk.detail) : risk.detail;
-    return {
-      ...rest,
-      riskLikelihood: numbers.riskLikelihood,
-      riskImpact: numbers.riskImpact,
-      exposureRating: numbers.exposureRating,
-      ...(defaulted.length === 0 ? {} : { defaultedFields: defaulted }),
-      ...(detail === undefined || Object.keys(detail).length === 0 ? {} : { detail }),
-    };
+    return numbers === undefined ? risk : withNumbers(risk, numbers);
   });
   return risks.some((risk, i) => risk !== draft.risks[i]) ? { ...draft, risks } : draft;
 }
@@ -140,7 +176,8 @@ export function feedback(doc: RiskDocument, riskId: string): Feedback | undefine
   };
 }
 
-const sameInputs = (a: RiskDocument, riskA: Risk, b: RiskDocument, riskB: Risk): boolean => inputsOf(a, riskA) === inputsOf(b, riskB);
+const sameInputs = (a: RiskDocument, riskA: Risk, b: RiskDocument, riskB: Risk): boolean =>
+  inputsOf(a, riskA) === inputsOf(b, riskB) && labelInputs(a, riskA) === labelInputs(b, riskB);
 
 // After a save, the open draft takes the numbers that the save computed, for every risk whose
 // inputs did not change since. Without this, the next save would write the old numbers back.

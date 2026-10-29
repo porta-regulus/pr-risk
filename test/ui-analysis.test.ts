@@ -2,10 +2,10 @@
 import { describe, expect, it } from 'vitest';
 import { riskStats, simulate } from '../src/engine';
 import { documentErrors, type Risk, type RiskDocument } from '../src/schema';
-import { feedback, NOT_ESTIMATED, riskNumbers, withNistNumbers, withNumbersFrom, withSimulationSettings } from '../src/ui/analysis';
+import { feedback, labelNumbers, NOT_ESTIMATED, riskNumbers, withNistNumbers, withNumbersFrom, withSimulationSettings } from '../src/ui/analysis';
 import { prepareSave } from '../src/ui/editor';
 import { newRisk, registerTree } from '../src/ui/identify';
-import { example, EXAMPLE_2 } from './schema-helpers';
+import { example, EXAMPLE_1, EXAMPLE_2 } from './schema-helpers';
 
 const doc = example(EXAMPLE_2);
 const settings = doc.simulation ?? { seed: 0, trials: 100_000, engineVersion: 'x' };
@@ -102,5 +102,33 @@ describe('S3 helpers', () => {
     expect(registerTree(doc.registers).map((item) => [item.register.id, item.depth])).toEqual(
       doc.registers.map((register) => [register.id, register.parentRegisterId === undefined ? 0 : 1]),
     );
+  });
+});
+
+describe('labels give the numbers of a risk without an estimate (rules D-Q1 and D-Q3)', () => {
+  const doc1 = example(EXAMPLE_1);
+  const risk1 = doc1.risks[0] as Risk;
+
+  it('D-Q1. An exposure label gives the exposure, and the impact follows', () => {
+    expect(labelNumbers(doc1, { ...risk1, riskLikelihoodLabel: 'High', exposureRatingLabel: 'Mod' })).toEqual({ riskLikelihood: 0.9, riskImpact: 555_556, exposureRating: 500_000 });
+  });
+
+  it('D-Q3. Without an exposure label, the impact label gives the impact', () => {
+    const { exposureRatingLabel: _drop, ...rest } = risk1;
+    expect(labelNumbers(doc1, { ...rest, riskLikelihoodLabel: 'Low', riskImpactLabel: 'High' })).toEqual({ riskLikelihood: 0.1, riskImpact: 10_000_000, exposureRating: 1_000_000 });
+  });
+
+  it('a label change updates the numbers, keeps them listed as defaulted, and the document stays valid', () => {
+    const changed = withRisk(doc1, { ...risk1, riskLikelihoodLabel: 'High' });
+    const result = withNistNumbers(doc1, changed);
+    const after = result.risks[0] as Risk;
+    expect(after.riskLikelihood).toBe(0.9);
+    expect(after.defaultedFields).toEqual(risk1.defaultedFields);
+    expect(documentErrors(result)).toEqual([]);
+  });
+
+  it('an unrelated save leaves every risk of example 1 as it is', () => {
+    const draft = { ...doc1, context: { ...doc1.context, mission: 'Test' } };
+    expect(withNistNumbers(doc1, draft).risks).toBe(draft.risks);
   });
 });
