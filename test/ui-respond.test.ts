@@ -2,11 +2,13 @@
 import { describe, expect, it } from 'vitest';
 import { priorityNumbers } from '../src/engine';
 import { documentErrors, type ResponseOption, type RiskDocument } from '../src/schema';
-import { CATALOGUE, fromCatalogue } from '../src/ui/catalogue';
+import riskletData from '../src/catalogue/risklet.json';
+import { CATALOGUE, fromCatalogue, riskletSubcode } from '../src/ui/catalogue';
 import { documentChanges, withChangeLog } from '../src/ui/edit';
 import { newRisk } from '../src/ui/identify';
 import { proposedPriorities, simulationKey } from '../src/ui/prioritize';
 import { residualRisks } from '../src/ui/record';
+import { SUBCODES } from '../src/ui/risk-editor';
 import { TABLE_2, templateStatement } from '../src/ui/templates';
 import { example, EXAMPLE_1, EXAMPLE_2 } from './schema-helpers';
 
@@ -97,5 +99,41 @@ describe('S3 catalogue picker (SPEC.md Sec. 6.7.1 item 3)', () => {
       const qualitative: RiskDocument = { ...doc, registers: doc.registers.map((register) => ({ ...register, method: 'qualitative' })) as RiskDocument['registers'] };
       expect(documentErrors({ ...qualitative, risks: [...qualitative.risks, risk] })).toEqual([]);
     }
+  });
+});
+
+describe('Risklet catalogue (SPEC.md Sec. 6.7.7, Q3 answered 2026-10-29)', () => {
+  const risklet = CATALOGUE.filter((entry) => entry.catalogue === 'Risklet');
+  const subcodeOf = (id: string): string | undefined => risklet.find((entry) => entry.id === id)?.category.subcode;
+
+  it('ships all 119 names with 39 labels, each mapped to a release 1 subcode', () => {
+    expect(risklet).toHaveLength(119);
+    expect(new Set(risklet.map((entry) => entry.group)).size).toBe(39);
+    for (const entry of risklet) {
+      expect(entry.polarity).toBe('negative');
+      expect(
+        SUBCODES[entry.category.code].map((suffix) => `${entry.category.code}.${suffix}`),
+        `${entry.id} ${entry.text}`,
+      ).toContain(entry.category.subcode);
+    }
+  });
+
+  it('applies the exceptions of the table', () => {
+    expect(risklet.find((entry) => entry.id === '54')?.text).toBe('Vendor Bankruptcy/Closure');
+    expect(subcodeOf('54')).toBe('operational.supplier');
+    expect(subcodeOf('61')).toBe('legal.privacy');
+    expect(subcodeOf('64')).toBe('legal.contract');
+    for (const name of ['Network Segmentation Failure', 'Network Sensor Blind Spots', 'Load Balancer Configuration Drift']) {
+      expect(risklet.find((entry) => entry.text === name)?.category.subcode, name).toBe('ict.misconfiguration');
+    }
+    const vendors = risklet.filter((entry) => entry.group === 'Risklet, Vendor' && entry.id !== '54');
+    expect(vendors.length).toBeGreaterThan(0);
+    for (const entry of vendors) expect(entry.category.subcode).toBe('ict.supply-chain');
+    for (const entry of risklet.filter((item) => item.group === 'Risklet, Compliance' && !['61', '64'].includes(item.id))) expect(entry.category.subcode).toBe('legal.regulatory');
+  });
+
+  it('every label has a mapping, so no name is lost', () => {
+    for (const entry of riskletData.entries) expect(riskletSubcode(entry), entry.label).toBeDefined();
+    expect(riskletData.licence).toBe('CC-BY-4.0');
   });
 });

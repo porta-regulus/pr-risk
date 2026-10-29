@@ -3,7 +3,7 @@
 import { useState } from 'preact/hooks';
 import type { Register, Risk, RiskDocument } from '../schema/types';
 import { NOT_ESTIMATED, numbersSource } from './analysis';
-import { CATALOGUE, fromCatalogue } from './catalogue';
+import { CATALOGUE, CATALOGUE_GROUPS, fromCatalogue, RISKLET_ATTRIBUTION } from './catalogue';
 import { formatNumber } from './distribution';
 import { nextId, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
@@ -36,7 +36,10 @@ export function registerTree(registers: readonly Register[]): { register: Regist
 // listed in defaultedFields. The response is the interim Accept with cost 0 (rule V-09).
 export function newRisk(doc: RiskDocument, registerId: string, description: string, polarity: Risk['polarity']): Risk {
   return {
-    riskId: nextId('R-', doc.risks.map((risk) => risk.riskId)),
+    riskId: nextId(
+      'R-',
+      doc.risks.map((risk) => risk.riskId),
+    ),
     registerId,
     riskDescription: description,
     riskCategory: 'Not set',
@@ -57,13 +60,23 @@ export function newRisk(doc: RiskDocument, registerId: string, description: stri
   };
 }
 
-function RegisterPanel({ doc, update, selected, onSelect }: { readonly doc: RiskDocument; readonly update: Update; readonly selected: Register; readonly onSelect: (id: string) => void }) {
+function RegisterPanel({
+  doc,
+  update,
+  selected,
+  onSelect,
+}: {
+  readonly doc: RiskDocument;
+  readonly update: Update;
+  readonly selected: Register;
+  readonly onSelect: (id: string) => void;
+}) {
   const tree = registerTree(doc.registers);
   const children = doc.registers.filter((register) => register.parentRegisterId === selected.id);
   const used = doc.risks.some((risk) => risk.registerId === selected.id) || children.length > 0;
   // A parent cannot be the register itself or one of its descendants (rule V-02).
   const descendants = new Set<string>([selected.id]);
-  for (let grew = true; grew; ) {
+  for (let grew = true; grew;) {
     grew = false;
     for (const register of doc.registers) {
       if (register.parentRegisterId !== undefined && descendants.has(register.parentRegisterId) && !descendants.has(register.id)) {
@@ -82,9 +95,14 @@ function RegisterPanel({ doc, update, selected, onSelect }: { readonly doc: Risk
       <ul class="tree">
         {tree.map(({ register, depth }) => (
           <li key={register.id} style={{ paddingLeft: `${String(depth * 1.25)}rem` }}>
-            <button type="button" class={register.id === selected.id ? 'tree-item active' : 'tree-item'} aria-current={register.id === selected.id ? 'true' : undefined} onClick={() => {
+            <button
+              type="button"
+              class={register.id === selected.id ? 'tree-item active' : 'tree-item'}
+              aria-current={register.id === selected.id ? 'true' : undefined}
+              onClick={() => {
                 onSelect(register.id);
-              }}>
+              }}
+            >
               {register.title}
             </button>
             <span class="sub">
@@ -93,20 +111,40 @@ function RegisterPanel({ doc, update, selected, onSelect }: { readonly doc: Risk
           </li>
         ))}
       </ul>
-      <button type="button" class="quiet" onClick={() => {
-          const created: Register = { id: nextId('REG-', doc.registers.map((item) => item.id)), title: 'New register', level: 'system', parentRegisterId: selected.id, timeframeMonths: 12, asOf: today(), method: 'qualitative' };
+      <button
+        type="button"
+        class="quiet"
+        onClick={() => {
+          const created: Register = {
+            id: nextId(
+              'REG-',
+              doc.registers.map((item) => item.id),
+            ),
+            title: 'New register',
+            level: 'system',
+            parentRegisterId: selected.id,
+            timeframeMonths: 12,
+            asOf: today(),
+            method: 'qualitative',
+          };
           update((current) => ({ ...current, registers: [...current.registers, created] as RiskDocument['registers'] }));
           onSelect(created.id);
-        }}>
+        }}
+      >
         Add a register under {selected.title}
       </button>
 
       <h3>Register {selected.id}</h3>
       <div class="field-row">
         <div class="field wide">
-          <TextField id={`${id}-title`} label="Title" value={selected.title} onChange={(title) => {
+          <TextField
+            id={`${id}-title`}
+            label="Title"
+            value={selected.title}
+            onChange={(title) => {
               setRegister((register) => ({ ...register, title }));
-            }} />
+            }}
+          />
         </div>
         <div class="field">
           <SelectField
@@ -152,14 +190,28 @@ function RegisterPanel({ doc, update, selected, onSelect }: { readonly doc: Risk
           />
         </div>
         <div class="field">
-          <NumberField id={`${id}-timeframe`} label="Timeframe (months)" integer min={1} max={60} value={selected.timeframeMonths} onChange={(months) => {
+          <NumberField
+            id={`${id}-timeframe`}
+            label="Timeframe (months)"
+            integer
+            min={1}
+            max={60}
+            value={selected.timeframeMonths}
+            onChange={(months) => {
               setRegister((register) => withValue(register, 'timeframeMonths', months));
-            }} />
+            }}
+          />
         </div>
         <div class="field">
-          <TextField id={`${id}-as-of`} label="As of" type="date" value={selected.asOf} onChange={(asOf) => {
+          <TextField
+            id={`${id}-as-of`}
+            label="As of"
+            type="date"
+            value={selected.asOf}
+            onChange={(asOf) => {
               setRegister((register) => ({ ...register, asOf }));
-            }} />
+            }}
+          />
         </div>
         <div class="field">
           <NumberField
@@ -173,14 +225,24 @@ function RegisterPanel({ doc, update, selected, onSelect }: { readonly doc: Risk
           />
         </div>
         <div class="field">
-          <TextField id={`${id}-owner`} label="Owner" value={selected.owner} onChange={(owner) => {
+          <TextField
+            id={`${id}-owner`}
+            label="Owner"
+            value={selected.owner}
+            onChange={(owner) => {
               setRegister((register) => withValue(register, 'owner', owner));
-            }} />
+            }}
+          />
         </div>
       </div>
-      <TextField id={`${id}-scope`} label="Scope" value={selected.scope} onChange={(scope) => {
+      <TextField
+        id={`${id}-scope`}
+        label="Scope"
+        value={selected.scope}
+        onChange={(scope) => {
           setRegister((register) => withValue(register, 'scope', scope));
-        }} />
+        }}
+      />
       <div class="button-row">
         <button
           type="button"
@@ -199,7 +261,19 @@ function RegisterPanel({ doc, update, selected, onSelect }: { readonly doc: Risk
   );
 }
 
-function RiskTable({ doc, update, register, selected, onSelect }: { readonly doc: RiskDocument; readonly update: Update; readonly register: Register; readonly selected: string | undefined; readonly onSelect: (id: string) => void }) {
+function RiskTable({
+  doc,
+  update,
+  register,
+  selected,
+  onSelect,
+}: {
+  readonly doc: RiskDocument;
+  readonly update: Update;
+  readonly register: Register;
+  readonly selected: string | undefined;
+  readonly onSelect: (id: string) => void;
+}) {
   const [description, setDescription] = useState('');
   const [polarity, setPolarity] = useState<Risk['polarity']>('negative');
   const [entryId, setEntryId] = useState<string>();
@@ -252,9 +326,14 @@ function RiskTable({ doc, update, register, selected, onSelect }: { readonly doc
                       )}
                     </td>
                     <td>
-                      <button type="button" class="quiet" aria-pressed={risk.riskId === selected} onClick={() => {
+                      <button
+                        type="button"
+                        class="quiet"
+                        aria-pressed={risk.riskId === selected}
+                        onClick={() => {
                           onSelect(risk.riskId);
-                        }}>
+                        }}
+                      >
                         Edit {risk.riskId}
                       </button>
                     </td>
@@ -266,7 +345,14 @@ function RiskTable({ doc, update, register, selected, onSelect }: { readonly doc
         </div>
       )}
       <h3>Add a risk</h3>
-      <TextField id="new-risk-description" label="Risk description" hint='Cause and effect, "if X occurs, then Y happens".' multiline value={description} onChange={setDescription} />
+      <TextField
+        id="new-risk-description"
+        label="Risk description"
+        hint='Cause and effect, "if X occurs, then Y happens".'
+        multiline
+        value={description}
+        onChange={setDescription}
+      />
       <div class="field-row">
         <div class="field">
           <SelectField
@@ -283,35 +369,61 @@ function RiskTable({ doc, update, register, selected, onSelect }: { readonly doc
           />
         </div>
       </div>
-      <button type="button" disabled={description.trim() === ''} onClick={() => {
+      <button
+        type="button"
+        disabled={description.trim() === ''}
+        onClick={() => {
           const risk = newRisk(doc, register.id, description.trim(), polarity);
           update((current) => ({ ...current, risks: [...current.risks, risk] }));
           setDescription('');
           onSelect(risk.riskId);
-        }}>
+        }}
+      >
         Add risk to {register.title}
       </button>
       <h3>Add a risk from the catalogue</h3>
       <p class="hint">A template gives the text and the category. You still give the frequency, the impact and the owner.</p>
       <div class="field-row">
         <div class="field wide">
-          <SelectField
+          <label for="catalogue-entry">Template</label>
+          <select
             id="catalogue-entry"
-            label="Template"
-            emptyLabel="Select a template"
-            value={entryId}
-            options={CATALOGUE.map((entry) => [entry.id, `${entry.text} (${entry.source})`] as const)}
-            onChange={setEntryId}
-          />
+            value={entryId ?? ''}
+            onChange={(event) => {
+              const next = event.currentTarget.value;
+              setEntryId(next === '' ? undefined : next);
+            }}
+          >
+            <option value="">Select a template</option>
+            {CATALOGUE_GROUPS.map((group) => (
+              <optgroup key={group} label={group}>
+                {CATALOGUE.filter((item) => item.group === group).map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.text}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
         </div>
       </div>
-      <button type="button" disabled={entry === undefined} onClick={() => {
+      {entry !== undefined && (
+        <p class="hint">
+          Source {entry.source}. Category {entry.category.subcode ?? entry.category.code}. Write the description as cause and effect after you add it.
+        </p>
+      )}
+      <p class="source">{RISKLET_ATTRIBUTION}.</p>
+      <button
+        type="button"
+        disabled={entry === undefined}
+        onClick={() => {
           if (entry === undefined) return;
           const risk = fromCatalogue(newRisk(doc, register.id, entry.text, entry.polarity), entry);
           update((current) => ({ ...current, risks: [...current.risks, risk] }));
           setEntryId(undefined);
           onSelect(risk.riskId);
-        }}>
+        }}
+      >
         Add the template to {register.title}
       </button>
     </section>
@@ -349,7 +461,9 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
   return (
     <section aria-labelledby="assets-title" class="panel">
       <h2 id="assets-title">Asset inventory</h2>
-      <p class="muted">"The value of an asset extends beyond its replacement cost" (Sec. 3.3.1), so a value needs a basis. Assets inherit the criticality of the functions they support.</p>
+      <p class="muted">
+        "The value of an asset extends beyond its replacement cost" (Sec. 3.3.1), so a value needs a basis. Assets inherit the criticality of the functions they support.
+      </p>
       {assets.map((asset, i) => {
         const risks = usedBy(asset.id);
         const id = `asset-${String(i)}`;
@@ -366,47 +480,87 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                     <strong>ID</strong> {asset.id}
                   </p>
                 ) : (
-                  <TextField id={`${id}-id`} label="ID" value={asset.id} onChange={(value) => {
+                  <TextField
+                    id={`${id}-id`}
+                    label="ID"
+                    value={asset.id}
+                    onChange={(value) => {
                       setAsset(i, { ...asset, id: value });
-                    }} />
+                    }}
+                  />
                 )}
               </div>
               <div class="field wide">
-                <TextField id={`${id}-name`} label="Name" value={asset.name} onChange={(name) => {
+                <TextField
+                  id={`${id}-name`}
+                  label="Name"
+                  value={asset.name}
+                  onChange={(name) => {
                     setAsset(i, { ...asset, name });
-                  }} />
+                  }}
+                />
               </div>
               <div class="field">
-                <SelectField id={`${id}-kind`} label="Kind" value={asset.kind} options={ASSET_KINDS} onChange={(kind) => {
+                <SelectField
+                  id={`${id}-kind`}
+                  label="Kind"
+                  value={asset.kind}
+                  options={ASSET_KINDS}
+                  onChange={(kind) => {
                     setAsset(i, { ...asset, kind: kind ?? 'information' });
-                  }} />
+                  }}
+                />
               </div>
               <div class="field">
-                <TextField id={`${id}-owner`} label="Owner" value={asset.owner} onChange={(owner) => {
+                <TextField
+                  id={`${id}-owner`}
+                  label="Owner"
+                  value={asset.owner}
+                  onChange={(owner) => {
                     setAsset(i, withValue(asset, 'owner', owner));
-                  }} />
+                  }}
+                />
               </div>
               <div class="field">
-                <TextField id={`${id}-criticality`} label="Criticality" value={asset.criticality} onChange={(value) => {
+                <TextField
+                  id={`${id}-criticality`}
+                  label="Criticality"
+                  value={asset.criticality}
+                  onChange={(value) => {
                     setAsset(i, withValue(asset, 'criticality', value));
-                  }} />
+                  }}
+                />
               </div>
               <div class="field">
-                <TextField id={`${id}-sensitivity`} label="Sensitivity" value={asset.sensitivity} onChange={(value) => {
+                <TextField
+                  id={`${id}-sensitivity`}
+                  label="Sensitivity"
+                  value={asset.sensitivity}
+                  onChange={(value) => {
                     setAsset(i, withValue(asset, 'sensitivity', value));
-                  }} />
+                  }}
+                />
               </div>
             </div>
             <label class="check">
-              <input type="checkbox" checked={asset.external === true} onChange={(event) => {
+              <input
+                type="checkbox"
+                checked={asset.external === true}
+                onChange={(event) => {
                   setAsset(i, withValue(asset, 'external', event.currentTarget.checked ? true : undefined));
-                }} />
+                }}
+              />
               Outside direct control (external)
             </label>
             {asset.external === true && (
-              <TextField id={`${id}-provider`} label="Provider" value={asset.provider} onChange={(provider) => {
+              <TextField
+                id={`${id}-provider`}
+                label="Provider"
+                value={asset.provider}
+                onChange={(provider) => {
                   setAsset(i, withValue(asset, 'provider', provider));
-                }} />
+                }}
+              />
             )}
             {(doc.context?.functions ?? []).length > 0 && (
               <Checkboxes
@@ -421,37 +575,75 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
             )}
             <div class="field-row">
               <div class="field">
-                <NumberField id={`${id}-value`} label={`Value (${currency})`} min={0} value={asset.value?.amount} onChange={(amount) => {
+                <NumberField
+                  id={`${id}-value`}
+                  label={`Value (${currency})`}
+                  min={0}
+                  value={asset.value?.amount}
+                  onChange={(amount) => {
                     const next = { ...(asset.value ?? { basis: 'replacement-cost' as const }), ...(amount === undefined ? {} : { amount }) };
                     setAsset(i, withValue(asset, 'value', amount === undefined ? undefined : (next as Asset['value'])));
-                  }} />
+                  }}
+                />
               </div>
               {asset.value !== undefined && (
                 <>
                   <div class="field">
-                    <SelectField id={`${id}-basis`} label="Basis of the value" value={asset.value.basis} options={BASES} onChange={(basis) => {
+                    <SelectField
+                      id={`${id}-basis`}
+                      label="Basis of the value"
+                      value={asset.value.basis}
+                      options={BASES}
+                      onChange={(basis) => {
                         if (asset.value !== undefined) setAsset(i, { ...asset, value: { ...asset.value, basis: basis ?? 'other' } });
-                      }} />
+                      }}
+                    />
                   </div>
                   <div class="field wide">
-                    <TextField id={`${id}-rationale`} label="Rationale of the value" value={asset.value.rationale} onChange={(rationale) => {
+                    <TextField
+                      id={`${id}-rationale`}
+                      label="Rationale of the value"
+                      value={asset.value.rationale}
+                      onChange={(rationale) => {
                         if (asset.value !== undefined) setAsset(i, { ...asset, value: withValue(asset.value, 'rationale', rationale) });
-                      }} />
+                      }}
+                    />
                   </div>
                 </>
               )}
             </div>
-            <button type="button" class="quiet" disabled={risks.length > 0} onClick={() => {
+            <button
+              type="button"
+              class="quiet"
+              disabled={risks.length > 0}
+              onClick={() => {
                 setAsset(i, undefined);
-              }}>
+              }}
+            >
               Remove asset {asset.id}
             </button>
           </details>
         );
       })}
-      <button type="button" class="quiet" onClick={() => {
-          update((current) => withValue(current, 'assets', [...(current.assets ?? []), { id: nextId('A-', (current.assets ?? []).map((item) => item.id)), name: '', kind: 'information' }]));
-        }}>
+      <button
+        type="button"
+        class="quiet"
+        onClick={() => {
+          update((current) =>
+            withValue(current, 'assets', [
+              ...(current.assets ?? []),
+              {
+                id: nextId(
+                  'A-',
+                  (current.assets ?? []).map((item) => item.id),
+                ),
+                name: '',
+                kind: 'information',
+              },
+            ]),
+          );
+        }}
+      >
         Add an asset
       </button>
     </section>
@@ -467,16 +659,27 @@ function IdentifyBody({ doc, update }: { readonly doc: RiskDocument; readonly up
   return (
     <>
       <div class="grid">
-        <RegisterPanel doc={doc} update={update} selected={register} onSelect={(id) => {
+        <RegisterPanel
+          doc={doc}
+          update={update}
+          selected={register}
+          onSelect={(id) => {
             setRegisterId(id);
             setRiskId(undefined);
-          }} />
+          }}
+        />
         <RiskTable doc={doc} update={update} register={register} selected={risk?.riskId} onSelect={setRiskId} />
       </div>
       {risk !== undefined && (
-        <RiskEditor key={risk.riskId} doc={doc} risk={risk} update={update} onRemoved={() => {
+        <RiskEditor
+          key={risk.riskId}
+          doc={doc}
+          risk={risk}
+          update={update}
+          onRemoved={() => {
             setRiskId(undefined);
-          }} />
+          }}
+        />
       )}
       <div class="grid">
         <AssetPanel doc={doc} update={update} />

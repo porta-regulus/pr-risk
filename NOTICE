@@ -8,3 +8,8 @@ NIST IR 8286 Rev. 1, published by the National Institute of Standards and
 Technology. They are works of the U.S. Government and are not subject to
 copyright protection in the United States. The files are unchanged and pinned
 by SHA-256.
+
+src/catalogue/risklet.json holds the Risklet catalogue (119 risk names and their
+category labels), copyright 2026 PortaRegulus, licensed under the Creative
+Commons Attribution 4.0 International licence (CC BY 4.0,
+https://creativecommons.org/licenses/by/4.0/).

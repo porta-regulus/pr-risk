@@ -4,7 +4,8 @@ import { expectAccessible } from './axe';
 
 // Build task 5, done criterion 2. A scripted run of the AT-5 task (SPEC.md Sec. 12.5) on a
 // fictitious company, from an empty browser to the printed decision record, in under 10
-// minutes. The positive risk comes from the catalogue picker, and the other 4 are own risks.
+// minutes. R-4 (Risklet) and the positive R-5 (NIST text) come from the catalogue picker, and
+// the other 3 are own risks.
 interface RiskInput {
   readonly description: string;
   // The id of a catalogue template. The description is then the template text.
@@ -33,7 +34,8 @@ const RISKS: readonly RiskInput[] = [
     impact: [5_000, 80_000],
   },
   {
-    description: 'If customer data leaks from the web shop, then the authority fines us.',
+    description: 'Privacy Regulation Violation',
+    template: '61',
     owner: 'Managing director',
     objective: 'OBJ-2',
     frequency: [0.02, 0.2],
@@ -145,6 +147,7 @@ test('AT-5 task from an empty browser to the printed decision record in under 10
   const r5 = page.getByRole('row').filter({ hasText: 'cloud-based authentication platform' });
   await expect(r5).toContainText('Opportunity');
   await expect(r5).toContainText('ict.identity');
+  await expect(page.getByRole('row').filter({ hasText: 'Privacy Regulation Violation' })).toContainText('legal.privacy');
 
   // 1 driver with 2 links.
   await page.getByRole('button', { name: 'Add a driver' }).click();
