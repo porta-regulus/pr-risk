@@ -14,11 +14,13 @@ import { documentChanges, withChangeLog } from './edit';
 import { InvalidFields } from './fields';
 
 export type Update = (change: (doc: RiskDocument) => RiskDocument) => void;
-export type ScreenName = 'start' | 'context' | 'identify';
+export type ScreenName = 'start' | 'context' | 'identify' | 'prioritize' | 'respond';
 
 const SCREENS: readonly (readonly [Exclude<ScreenName, 'start'>, string])[] = [
   ['context', 'Context and strategy'],
   ['identify', 'Identify and analyze'],
+  ['prioritize', 'Prioritize'],
+  ['respond', 'Respond and optimize'],
 ];
 
 const SAVE_DELAY_MS = 600;

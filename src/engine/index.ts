@@ -1,4 +1,8 @@
-export const ENGINE_VERSION = '0.1.0';
+export { ENGINE_VERSION } from './version';
+export { decisionRecord, documentHash, statusOf } from './decision';
+export { priorityNumbers } from './prioritize';
+export type { PriorityNumbers, RegisterCurve } from './prioritize';
+export type { DecisionRecord, NotFunded, PortfolioRow, RiskRow, StateNumbers, ToleranceStatus } from './decision';
 export {
   capacityOf,
   contributions,
@@ -27,6 +31,7 @@ export {
   feasiblePortfolios,
   firstYearCash,
   fiscal,
+  batchSe,
   measure,
   optimize,
   pairedSe,

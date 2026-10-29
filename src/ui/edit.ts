@@ -62,7 +62,7 @@ export function changedSections(before: RiskDocument, after: RiskDocument): Sect
   return SECTIONS.filter((section) => before[section] !== after[section] && canonicalize(before[section] ?? null) !== canonicalize(after[section] ?? null));
 }
 
-type EntityKind = 'register' | 'risk' | 'asset' | 'driver';
+type EntityKind = 'register' | 'risk' | 'asset' | 'driver' | 'response';
 type Keyed = { readonly id?: string; readonly riskId?: string };
 
 export interface Change {
@@ -73,11 +73,12 @@ export interface Change {
   readonly after?: unknown;
 }
 
-const ENTITY_LISTS: readonly (readonly ['registers' | 'risks' | 'assets' | 'drivers', EntityKind])[] = [
+const ENTITY_LISTS: readonly (readonly ['registers' | 'risks' | 'assets' | 'drivers' | 'responses', EntityKind])[] = [
   ['registers', 'register'],
   ['risks', 'risk'],
   ['assets', 'asset'],
   ['drivers', 'driver'],
+  ['responses', 'response'],
 ];
 
 const keyOf = (item: Keyed): string => item.riskId ?? item.id ?? '';
