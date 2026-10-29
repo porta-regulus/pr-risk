@@ -18,7 +18,7 @@ export function sha256(message: Uint8Array): Uint8Array {
   const bitLength = message.length * 8;
   const padded = new Uint8Array(Math.ceil((message.length + 9) / 64) * 64);
   padded.set(message);
-  padded[message.length] = 0x80;
+  padded.set([0x80], message.length);
   const view = new DataView(padded.buffer);
   view.setUint32(padded.length - 8, Math.floor(bitLength / 2 ** 32));
   view.setUint32(padded.length - 4, bitLength >>> 0);

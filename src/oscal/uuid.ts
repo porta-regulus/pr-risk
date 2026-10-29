@@ -4,7 +4,7 @@
 function sha1(message: Uint8Array): Uint8Array {
   const padded = new Uint8Array(Math.ceil((message.length + 9) / 64) * 64);
   padded.set(message);
-  padded[message.length] = 0x80;
+  padded.set([0x80], message.length);
   const view = new DataView(padded.buffer);
   const bits = message.length * 8;
   view.setUint32(padded.length - 8, Math.floor(bits / 2 ** 32));

@@ -11,6 +11,9 @@ export interface ImportRequest {
 export type ImportResponse = { readonly kind: 'preview'; readonly preview: ImportPreview } | { readonly kind: 'error'; readonly message: string };
 
 addEventListener('message', (event: MessageEvent<ImportRequest>) => {
+  // Only the page that made this dedicated worker can post to it, and the event origin is then
+  // empty. The check refuses anything else (CodeQL js/missing-origin-check).
+  if (event.origin !== '' && event.origin !== location.origin) return;
   const { doc, file, options } = event.data;
   try {
     postMessage({ kind: 'preview', preview: prepareImport(doc, file, options) } satisfies ImportResponse);

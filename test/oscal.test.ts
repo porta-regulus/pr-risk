@@ -4,7 +4,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import Ajv from 'ajv';
 import { describe, expect, it } from 'vitest';
-import { exportPoam, importPoam } from '../src/oscal/poam';
+import { DETAIL_FIELDS, exportPoam, importPoam, NS, RISK_FIELDS } from '../src/oscal/poam';
 import { sha1Hex, uuidv5 } from '../src/oscal/uuid';
 import { canonicalize, sha256Hex } from '../src/schema';
 import { EXAMPLE_NAMES, example } from './schema-helpers';
@@ -23,6 +23,16 @@ describe('SHA-1 and UUIDv5', () => {
 
   it('the schema file is the OSCAL 1.2.3 release asset', () => {
     expect(sha256Hex(new Uint8Array(schemaBytes))).toBe('f4fd94487408a9589954b5b92d88965c984d4f79b85365cc574b860898759437');
+  });
+});
+
+describe('OSCAL native import names', () => {
+  it('equal the schema risk and riskDetail properties with the NIST register fields', () => {
+    const read = (path: string): unknown => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
+    const schema = read('../docs/schema/risk-register.schema.json') as { $defs: Record<string, { properties: object }> };
+    const nist = read('../docs/schema/vendor/nist-ir8286r1/risk_register_schema.json') as { properties: object };
+    expect(new Set(RISK_FIELDS)).toEqual(new Set([...Object.keys(schema.$defs['risk']?.properties ?? {}), ...Object.keys(nist.properties)]));
+    expect(new Set(DETAIL_FIELDS)).toEqual(new Set(Object.keys(schema.$defs['riskDetail']?.properties ?? {})));
   });
 });
 
@@ -58,6 +68,24 @@ for (const name of EXAMPLE_NAMES) {
         expect(result.risks.map((risk) => canonicalize(risk))).toEqual(doc.risks.map((risk) => canonicalize(risk)));
         expect(result.registers).toEqual([]);
         expect(result.report.join(' ')).toContain('not in the mapped elements');
+      }
+    });
+
+    it('native path drops props with unknown names, also __proto__', () => {
+      const stripped = structuredClone(poam) as { 'plan-of-action-and-milestones': { 'back-matter'?: unknown; risks: { props: Record<string, string>[] }[] } };
+      delete stripped['plan-of-action-and-milestones']['back-matter'];
+      stripped['plan-of-action-and-milestones'].risks[0]?.props.push(
+        { name: '__proto__', ns: NS, value: '{"polluted":true}', class: 'json' },
+        { name: 'constructor', ns: NS, value: 'x', group: 'detail' },
+        { name: 'madeUp', ns: NS, value: 'x' },
+      );
+      const result = importPoam(stripped, { ...doc, risks: [] }, '2026-10-28');
+      expect(result.path).toBe('native');
+      if (result.path === 'native') {
+        expect(canonicalize(result.risks[0])).toBe(canonicalize(doc.risks[0]));
+        expect(Object.getPrototypeOf(result.risks[0])).toBe(Object.prototype);
+        expect(({} as Record<string, unknown>)['polluted']).toBeUndefined();
+        expect(result.report.join(' ')).toContain('They are ignored: __proto__, constructor, madeUp.');
       }
     });
 

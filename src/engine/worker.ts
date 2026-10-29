@@ -8,6 +8,9 @@ const post = (message: EngineResponse): void => {
 };
 
 addEventListener('message', (event: MessageEvent<EngineRequest>) => {
+  // Only the page that made this dedicated worker can post to it, and the event origin is then
+  // empty. The check refuses anything else (CodeQL js/missing-origin-check).
+  if (event.origin !== '' && event.origin !== location.origin) return;
   const request = event.data;
   try {
     if (request.kind === 'simulate') {

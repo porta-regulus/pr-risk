@@ -241,6 +241,25 @@ interface OscalRisk {
   remediations?: { props?: Prop[] }[];
 }
 
+// Field names that the native import accepts: the risk and riskDetail properties of the
+// schema, with the NIST register fields. A prop with another name is reported and dropped, so a
+// crafted file cannot set __proto__ or an inherited name. test/oscal.test.ts checks the lists.
+export const RISK_FIELDS: ReadonlySet<string> = new Set([
+  'acceptance', 'assetIds', 'catalogueRef', 'category', 'defaultedFields', 'detail', 'driverLinks', 'estimate', 'evidence',
+  'exposureRating', 'exposureRatingLabel', 'horizon', 'impacts', 'linkedRisks', 'notes', 'objectiveIds', 'onlyWithResponse',
+  'polarity', 'previousAssessment', 'priority', 'priorityOverride', 'registerId', 'responseDecision', 'reviewDue',
+  'riskCategory', 'riskDescription', 'riskId', 'riskImpact', 'riskImpactLabel', 'riskLikelihood', 'riskLikelihoodLabel',
+  'riskOwnerPointOfContact', 'riskResponseCost', 'riskResponseDescription', 'riskResponseType', 'rollUp', 'sourceRefs',
+  'status', 'threatSourceType',
+]);
+export const DETAIL_FIELDS: ReadonlySet<string> = new Set([
+  'assetsAffected', 'comments', 'currentRiskAnalysis', 'currentStatusDate', 'dateOfRiskIdentification', 'dependencies',
+  'followUpDate', 'implementedResponseDescription', 'measured', 'organizationOrBusinessUnit', 'otherScenarioDetails',
+  'planned', 'primaryAdverseImpact', 'residualResponseAsImplemented', 'resourceRequirementsForPlannedRisk',
+  'riskScenarioDescription', 'secondaryAdverseImpacts', 'sourceOfRiskInformation', 'systemAffected', 'threatEvents',
+  'threatSourcesActors', 'threatVectors', 'vulnerabilityPredisposingConditions',
+]);
+
 const NOT_IN_OSCAL = ['context', 'governance', 'strategy', 'appetite', 'assets', 'drivers', 'responses', 'forecasts', 'simulation', 'provenance', 'changeLog'];
 
 export function importPoam(json: unknown, target: RiskDocument, asOf: string): PoamImport {
@@ -259,23 +278,30 @@ export function importPoam(json: unknown, target: RiskDocument, asOf: string): P
   }
   const report = [resource === undefined ? 'The POA&M has no pr-risk payload. Risks come from the mapped elements.' : 'The payload hash does not match. Risks come from the mapped elements.'];
   const risks = ((poam['risks'] as OscalRisk[] | undefined) ?? []).map((item, index): Risk => {
-    const fields: Record<string, unknown> = {};
-    const detail: Record<string, unknown> = {};
+    // Maps, not plain objects, until the names are checked. Object.fromEntries defines own properties.
+    const fields = new Map<string, unknown>();
+    const detail = new Map<string, unknown>();
+    const unknown: string[] = [];
+    const take = (prop: Prop, into: Map<string, unknown>, allowed: ReadonlySet<string>): void => {
+      if (allowed.has(prop.name)) into.set(prop.name, valueOf(prop));
+      else unknown.push(prop.name);
+    };
     for (const prop of item.props ?? []) {
       if (prop.ns !== NS) continue;
-      if (prop.group === 'detail') detail[prop.name] = valueOf(prop);
-      else fields[prop.name] = valueOf(prop);
+      if (prop.group === 'detail') take(prop, detail, DETAIL_FIELDS);
+      else take(prop, fields, RISK_FIELDS);
     }
-    if (Object.keys(detail).length > 0) fields['detail'] = detail;
+    if (detail.size > 0) fields.set('detail', Object.fromEntries(detail));
     const ours = new Map((item.characterizations ?? []).flatMap((c) => c.facets ?? []).filter((facet) => facet.system === NS).map((facet) => [facet.name, facet.value]));
-    fields['riskLikelihood'] = Number(ours.get('likelihood-probability') ?? 0);
-    fields['riskImpact'] = Number(ours.get('impact-conditional-mean') ?? 0);
-    fields['exposureRating'] = Number(ours.get('expected-annual-impact') ?? 0);
-    fields['riskDescription'] ??= item.title ?? `Risk ${String(index + 1)}`;
+    fields.set('riskLikelihood', Number(ours.get('likelihood-probability') ?? 0));
+    fields.set('riskImpact', Number(ours.get('impact-conditional-mean') ?? 0));
+    fields.set('exposureRating', Number(ours.get('expected-annual-impact') ?? 0));
+    fields.set('riskDescription', fields.get('riskDescription') ?? item.title ?? `Risk ${String(index + 1)}`);
     const response = (item.remediations ?? []).find((remediation) => (remediation.props ?? []).some((prop) => prop.name === 'role' && prop.value === 'nist-response'));
-    for (const prop of response?.props ?? []) if (prop.ns === NS && prop.name !== 'role') fields[prop.name] = valueOf(prop);
-    if (item.deadline !== undefined) fields['reviewDue'] = item.deadline.slice(0, 10);
-    return fields as unknown as Risk;
+    for (const prop of response?.props ?? []) if (prop.ns === NS && prop.name !== 'role') take(prop, fields, RISK_FIELDS);
+    if (item.deadline !== undefined) fields.set('reviewDue', item.deadline.slice(0, 10));
+    if (unknown.length > 0) report.push(`Risk ${String(index + 1)} has props with unknown names. They are ignored: ${unknown.join(', ')}.`);
+    return Object.fromEntries(fields) as unknown as Risk;
   });
   const known = new Set(target.registers.map((register) => register.id));
   const registers: Register[] = [];

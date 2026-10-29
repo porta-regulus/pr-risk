@@ -30,6 +30,33 @@ export class Xoshiro128 {
     s[3] = (s3 << 11) | (s3 >>> 21);
     return result;
   }
+
+  // The next count words in one loop with the state in local variables. Same words as
+  // count calls of next(), and faster in the simulation loop.
+  fill(count: number): Uint32Array {
+    const out = new Uint32Array(count);
+    const s = this.s;
+    let s0 = s[0] ?? 0;
+    let s1 = s[1] ?? 0;
+    let s2 = s[2] ?? 0;
+    let s3 = s[3] ?? 0;
+    for (let i = 0; i < count; i++) {
+      const x = Math.imul(s1, 5);
+      out[i] = Math.imul((x << 7) | (x >>> 25), 9);
+      const t = s1 << 9;
+      s2 ^= s0;
+      s3 ^= s1;
+      s1 ^= s2;
+      s0 ^= s3;
+      s2 ^= t;
+      s3 = (s3 << 11) | (s3 >>> 21);
+    }
+    s[0] = s0;
+    s[1] = s1;
+    s[2] = s2;
+    s[3] = s3;
+    return out;
+  }
 }
 
 // The stream for one (entity kind, entity id, variable), for example "risk|R-01|rate".

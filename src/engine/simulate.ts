@@ -107,18 +107,17 @@ export function simulate(doc: RiskDocument, options: RunOptions & { readonly cac
       continue;
     }
     const frequency = sampler(distribution);
-    const rateStream = stream(seed, `driver|${driver.id}|rate`);
-    const countStream = stream(seed, `driver|${driver.id}|count`);
+    const rateWords = stream(seed, `driver|${driver.id}|rate`).fill(trials);
+    const countWords = stream(seed, `driver|${driver.id}|count`).fill(trials);
     const counts = new Uint32Array(trials);
     let clippedHere = 0;
     for (let t = 0; t < trials; t++) {
-      const word = rateStream.next();
-      let rate = driverFactor * (frequency.constant ?? frequency.sample(rng.reseed(word)));
+      let rate = driverFactor * (frequency.constant ?? frequency.sample(rng.reseed(rateWords[t] ?? 0)));
       if (rate > RATE_CAP) {
         rate = RATE_CAP;
         clippedHere += 1;
       }
-      counts[t] = poisson(rate, rng.reseed(countStream.next()).uniform());
+      counts[t] = poisson(rate, rng.reseed(countWords[t] ?? 0).uniform());
     }
     cache?.drivers.set(key, { counts, clipped: clippedHere });
     clippedRates += clippedHere;
@@ -162,11 +161,12 @@ export function simulate(doc: RiskDocument, options: RunOptions & { readonly cac
     const links = linkInputs.map((link) => ({
       q: link.triggerProbability,
       counts: drivers.get(link.driverId) ?? new Uint32Array(trials),
-      words: stream(seed, `risk|${id}|thin|${link.driverId}`),
+      words: stream(seed, `risk|${id}|thin|${link.driverId}`).fill(trials),
     }));
-    const rateStream = stream(seed, `risk|${id}|rate`);
-    const countStream = stream(seed, `risk|${id}|count`);
-    const impactStream = stream(seed, `risk|${id}|impact`);
+    // One word per trial per stream, also when a word is not used (Sec. 8.6 item 3).
+    const rateWords = stream(seed, `risk|${id}|rate`).fill(trials);
+    const countWords = stream(seed, `risk|${id}|count`).fill(trials);
+    const impactWords = stream(seed, `risk|${id}|impact`).fill(trials);
     const counts = new Uint32Array(trials);
     const annual = new Float64Array(trials);
     const above = new Uint32Array(trials);
@@ -176,26 +176,23 @@ export function simulate(doc: RiskDocument, options: RunOptions & { readonly cac
     let clippedHere = 0;
 
     for (let t = 0; t < trials; t++) {
-      // Every stream gives one word per trial, also when the word is not used.
-      const word = rateStream.next();
-      let rate = factor * (constantRate ?? frequency.sample(rng.reseed(word)));
+      let rate = factor * (constantRate ?? frequency.sample(rng.reseed(rateWords[t] ?? 0)));
       if (rate > RATE_CAP) {
         rate = RATE_CAP;
         clippedHere += 1;
       }
-      let n = poisson(rate, rng.reseed(countStream.next()).uniform());
+      let n = poisson(rate, rng.reseed(countWords[t] ?? 0).uniform());
       for (let l = 0; l < linkCount; l++) {
         const link = links[l];
         if (link === undefined) continue;
-        rng.reseed(link.words.next());
+        rng.reseed(link.words[t] ?? 0);
         const events = link.counts[t] ?? 0;
         for (let k = 0; k < events; k++) if (rng.uniform() < link.q) n += 1;
       }
-      const impactWord = impactStream.next();
       let sum = 0;
       let hits = 0;
       if (n > 0) {
-        rng.reseed(impactWord);
+        rng.reseed(impactWords[t] ?? 0);
         for (let k = 0; k < n; k++) {
           let x = primary.sample(rng);
           for (let j = 0; j < secondaryCount; j++) {
