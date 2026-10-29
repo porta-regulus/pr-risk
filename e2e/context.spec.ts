@@ -67,7 +67,10 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
   // G2 (b). Example 1 fires the leading KRI, the tolerance and the lagging KRI.
   await check(page, 'T9-EX1', { computers_unpatched_cvss10_over_10_days: 2, mission_critical_systems_unpatched_cvss10_over_14_days: 1, computers_unpatched_cvss10_over_15_days: 1 });
   await expect(result(page, 'T9-EX1').locator('li')).toHaveText(['Leading KRI T9-EX1-LKRI fires', 'Lagging KRI T9-EX1-GKRI fires', 'Tolerance T9-EX1-TOL is breached']);
-  // Example 3.
+  // Example 3. With one value missing, nothing is checked, and the screen says so.
+  await check(page, 'T9-EX3', { outage_hours: 2.5 });
+  await expect(result(page, 'T9-EX3')).toContainText('Not checked, because a value is missing. Leading KRI T9-EX3-LKRI1 needs customers_affected_percent');
+  await expect(result(page, 'T9-EX3')).not.toContainText('Nothing fires');
   const ex3 = async (hours: number, percent: number): Promise<void> => {
     await check(page, 'T9-EX3', { outage_hours: hours, customers_affected_percent: percent });
   };
@@ -100,10 +103,24 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
   await page.getByLabel('Point 2 probability').fill('0.2');
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
 
+  // Text that is not a number refuses the save, and leaving is refused until it is discarded.
+  await page.getByLabel('Capacity (USD)').fill('1e');
+  await expect(page.getByText('Not saved. These fields do not hold a number: Capacity (USD).')).toBeVisible();
+  await page.getByRole('button', { name: 'Back to start' }).click();
+  await expect(page.getByText('Correct the changes, or discard them, before you go back.')).toBeVisible();
+  await page.getByRole('button', { name: 'Discard unsaved changes' }).click();
+  await expect(page.getByLabel('Capacity (USD)')).toHaveValue('1000000');
+  await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
+
+  // Leaving at once after an edit saves the edit first.
+  await page.getByLabel('Mission', { exact: true }).fill('Keep the plant safe.');
+  await page.getByRole('button', { name: 'Back to start' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'PortaRegulus Risk' })).toBeVisible();
+
   // The edits survive a reload.
   await page.reload();
   await page.getByRole('button', { name: 'Context and strategy' }).click();
-  await expect(page.getByLabel('Mission', { exact: true })).toHaveValue('Keep the plant running safely.');
+  await expect(page.getByLabel('Mission', { exact: true })).toHaveValue('Keep the plant safe.');
   await expect(page.getByLabel('Capacity (USD)')).toHaveValue('1000000');
 
   // Undo goes back one saved version at a time.

@@ -1,13 +1,14 @@
 // Screen S2 Context and strategy (SPEC.md Sec. 5, 6.4 to 6.6). A valid change is saved in
 // this browser after a short pause, with one change log entry per section (Sec. 6.18).
 // An invalid change shows its errors and is not saved.
-import { useEffect, useState } from 'preact/hooks';
+import { Fragment } from 'preact';
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import { documentErrors } from '../schema/document';
 import type { Finding, RiskDocument } from '../schema/types';
 import { exportOverdue, loadDocument, openDb, saveDocument, type StoredDocument, undo } from '../storage/db';
 import { AppetiteSection } from './appetite';
 import { changedSections, nextId, withChangeLog, withSection, withValue } from './edit';
-import { Checkboxes, LinesField, SelectField, TextField } from './fields';
+import { Checkboxes, InvalidFields, LinesField, SelectField, TextField } from './fields';
 import { StrategySection } from './strategy';
 
 type Context = NonNullable<RiskDocument['context']>;
@@ -303,6 +304,22 @@ export function ContextScreen({ id, onBack }: { readonly id: string; readonly on
   const [errors, setErrors] = useState<readonly Finding[]>([]);
   const [failure, setFailure] = useState<string>();
   const [note, setNote] = useState<string>();
+  // Number fields whose text is not a number. The document still holds the old value, so
+  // the screen saves nothing until the text is a number again or is discarded.
+  const [invalid, setInvalid] = useState<ReadonlyMap<string, string>>(new Map());
+  // A new value remounts the fields, so discard and undo also reset their typed text.
+  const [revision, setRevision] = useState(0);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const reportInvalid = useCallback((field: string, label: string | undefined) => {
+    setInvalid((current) => {
+      if (label === undefined ? !current.has(field) : current.get(field) === label) return current;
+      const next = new Map(current);
+      if (label === undefined) next.delete(field);
+      else next.set(field, label);
+      return next;
+    });
+  }, []);
 
   // Its own connection, closed on leaving, so "Remove all data" on S1 is never blocked.
   useEffect(() => {
@@ -328,6 +345,13 @@ export function ContextScreen({ id, onBack }: { readonly id: string; readonly on
   }, [ready]);
 
   const dirty = stored !== undefined && draft !== undefined && changedSections(stored.doc, draft).length > 0;
+  const blocked = invalid.size > 0;
+
+  const persist = (database: IDBDatabase, base: StoredDocument, next: RiskDocument): Promise<void> =>
+    saveDocument(database, withChangeLog(base.doc, next, isoSeconds())).then((saved) => {
+      setFailure(undefined);
+      setStored(saved);
+    });
 
   // Autosave (SPEC.md Sec. 10 item 3). Each save is a new version, so undo can go back.
   useEffect(() => {
@@ -337,21 +361,18 @@ export function ContextScreen({ id, onBack }: { readonly id: string; readonly on
     }
     const found = documentErrors(draft);
     setErrors(found);
-    if (found.length > 0) return undefined;
-    const timer = setTimeout(() => {
-      saveDocument(db, withChangeLog(stored.doc, draft, isoSeconds()))
-        .then((saved) => {
-          setFailure(undefined);
-          setStored(saved);
-        })
-        .catch((error: unknown) => {
-          setFailure(error instanceof Error ? error.message : String(error));
-        });
+    if (found.length > 0 || blocked) return undefined;
+    timer.current = setTimeout(() => {
+      timer.current = undefined;
+      persist(db, stored, draft).catch((error: unknown) => {
+        setFailure(error instanceof Error ? error.message : String(error));
+      });
     }, SAVE_DELAY_MS);
     return () => {
-      clearTimeout(timer);
+      clearTimeout(timer.current);
+      timer.current = undefined;
     };
-  }, [db, stored, draft, dirty]);
+  }, [db, stored, draft, dirty, blocked]);
 
   if (db === undefined || stored === undefined || draft === undefined) {
     return (
@@ -367,8 +388,9 @@ export function ContextScreen({ id, onBack }: { readonly id: string; readonly on
   };
 
   const undoLast = (): void => {
-    if (dirty) {
+    if (dirty || blocked) {
       setDraft(stored.doc);
+      setRevision((value) => value + 1);
       setNote('The unsaved changes are discarded.');
       return;
     }
@@ -379,17 +401,44 @@ export function ContextScreen({ id, onBack }: { readonly id: string; readonly on
       }
       setStored(back);
       setDraft(back.doc);
+      setRevision((value) => value + 1);
       setNote(`Version ${String(back.version)} is back.`);
     });
   };
 
-  const saveText = errors.length > 0 ? 'Not saved. Correct the errors below.' : dirty ? 'Saving.' : `Saved as version ${String(stored.version)}.`;
+  // Leaving saves a pending valid change at once. A change that cannot be saved stays, and
+  // the screen says so, because leaving would drop it without a word.
+  const leave = (): void => {
+    if (!dirty && !blocked) {
+      onBack();
+      return;
+    }
+    if (blocked || documentErrors(draft).length > 0) {
+      setNote('Correct the changes, or discard them, before you go back.');
+      return;
+    }
+    clearTimeout(timer.current);
+    timer.current = undefined;
+    persist(db, stored, draft)
+      .then(onBack)
+      .catch((error: unknown) => {
+        setFailure(error instanceof Error ? error.message : String(error));
+      });
+  };
+
+  const saveText = blocked
+    ? `Not saved. These fields do not hold a number: ${[...invalid.values()].join(', ')}.`
+    : errors.length > 0
+      ? 'Not saved. Correct the errors below.'
+      : dirty
+        ? 'Saving.'
+        : `Saved as version ${String(stored.version)}.`;
 
   return (
     <main class="screen">
       <header class="screen-head">
         <nav aria-label="Screens" class="button-row">
-          <button type="button" class="quiet" onClick={onBack}>
+          <button type="button" class="quiet" onClick={leave}>
             Back to start
           </button>
         </nav>
@@ -408,12 +457,12 @@ export function ContextScreen({ id, onBack }: { readonly id: string; readonly on
       )}
 
       <div class="save-bar panel">
-        <p role="status" aria-live="polite" class={errors.length > 0 || failure !== undefined ? 'save-error' : undefined}>
+        <p role="status" aria-live="polite" class={blocked || errors.length > 0 || failure !== undefined ? 'save-error' : undefined}>
           {failure === undefined ? saveText : `Not saved. ${failure}`} {note}
         </p>
         <p class="muted">Last export: {stored.lastExportOn === undefined ? 'never' : new Date(stored.lastExportOn).toLocaleString()}.</p>
         <button type="button" class="quiet" onClick={undoLast}>
-          {dirty ? 'Discard unsaved changes' : 'Undo last change'}
+          {dirty || blocked ? 'Discard unsaved changes' : 'Undo last change'}
         </button>
         {errors.length > 0 && (
           <ul class="errors">
@@ -426,10 +475,14 @@ export function ContextScreen({ id, onBack }: { readonly id: string; readonly on
         )}
       </div>
 
-      <ContextSection doc={draft} update={update} />
-      <GovernanceSection doc={draft} update={update} />
-      <AppetiteSection doc={draft} update={update} />
-      <StrategySection doc={draft} update={update} />
+      <InvalidFields.Provider value={reportInvalid}>
+        <Fragment key={revision}>
+          <ContextSection doc={draft} update={update} />
+          <GovernanceSection doc={draft} update={update} />
+          <AppetiteSection doc={draft} update={update} />
+          <StrategySection doc={draft} update={update} />
+        </Fragment>
+      </InvalidFields.Provider>
     </main>
   );
 }

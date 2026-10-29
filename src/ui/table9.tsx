@@ -3,7 +3,7 @@
 import { useState } from 'preact/hooks';
 import { boundaryGaps, evaluateStatement, type Values } from '../monitor/triggers';
 import type { RiskDocument } from '../schema/types';
-import { NumberField } from './fields';
+import { IgnoreInvalid, NumberField } from './fields';
 
 type Statement = NonNullable<NonNullable<RiskDocument['appetite']>['statements']>[number];
 
@@ -81,25 +81,33 @@ export function TriggerCheck({ statement }: { readonly statement: Statement }) {
     ...result.indicators.filter((item) => item.fired).map((item) => `${KIND_TEXT[item.kind] ?? item.kind} ${item.id} fires`),
     ...result.tolerances.filter((item) => item.breached).map((item) => `Tolerance ${item.id} is breached`),
   ];
+  // A trigger with a missing value is not checked. It must not read as "does not fire".
+  const unchecked = [
+    ...result.indicators.filter((item) => item.missing.length > 0).map((item) => ({ name: `${KIND_TEXT[item.kind] ?? item.kind} ${item.id}`, missing: item.missing })),
+    ...result.tolerances.filter((item) => item.missing.length > 0).map((item) => ({ name: `Tolerance ${item.id}`, missing: item.missing })),
+  ];
+  const checked = result.indicators.length + result.tolerances.length - unchecked.length;
   const entered = Object.keys(values).length > 0;
   const gaps = boundaryGaps(statement);
   return (
     <div class="check-box" data-statement={statement.id}>
-      <div class="field-row">
-        {metrics.map(({ metric, unit }) => (
-          <div class="field" key={metric}>
-            <NumberField
-              id={`check-${statement.id}-${metric}`}
-              label={unit === undefined ? metric : `${metric} (${unit})`}
-              value={values[metric]}
-              onChange={(value) => {
-                const others = Object.entries(values).filter(([name]) => name !== metric);
-                setValues(Object.fromEntries(value === undefined ? others : [...others, [metric, value]]));
-              }}
-            />
-          </div>
-        ))}
-      </div>
+      <IgnoreInvalid>
+        <div class="field-row">
+          {metrics.map(({ metric, unit }) => (
+            <div class="field" key={metric}>
+              <NumberField
+                id={`check-${statement.id}-${metric}`}
+                label={unit === undefined ? metric : `${metric} (${unit})`}
+                value={values[metric]}
+                onChange={(value) => {
+                  const others = Object.entries(values).filter(([name]) => name !== metric);
+                  setValues(Object.fromEntries(value === undefined ? others : [...others, [metric, value]]));
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </IgnoreInvalid>
       <div role="status" aria-live="polite" class="check-result">
         {!entered ? (
           <p class="muted">Type values to see which indicators fire and which tolerances are breached.</p>
@@ -109,8 +117,13 @@ export function TriggerCheck({ statement }: { readonly statement: Statement }) {
               <li key={text}>{text}</li>
             ))}
           </ul>
-        ) : (
-          <p>Nothing fires.</p>
+        ) : checked === 0 ? null : (
+          <p>{unchecked.length === 0 ? 'Nothing fires.' : 'Nothing fires among the checked triggers.'}</p>
+        )}
+        {entered && unchecked.length > 0 && (
+          <p class="unchecked">
+            Not checked, because a value is missing. {unchecked.map((item) => `${item.name} needs ${item.missing.join(' and ')}`).join('. ')}.
+          </p>
         )}
         {result.inGap.map((gap) => (
           <p class="banner" key={gap.metric}>

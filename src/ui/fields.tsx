@@ -1,6 +1,7 @@
 // Labelled form fields for the screens. Every field has a visible label or, inside a
 // table, an aria-label (WCAG 2.2 AA, SPEC.md Sec. 10 item 2).
-import { useEffect, useState } from 'preact/hooks';
+import { type ComponentChildren, createContext } from 'preact';
+import { useContext, useEffect, useState } from 'preact/hooks';
 import { lines } from './edit';
 
 interface Base {
@@ -48,6 +49,17 @@ export function TextField(
   );
 }
 
+// A number field reports text that is not a number, with its label, or undefined when the
+// text is a number again. A screen that saves uses it to refuse the save, because the
+// document still holds the old value. The default ignores reports.
+export type InvalidReport = (field: string, label: string | undefined) => void;
+const ignore: InvalidReport = () => undefined;
+export const InvalidFields = createContext<InvalidReport>(ignore);
+// For fields whose value is not part of the document, such as a trigger check.
+export function IgnoreInvalid({ children }: { readonly children: ComponentChildren }) {
+  return <InvalidFields.Provider value={ignore}>{children}</InvalidFields.Provider>;
+}
+
 // Keeps the typed text, so "0." or "1e" can be typed. Calls onChange with a finite number,
 // or undefined for an empty field. Other text stays in the field and shows as invalid.
 export function NumberField(
@@ -60,8 +72,15 @@ export function NumberField(
     if (text.trim() === '' ? value !== undefined : Number(text) !== value) setText(value === undefined ? '' : String(value));
   }, [value]);
   const parsed = text.trim() === '' ? undefined : Number(text);
-  const invalid =
-    parsed !== undefined && (!Number.isFinite(parsed) || (min !== undefined && parsed < min) || (max !== undefined && parsed > max) || (integer === true && !Number.isInteger(parsed)));
+  const notNumber = parsed !== undefined && !Number.isFinite(parsed);
+  const invalid = notNumber || (parsed !== undefined && ((min !== undefined && parsed < min) || (max !== undefined && parsed > max) || (integer === true && !Number.isInteger(parsed))));
+  const report = useContext(InvalidFields);
+  useEffect(() => {
+    report(id, notNumber ? label : undefined);
+    return () => {
+      report(id, undefined);
+    };
+  }, [report, id, label, notNumber]);
   return (
     <>
       <Label {...props} />
