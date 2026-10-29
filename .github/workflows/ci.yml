@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions: read-all
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-unit:
+    name: Lint, type check and unit tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+
+  e2e:
+    name: Build and Playwright
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npx --no-install playwright install --with-deps chromium
+      - run: npx --no-install playwright test
+      - name: Engine in Chromium (Node and browser agree within 1e-9)
+        run: npm run test:browser
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  performance:
+    name: Engine performance targets (SPEC.md Sec. 8.16, margin factor 2)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run test:performance
+
+  oscal:
+    name: OSCAL POA&M exports pass oscal-cli (AT-4)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Export the three examples
+        env:
+          OSCAL_OUT: oscal-out
+        run: |
+          mkdir -p oscal-out
+          npx --no-install vitest run --project node test/oscal.test.ts
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Get oscal-cli 3.2.0 from Maven Central, pinned by SHA-256
+        run: |
+          curl -sSfL -o oscal-cli.zip https://repo1.maven.org/maven2/dev/metaschema/oscal/oscal-cli-enhanced/3.2.0/oscal-cli-enhanced-3.2.0-oscal-cli.zip
+          echo "e001b353ee245da6f4ff0ad930c4dfaa88083c63243ca004bd5f5bcef44e8ec8  oscal-cli.zip" | sha256sum -c -
+          unzip -q oscal-cli.zip -d oscal-cli
+      - name: Validate every export
+        run: |
+          for f in oscal-out/*-poam.json; do oscal-cli/bin/oscal-cli poam validate "$f"; done
+
+  docs:
+    name: Schema and reference model checks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: 'python -m pip install --require-hashes --only-binary=:all: -r tools/requirements-docs.txt'
+      - run: npm ci --ignore-scripts
+      - run: python -I docs/schema/validate.py
+      - run: python -I docs/reference/sim_reference.py docs/schema/examples/example-2-sme-quantitative.json --budget=60000
+      - name: Generated validators and types are up to date
+        run: node scripts/gen-schema.mjs --check
+      - name: Python parity fixture is up to date
+        run: python -I tools/python_parity.py | cmp - test/fixtures/python-parity.json
+      - name: AT-1 with the Python validator
+        env:
+          AT1_CORPUS: at1-corpus.json
+        run: |
+          npx --no-install vitest run --project node test/at1.test.ts
+          python -I tools/at1_check.py at1-corpus.json
