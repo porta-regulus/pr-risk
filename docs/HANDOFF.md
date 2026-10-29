@@ -60,7 +60,7 @@ Work in this order. Each task ends with its done criteria met and committed on a
 
 Goal. An empty app that already meets the release integrity rules.
 
-Status 2026-10-27. Built locally. Done criteria 1 and 2 pass on the local machine. Criteria 3 to 5 need the GitHub repository, which the product owner must approve first (step 1). The GCP resources need `infra/gcp/bootstrap.sh` and `terraform apply` by the product owner.
+Status 2026-10-29. Merged to `main` with pull request 1 of `porta-regulus/pr-risk`. CI, CodeQL and the OpenSSF Scorecard run on GitHub. The GCP resources exist (`infra/gcp/README.md`). The `production` environment, its variables and private vulnerability reporting still need the product owner.
 
 Steps.
 1. Create the public repository now, because the Scorecard Maintained check scores 0 for the first 90 days. Ask the product owner before you create or push it.
@@ -81,7 +81,7 @@ Done criteria.
 
 Goal. A TypeScript package that reads, validates, migrates and projects documents as SPEC.md Sec. 7 says.
 
-Status 2026-10-28. Done in `src/schema/`, not yet committed. Done criteria 1 to 5 pass locally. `npm test` runs them, and the CI job `docs` checks the Python side. Criterion 4 (AT-1) covers 1 000 generated documents with 3 391 risks, which pass Ajv and `validate.py` and project equal in both. G4 (d), the RDR print view, belongs to task 5. Migration accepts major version 1 only, because no older major version exists.
+Status 2026-10-29. Done in `src/schema/`, merged to `main` with pull request 1. Done criteria 1 to 5 pass locally. `npm test` runs them, and the CI job `docs` checks the Python side. Criterion 4 (AT-1) covers 1 000 generated documents with 3 391 risks, which pass Ajv and `validate.py` and project equal in both. G4 (d), the RDR print view, belongs to task 5. Migration accepts major version 1 only, because no older major version exists.
 
 Steps.
 1. Generate TypeScript types from `risk-register.schema.json`.
@@ -101,7 +101,7 @@ Done criteria.
 
 Goal. SPEC.md Sec. 8.2 to 8.12, deterministic and fast.
 
-Status 2026-10-28. Done in `src/engine/`, not yet committed. Done criteria 1 to 5 pass on this Mac.
+Status 2026-10-29. Done in `src/engine/`, merged to `main` with pull request 1. Done criteria 1 to 5 pass, criterion 4 on the GitHub runner too.
 1. P1 to P16 are in `test/engine-properties.test.ts`. The cross-engine part of P11 is in `test/browser/engine.test.ts`.
 2. EAL, EAG, P(N at least 1) per risk and LEC at the 4 tolerance points agree with `sim_reference.py` within 4 standard errors (`test/engine-crosscheck.test.ts`).
 3. Seeds 20261207, 1, 2 and 3 select O-4 and O-5 from 21 portfolios. The fiscal baseline is O-1, O-3, O-4. At B = 72 000 the best portfolio is O-1, O-4, O-5.
@@ -127,7 +127,7 @@ Done criteria.
 
 Goal. Every import path of SPEC.md Sec. 9 with preview, defaults and provenance.
 
-Status 2026-10-28. Built in `src/import/`, not yet committed. Gate G-A is open, so the importer stays "unvalidated".
+Status 2026-10-29. Built in `src/import/`, merged to `main` with pull request 1. Gate G-A is open, so the importer stays "unvalidated".
 1. G1 (a), (c), (d) and (e) pass from the Fig. 10 CSV. (a) compares every field except the hand-written `notes`, and `defaultedFields` as a set.
 2. G3 (a) to (e) pass. (b) to (d) use `src/import/rollup.ts`.
 3. The CVD Portal fixture gives GW-1 and GW-2 equal to example 3, notes included. The dropped fields never enter the result. Re-import updates evidence and sets "Review needed".
@@ -156,7 +156,9 @@ Done criteria.
 
 Goal. The life cycle screens up to Respond (SPEC.md Sec. 5), enough to run the usability test.
 
-Status 2026-10-29. Screen S1 Start works (`src/ui/start.tsx`) on the IndexedDB storage of `src/storage/db.ts`. It opens, creates, imports through the import worker, exports in all five formats, shows storage status and the export reminder, and removes all data after a typed confirmation. The Playwright test `e2e/start.spec.ts` runs that flow under the production CSP with no console error. Screens S2 to S5 and the decision record print view are still to build. Undo exists in storage but has no button yet.
+Status 2026-10-29. Screen S1 Start works (`src/ui/start.tsx`) on the IndexedDB storage of `src/storage/db.ts`. It opens, creates, imports through the import worker, exports in all five formats, shows storage status and the export reminder, and removes all data after a typed confirmation. The Playwright test `e2e/start.spec.ts` runs that flow under the production CSP with no console error.
+
+Screen S2 Context and strategy works (`src/ui/context.tsx`, `appetite.tsx`, `strategy.tsx`, `table9.tsx`). It edits mission, context, stakeholders, disciplines, objectives, functions, roles, capacity, the tolerance curve (with the starting points of SPEC.md Sec. 8.9), appetite statements with tolerances, controls, indicators and triggers, scales, review and reporting cycle, budget, thresholds and the optimization method. A valid change is saved after 0.6 s as a new version, with one change log entry per section, and a change within 10 minutes updates that entry. An invalid change shows the rule and is not saved. Undo goes back one kept version. The Table 9 view and the value check pass G2 parts (a) and (b) in `e2e/context.spec.ts`. Still open for S2. The Table 2 templates of Sec. 6.5 item 4, and an axe-core check (done criterion 3), which needs a new dev dependency. S3 to S5 and the decision record print view are still to build.
 
 Steps.
 1. S1 Start with storage status and remove-all.

@@ -55,7 +55,13 @@ export function openDb(): Promise<IDBDatabase> {
     if (!db.objectStoreNames.contains('documents')) db.createObjectStore('documents', { keyPath: 'id' });
     if (!db.objectStoreNames.contains('versions')) db.createObjectStore('versions', { keyPath: 'key' }).createIndex('byDocument', 'id');
   };
-  return request(req);
+  return request(req).then((db) => {
+    // A delete of the database (remove all) must not wait for this connection.
+    db.onversionchange = () => {
+      db.close();
+    };
+    return db;
+  });
 }
 
 const versionKey = (id: string, version: number): string => `${id}\u0000${String(version).padStart(10, '0')}`;
