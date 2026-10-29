@@ -173,7 +173,7 @@ Done criteria status 2026-10-29.
 2. Passes. `e2e/at5.spec.ts` completes the AT-5 task from an empty browser to the printed record in about 13 s. Two risks come from the catalogue picker (a Risklet name and a NIST opportunity), and 3 are own risks, as AT-5 asks.
 3. Passes for S1 to S5. axe-core (`e2e/axe.ts`) finds no WCAG 2.2 A or AA violation, also with the record and the option editor open.
 4. Passes. The record of example 2 prints on 2 A4 pages with the fiscal baseline and the budget sensitivity.
-5. Open. It needs a pilot session with one target user.
+5. Open. It needs a pilot session with one target user. The kit is ready in `docs/pilot/` (facilitator guide, consent text, task sheet with a fictitious company, observation and blocker log). The product owner runs the session and writes the result here.
 
 Steps.
 1. S1 Start with storage status and remove-all.
