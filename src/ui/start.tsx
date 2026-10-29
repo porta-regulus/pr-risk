@@ -50,10 +50,10 @@ function ErrorList({ errors }: { readonly errors: readonly Finding[] }) {
   );
 }
 
-export function StartScreen() {
+export function StartScreen({ selectedId, onOpenContext }: { readonly selectedId?: string | undefined; readonly onOpenContext: (id: string) => void }) {
   const [db, setDb] = useState<IDBDatabase>();
   const [documents, setDocuments] = useState<StoredDocument[]>([]);
-  const [currentId, setCurrentId] = useState<string>();
+  const [currentId, setCurrentId] = useState<string | undefined>(selectedId);
   const [status, setStatus] = useState<StorageStatus>();
   const [message, setMessage] = useState<Message>();
   const [preview, setPreview] = useState<{ preview: ImportPreview; fileName: string }>();
@@ -260,9 +260,18 @@ export function StartScreen() {
           </div>
         )}
         {current !== undefined && (
-          <p class="muted">
-            Selected: <strong>{current.title}</strong>. Lint shows {warnings} {warnings === 1 ? 'warning' : 'warnings'}. The other screens come in the next build tasks.
-          </p>
+          <>
+            <p class="muted">
+              Selected: <strong>{current.title}</strong>. Lint shows {warnings} {warnings === 1 ? 'warning' : 'warnings'}. Screens S3 to S7 come in the next build tasks.
+            </p>
+            <div class="button-row">
+              <button type="button" onClick={() => {
+                  onOpenContext(current.id);
+                }} disabled={busy}>
+                Context and strategy
+              </button>
+            </div>
+          </>
         )}
       </section>
 
