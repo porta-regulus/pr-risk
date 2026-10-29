@@ -1,0 +1,4 @@
+Register,Risk Id, Risk Description, Risk Likelihood, Risk Impact, Risk Response Type, Risk Owner Point Of Contact
+SYS-A,1,An external attacker deploys a remote access tool and uses it to exfiltrate the plans for the company’s upcoming merger.,0.1,2000000,Mitigate,Merger project lead
+SYS-B,1,External threat actors steal information about marketing plans through malicious code deployed in the sales department.,0.3,400000,Mitigate,Head of sales
+SYS-C,1,"Malicious parties plant a web shell in an external site that enables them to access documents stored in the Legal Affairs shared document folder, resulting in the loss of critical corporate information.",0.2,800000,Accept,General counsel

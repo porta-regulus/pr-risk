@@ -1,0 +1,27 @@
+ID,Pri.,Risk Description,Risk Category,Financial Impact,Reputation Impact,Mission Impact,Likelihood,Exposure Rating,Risk Response,Risk Owner,Status
+1,5,Retiring staff lead to personnel shortages,Operational Risk,OpEx: M CapEx: L,Low,Mod,Mod,Mod,"Improve hiring diversity
+Improve employee benefits per recent survey and discussions",Dwayne Rhodes (Human Resources Department),Open
+2,6,A strategic opportunity to hire a famous technologist to establish a new satellite communications initiative.,Operational Risk,OpEx: M CapEx: L,High,Mod,Mod,Mod,"Allocate funds for compensation package
+Initiate strategic recruiting plan",Dwayne Rhodes (Human Resources Department),Open
+3,1,A social engineering attack on enterprise workforce leads staff to wire transfer significant funds.,Operational Risk,OpEx: M CapEx: L,High,Mod,High,High,"Update corporate IT security training
+Implement phishing training service
+Update email security products per recommendations from IT Risk Council",Carly Franklin (CISO),Open
+4,3,An employee of a third-party partner steals customer information.,Operational Risk,OpEx: H CapEx: M,High,High,Mod,High,"CFO and CEO to agree on plans for likely secondary financial impact from reputational risk impact.
+Update procurement contract requirements to include clauses per 11/3/2019 report from Legal Dept
+Implement 3rd Party Partner Assmt. for Tier 1 providers per CIO & CISO recommendations",Ernest Woods (Procurement),Open
+5,7,Sales reduction due to tariffs leads to reduced revenues.,Financial Risk,OpEx: M CapEx: L,Low,Low,Low,Low,"Increase marketing in target areas
+Ensure competitive pricing in target markets",Elaine Kim (VP Sales),Open
+6,8,Customer budget tightening results in reduced revenue and profits.,Financial Risk,OpEx: M CapEx: L,Low,Low,Mod,Mod,"Implement customer surveys to better forecast purchasing changes
+Use cost-cutting measures to offset reductions and maintain profitability",Elaine Kim (VP Sales),Open
+7,9,Failure to innovate results in market share erosion.,Strategic Risk,OpEx: M CapEx: M,Mod,Low,Mod,Low,"Approve CIO proposal to increase internal R&D funding by 10% to spur internal innovation
+Update technical training to include design thinking methodologies
+Implement customer surveys in target marketing areas","Sharika Grigsby (VP, Product Development)",Open
+8,2,Company intellectual property data is disclosed through employee error or malicious act.,Operational Risk,OpEx: M CapEx: M,High,High,Mod,Mod,"Review and update (if needed) background screening controls
+Update corporate security training to reinforce the need for diligence
+Implement data loss prevention tools per CISO recommendation",Carly Franklin (CISO),Closed
+9,10,"A flaw in product quality leads to reputational damage, reducing sales.",Strategic Risk,OpEx: M CapEx: M,High,High,Low,Low,"Update continuous improvement process
+Implement Baldrige Framework
+Update external provider quality standards and monitoring","Sharika Grigsby (VP, Product Development)",Open
+10,4,"Failure to implement California Consumer Privacy Act (CCPA) provisions exposes the company to fines, penalties, and legal fees.",Compliance Risk,OpEx: H CapEx: L,Mod,Mod,Mod,Mod,"Create & maintain a centralized register of compliance requirements
+Update employee training based on updated privacy requirements
+Review business impact assessment (BIA) templates to ensure ICT criteria are included.",Zoe Davidson (Chief Privacy Officer),Open

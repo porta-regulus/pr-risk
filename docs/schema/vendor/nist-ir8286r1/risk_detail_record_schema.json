@@ -1,0 +1,151 @@
+{
+    "$id": "https://csrc.nist.gov/csrc/media/schema/olir/risk_detail_record.v3.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "RDR may help provide information regarding each risk; roles and stakeholders involved in risk decisions and management; schedule considerations, such as the date the risk was first documented and the date of the next expected assessment; and risk response decisions and follow-up, including detailed plans, status, and risk indicators.",
+    "title": "Risk Detail Record",
+    "type": "object",
+    "properties": {
+        "riskIdNumbers": {
+            "description": "Risk ID Number(s)",
+            "type": "string"
+        },
+        "systemAffected": {
+            "description": "System Affected",
+            "type": "string"
+        },
+        "organizationOrBusinessUnit": {
+            "description": "Organization or business unit",
+            "type": "string"
+        },
+        "riskScenarioDescription": {
+            "description": "Risk Scenario Description",
+            "type": "string"
+        },
+        "assetsAffected": {
+            "description": "Asset(s) Affected",
+            "type": "string"
+        },
+        "threatSourcesActors": {
+            "description": "Threat Source(s) / Actor(s) (with intent? with motivation?)",
+            "type": "string"
+        },
+        "threatVectors": {
+            "description": "Threat Vector(s)",
+            "type": "string"
+        },
+        "threatEvents": {
+            "description": "Threat Event(s)",
+            "type": "string"
+        },
+        "vulnerabilityPredisposingConditions": {
+            "description": "Vulnerability / Predisposing Conditions",
+            "type": "string"
+        },
+        "primaryAdverseImpact": {
+            "description": "Primary Adverse Impact (be sure to reconcile impact vs consequences)",
+            "type": "string"
+        },
+        "secondaryAdverseImpacts": {
+            "description": "Secondary Adverse Impact(s)",
+            "type": "string"
+        },
+        "otherScenarioDetails": {
+            "description": "Other scenario details",
+            "type": "string"
+        },
+        "riskCategory": {
+            "description": "Risk Category",
+            "type": "string"
+        },
+        "likelihoodBeforeControls": {
+            "description": "Likelihood before controls (%)",
+            "type": "number"
+        },
+        "impactBeforeControls": {
+            "description": "Impact before controls ($)",
+            "type": "number"
+        },
+        "exposureRatingBeforeControls": {
+            "description": "Exposure Rating before controls ($)",
+            "type": "number"
+        },
+        "plannedRiskResponse": {
+            "description": "Planned Risk Response",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "enum": [ "Accept", "Avoid", "Transfer", "Mitigate", "Realize", "Share", "Enhance" ]
+            },
+            "uniqueItems": true
+          },
+        "plannedRiskResponseDescription": {
+            "description": "Planned Risk Response Description",
+            "type": "string"
+        },
+        "resourceRequirementsForPlannedRisk": {
+            "description": "Resource Requirements for Planned Risk",
+            "type": "string"
+        },
+        "plannedResponseCost": {
+            "description": "Planned Response Cost ($)",
+            "type": "number"
+        },
+        "likelihoodAfterControlsWillBe": {
+            "description": "Likelihood after controls will be (%)",
+            "type": "number"
+        },
+        "impactAfterControls": {
+            "description": "Impact after controls ($)",
+            "type": "number"
+        },
+        "expectedExposureRating": {
+            "description": "Expected Exposure Rating ($)",
+            "type": "number"
+        },
+        "actualResponseCost": {
+            "description": "Actual Response Cost ($)",
+            "type": "number"
+        },
+        "likelihoodAfterControlsAreInPlaceWillBe": {
+            "description": "After controls are in place, measured Likelihood is (%)",
+            "type": "number"
+        },
+        "impactAfterControlsAreInPlace": {
+            "description": "Impact after controls are in place ($)",
+            "type": "number"
+        },
+        "finalExposureRating": {
+            "description": "Final Exposure Rating ($)",
+            "type": "number"
+        },
+        "riskOwnerPointOfContact": {
+            "description": "Risk owner / point of contact",
+            "type": "string"
+        },
+        "dateOfRiskIdentification": {
+            "description": "Date of risk identification",
+            "type": "string"
+        },
+        "sourceOfRiskInformation": {
+            "description": "Source of risk information",
+            "type": "string"
+        },
+        "currentStatusDate": {
+            "description": "Current status date",
+            "type": "string"
+        },
+        "dependencies": {
+            "description": "Dependencies",
+            "type": "string"
+        },
+        "followUpDate": {
+            "description": "Follow-up date",
+            "type": "string"
+        },
+        "comments": {
+            "description": "Comments",
+            "type": "string"
+        }
+    },
+    "required": [ "riskIdNumbers", "systemAffected", "organizationOrBusinessUnit", "riskScenarioDescription", "assetsAffected", "threatSourcesActors", "threatVectors", "threatEvents", "vulnerabilityPredisposingConditions", "primaryAdverseImpact", "secondaryAdverseImpacts", "otherScenarioDetails", "riskCategory", "currentRiskAnalysis", "likelihoodBeforeControls", "impactBeforeControls", "exposureRatingBeforeControls", "plannedRiskResponseDescription", "resourceRequirementsForPlannedRisk", "plannedResponseCost", "likelihoodAfterControlsWillBe", "impactAfterControls", "expectedExposureRating", "actualResponseCost", "likelihoodAfterControlsAreInPlaceWillBe", "impactAfterControlsAreInPlace", "finalExposureRating", "riskOwnerPointOfContact", "dateOfRiskIdentification", "sourceOfRiskInformation", "currentStatusDate", "dependencies", "followUpDate"]
+}

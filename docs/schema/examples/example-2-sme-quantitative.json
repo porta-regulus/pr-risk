@@ -1,0 +1,1180 @@
+{
+  "$schema": "../risk-register.schema.json",
+  "schemaVersion": "1.0.0",
+  "document": {
+    "id": "EXAMPLE-SME-2026",
+    "title": "Example Machinery GmbH risk registers, budget cycle 2027",
+    "organization": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+    "currency": "EUR",
+    "createdOn": "2026-10-27T09:00:00Z",
+    "tool": {
+      "name": "sim_reference.py",
+      "version": "0.1.0"
+    },
+    "notes": "Fictitious company. All estimates are illustrative calibrated ranges, not data. Derived NIST fields (riskLikelihood, riskImpact, exposureRating) and forecast probabilities are computed by docs/reference/sim_reference.py with seed 20261207 and 100000 trials. R-09 values come from a run with O-3 funded, because R-09 exists only then."
+  },
+  "context": {
+    "mission": "Design, build and service special machinery for EU food and packaging plants.",
+    "objectives": [
+      {
+        "id": "OBJ-S1",
+        "kind": "strategic",
+        "statement": "Win service contracts with CRA-ready secure updates."
+      },
+      {
+        "id": "OBJ-O1",
+        "kind": "operations",
+        "statement": "Ship every order on the promised date."
+      },
+      {
+        "id": "OBJ-R1",
+        "kind": "reporting",
+        "statement": "Report significant incidents to the authority on time."
+      },
+      {
+        "id": "OBJ-C1",
+        "kind": "compliance",
+        "statement": "Meet customer confidentiality clauses and NIS2 duties."
+      }
+    ],
+    "functions": [
+      {
+        "id": "FN-PLAN",
+        "name": "Production planning and shipping",
+        "criticality": "High"
+      },
+      {
+        "id": "FN-ENG",
+        "name": "Engineering and firmware release",
+        "criticality": "High"
+      },
+      {
+        "id": "FN-FIN",
+        "name": "Payments and invoicing",
+        "criticality": "Moderate"
+      }
+    ],
+    "externalContext": "Customers in regulated food production ask for CRA evidence in tenders. One managed service provider runs the office IT.",
+    "internalContext": "120 staff, two sites, one IT lead and one external MSP. No security team.",
+    "stakeholders": [
+      "Customers",
+      "Competent authority for NIS2",
+      "Bank",
+      "Insurer",
+      "Staff"
+    ],
+    "disciplines": [
+      "cybersecurity",
+      "supply chain",
+      "OT"
+    ]
+  },
+  "governance": {
+    "roles": [
+      {
+        "role": "Management body",
+        "level": "enterprise-oversight",
+        "holder": "Managing directors",
+        "responsibilities": "Approve risk appetite, tolerance curve and the funding decision record."
+      },
+      {
+        "role": "Risk manager",
+        "level": "enterprise-management",
+        "holder": "IT lead",
+        "responsibilities": "Keep the registers, run the analysis, prepare the decision record."
+      },
+      {
+        "role": "System owner",
+        "level": "system",
+        "holder": "Head of engineering",
+        "responsibilities": "Own the product line A register and its risks."
+      }
+    ]
+  },
+  "strategy": {
+    "reviewFrequencyMonths": 12,
+    "reportingFrequencyMonths": 3,
+    "budget": {
+      "firstYearCash": 60000,
+      "capexCeiling": 40000,
+      "opexCeiling": 40000,
+      "fiscalYearStart": "2027-01-01"
+    },
+    "inclusionThreshold": 1000,
+    "escalationThreshold": 25000,
+    "optimizationMethod": "algorithmic"
+  },
+  "registers": [
+    {
+      "id": "CORP",
+      "title": "Company ICT and business risks",
+      "level": "organization",
+      "scope": "All sites, office IT, ERP, engineering data, finance",
+      "owner": "IT lead",
+      "timeframeMonths": 12,
+      "asOf": "2026-10-27",
+      "method": "quantitative",
+      "reportableEventThreshold": 5000
+    },
+    {
+      "id": "PROD-A",
+      "title": "Product line A controller firmware and update service",
+      "level": "system",
+      "parentRegisterId": "CORP",
+      "scope": "Controller firmware build, signing and over-the-air update service",
+      "owner": "Head of engineering",
+      "timeframeMonths": 12,
+      "asOf": "2026-10-27",
+      "method": "quantitative",
+      "reportableEventThreshold": 5000
+    }
+  ],
+  "appetite": {
+    "capacity": {
+      "amount": 3000000,
+      "rationale": "Cash reserve plus unused credit line. A loss above this amount in one year threatens payroll."
+    },
+    "toleranceCurve": {
+      "points": [
+        {
+          "loss": 50000,
+          "maxExceedanceProbability": 0.5
+        },
+        {
+          "loss": 250000,
+          "maxExceedanceProbability": 0.2
+        },
+        {
+          "loss": 1000000,
+          "maxExceedanceProbability": 0.05
+        },
+        {
+          "loss": 3000000,
+          "maxExceedanceProbability": 0.01
+        }
+      ],
+      "approvedBy": "Managing directors",
+      "approvedOn": "2026-10-20"
+    },
+    "statements": [
+      {
+        "id": "AP-1",
+        "title": "Production availability",
+        "appetite": "We accept short IT outages, but production planning and shipping must not stop for more than two working days.",
+        "categoryCodes": [
+          "ict",
+          "operational"
+        ],
+        "tolerances": [
+          {
+            "id": "TOL-1",
+            "text": "ERP unavailable for no more than 16 working hours per incident.",
+            "breachWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "erp_outage_hours",
+                  "operator": ">",
+                  "threshold": 16,
+                  "unit": "hours"
+                }
+              ]
+            }
+          }
+        ],
+        "controls": [
+          "Immutable offline backups",
+          "Restore test every quarter"
+        ],
+        "indicators": [
+          {
+            "id": "KRI-1",
+            "kind": "leading-kri",
+            "text": "Days since the last successful full restore test.",
+            "firesWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "days_since_restore_test",
+                  "operator": ">",
+                  "threshold": 100,
+                  "unit": "days"
+                }
+              ]
+            },
+            "observations": [
+              {
+                "observedOn": "2026-10-27",
+                "values": {
+                  "days_since_restore_test": 210
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "AP-2",
+        "title": "Customer trust in product updates",
+        "appetite": "We have no appetite for a malicious update signed with our key.",
+        "categoryCodes": [
+          "ict",
+          "reputation"
+        ],
+        "tolerances": [
+          {
+            "id": "TOL-2",
+            "text": "Zero signed malicious firmware releases.",
+            "breachWhen": {
+              "combine": "all",
+              "conditions": [
+                {
+                  "metric": "malicious_signed_releases",
+                  "operator": ">",
+                  "threshold": 0,
+                  "unit": "count"
+                }
+              ]
+            }
+          }
+        ],
+        "controls": [
+          "Signing key in a hardware security module",
+          "Two-person release approval"
+        ]
+      }
+    ]
+  },
+  "assets": [
+    {
+      "id": "A-ERP",
+      "name": "ERP system",
+      "kind": "software",
+      "owner": "CFO",
+      "criticality": "High",
+      "sensitivity": "Moderate",
+      "supportsFunctionIds": [
+        "FN-PLAN",
+        "FN-FIN"
+      ],
+      "value": {
+        "amount": 400000,
+        "basis": "revenue-dependency",
+        "rationale": "About 10 working days of shipping depend on it before manual workarounds fail."
+      }
+    },
+    {
+      "id": "A-ENGDATA",
+      "name": "Engineering file share with customer drawings",
+      "kind": "information",
+      "owner": "Head of engineering",
+      "criticality": "High",
+      "sensitivity": "High",
+      "supportsFunctionIds": [
+        "FN-ENG"
+      ],
+      "value": {
+        "amount": 1500000,
+        "basis": "contract-penalty",
+        "rationale": "Confidentiality penalties in two large customer contracts."
+      }
+    },
+    {
+      "id": "A-IDP",
+      "name": "Cloud identity, mail and collaboration tenant",
+      "kind": "service",
+      "external": true,
+      "provider": "Cloud provider",
+      "criticality": "High",
+      "sensitivity": "High",
+      "supportsFunctionIds": [
+        "FN-PLAN",
+        "FN-ENG",
+        "FN-FIN"
+      ]
+    },
+    {
+      "id": "A-MSP",
+      "name": "Managed service provider remote administration",
+      "kind": "service",
+      "external": true,
+      "provider": "Managed service provider",
+      "criticality": "High",
+      "sensitivity": "High",
+      "supportsFunctionIds": [
+        "FN-PLAN",
+        "FN-ENG"
+      ]
+    },
+    {
+      "id": "A-SRVROOM",
+      "name": "Main site server room",
+      "kind": "facility",
+      "owner": "IT lead",
+      "criticality": "High",
+      "supportsFunctionIds": [
+        "FN-PLAN"
+      ]
+    },
+    {
+      "id": "A-SIGNKEY",
+      "name": "Firmware signing key",
+      "kind": "information",
+      "owner": "Head of engineering",
+      "criticality": "High",
+      "sensitivity": "High",
+      "supportsFunctionIds": [
+        "FN-ENG"
+      ]
+    },
+    {
+      "id": "A-CTRL",
+      "name": "Controller firmware and web interface, product line A",
+      "kind": "software",
+      "owner": "Head of engineering",
+      "criticality": "High",
+      "supportsFunctionIds": [
+        "FN-ENG"
+      ]
+    }
+  ],
+  "drivers": [
+    {
+      "id": "D-MSP",
+      "kind": "supplier",
+      "name": "Managed service provider admin access compromised",
+      "description": "The MSP holds domain admin rights through a remote management tool.",
+      "frequency": {
+        "type": "lognormal",
+        "lower": 0.02,
+        "upper": 0.2,
+        "confidence": 0.9
+      },
+      "rationale": "MSP compromise through remote management tools is a repeated initial access path. Range kept wide because we have no own history."
+    },
+    {
+      "id": "D-IDP",
+      "kind": "control",
+      "name": "Identity provider control fails (MFA bypass or token theft)",
+      "description": "One failure of the cloud identity control that protects mail, VPN and the code repository.",
+      "frequency": {
+        "type": "lognormal",
+        "lower": 0.03,
+        "upper": 0.3,
+        "confidence": 0.9
+      },
+      "rationale": "Push MFA and session token theft are common. We use push MFA, not phishing-resistant MFA."
+    },
+    {
+      "id": "D-SITE",
+      "kind": "asset",
+      "name": "Main site server room outage (power, cooling, water)",
+      "frequency": {
+        "type": "lognormal",
+        "lower": 0.05,
+        "upper": 0.4,
+        "confidence": 0.9
+      },
+      "rationale": "Two power cuts longer than UPS runtime in the last eight years. Cooling is one unit."
+    }
+  ],
+  "risks": [
+    {
+      "riskId": "R-01",
+      "registerId": "CORP",
+      "priority": 1,
+      "polarity": "negative",
+      "riskDescription": "If ransomware encrypts the file servers and the ERP, then production planning and shipping stop for days and we pay recovery and overtime costs.",
+      "riskCategory": "ICT risk",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.malware"
+      },
+      "riskLikelihood": 0.1055,
+      "riskImpact": 925833,
+      "exposureRating": 97675,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision. Candidate responses O-1, O-2, O-3 and O-4.",
+      "riskOwnerPointOfContact": "IT lead",
+      "status": "Open",
+      "responseDecision": "pending",
+      "estimate": {
+        "frequency": {
+          "type": "lognormal",
+          "lower": 0.02,
+          "upper": 0.15,
+          "confidence": 0.9
+        },
+        "impactPerEvent": {
+          "type": "lognormal",
+          "lower": 150000,
+          "upper": 2500000,
+          "confidence": 0.9
+        },
+        "method": "expert-calibrated",
+        "rationale": "Background rate excludes attacks through the MSP and the identity provider. Impact covers 3 to 15 days of lost production, recovery work and customer penalties.",
+        "sources": [
+          "Cyentia IRIS 2025 Table 1 used as a sanity check for the impact range"
+        ],
+        "estimatedBy": "IT lead, CFO",
+        "estimatedOn": "2026-10-21"
+      },
+      "driverLinks": [
+        {
+          "driverId": "D-MSP",
+          "triggerProbability": 0.35,
+          "rationale": "MSP access gives domain admin, so ransomware deployment is likely."
+        },
+        {
+          "driverId": "D-IDP",
+          "triggerProbability": 0.15,
+          "rationale": "Mail account takeover leads to ransomware in a minority of cases."
+        }
+      ],
+      "catalogueRef": {
+        "catalogue": "risklet-2026",
+        "id": "18"
+      },
+      "objectiveIds": [
+        "OBJ-O1"
+      ],
+      "assetIds": [
+        "A-ERP",
+        "A-ENGDATA"
+      ],
+      "threatSourceType": "adversarial",
+      "horizon": "current",
+      "previousAssessment": {
+        "asOf": "2025-10-27",
+        "riskLikelihood": 0.12,
+        "riskImpact": 800000,
+        "exposureRating": 96000
+      }
+    },
+    {
+      "riskId": "R-02",
+      "registerId": "CORP",
+      "priority": 2,
+      "polarity": "negative",
+      "riskDescription": "If an attacker takes over a mailbox and sends a changed bank account to a customer or to our accounts payable, then we lose a payment.",
+      "riskCategory": "ICT risk",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.fraud"
+      },
+      "riskLikelihood": 0.2191,
+      "riskImpact": 122426,
+      "exposureRating": 26824,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision.",
+      "riskOwnerPointOfContact": "CFO",
+      "status": "Open",
+      "responseDecision": "pending",
+      "estimate": {
+        "frequency": {
+          "type": "lognormal",
+          "lower": 0.05,
+          "upper": 0.5,
+          "confidence": 0.9
+        },
+        "impactPerEvent": {
+          "type": "lognormal",
+          "lower": 15000,
+          "upper": 300000,
+          "confidence": 0.9
+        },
+        "method": "expert-calibrated",
+        "rationale": "Two attempts in 2025 were stopped by a call-back check. Background rate covers fraud without our identity provider failing, for example a spoofed supplier.",
+        "estimatedBy": "CFO",
+        "estimatedOn": "2026-10-21"
+      },
+      "driverLinks": [
+        {
+          "driverId": "D-IDP",
+          "triggerProbability": 0.5,
+          "rationale": "A taken-over mailbox is the usual path for payment fraud."
+        }
+      ],
+      "catalogueRef": {
+        "catalogue": "risklet-2026",
+        "id": "111"
+      },
+      "objectiveIds": [
+        "OBJ-O1"
+      ],
+      "assetIds": [
+        "A-IDP"
+      ],
+      "threatSourceType": "adversarial",
+      "horizon": "current"
+    },
+    {
+      "riskId": "R-03",
+      "registerId": "CORP",
+      "priority": 4,
+      "polarity": "negative",
+      "riskDescription": "If the server room fails, then the ERP and file services are down until power and cooling return.",
+      "riskCategory": "ICT risk",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.availability"
+      },
+      "riskLikelihood": 0.1143,
+      "riskImpact": 146720,
+      "exposureRating": 16770,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision.",
+      "riskOwnerPointOfContact": "IT lead",
+      "status": "Open",
+      "responseDecision": "pending",
+      "estimate": {
+        "frequency": {
+          "type": "constant",
+          "value": 0.02
+        },
+        "impactPerEvent": {
+          "type": "lognormal",
+          "lower": 20000,
+          "upper": 400000,
+          "confidence": 0.9
+        },
+        "method": "expert-calibrated",
+        "rationale": "Almost all outages come through the site driver. A small background rate covers hardware failure of the virtualization host."
+      },
+      "driverLinks": [
+        {
+          "driverId": "D-SITE",
+          "triggerProbability": 0.6,
+          "rationale": "Most site events last longer than the UPS runtime."
+        }
+      ],
+      "catalogueRef": {
+        "catalogue": "risklet-2026",
+        "id": "55"
+      },
+      "objectiveIds": [
+        "OBJ-O1"
+      ],
+      "assetIds": [
+        "A-SRVROOM",
+        "A-ERP"
+      ],
+      "threatSourceType": "environmental",
+      "horizon": "current"
+    },
+    {
+      "riskId": "R-04",
+      "registerId": "CORP",
+      "priority": 3,
+      "polarity": "negative",
+      "riskDescription": "If our MSP is breached, then customer machine drawings that we store are disclosed and customers claim damages.",
+      "riskCategory": "ICT risk",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.supply-chain"
+      },
+      "riskLikelihood": 0.0588,
+      "riskImpact": 366619,
+      "exposureRating": 21557,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision.",
+      "riskOwnerPointOfContact": "Managing director",
+      "status": "Open",
+      "responseDecision": "pending",
+      "estimate": {
+        "frequency": {
+          "type": "lognormal",
+          "lower": 0.005,
+          "upper": 0.05,
+          "confidence": 0.9
+        },
+        "impactPerEvent": {
+          "type": "lognormal",
+          "lower": 30000,
+          "upper": 400000,
+          "confidence": 0.9
+        },
+        "method": "expert-calibrated",
+        "rationale": "Primary loss is forensics, notification and rework. Secondary loss is customer claims, which follow in about 4 of 10 disclosures. Background rate covers breaches of our own file shares.",
+        "secondaryImpacts": [
+          {
+            "description": "Customer claims under confidentiality clauses after disclosure",
+            "probability": 0.4,
+            "impactPerEvent": {
+              "type": "lognormal",
+              "lower": 80000,
+              "upper": 1500000,
+              "confidence": 0.9
+            }
+          }
+        ]
+      },
+      "driverLinks": [
+        {
+          "driverId": "D-MSP",
+          "triggerProbability": 0.5,
+          "rationale": "MSP has read access to the engineering share."
+        }
+      ],
+      "catalogueRef": {
+        "catalogue": "risklet-2026",
+        "id": "52"
+      },
+      "objectiveIds": [
+        "OBJ-C1"
+      ],
+      "assetIds": [
+        "A-MSP",
+        "A-ENGDATA"
+      ],
+      "threatSourceType": "adversarial",
+      "horizon": "current"
+    },
+    {
+      "riskId": "R-05",
+      "registerId": "CORP",
+      "priority": 6,
+      "polarity": "negative",
+      "riskDescription": "If we report a significant incident late or not at all, then the competent authority imposes a fine and we pay legal costs.",
+      "riskCategory": "Legal risk",
+      "category": {
+        "code": "legal",
+        "subcode": "legal.regulatory"
+      },
+      "riskLikelihood": 0.0201,
+      "riskImpact": 98096,
+      "exposureRating": 1972,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Accept. The incident reporting procedure is tested twice a year.",
+      "riskOwnerPointOfContact": "Managing director",
+      "status": "Accepted",
+      "responseDecision": "decided",
+      "estimate": {
+        "frequency": {
+          "type": "lognormal",
+          "lower": 0.005,
+          "upper": 0.05,
+          "confidence": 0.9
+        },
+        "impactPerEvent": {
+          "type": "pert",
+          "min": 10000,
+          "mode": 40000,
+          "max": 400000
+        },
+        "method": "expert-calibrated",
+        "rationale": "PERT because the loss has a hard upper limit in practice. NIS2 Art. 34(5) caps fines for important entities at EUR 7 M or 1.4 percent of turnover, and a first late report is unlikely to reach the cap."
+      },
+      "objectiveIds": [
+        "OBJ-R1",
+        "OBJ-C1"
+      ],
+      "horizon": "current",
+      "acceptance": {
+        "kind": "acceptance",
+        "acceptedBy": "Managing directors",
+        "acceptedOn": "2026-10-20",
+        "validUntil": "2027-10-20",
+        "rationale": "Expected annual loss is low and the reporting procedure is tested. Review after any significant incident."
+      }
+    },
+    {
+      "riskId": "R-06",
+      "registerId": "CORP",
+      "priority": 5,
+      "polarity": "positive",
+      "riskDescription": "If we can show CRA-ready secure updates before our competitors, then we win additional service contracts.",
+      "riskCategory": "Strategic risk",
+      "category": {
+        "code": "strategic",
+        "subcode": "strategic.market"
+      },
+      "riskLikelihood": 0.377,
+      "riskImpact": 142619,
+      "exposureRating": 53767,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision. Candidate response O-5 enhances this opportunity.",
+      "riskOwnerPointOfContact": "Head of sales",
+      "status": "Open",
+      "responseDecision": "pending",
+      "estimate": {
+        "frequency": {
+          "type": "lognormal",
+          "lower": 0.2,
+          "upper": 1.0,
+          "confidence": 0.9
+        },
+        "impactPerEvent": {
+          "type": "lognormal",
+          "lower": 30000,
+          "upper": 250000,
+          "confidence": 0.9
+        },
+        "method": "expert-calibrated",
+        "rationale": "Three customers asked for CRA evidence in 2026 tenders. One extra contract has a gross margin of 30 to 250 thousand EUR."
+      },
+      "objectiveIds": [
+        "OBJ-S1"
+      ],
+      "horizon": "emerging",
+      "linkedRisks": [
+        {
+          "riskId": "R-07",
+          "relation": "trade-off",
+          "note": "Selling secure updates raises the stake of a signing key compromise (Sec. 5.4.3)."
+        }
+      ]
+    },
+    {
+      "riskId": "R-07",
+      "registerId": "PROD-A",
+      "priority": 1,
+      "polarity": "negative",
+      "riskDescription": "If an attacker steals the firmware signing key, then customers install a malicious signed update and we must recall and re-key all controllers.",
+      "riskCategory": "ICT risk",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.supply-chain"
+      },
+      "riskLikelihood": 0.018,
+      "riskImpact": 2083395,
+      "exposureRating": 37501,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision. Candidate response O-6.",
+      "riskOwnerPointOfContact": "Head of engineering",
+      "status": "Open",
+      "responseDecision": "pending",
+      "estimate": {
+        "frequency": {
+          "type": "lognormal",
+          "lower": 0.003,
+          "upper": 0.03,
+          "confidence": 0.9
+        },
+        "impactPerEvent": {
+          "type": "lognormal",
+          "lower": 300000,
+          "upper": 6000000,
+          "confidence": 0.9
+        },
+        "method": "expert-calibrated",
+        "rationale": "Key is a file on the build server today. Impact includes field recall, re-keying and contract penalties."
+      },
+      "driverLinks": [
+        {
+          "driverId": "D-IDP",
+          "triggerProbability": 0.05,
+          "rationale": "Repository access through a stolen session can reach the build server."
+        }
+      ],
+      "catalogueRef": {
+        "catalogue": "risklet-2026",
+        "id": "53"
+      },
+      "objectiveIds": [
+        "OBJ-S1",
+        "OBJ-C1"
+      ],
+      "assetIds": [
+        "A-SIGNKEY",
+        "A-CTRL"
+      ],
+      "threatSourceType": "adversarial",
+      "horizon": "current"
+    },
+    {
+      "riskId": "R-08",
+      "registerId": "PROD-A",
+      "priority": 2,
+      "polarity": "negative",
+      "riskDescription": "If an attacker exploits a known vulnerability in the controller web interface, then customer machines stop and we pay field service and penalties.",
+      "riskCategory": "ICT risk",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.vulnerability"
+      },
+      "riskLikelihood": 0.1512,
+      "riskImpact": 180878,
+      "exposureRating": 27349,
+      "riskResponseType": [
+        "Mitigate"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Fix the two open reports from CVD Portal in the next release.",
+      "riskOwnerPointOfContact": "Head of engineering",
+      "status": "In treatment",
+      "responseDecision": "decided",
+      "estimate": {
+        "frequency": {
+          "type": "lognormal",
+          "lower": 0.05,
+          "upper": 0.4,
+          "confidence": 0.9
+        },
+        "impactPerEvent": {
+          "type": "lognormal",
+          "lower": 20000,
+          "upper": 500000,
+          "confidence": 0.9
+        },
+        "method": "mixed",
+        "rationale": "Two open reports in CVD Portal, one high severity. Many controllers are reachable from customer office networks."
+      },
+      "evidence": [
+        {
+          "kind": "cvd-portal-submission",
+          "ref": "cvdp:sub_2026_0141",
+          "summary": "AUTH_BYPASS in web interface",
+          "severity": "HIGH",
+          "status": "IN_PROGRESS",
+          "date": "2026-09-30"
+        },
+        {
+          "kind": "cvd-portal-submission",
+          "ref": "cvdp:sub_2026_0157",
+          "summary": "XSS in diagnostics page",
+          "severity": "MEDIUM",
+          "status": "ACKNOWLEDGED",
+          "date": "2026-10-12"
+        }
+      ],
+      "catalogueRef": {
+        "catalogue": "risklet-2026",
+        "id": "19"
+      },
+      "objectiveIds": [
+        "OBJ-O1"
+      ],
+      "assetIds": [
+        "A-CTRL"
+      ],
+      "threatSourceType": "adversarial",
+      "horizon": "current",
+      "previousAssessment": {
+        "asOf": "2025-10-27",
+        "riskLikelihood": 0.1,
+        "riskImpact": 150000,
+        "exposureRating": 15000
+      }
+    },
+    {
+      "riskId": "R-09",
+      "registerId": "CORP",
+      "priority": 7,
+      "polarity": "negative",
+      "riskDescription": "If staff cannot authenticate with their FIDO2 key (lost key, new device), then their work stops until the help desk restores access.",
+      "riskCategory": "ICT risk",
+      "category": {
+        "code": "ict",
+        "subcode": "ict.availability"
+      },
+      "riskLikelihood": 0.9702,
+      "riskImpact": 8704,
+      "exposureRating": 8445,
+      "riskResponseType": [
+        "Accept"
+      ],
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance. Exists only if O-3 is funded.",
+      "riskOwnerPointOfContact": "IT lead",
+      "status": "Open",
+      "responseDecision": "pending",
+      "estimate": {
+        "frequency": {
+          "type": "lognormal",
+          "lower": 2,
+          "upper": 12,
+          "confidence": 0.9
+        },
+        "impactPerEvent": {
+          "type": "lognormal",
+          "lower": 300,
+          "upper": 4000,
+          "confidence": 0.9
+        },
+        "method": "expert-calibrated",
+        "rationale": "SP 800-221r1 lines 1072 to 1074 give this example. Lost keys and new phones cause a few lockouts per year, each costing lost hours."
+      },
+      "objectiveIds": [
+        "OBJ-O1"
+      ],
+      "assetIds": [
+        "A-IDP"
+      ],
+      "threatSourceType": "accidental",
+      "horizon": "current",
+      "onlyWithResponse": "O-3"
+    }
+  ],
+  "responses": [
+    {
+      "id": "O-1",
+      "title": "Just-in-time admin access for the MSP",
+      "description": "Privileged access management with approval and session recording for all MSP admin sessions.",
+      "responseType": "Mitigate",
+      "costs": {
+        "oneOff": 15000,
+        "annual": 6000,
+        "lifetimeYears": 3
+      },
+      "status": "candidate",
+      "effects": [
+        {
+          "targetKind": "driver",
+          "targetId": "D-MSP",
+          "frequency": {
+            "type": "lognormal",
+            "lower": 0.005,
+            "upper": 0.06,
+            "confidence": 0.9
+          },
+          "rationale": "Standing admin rights disappear. A compromised MSP must still pass our approval."
+        }
+      ],
+      "controlTypes": [
+        "preventative",
+        "detective"
+      ],
+      "informativeReferences": [
+        "CSF 2.0 PR.AA-05",
+        "SP 800-53r5 AC-6"
+      ]
+    },
+    {
+      "id": "O-2",
+      "title": "Immutable offline backups and quarterly restore tests",
+      "responseType": "Mitigate",
+      "costs": {
+        "oneOff": 25000,
+        "annual": 8000,
+        "lifetimeYears": 5
+      },
+      "status": "candidate",
+      "effects": [
+        {
+          "targetKind": "risk",
+          "targetId": "R-01",
+          "impactPerEvent": {
+            "type": "lognormal",
+            "lower": 60000,
+            "upper": 900000,
+            "confidence": 0.9
+          },
+          "rationale": "Tested restore cuts downtime from days to about one day."
+        }
+      ],
+      "controlTypes": [
+        "corrective"
+      ],
+      "informativeReferences": [
+        "CSF 2.0 PR.DS-11",
+        "SP 800-53r5 CP-9"
+      ]
+    },
+    {
+      "id": "O-3",
+      "title": "Phishing-resistant MFA (FIDO2 keys) for all staff",
+      "responseType": "Mitigate",
+      "costs": {
+        "oneOff": 12000,
+        "annual": 4000,
+        "lifetimeYears": 4
+      },
+      "status": "candidate",
+      "effects": [
+        {
+          "targetKind": "driver",
+          "targetId": "D-IDP",
+          "frequency": {
+            "type": "lognormal",
+            "lower": 0.005,
+            "upper": 0.06,
+            "confidence": 0.9
+          },
+          "rationale": "Removes push fatigue and most token phishing."
+        }
+      ],
+      "controlTypes": [
+        "preventative"
+      ],
+      "informativeReferences": [
+        "CSF 2.0 PR.AA-03",
+        "SP 800-53r5 IA-2(1)"
+      ],
+      "introducesRisks": [
+        "R-09"
+      ]
+    },
+    {
+      "id": "O-4",
+      "title": "Cyber insurance, EUR 2 M limit, EUR 50 000 deductible",
+      "responseType": "Transfer",
+      "costs": {
+        "oneOff": 0,
+        "annual": 18000,
+        "lifetimeYears": 1
+      },
+      "status": "candidate",
+      "effects": [
+        {
+          "targetKind": "risk",
+          "targetId": "R-01",
+          "impactPerEvent": {
+            "type": "lognormal",
+            "lower": 50000,
+            "upper": 700000,
+            "confidence": 0.9
+          },
+          "rationale": "Retained loss is the deductible plus uninsured business interruption beyond the waiting period."
+        }
+      ]
+    },
+    {
+      "id": "O-5",
+      "title": "CRA readiness evidence pack for sales",
+      "responseType": "Enhance",
+      "costs": {
+        "oneOff": 20000,
+        "annual": 10000,
+        "lifetimeYears": 3
+      },
+      "status": "candidate",
+      "effects": [
+        {
+          "targetKind": "risk",
+          "targetId": "R-06",
+          "frequency": {
+            "type": "lognormal",
+            "lower": 0.4,
+            "upper": 1.6,
+            "confidence": 0.9
+          },
+          "rationale": "Sales can answer tender questions on secure updates on day one."
+        }
+      ]
+    },
+    {
+      "id": "O-6",
+      "title": "Move the signing key into a hardware security module",
+      "responseType": "Mitigate",
+      "costs": {
+        "oneOff": 30000,
+        "annual": 3000,
+        "lifetimeYears": 5
+      },
+      "status": "candidate",
+      "effects": [
+        {
+          "targetKind": "risk",
+          "targetId": "R-07",
+          "frequency": {
+            "type": "lognormal",
+            "lower": 0.0005,
+            "upper": 0.005,
+            "confidence": 0.9
+          },
+          "rationale": "The key can no longer be copied. An attacker must abuse the signing service, which has two-person approval."
+        }
+      ],
+      "controlTypes": [
+        "preventative"
+      ],
+      "informativeReferences": [
+        "SP 800-53r5 SC-12"
+      ]
+    },
+    {
+      "id": "O-7",
+      "title": "Incident response retainer with a risk reserve",
+      "description": "Retainer with an incident response firm. EUR 40 000 is set aside for its work and released at year end if unused.",
+      "responseType": "Mitigate",
+      "costs": {
+        "oneOff": 0,
+        "annual": 3000,
+        "lifetimeYears": 1,
+        "reserveAmount": 40000
+      },
+      "status": "candidate",
+      "controlTypes": [
+        "corrective"
+      ],
+      "informativeReferences": [
+        "CSF 2.0 RS.MA-01"
+      ],
+      "effects": [
+        {
+          "targetKind": "risk",
+          "targetId": "R-01",
+          "impactPerEvent": {
+            "type": "lognormal",
+            "lower": 110000,
+            "upper": 1800000,
+            "confidence": 0.9
+          },
+          "rationale": "Experts on site within 24 hours shorten recovery by 2 to 4 days."
+        }
+      ]
+    }
+  ],
+  "forecasts": [
+    {
+      "id": "F-2026-R-02",
+      "riskId": "R-02",
+      "createdOn": "2025-10-27T09:00:00Z",
+      "windowStart": "2025-10-27",
+      "windowEnd": "2026-10-26",
+      "eventDefinition": "At least one payment fraud event with a loss of EUR 5000 or more between windowStart and windowEnd.",
+      "eventThreshold": 5000,
+      "probability": 0.2186,
+      "engineVersion": "sim_reference 0.1.0",
+      "seed": 20261207,
+      "trials": 100000,
+      "inputsSha256": "8947c7c1344438402f9c462c7959018cb48b45e49de13564fa13753897a11baf",
+      "outcome": {
+        "occurred": false,
+        "recordedOn": "2026-10-27",
+        "evidence": "Finance confirmed no fraud loss. Two attempts stopped by call-back."
+      }
+    },
+    {
+      "id": "F-2027-R-01",
+      "riskId": "R-01",
+      "createdOn": "2026-10-27T09:00:00Z",
+      "windowStart": "2026-10-27",
+      "windowEnd": "2027-10-26",
+      "eventDefinition": "At least one ransomware event that encrypts production IT with a loss of EUR 5000 or more between windowStart and windowEnd.",
+      "eventThreshold": 5000,
+      "probability": 0.1055,
+      "engineVersion": "sim_reference 0.1.0",
+      "seed": 20261207,
+      "trials": 100000,
+      "inputsSha256": "97f5c872d42a2db74252542fdc2e237adb0d5feb246e6c947d32a4eafae9da5f"
+    }
+  ],
+  "simulation": {
+    "seed": 20261207,
+    "trials": 100000,
+    "engineVersion": "sim_reference 0.1.0"
+  }
+}
