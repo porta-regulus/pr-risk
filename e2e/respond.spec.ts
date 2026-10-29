@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
+import { parseCsv } from '../src/import/csv';
 import { expectAccessible } from './axe';
 
 function watchProblems(page: Page): string[] {
@@ -101,5 +103,33 @@ test('S5 finds the best portfolio of example 2 and prints the decision record on
   await page.getByRole('button', { name: 'Find the best portfolio' }).click();
   await expect(record).toContainText('Draft. 3 accepted residual risks need an acceptance record', { timeout: 30_000 });
   await expect(record).toContainText('Accepted by Managing directors');
+  expect(problems).toEqual([]);
+});
+
+// Golden test G1 part (b) (SPEC.md Sec. 12.2). The ERR view of example 1 renders 10 rows,
+// and every cell text equals the CSV fixture of Fig. 10. A response cell has one line per
+// line of the CSV cell.
+test('G1 (b). The register ERR of example 1 renders in the layout of Fig. 10, equal to the CSV', async ({ page }) => {
+  const problems = watchProblems(page);
+  const rows = parseCsv(readFileSync(new URL('../docs/schema/fixtures/sp800-221r1-fig10.csv', import.meta.url), 'utf8'), ',');
+  const [header, ...body] = rows.filter((row) => row.some((cell) => cell.trim() !== ''));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'NIST Fig. 10 and Table 9 (example 1)' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
+  await page.getByRole('button', { name: 'Prioritize' }).click();
+  await expect(page.getByLabel('Register', { exact: true })).toHaveValue('ERR');
+  const table = page.locator('table.err');
+  await expect(table.locator('thead th')).toHaveText(header ?? []);
+  await expect(table.locator('tbody tr')).toHaveCount(10);
+  expect(body).toHaveLength(10);
+  for (const [r, row] of body.entries()) {
+    const cells = table.locator('tbody tr').nth(r).locator('td');
+    for (const [c, text] of row.entries()) {
+      const lines = text.split(/\r?\n/).map((line) => line.trim()).filter((line) => line !== '');
+      if (lines.length > 1) await expect(cells.nth(c).locator('.line')).toHaveText(lines);
+      else await expect(cells.nth(c)).toHaveText(text.trim());
+    }
+  }
+  await expectAccessible(page, 'S4 of example 1 with the Fig. 10 view');
   expect(problems).toEqual([]);
 });

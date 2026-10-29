@@ -606,6 +606,12 @@ svg.swatch {
   font-size: 0.8rem;
   color: var(--muted);
 }
+table.err {
+  min-width: 60rem;
+}
+table.err .line {
+  display: block;
+}
 .register-status {
   margin: 0;
   padding-left: 1.1rem;

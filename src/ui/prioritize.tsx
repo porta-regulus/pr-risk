@@ -11,6 +11,7 @@ import { numbersSource } from './analysis';
 import { withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
 import { Checkboxes, NumberField, TextField } from './fields';
+import { ErrView } from './err';
 import { registerTree } from './identify';
 import { useEngine } from './jobs';
 import { LecChart, money, percent, probability, short, sourceLine, StatusText } from './report';
@@ -391,9 +392,12 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
   const points = doc.appetite?.toleranceCurve?.points ?? [];
   if (key === undefined) {
     return (
-      <section class="panel">
-        <p>No risk has an estimate yet. Add a frequency and an impact range to a risk on the screen Identify and analyze. Matrices alone cannot rank risks (Cox 2008).</p>
-      </section>
+      <>
+        <section class="panel">
+          <p>No risk has an estimate yet. Add a frequency and an impact range to a risk on the screen Identify and analyze. Matrices alone cannot rank risks (Cox 2008).</p>
+        </section>
+        <ErrView doc={doc} number={1} />
+      </>
     );
   }
   const expectedAnnual = new Map((numbers?.state.risks ?? []).map((risk) => [risk.riskId, risk.expectedAnnual]));
@@ -491,6 +495,7 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
           </section>
         </>
       )}
+      <ErrView doc={doc} number={4} />
     </>
   );
 }

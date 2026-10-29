@@ -169,7 +169,7 @@ Screen S5 Respond and optimize works (`src/ui/respond.tsx`). It edits the budget
 The decision record (`src/ui/record.tsx`) has every section of SPEC.md Sec. 4 in the layout of Sec. 4.1. `test/engine-decision.test.ts` checks the record of example 2 against the worked example of Sec. 8.11 within 4 combined standard errors, including the alternatives, the fiscal baseline (EUR 17 860 less), the marginal values of O-4 and O-5, and the best portfolio at EUR 48 000 and 72 000. `e2e/respond.spec.ts` prints the record of example 2 to PDF and counts 2 A4 pages.
 
 Done criteria status 2026-10-29.
-1. G2 parts (a) and (b) pass. G1 part (b) needs the ERR view of S7 (task 7) and is open.
+1. Passes. G2 parts (a) and (b) pass in `e2e/context.spec.ts`. G1 part (b) passes in `e2e/respond.spec.ts`. S4 shows a register in the layout of Fig. 10, and every cell of the ERR register of example 1 equals the CSV fixture. The full S7 enterprise view stays in task 7.
 2. Passes. `e2e/at5.spec.ts` completes the AT-5 task from an empty browser to the printed record in about 13 s. The catalogue risk waits for Q3, so all 5 risks are own risks.
 3. Passes for S1 to S5. axe-core (`e2e/axe.ts`) finds no WCAG 2.2 A or AA violation, also with the record and the option editor open.
 4. Passes. The record of example 2 prints on 2 A4 pages with the fiscal baseline and the budget sensitivity.
