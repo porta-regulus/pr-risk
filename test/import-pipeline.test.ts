@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { decodeText, parseCsv } from '../src/import/csv';
 import { commitImport, detectFormat, MAX_ROWS, prepareImport, type ImportFile } from '../src/import/pipeline';
 import { parseCell } from '../src/import/values';
-import { documentErrors, type Register, type RiskDocument } from '../src/schema';
+import { canonicalize, documentErrors, type Register, type RiskDocument } from '../src/schema';
 import { example, EXAMPLE_1, EXAMPLE_2, EXAMPLE_3 } from './schema-helpers';
 
 const bytesOf = (path: string): Uint8Array => new Uint8Array(readFileSync(new URL(`../docs/schema/${path}`, import.meta.url)));
@@ -72,6 +72,21 @@ describe('pipeline and provenance', () => {
     expect(preview.risks[0]?.status).toBe('Open');
     expect(preview.risks[0]?.category).toEqual({ code: 'ict', subcode: 'ict.identity' });
     expect(preview.warnings.join(' ')).toMatch(/percentage.*unknown status "Updated"/);
+  });
+});
+
+describe('whole-document restore', () => {
+  it('validates the incoming document on its own, so a backup restores into an empty document', () => {
+    const backup = example(EXAMPLE_2);
+    const empty: RiskDocument = { ...structuredClone(errOnly), document: { ...errOnly.document, id: 'doc-empty' }, changeLog: [] };
+    const preview = prepareImport(empty, file('backup.json', JSON.stringify(backup)), { register: err, importedOn: IMPORTED_ON });
+    // The merge misses the drivers, responses and objectives of the backup. The restore has them.
+    expect(preview.errors.length).toBeGreaterThan(0);
+    expect(preview.documentErrors).toEqual([]);
+    expect(() => commitImport(empty, preview)).toThrow('has errors');
+    const restored = commitImport(empty, preview, {}, undefined, 'replace');
+    expect(canonicalize(restored.risks)).toBe(canonicalize(backup.risks));
+    expect(restored.provenance?.at(-1)?.fileName).toBe('backup.json');
   });
 });
 

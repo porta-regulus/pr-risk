@@ -27,7 +27,9 @@ export function slug(text: string): string {
   );
 }
 
-// SPEC.md Sec. 6.1 item 1. A new document starts with one organization register.
+// SPEC.md Sec. 6.1 item 1. A new document starts with one organization register. It is
+// qualitative, so imported rows without estimates are valid (rule V-08). A register can move
+// to quantitative risk by risk (Sec. 6.8 item 1).
 export function newDocument(title: string, organization: string, currency: string, now = new Date()): RiskDocument {
   const iso = now.toISOString().replace(/\.\d{3}Z$/, 'Z');
   return {
@@ -40,7 +42,7 @@ export function newDocument(title: string, organization: string, currency: strin
       createdOn: iso,
       tool: { name: 'PortaRegulus Risk', version: __APP_VERSION__ },
     },
-    registers: [{ id: 'ORG', title: organization === '' ? 'Organization register' : `${organization} register`, level: 'organization', timeframeMonths: 12, asOf: iso.slice(0, 10), method: 'quantitative' }],
+    registers: [{ id: 'ORG', title: organization === '' ? 'Organization register' : `${organization} register`, level: 'organization', timeframeMonths: 12, asOf: iso.slice(0, 10), method: 'qualitative' }],
     risks: [],
   };
 }

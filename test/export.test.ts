@@ -89,6 +89,14 @@ describe('encrypted export', () => {
     expect(file.data).toBe(expected);
   });
 
+  it('encrypts a large document without a call stack error', async () => {
+    const plaintext = 'x'.repeat(2_000_000);
+    const file = await encrypt(plaintext, passphrase, { salt: new Uint8Array(16), iv: new Uint8Array(12), iterations: 1 });
+    const key = pbkdf2Sync(passphrase, new Uint8Array(16), 1, 32, 'sha256');
+    const cipher = createCipheriv('aes-256-gcm', key, new Uint8Array(12));
+    expect(file.data).toBe(Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final(), cipher.getAuthTag()]).toString('base64'));
+  });
+
   it('refuses short passphrases and files with a weak key setting', async () => {
     await expect(encrypt('x', 'short')).rejects.toThrow('12 characters');
     const file = await encrypt('x', passphrase);

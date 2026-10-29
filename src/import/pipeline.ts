@@ -42,11 +42,14 @@ export interface ImportPreview {
   readonly registers: Register[];
   readonly risks: Risk[];
   readonly warnings: string[];
+  // Errors of the merge into the open document.
   readonly errors: Finding[];
   readonly diff: DiffEntry[];
   readonly provenance: ProvenanceRecord;
   // The whole document, when the file restores one without loss (native JSON, OSCAL payload).
   readonly document?: RiskDocument;
+  // Errors of that whole document on its own, for a restore that replaces the open document.
+  readonly documentErrors?: Finding[];
 }
 
 const isZip = (bytes: Uint8Array): boolean => bytes[0] === 0x50 && bytes[1] === 0x4b && bytes[2] === 0x03 && bytes[3] === 0x04;
@@ -188,7 +191,16 @@ export function prepareImport(doc: RiskDocument, file: ImportFile, options: Impo
     ...risks.flatMap((risk) => diffOf('risk', doc.risks.find((item) => item.riskId === risk.riskId), risk, risk.riskId)),
   ];
   const errors = documentErrors({ ...merged(doc, registers, risks), provenance: [...(doc.provenance ?? []), provenance] });
-  return { format, registers, risks, warnings, errors, diff, provenance, ...(document === undefined ? {} : { document }) };
+  return {
+    format,
+    registers,
+    risks,
+    warnings,
+    errors,
+    diff,
+    provenance,
+    ...(document === undefined ? {} : { document, documentErrors: documentErrors(replacement(document, provenance)) }),
+  };
 }
 
 export type Choice = 'current' | 'incoming' | 'both';
@@ -202,6 +214,15 @@ function withUniqueId(record: ProvenanceRecord, existing: readonly ProvenanceRec
   return { ...record, id: `PV-${String(n)}` };
 }
 
+// The restored document as it is saved. Its provenance and change log continue.
+function replacement(document: RiskDocument, provenance: ProvenanceRecord, actor?: string): RiskDocument {
+  return {
+    ...document,
+    provenance: [...(document.provenance ?? []), withUniqueId(provenance, document.provenance ?? [])],
+    changeLog: [...(document.changeLog ?? []), { at: provenance.importedOn, entityKind: 'context', entityId: document.document.id, path: '', ...(actor === undefined ? {} : { actor }) }],
+  };
+}
+
 // Sec. 9.7. Per matched entity the user keeps current, takes incoming, or keeps both
 // (incoming gets a new id). The change log records the result.
 export function commitImport(
@@ -211,19 +232,15 @@ export function commitImport(
   actor?: string,
   mode: 'merge' | 'replace' = 'merge',
 ): RiskDocument {
-  if (preview.errors.length > 0) throw new Error('The import has errors and cannot be committed');
   if (mode === 'replace') {
-    // Replace the open document with the imported one. Its provenance and change log continue.
+    // Replace the open document with the imported one. Only the incoming document must be valid.
     if (preview.document === undefined) throw new Error('Only a whole document can replace the open document');
-    const replaced: RiskDocument = {
-      ...preview.document,
-      provenance: [...(preview.document.provenance ?? []), withUniqueId(preview.provenance, preview.document.provenance ?? [])],
-      changeLog: [...(preview.document.changeLog ?? []), { at: preview.provenance.importedOn, entityKind: 'context', entityId: preview.document.document.id, path: '', ...(actor === undefined ? {} : { actor }) }],
-    };
+    const replaced = replacement(preview.document, preview.provenance, actor);
     const replaceErrors = documentErrors(replaced);
     if (replaceErrors.length > 0) throw new Error(`The imported document is not valid: ${replaceErrors[0]?.message ?? ''}`);
     return replaced;
   }
+  if (preview.errors.length > 0) throw new Error('The import has errors and cannot be committed');
   const at = preview.provenance.importedOn;
   const taken = new Set(doc.risks.map((risk) => risk.riskId));
   const incoming: Risk[] = [];

@@ -2,6 +2,7 @@
 // Export carries the whole native document as an RFC 8785 payload in back-matter, so an
 // import with a matching hash is lossless. Without the payload, risks come back from the
 // mapped elements, and the import report lists what is missing.
+import { fromBase64, toBase64 } from '../schema/base64';
 import { canonicalize } from '../schema/canonical';
 import { readDocument } from '../schema/document';
 import { sha256Hex } from '../schema/sha256';
@@ -217,16 +218,6 @@ export function exportPoam(doc: RiskDocument, options: PoamOptions = {}): Record
       },
     },
   };
-}
-
-function toBase64(bytes: Uint8Array): string {
-  let binary = '';
-  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  return btoa(binary);
-}
-
-function fromBase64(text: string): Uint8Array {
-  return Uint8Array.from(atob(text), (ch) => ch.charCodeAt(0));
 }
 
 export type PoamImport =

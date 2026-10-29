@@ -20,7 +20,7 @@ import {
 const doc = example2 as unknown as RiskDocument;
 const withTitle = (title: string): RiskDocument => ({ ...doc, document: { ...doc.document, title } });
 
-it('saves versions, keeps 20 for undo, and undoes to the previous one', async () => {
+it('saves versions, keeps 20 for undo, and undo goes back through all of them', async () => {
   await removeAll();
   const db = await openDb();
   for (let i = 1; i <= 25; i++) await saveDocument(db, withTitle(`Version ${String(i)}`), `2026-10-28T00:00:${String(i).padStart(2, '0')}Z`);
@@ -29,9 +29,18 @@ it('saves versions, keeps 20 for undo, and undoes to the previous one', async ()
   expect(versions).toHaveLength(UNDO_VERSIONS);
   expect(versions[0]).toBe(25);
   expect(versions.at(-1)).toBe(6);
-  const undone = await undo(db, doc.document.id);
-  expect(undone?.doc.document.title).toBe('Version 24');
-  expect(undone?.version).toBe(26);
+  for (let expected = 24; expected >= 6; expected--) {
+    const undone = await undo(db, doc.document.id);
+    expect(undone?.doc.document.title).toBe(`Version ${String(expected)}`);
+    expect(undone?.version).toBe(expected);
+  }
+  expect(await undo(db, doc.document.id)).toBeUndefined();
+  expect((await loadDocument(db, doc.document.id))?.doc.document.title).toBe('Version 6');
+  // A save after undo drops the versions after the current one.
+  const saved = await saveDocument(db, withTitle('Edit after undo'));
+  expect(saved.version).toBe(7);
+  expect(await listVersions(db, doc.document.id)).toEqual([7, 6]);
+  expect((await undo(db, doc.document.id))?.doc.document.title).toBe('Version 6');
   db.close();
 });
 

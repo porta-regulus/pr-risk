@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 
-// Screen S1 under the production CSP and Trusted Types: open, create, import, export, remove all.
+// Screen S1 under the production CSP and Trusted Types: open, create, import, export, restore, remove all.
 test('start screen works end to end with no CSP violation', async ({ page }) => {
   const problems: string[] = [];
   page.on('pageerror', (error) => problems.push(error.message));
@@ -27,6 +27,13 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   expect(exported.risks).toHaveLength(9);
   await expect(page.getByText('You have not saved a copy of this document yet.')).toBeHidden();
 
+  // Save an encrypted copy for the restore below.
+  const passphrase = 'correct horse battery staple';
+  await page.getByLabel('Passphrase for an encrypted copy').fill(passphrase);
+  const encryptedPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Encrypted copy' }).click();
+  const encrypted = readFileSync(await (await encryptedPromise).path());
+
   // Create a new document and import the Table 10 CSV into it through the import worker.
   await page.getByLabel('Title', { exact: true }).fill('Test register');
   await page.getByLabel('Organization').fill('Example GmbH');
@@ -45,6 +52,25 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   await page.getByLabel(/Type REMOVE/).fill('REMOVE');
   await remove.click();
   await expect(page.getByText('All data is removed from this browser.')).toBeVisible();
+  await expect(page.getByText('No document is stored in this browser.')).toBeVisible();
+
+  // In an empty browser, restore the encrypted copy as a whole document.
+  await page.getByLabel('Passphrase, only for an encrypted file').fill(passphrase);
+  await page.setInputFiles('#import-file', { name: 'backup.encrypted.json', mimeType: 'application/json', buffer: encrypted });
+  await expect(page.getByText('Format native. 9 risks')).toBeVisible();
+  await page.getByRole('button', { name: 'Save as a new document' }).click();
+  await expect(page.getByText('9 risks from backup.encrypted.json are saved.')).toBeVisible();
+  await page.getByLabel(/Type REMOVE/).fill('REMOVE');
+  await remove.click();
+  await expect(page.getByText('All data is removed from this browser.')).toBeVisible();
+
+  // In an empty browser, import a CSV without a register column.
+  await page.setInputFiles('#import-file', fileURLToPath(new URL('../docs/schema/fixtures/sp800-221r1-fig10.csv', import.meta.url)));
+  await expect(page.getByText('Format csv. 10 risks')).toBeVisible();
+  await page.getByRole('button', { name: 'Save as a new document' }).click();
+  await expect(page.getByText('10 risks from sp800-221r1-fig10.csv are saved.')).toBeVisible();
+  await page.getByLabel(/Type REMOVE/).fill('REMOVE');
+  await remove.click();
   await expect(page.getByText('No document is stored in this browser.')).toBeVisible();
 
   expect(problems, 'errors, warnings and CSP violations').toEqual([]);

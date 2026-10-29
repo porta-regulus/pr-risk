@@ -7,7 +7,7 @@ import { runImport } from '../import/client';
 import { commitImport, type ImportPreview } from '../import/pipeline';
 import { exportPoam } from '../oscal/poam';
 import { lint } from '../schema/rules';
-import type { RiskDocument } from '../schema/types';
+import type { Finding, RiskDocument } from '../schema/types';
 import {
   deleteDocument,
   exportOverdue,
@@ -37,6 +37,19 @@ interface Message {
   readonly text: string;
 }
 
+function ErrorList({ errors }: { readonly errors: readonly Finding[] }) {
+  if (errors.length === 0) return null;
+  return (
+    <ul class="errors">
+      {errors.slice(0, 8).map((error, i) => (
+        <li key={i}>
+          {error.rule} {error.message}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function StartScreen() {
   const [db, setDb] = useState<IDBDatabase>();
   const [documents, setDocuments] = useState<StoredDocument[]>([]);
@@ -46,6 +59,7 @@ export function StartScreen() {
   const [preview, setPreview] = useState<{ preview: ImportPreview; fileName: string }>();
   const [busy, setBusy] = useState(false);
   const [passphrase, setPassphrase] = useState('');
+  const [openPassphrase, setOpenPassphrase] = useState('');
   const [confirmText, setConfirmText] = useState('');
   const [newTitle, setNewTitle] = useState('');
   const [newOrganization, setNewOrganization] = useState('');
@@ -116,7 +130,8 @@ export function StartScreen() {
       if (text.includes('pr-risk-encrypted')) {
         const value = JSON.parse(new TextDecoder().decode(bytes)) as unknown;
         if (!isEncryptedFile(value)) throw new Error('The encrypted file is damaged.');
-        bytes = new TextEncoder().encode(await decrypt(value, passphrase));
+        if (openPassphrase === '') throw new Error('The file is encrypted. Type its passphrase, then choose the file again.');
+        bytes = new TextEncoder().encode(await decrypt(value, openPassphrase));
       }
       const base = current?.doc ?? newDocument(file.name.replace(/\.[^.]+$/, '') || 'Imported register', '', 'EUR');
       // A document always has at least one register. The first one takes rows without a register column.
@@ -133,8 +148,10 @@ export function StartScreen() {
   const commit = (mode: 'merge' | 'replace') =>
     guard(async () => {
       if (preview === undefined) return;
-      const base = mode === 'replace' || current === undefined ? (preview.preview.document ?? newDocument(preview.fileName, '', 'EUR')) : current.doc;
-      const doc = commitImport(base, preview.preview, {}, undefined, mode === 'replace' && preview.preview.document !== undefined ? 'replace' : 'merge');
+      // With no open document, a whole document is restored as it is.
+      const replace = preview.preview.document !== undefined && (mode === 'replace' || current === undefined);
+      const base = replace || current === undefined ? (preview.preview.document ?? newDocument(preview.fileName, '', 'EUR')) : current.doc;
+      const doc = commitImport(base, preview.preview, {}, undefined, replace ? 'replace' : 'merge');
       setPreview(undefined);
       await store(doc, `${String(preview.preview.risks.length)} risks from ${preview.fileName} are saved.`);
     });
@@ -178,6 +195,9 @@ export function StartScreen() {
   });
 
   const warnings = current === undefined ? 0 : lint(current.doc).length;
+  // With no open document, a whole document file is restored on its own (no merge).
+  const restoreOnly = current === undefined && preview?.preview.document !== undefined;
+  const restoreErrors = preview?.preview.documentErrors?.length ?? 0;
 
   return (
     <main class="screen">
@@ -277,6 +297,10 @@ export function StartScreen() {
         <section aria-labelledby="import-title" class="panel">
           <h2 id="import-title">Import a file</h2>
           <p class="muted">CSV, XLSX, NIST IR 8286 JSON, OSCAL POA&amp;M, a CVD Portal export, or a file from this app. The import shows a preview first.</p>
+          <label for="open-passphrase">Passphrase, only for an encrypted file</label>
+          <input id="open-passphrase" type="password" autoComplete="current-password" value={openPassphrase} onInput={(event) => {
+              setOpenPassphrase(event.currentTarget.value);
+            }} />
           <label for="import-file">File</label>
           <input id="import-file" type="file" accept=".csv,.tsv,.txt,.xlsx,.json" onChange={(event) => {
               void onFile(event);
@@ -287,14 +311,14 @@ export function StartScreen() {
               <p>
                 Format {preview.preview.format}. {preview.preview.risks.length} risks, {preview.preview.registers.length} new registers, {preview.preview.diff.length} changed fields.
               </p>
-              {preview.preview.errors.length > 0 && (
-                <ul class="errors">
-                  {preview.preview.errors.slice(0, 8).map((error, i) => (
-                    <li key={i}>
-                      {error.rule} {error.message}
-                    </li>
-                  ))}
-                </ul>
+              {restoreOnly ? (
+                <ErrorList errors={preview.preview.documentErrors ?? []} />
+              ) : (
+                <>
+                  <ErrorList errors={preview.preview.errors} />
+                  {(preview.preview.documentErrors ?? []).length > 0 && <p>The file cannot open as its own document.</p>}
+                  <ErrorList errors={preview.preview.documentErrors ?? []} />
+                </>
               )}
               {preview.preview.warnings.length > 0 && (
                 <ul class="warnings">
@@ -304,11 +328,11 @@ export function StartScreen() {
                 </ul>
               )}
               <div class="button-row">
-                <button type="button" onClick={commit('merge')} disabled={busy || preview.preview.errors.length > 0}>
+                <button type="button" onClick={commit('merge')} disabled={busy || (restoreOnly ? restoreErrors : preview.preview.errors.length) > 0}>
                   {current === undefined ? 'Save as a new document' : `Add to ${current.title}`}
                 </button>
-                {preview.preview.document !== undefined && (
-                  <button type="button" class="quiet" onClick={commit('replace')} disabled={busy || preview.preview.errors.length > 0}>
+                {preview.preview.document !== undefined && current !== undefined && (
+                  <button type="button" class="quiet" onClick={commit('replace')} disabled={busy || restoreErrors > 0}>
                     Open as its own document
                   </button>
                 )}
@@ -343,7 +367,7 @@ export function StartScreen() {
                   OSCAL POA&amp;M
                 </button>
               </div>
-              <label for="passphrase">Passphrase for an encrypted copy, or to open one (12 characters or more)</label>
+              <label for="passphrase">Passphrase for an encrypted copy (12 characters or more)</label>
               <input id="passphrase" type="password" autoComplete="new-password" value={passphrase} onInput={(event) => {
             setPassphrase(event.currentTarget.value);
           }} />

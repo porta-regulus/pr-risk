@@ -11,6 +11,7 @@ export const EXPORT_REMINDER_DAYS = 7;
 export interface StoredDocument {
   readonly id: string;
   readonly title: string;
+  // The kept version that doc is. After an undo it is lower than the newest kept version.
   readonly version: number;
   readonly savedOn: string;
   readonly lastExportOn?: string;
@@ -59,7 +60,8 @@ export function openDb(): Promise<IDBDatabase> {
 
 const versionKey = (id: string, version: number): string => `${id}\u0000${String(version).padStart(10, '0')}`;
 
-// Saves a valid document as a new version and keeps the last 20 versions.
+// Saves a valid document as a new version and keeps the last 20 versions. A save after an
+// undo removes the versions after the current one, as in an editor.
 export async function saveDocument(db: IDBDatabase, doc: RiskDocument, now = new Date().toISOString()): Promise<StoredDocument> {
   const errors = documentErrors(doc);
   if (errors.length > 0) throw new Error(`The document is not valid: ${errors[0]?.message ?? ''}`);
@@ -77,6 +79,7 @@ export async function saveDocument(db: IDBDatabase, doc: RiskDocument, now = new
   };
   documents.put(stored);
   versions.put({ key: versionKey(stored.id, stored.version), id: stored.id, version: stored.version, doc } satisfies VersionRecord);
+  versions.delete(IDBKeyRange.lowerBound(versionKey(stored.id, stored.version), true));
   const oldest = stored.version - UNDO_VERSIONS;
   if (oldest >= 1) versions.delete(IDBKeyRange.bound(versionKey(stored.id, 0), versionKey(stored.id, oldest)));
   await done(tx);
@@ -98,12 +101,20 @@ export async function listVersions(db: IDBDatabase, id: string): Promise<number[
   return records.map((record) => record.version).sort((a, b) => b - a);
 }
 
-// Undo makes the previous version current again, as a new version.
+// Undo makes the previous kept version current. It writes no new version, so repeated undo
+// goes back through all 20 kept versions.
 export async function undo(db: IDBDatabase, id: string, now = new Date().toISOString()): Promise<StoredDocument | undefined> {
-  const current = await loadDocument(db, id);
-  if (current === undefined) return undefined;
-  const previous = (await request(db.transaction('versions').objectStore('versions').get(versionKey(id, current.version - 1)))) as VersionRecord | undefined;
-  return previous === undefined ? undefined : saveDocument(db, previous.doc, now);
+  const tx = db.transaction(['documents', 'versions'], 'readwrite');
+  const documents = tx.objectStore('documents');
+  const current = (await request(documents.get(id))) as StoredDocument | undefined;
+  const previous = current === undefined ? undefined : ((await request(tx.objectStore('versions').get(versionKey(id, current.version - 1)))) as VersionRecord | undefined);
+  let stored: StoredDocument | undefined;
+  if (current !== undefined && previous !== undefined) {
+    stored = { ...current, title: previous.doc.document.title, version: previous.version, savedOn: now, doc: previous.doc };
+    documents.put(stored);
+  }
+  await done(tx);
+  return stored;
 }
 
 export async function recordExport(db: IDBDatabase, id: string, now = new Date().toISOString()): Promise<void> {

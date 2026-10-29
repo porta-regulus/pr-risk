@@ -2,6 +2,8 @@
 // PBKDF2-HMAC-SHA-256, 600 000 iterations (OWASP Password Storage Cheat Sheet),
 // 16-byte random salt, 12-byte random IV. All through WebCrypto.
 
+import { fromBase64, toBase64 } from '../schema/base64';
+
 export const ITERATIONS = 600_000;
 const FORMAT = 'pr-risk-encrypted';
 
@@ -20,8 +22,6 @@ export class WrongPassphraseError extends Error {
   }
 }
 
-const toBase64 = (bytes: Uint8Array): string => btoa(String.fromCharCode(...bytes));
-const fromBase64 = (text: string): Uint8Array<ArrayBuffer> => Uint8Array.from(atob(text), (ch) => ch.charCodeAt(0));
 
 async function deriveKey(passphrase: string, salt: Uint8Array<ArrayBuffer>, iterations: number): Promise<CryptoKey> {
   const material = await crypto.subtle.importKey('raw', new TextEncoder().encode(passphrase), 'PBKDF2', false, ['deriveKey']);
