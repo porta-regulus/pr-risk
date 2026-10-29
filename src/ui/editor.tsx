@@ -47,7 +47,8 @@ export function DocumentScreen({
   readonly title: string;
   readonly lede: string;
   readonly onNavigate: (screen: ScreenName) => void;
-  readonly children: (doc: RiskDocument, update: Update) => ComponentChildren;
+  // blocked is true while a number field holds text that is not a number.
+  readonly children: (doc: RiskDocument, update: Update, status: { readonly blocked: boolean }) => ComponentChildren;
 }) {
   const [db, setDb] = useState<IDBDatabase>();
   const [stored, setStored] = useState<StoredDocument>();
@@ -277,7 +278,7 @@ export function DocumentScreen({
       </div>
 
       <InvalidFields.Provider value={reportInvalid}>
-        <Fragment key={revision}>{children(draft, update)}</Fragment>
+        <Fragment key={revision}>{children(draft, update, { blocked })}</Fragment>
       </InvalidFields.Provider>
     </main>
   );

@@ -3,6 +3,7 @@
 // so each number must agree within 4 combined standard errors, not exactly.
 import { describe, expect, it } from 'vitest';
 import { decisionRecord, type PortfolioRow } from '../src/engine';
+import type { RiskDocument } from '../src/schema';
 import { example, EXAMPLE_2 } from './schema-helpers';
 
 const doc = example(EXAMPLE_2);
@@ -153,5 +154,29 @@ describe('decision record of example 2 at B = 60 000 (SPEC.md Sec. 8.11)', () =>
     const total = record.objectives.reduce((sum, row) => sum + row.ealBefore, 0);
     expect(total).toBeGreaterThan(0);
     for (const row of record.objectives) expect(row.ealAfter).toBeLessThanOrEqual(row.ealBefore + 1e-6);
+  });
+});
+
+describe('alternatives that clearly breach rank by excess area (SPEC.md Sec. 8.11)', () => {
+  it('orders them as compareRank does, smallest excess area first', () => {
+    const appetite = doc.appetite ?? {};
+    const strict: RiskDocument = {
+      ...doc,
+      appetite: {
+        ...appetite,
+        toleranceCurve: {
+          points: [
+            { loss: 10_000, maxExceedanceProbability: 0.05 },
+            { loss: 100_000, maxExceedanceProbability: 0.01 },
+            { loss: 1_000_000, maxExceedanceProbability: 0.001 },
+          ],
+        },
+      },
+    };
+    const strictRecord = decisionRecord(strict, { budget: 60_000, seed: 20261207 });
+    expect(strictRecord.alternatives.length).toBe(3);
+    for (const row of strictRecord.alternatives) expect(row.status).toBe('clear');
+    const areas = strictRecord.alternatives.map((row) => row.area);
+    expect(areas).toEqual([...areas].sort((a, b) => a - b));
   });
 });

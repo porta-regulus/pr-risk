@@ -3,6 +3,7 @@
 // fiscal baseline and the budget sensitivity, and the decision record to print.
 import { useMemo, useState } from 'preact/hooks';
 import { documentHash } from '../engine/decision';
+import { documentErrors } from '../schema/document';
 import type { ResponseOption, Risk, RiskDocument } from '../schema/types';
 import { DistributionField, formatNumber } from './distribution';
 import { nextId, withSection, withValue } from './edit';
@@ -567,7 +568,7 @@ function AcceptanceEditor({ risk, update }: { readonly risk: Risk; readonly upda
   );
 }
 
-function RespondBody({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
+function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; readonly update: Update; readonly blocked: boolean }) {
   const currency = doc.document.currency;
   const options = doc.responses ?? [];
   const budget = doc.strategy?.budget?.firstYearCash;
@@ -588,7 +589,11 @@ function RespondBody({ doc, update }: { readonly doc: RiskDocument; readonly upd
   const record = job.result;
   const hash = useMemo(() => (record === undefined ? undefined : documentHash(doc)), [doc, record]);
   const stale = record !== undefined && hash !== record.hash;
-  const canRun = budget !== undefined && doc.simulation !== undefined && options.some((option) => option.status === 'candidate' || option.status === 'selected');
+  // A draft that cannot be saved never gives a record. Missing costs would reach the engine as
+  // NaN, and an empty acceptance would look complete.
+  const valid = useMemo(() => documentErrors(doc).length === 0, [doc]);
+  const ready = valid && !blocked;
+  const canRun = ready && budget !== undefined && doc.simulation !== undefined && options.some((option) => option.status === 'candidate' || option.status === 'selected');
   const setBudget = (value: number | undefined): void => {
     update((current) => withSection(current, 'strategy', withValue(current.strategy, 'budget', withValue(current.strategy?.budget ?? {}, 'firstYearCash', value))));
   };
@@ -695,7 +700,7 @@ function RespondBody({ doc, update }: { readonly doc: RiskDocument; readonly upd
           {record !== undefined && !job.running && (
             <button
               type="button"
-              disabled={stale}
+              disabled={stale || !ready}
               onClick={() => {
                 window.print();
               }}
@@ -704,13 +709,14 @@ function RespondBody({ doc, update }: { readonly doc: RiskDocument; readonly upd
             </button>
           )}
         </div>
-        {!canRun && <p class="hint">A run needs a budget, at least one estimate and at least one candidate option.</p>}
+        {!ready && <p class="hint">Correct the errors in the save bar first. A run and a print use only a document that can be saved.</p>}
+        {ready && !canRun && <p class="hint">A run needs a budget, at least one estimate and at least one candidate option.</p>}
         <p role="status" class={job.error === undefined ? 'muted' : 'save-error'}>
           {job.running
             ? `The optimization runs${job.progress === undefined ? '' : `, step ${String(job.progress[0])} of ${String(job.progress[1])}`}.`
             : job.error !== undefined
               ? `The run failed. ${job.error}`
-              : stale
+              : stale && ready
                 ? 'The document changed after the run. Run again before you print.'
                 : ''}
         </p>
@@ -783,7 +789,7 @@ function RespondBody({ doc, update }: { readonly doc: RiskDocument; readonly upd
         </section>
       )}
 
-      {record !== undefined && !stale && <DecisionRecordView doc={doc} record={record} />}
+      {record !== undefined && !stale && ready && <DecisionRecordView doc={doc} record={record} />}
     </>
   );
 }
@@ -797,7 +803,7 @@ export function RespondScreen({ id, onNavigate }: { readonly id: string; readonl
       lede="Describe the response options, find the best portfolio within the budget, and print the decision record."
       onNavigate={onNavigate}
     >
-      {(doc, update) => <RespondBody doc={doc} update={update} />}
+      {(doc, update, status) => <RespondBody doc={doc} update={update} blocked={status.blocked} />}
     </DocumentScreen>
   );
 }

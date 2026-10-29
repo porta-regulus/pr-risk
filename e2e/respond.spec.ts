@@ -105,6 +105,10 @@ test('S5 finds the best portfolio of example 2 and prints the decision record on
 
   // An acceptance changes the document, so the record waits for a new run.
   await page.getByRole('button', { name: 'Record the acceptance of R-02' }).click();
+  // An empty acceptance cannot be saved, so it can neither run nor print a record.
+  await expect(page.getByText('Correct the errors in the save bar first.', { exact: false })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Find the best portfolio' })).toBeDisabled();
+  await expect(record).toBeHidden();
   await page.locator('#accept-R-02-by').fill('Managing directors');
   await page.locator('#accept-R-02-rationale').fill('The loss stays below the tolerance at every point.');
   await expect(page.getByText('The document changed after the run. Run again before you print.')).toBeVisible();

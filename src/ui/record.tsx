@@ -130,7 +130,8 @@ export function DecisionRecordView({ doc, record }: { readonly doc: RiskDocument
   const after = new Map(record.after.risks.map((risk) => [risk.riskId, risk]));
   const statusRows = [...record.before.risks].sort((a, b) => Number(a.polarity === 'positive') - Number(b.polarity === 'positive') || b.expectedAnnual - a.expectedAnnual);
   const residual = residualRisks(doc, record.best.ids);
-  const missing = residual.filter((risk) => risk.acceptance === undefined);
+  // An acceptance without a person or a reason is not a record (Sec. 6.14 item 1).
+  const missing = residual.filter((risk) => risk.acceptance === undefined || risk.acceptance.acceptedBy.trim() === '' || risk.acceptance.rationale.trim() === '');
   const overrides = doc.risks.filter((risk) => risk.priorityOverride !== undefined);
   const points = doc.appetite?.toleranceCurve?.points ?? [];
   const capacity = doc.appetite?.capacity;

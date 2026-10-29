@@ -7,6 +7,7 @@ import type { RiskDocument } from '../schema/types';
 import { exceedance, lossGrid, PERCENTILES, quantile, riskStats, sortedCopy, standardError, tolerance, toleranceAt, type RiskStats } from './metrics';
 import {
   batchSe,
+  compareRank,
   CONFIRM_TRIALS,
   conflicts,
   evaluate,
@@ -77,6 +78,8 @@ export interface PortfolioRow {
   readonly eal: number;
   readonly eag: number;
   readonly gap: number;
+  // Excess area over the tolerance curve (Sec. 8.9). It ranks portfolios that clearly breach.
+  readonly area: number;
   readonly status: ToleranceStatus;
 }
 
@@ -191,6 +194,7 @@ function row(base: Measured, e: Evaluation): PortfolioRow {
     eal: e.eal,
     eag: e.eag,
     gap: e.gap,
+    area: e.area,
     status: statusOf(e.gap, e.clear),
   };
 }
@@ -321,11 +325,13 @@ export function decisionRecord(doc: RiskDocument, options: DecisionOptions): Dec
   if (bestMeasured === undefined) throw new Error('The best portfolio has no measured run');
   const after = state(doc, bestMeasured, best.ids, grid);
   step();
-  // The next 3 of the ranking, in rank order of their confirmation numbers.
+  // The next 3 of the ranking, in the rank order of the optimizer (compareRank, Sec. 8.11) on
+  // their confirmation numbers. A clear breach ranks by excess area, the others by net benefit.
   const alternatives = result.runnersUp
     .slice(0, 3)
-    .map((item) => row(base, check(item.ids)))
-    .sort((a, b) => Number(a.status === 'clear') - Number(b.status === 'clear') || b.net - a.net);
+    .map((item) => check(item.ids))
+    .sort(compareRank)
+    .map((evaluation) => row(base, evaluation));
   const fiscalRow = row(base, check(fiscalIds));
   step();
   const record: DecisionRecord = {
