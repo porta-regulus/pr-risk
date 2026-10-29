@@ -1,6 +1,10 @@
 // Samplers of SPEC.md Sec. 8.4 and 8.5. Every draw comes from one Mulberry32.
 import type { Distribution } from '../schema/types';
-import { normalQuantile } from './normal';
+import { normalQuantile as quantile } from './normal';
+
+// Test runners such as Vitest read an imported binding through a getter at each use. A module
+// constant keeps the hot loops as fast there as in the production bundle (CI job performance).
+const normalQuantile = quantile;
 import type { Mulberry32 } from './rng';
 
 export const Z90 = 1.6448536269514722;

@@ -1,6 +1,8 @@
 // Build task 3, done criterion 4. SPEC.md Sec. 8.16 targets with a margin factor of 2.
 // Timing needs a quiet machine, so these run only with PERF=1, alone (npm run test:performance,
 // CI job "performance"). Inside the full suite other test files share the CPU.
+// The log line gives the CPU model, because hosted runners differ in speed (HANDOFF task 3).
+import { cpus } from 'node:os';
 import { describe, expect, it } from 'vitest';
 import { optimize, simulate } from '../src/engine';
 import type { ResponseOption } from '../src/schema';
@@ -41,6 +43,7 @@ describe('performance (SPEC.md Sec. 8.16)', () => {
     const start = performance.now();
     const run = simulate(doc, { trials: 100_000, seed: 20261207 });
     const seconds = (performance.now() - start) / 1000;
+    console.log(`CPU ${cpus()[0]?.model ?? 'unknown'}. Simulation ${seconds.toFixed(2)} s.`);
     expect(run.risks.size).toBe(50);
     expect(seconds * MARGIN).toBeLessThan(3);
   }, 60_000);

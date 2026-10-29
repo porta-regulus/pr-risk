@@ -32,9 +32,8 @@ export class Xoshiro128 {
   }
 
   // The next count words in one loop with the state in local variables. Same words as
-  // count calls of next(), and faster in the simulation loop.
-  fill(count: number): Uint32Array {
-    const out = new Uint32Array(count);
+  // count calls of next(), and faster in the simulation loop. out can be reused.
+  fill(count: number, out = new Uint32Array(count)): Uint32Array {
     const s = this.s;
     let s0 = s[0] ?? 0;
     let s1 = s[1] ?? 0;

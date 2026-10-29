@@ -105,7 +105,7 @@ Status 2026-10-28. Done in `src/engine/`, not yet committed. Done criteria 1 to 
 1. P1 to P16 are in `test/engine-properties.test.ts`. The cross-engine part of P11 is in `test/browser/engine.test.ts`.
 2. EAL, EAG, P(N at least 1) per risk and LEC at the 4 tolerance points agree with `sim_reference.py` within 4 standard errors (`test/engine-crosscheck.test.ts`).
 3. Seeds 20261207, 1, 2 and 3 select O-4 and O-5 from 21 portfolios. The fiscal baseline is O-1, O-3, O-4. At B = 72 000 the best portfolio is O-1, O-4, O-5.
-4. 100 000 trials with 50 leaf risks and 5 drivers take about 0.75 s in plain Node and 1.4 s inside Vitest. 256 portfolios take 2.5 s. The optimizer caches each risk's results by its exact inputs, so a portfolio re-simulates only the risks that it changes. The GitHub runner time is not measured yet (CI job `performance`).
+4. 100 000 trials with 50 leaf risks and 5 drivers take about 0.65 s in plain Node on this Mac. 256 portfolios take 2.5 s. The optimizer caches each risk's results by its exact inputs, so a portfolio re-simulates only the risks that it changes. On the GitHub runner (CI job `performance`) one run of the same commit took 1.04 s on one runner and 1.67 s on another (2026-10-29), so the job prints the CPU model. Vitest read each imported function through a getter in the hot loop, which made the engine about 30% slower there than in the production bundle. The engine now binds these imports to module constants.
 5. Node and Chromium agree within 1e-9 relative on example 2 (`test/fixtures/engine-summary.json`).
 No screen uses the engine yet. The worker client is `src/engine/client.ts`. Cancel stops the worker in under 200 ms.
 

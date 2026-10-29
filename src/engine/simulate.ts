@@ -3,7 +3,11 @@
 import { canonicalize } from '../schema/canonical';
 import type { Distribution, Register, Risk, RiskDocument } from '../schema/types';
 import { Mulberry32, stream } from './rng';
-import { poisson, RATE_CAP, sampler } from './sample';
+import { poisson as drawCount, RATE_CAP as CAP, sampler } from './sample';
+
+// Module constants for the hot loop, for the reason given in sample.ts.
+const poisson = drawCount;
+const RATE_CAP = CAP;
 
 export interface RunOptions {
   readonly trials: number;
@@ -89,6 +93,10 @@ export function simulate(doc: RiskDocument, options: RunOptions & { readonly cac
     overrides.get(`${kind}|${id}|${part}`) ?? fallback;
   const registers = new Map(doc.registers.map((register) => [register.id, register]));
   const rng = new Mulberry32();
+  // Word buffers, reused by every entity. Each entity fills them before it reads them.
+  const rateWords = new Uint32Array(trials);
+  const countWords = new Uint32Array(trials);
+  const impactWords = new Uint32Array(trials);
   let clippedRates = 0;
   let sampledRates = 0;
 
@@ -107,8 +115,8 @@ export function simulate(doc: RiskDocument, options: RunOptions & { readonly cac
       continue;
     }
     const frequency = sampler(distribution);
-    const rateWords = stream(seed, `driver|${driver.id}|rate`).fill(trials);
-    const countWords = stream(seed, `driver|${driver.id}|count`).fill(trials);
+    stream(seed, `driver|${driver.id}|rate`).fill(trials, rateWords);
+    stream(seed, `driver|${driver.id}|count`).fill(trials, countWords);
     const counts = new Uint32Array(trials);
     let clippedHere = 0;
     for (let t = 0; t < trials; t++) {
@@ -164,9 +172,9 @@ export function simulate(doc: RiskDocument, options: RunOptions & { readonly cac
       words: stream(seed, `risk|${id}|thin|${link.driverId}`).fill(trials),
     }));
     // One word per trial per stream, also when a word is not used (Sec. 8.6 item 3).
-    const rateWords = stream(seed, `risk|${id}|rate`).fill(trials);
-    const countWords = stream(seed, `risk|${id}|count`).fill(trials);
-    const impactWords = stream(seed, `risk|${id}|impact`).fill(trials);
+    stream(seed, `risk|${id}|rate`).fill(trials, rateWords);
+    stream(seed, `risk|${id}|count`).fill(trials, countWords);
+    stream(seed, `risk|${id}|impact`).fill(trials, impactWords);
     const counts = new Uint32Array(trials);
     const annual = new Float64Array(trials);
     const above = new Uint32Array(trials);
