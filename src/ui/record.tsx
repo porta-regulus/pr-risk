@@ -448,7 +448,7 @@ export function DecisionRecordView({ doc, record }: { readonly doc: RiskDocument
           <p>No risk stays accepted.</p>
         ) : (
           <Scroll label="Table 6">
-            <table class="compact">
+            <table class="compact residual-table">
               <caption>Table 6. Risks with Accept, a pending decision, or no funded option (Sec. 5.1.2).</caption>
               <thead>
                 <tr>
@@ -524,14 +524,14 @@ export function DecisionRecordView({ doc, record }: { readonly doc: RiskDocument
           <div class="limits">
             <p class="limits-title">Limits of these numbers</p>
             <ol>
-              <li>Ranges are calibrated estimates of people, not measurements.</li>
-              <li>Results carry Monte Carlo error. The ± values are one standard error.</li>
-              <li>Matrices are display only. Ranking and funding use the simulation (Cox 2008, note 1).</li>
+              <li>Ranges are calibrated estimates, not measurements.</li>
+              <li>Results carry Monte Carlo error. ± is one standard error.</li>
+              <li>Matrices are display only (Cox 2008, note 1).</li>
             </ol>
           </div>
           <p class="source">
-            {record.notes.join(' ')} The document hash is SHA-256 of the RFC 8785 form of the document without the change log. Annualised cost is one-off cost over lifetime, plus
-            annual cost, plus the reserve times the chance that it is used (Sec. 8.10).
+            {record.notes.join(' ')} Ranking and funding use the simulation. Document hash, SHA-256 of the RFC 8785 form without the change log. Annualised cost, one-off cost over
+            lifetime plus annual cost plus the reserve times its chance of use (Sec. 8.10).
           </p>
           <p class="notes">1. Cox, L. A. (2008). What's Wrong with Risk Matrices? Risk Analysis 28(2), 497 to 512. https://doi.org/10.1111/j.1539-6924.2008.01030.x</p>
         </section>

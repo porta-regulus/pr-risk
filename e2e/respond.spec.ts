@@ -91,6 +91,16 @@ test('S5 finds the best portfolio of example 2 and prints the decision record on
   const pages = pdf.toString('latin1').match(/\/Type\s*\/Page(?![s\w])/g) ?? [];
   expect(pages.length).toBeGreaterThan(0);
   expect(pages.length).toBeLessThanOrEqual(2);
+  // A reader without Helvetica, Arial or Liberation Sans gets a wider font. The record must
+  // still fit. Verdana (macOS, Windows) and DejaVu Sans (Linux) are among the widest.
+  await page.evaluate(() => {
+    document.body.style.setProperty('font-family', 'Verdana, "DejaVu Sans", sans-serif', 'important');
+  });
+  const wide = await page.pdf({ preferCSSPageSize: true, printBackground: true });
+  expect((wide.toString('latin1').match(/\/Type\s*\/Page(?![s\w])/g) ?? []).length).toBeLessThanOrEqual(2);
+  await page.evaluate(() => {
+    document.body.style.removeProperty('font-family');
+  });
   await page.emulateMedia({ media: 'screen' });
 
   // An acceptance changes the document, so the record waits for a new run.

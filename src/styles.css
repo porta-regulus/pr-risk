@@ -791,6 +791,9 @@ table.sign td {
 .record .status-table th[scope='row'] {
   width: 46%;
 }
+.record .residual-table th[scope='row'] {
+  width: 48%;
+}
 
 @page {
   size: A4;
@@ -818,8 +821,11 @@ table.sign td {
     --level-text: #000000;
     color-scheme: light;
   }
+  /* Fonts with the widths of Helvetica on every system (Arial on Windows, Liberation Sans on
+     Linux), so the record prints on the same number of pages everywhere. */
   body {
     background: #ffffff;
+    font-family: Helvetica, Arial, 'Liberation Sans', 'Nimbus Sans', sans-serif;
     font-size: 7.6pt;
     line-height: 1.3;
   }
@@ -872,9 +878,12 @@ table.sign td {
   .record svg.lec {
     max-width: 100%;
   }
-  .record .side-by-side,
-  .record .closing {
+  .record .side-by-side {
     grid-template-columns: 52% 1fr;
+    gap: 4mm;
+  }
+  .record .closing {
+    grid-template-columns: 40% 1fr;
     gap: 4mm;
   }
   .record .closing > section {
@@ -882,6 +891,10 @@ table.sign td {
   }
   .record .kicker,
   .record-meta dt {
+    font-size: 6.6pt;
+  }
+  .record-meta .hash dd {
+    font-family: Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace;
     font-size: 6.6pt;
   }
   .record-meta {
@@ -897,11 +910,16 @@ table.sign td {
   .record .table-box {
     overflow: visible;
   }
-  .record table,
+  /* A long table can continue on the next page, but a row, a box and a figure stay whole. */
+  .record tr,
   .action-box,
   .limits,
   figure.chart {
     break-inside: avoid;
+  }
+  .record caption,
+  .record thead {
+    break-after: avoid;
   }
   .approval {
     break-inside: avoid;
