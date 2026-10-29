@@ -28,6 +28,7 @@ These are the only packages that reach the user's browser.
 | @types/node | 24.19.2 | MIT | Node types for build scripts and tests |
 | @vitest/browser-playwright | 5.0.5 | MIT | Runs `test/browser/` in Chromium, so the engine is checked in a real Web Worker (build task 3, done criterion 5) |
 | json-schema-to-typescript | 16.0.0 | MIT | TypeScript types from the exchange schema (`npm run gen:schema`). It reads the vendored NIST schemas, never the network. |
+| @axe-core/playwright | 4.14.0 | MPL-2.0 | WCAG 2.2 level A and AA check in the Playwright tests (build task 5, done criterion 3, `e2e/axe.ts`). It pulls `axe-core` 4.14.0 (MPL-2.0). Test only, never in the bundle. |
 | @cyclonedx/cyclonedx-npm | 6.0.1 | Apache-2.0 | CycloneDX 1.6 SBOM on release. It pulls `libxmljs2` and `node-gyp` for XML output. We write JSON only, and `--ignore-scripts` means the native part is never built. |
 
 ## CI tools that are not npm packages
@@ -43,6 +44,4 @@ These are the only packages that reach the user's browser.
 
 ## Planned
 
-| Package | Task | Rule |
-|---|---|---|
-| axe-core | 5 | Test only (WCAG 2.2 AA check). |
+None.

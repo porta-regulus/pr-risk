@@ -1,23 +1,16 @@
-// Screen S2 Context and strategy (SPEC.md Sec. 5, 6.4 to 6.6). A valid change is saved in
-// this browser after a short pause, with one change log entry per section (Sec. 6.18).
-// An invalid change shows its errors and is not saved.
-import { Fragment } from 'preact';
-import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
-import { documentErrors } from '../schema/document';
-import type { Finding, RiskDocument } from '../schema/types';
-import { exportOverdue, loadDocument, openDb, saveDocument, type StoredDocument, undo } from '../storage/db';
+// Screen S2 Context and strategy (SPEC.md Sec. 5, 6.4 to 6.6). Saving, undo and the change
+// log come from the shared frame in editor.tsx.
+import type { RiskDocument } from '../schema/types';
 import { AppetiteSection } from './appetite';
-import { changedSections, nextId, withChangeLog, withSection, withValue } from './edit';
-import { Checkboxes, InvalidFields, LinesField, SelectField, TextField } from './fields';
+import { nextId, withSection, withValue } from './edit';
+import { DocumentScreen, type ScreenName, type Update } from './editor';
+import { Checkboxes, LinesField, SelectField, TextField } from './fields';
 import { StrategySection } from './strategy';
 
 type Context = NonNullable<RiskDocument['context']>;
 type Objective = NonNullable<Context['objectives']>[number];
 type BusinessFunction = NonNullable<Context['functions']>[number];
 type Role = NonNullable<NonNullable<RiskDocument['governance']>['roles']>[number];
-type Update = (change: (doc: RiskDocument) => RiskDocument) => void;
-
-const SAVE_DELAY_MS = 600;
 
 // Sec. 1.1 and 6 of SP 800-221r1 name these disciplines.
 const DISCIPLINES = [
@@ -46,8 +39,6 @@ const ROLE_LEVELS: readonly (readonly [Role['level'], string])[] = [
 
 const replaceAt = <T,>(items: readonly T[], index: number, item: T | undefined): T[] =>
   item === undefined ? items.filter((_, i) => i !== index) : items.map((old, i) => (i === index ? item : old));
-
-const isoSeconds = (date = new Date()): string => date.toISOString().replace(/\.\d{3}Z$/, 'Z');
 
 function ContextSection({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
   const context: Context = doc.context ?? {};
@@ -297,192 +288,17 @@ function GovernanceSection({ doc, update }: { readonly doc: RiskDocument; readon
   );
 }
 
-export function ContextScreen({ id, onBack }: { readonly id: string; readonly onBack: () => void }) {
-  const [db, setDb] = useState<IDBDatabase>();
-  const [stored, setStored] = useState<StoredDocument>();
-  const [draft, setDraft] = useState<RiskDocument>();
-  const [errors, setErrors] = useState<readonly Finding[]>([]);
-  const [failure, setFailure] = useState<string>();
-  const [note, setNote] = useState<string>();
-  // Number fields whose text is not a number. The document still holds the old value, so
-  // the screen saves nothing until the text is a number again or is discarded.
-  const [invalid, setInvalid] = useState<ReadonlyMap<string, string>>(new Map());
-  // A new value remounts the fields, so discard and undo also reset their typed text.
-  const [revision, setRevision] = useState(0);
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  const reportInvalid = useCallback((field: string, label: string | undefined) => {
-    setInvalid((current) => {
-      if (label === undefined ? !current.has(field) : current.get(field) === label) return current;
-      const next = new Map(current);
-      if (label === undefined) next.delete(field);
-      else next.set(field, label);
-      return next;
-    });
-  }, []);
-
-  // Its own connection, closed on leaving, so "Remove all data" on S1 is never blocked.
-  useEffect(() => {
-    let open: IDBDatabase | undefined;
-    void openDb().then(async (database) => {
-      open = database;
-      setDb(database);
-      const loaded = await loadDocument(database, id);
-      setStored(loaded);
-      setDraft(loaded?.doc);
-    });
-    return () => {
-      open?.close();
-    };
-  }, [id]);
-
-  // A new screen starts at the top, with focus on its title for screen reader users.
-  const ready = stored !== undefined;
-  useEffect(() => {
-    if (!ready) return;
-    window.scrollTo(0, 0);
-    document.getElementById('screen-title')?.focus();
-  }, [ready]);
-
-  const dirty = stored !== undefined && draft !== undefined && changedSections(stored.doc, draft).length > 0;
-  const blocked = invalid.size > 0;
-
-  const persist = (database: IDBDatabase, base: StoredDocument, next: RiskDocument): Promise<void> =>
-    saveDocument(database, withChangeLog(base.doc, next, isoSeconds())).then((saved) => {
-      setFailure(undefined);
-      setStored(saved);
-    });
-
-  // Autosave (SPEC.md Sec. 10 item 3). Each save is a new version, so undo can go back.
-  useEffect(() => {
-    if (db === undefined || stored === undefined || draft === undefined || !dirty) {
-      setErrors([]);
-      return undefined;
-    }
-    const found = documentErrors(draft);
-    setErrors(found);
-    if (found.length > 0 || blocked) return undefined;
-    timer.current = setTimeout(() => {
-      timer.current = undefined;
-      persist(db, stored, draft).catch((error: unknown) => {
-        setFailure(error instanceof Error ? error.message : String(error));
-      });
-    }, SAVE_DELAY_MS);
-    return () => {
-      clearTimeout(timer.current);
-      timer.current = undefined;
-    };
-  }, [db, stored, draft, dirty, blocked]);
-
-  if (db === undefined || stored === undefined || draft === undefined) {
-    return (
-      <main class="screen">
-        <p role="status">Opening the document.</p>
-      </main>
-    );
-  }
-
-  const update: Update = (change) => {
-    setNote(undefined);
-    setDraft((current) => (current === undefined ? current : change(current)));
-  };
-
-  const undoLast = (): void => {
-    if (dirty || blocked) {
-      setDraft(stored.doc);
-      setRevision((value) => value + 1);
-      setNote('The unsaved changes are discarded.');
-      return;
-    }
-    void undo(db, id).then((back) => {
-      if (back === undefined) {
-        setNote('No older version is kept.');
-        return;
-      }
-      setStored(back);
-      setDraft(back.doc);
-      setRevision((value) => value + 1);
-      setNote(`Version ${String(back.version)} is back.`);
-    });
-  };
-
-  // Leaving saves a pending valid change at once. A change that cannot be saved stays, and
-  // the screen says so, because leaving would drop it without a word.
-  const leave = (): void => {
-    if (!dirty && !blocked) {
-      onBack();
-      return;
-    }
-    if (blocked || documentErrors(draft).length > 0) {
-      setNote('Correct the changes, or discard them, before you go back.');
-      return;
-    }
-    clearTimeout(timer.current);
-    timer.current = undefined;
-    persist(db, stored, draft)
-      .then(onBack)
-      .catch((error: unknown) => {
-        setFailure(error instanceof Error ? error.message : String(error));
-      });
-  };
-
-  const saveText = blocked
-    ? `Not saved. These fields do not hold a number: ${[...invalid.values()].join(', ')}.`
-    : errors.length > 0
-      ? 'Not saved. Correct the errors below.'
-      : dirty
-        ? 'Saving.'
-        : `Saved as version ${String(stored.version)}.`;
-
+export function ContextScreen({ id, onNavigate }: { readonly id: string; readonly onNavigate: (screen: ScreenName) => void }) {
   return (
-    <main class="screen">
-      <header class="screen-head">
-        <nav aria-label="Screens" class="button-row">
-          <button type="button" class="quiet" onClick={leave}>
-            Back to start
-          </button>
-        </nav>
-        <h1 id="screen-title" tabIndex={-1}>
-          Context and strategy
-        </h1>
-        <p class="lede">
-          {draft.document.title}. Step 1 of the life cycle, identify the context (Sec. 3.1 and 3.2). Changes are saved in this browser.
-        </p>
-      </header>
-
-      {exportOverdue(stored) && (
-        <p class="banner" role="status">
-          {stored.lastExportOn === undefined ? 'You have not saved a copy of this document yet.' : 'Your last copy is more than 7 days old.'} Browsers can delete stored data. Export a copy on the start screen.
-        </p>
-      )}
-
-      <div class="save-bar panel">
-        <p role="status" aria-live="polite" class={blocked || errors.length > 0 || failure !== undefined ? 'save-error' : undefined}>
-          {failure === undefined ? saveText : `Not saved. ${failure}`} {note}
-        </p>
-        <p class="muted">Last export: {stored.lastExportOn === undefined ? 'never' : new Date(stored.lastExportOn).toLocaleString()}.</p>
-        <button type="button" class="quiet" onClick={undoLast}>
-          {dirty || blocked ? 'Discard unsaved changes' : 'Undo last change'}
-        </button>
-        {errors.length > 0 && (
-          <ul class="errors">
-            {errors.slice(0, 8).map((error, i) => (
-              <li key={i}>
-                {error.rule} {error.message}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <InvalidFields.Provider value={reportInvalid}>
-        <Fragment key={revision}>
+    <DocumentScreen id={id} screen="context" title="Context and strategy" lede="Step 1 of the life cycle, identify the context (Sec. 3.1 and 3.2). Changes are saved in this browser." onNavigate={onNavigate}>
+      {(draft, update) => (
+        <>
           <ContextSection doc={draft} update={update} />
           <GovernanceSection doc={draft} update={update} />
           <AppetiteSection doc={draft} update={update} />
           <StrategySection doc={draft} update={update} />
-        </Fragment>
-      </InvalidFields.Provider>
-    </main>
+        </>
+      )}
+    </DocumentScreen>
   );
 }

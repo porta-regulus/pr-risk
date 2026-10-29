@@ -21,6 +21,7 @@ import {
   type StorageStatus,
   type StoredDocument,
 } from '../storage/db';
+import type { ScreenName } from './editor';
 import { downloadText, newDocument, slug } from './files';
 
 const EXAMPLES = {
@@ -50,7 +51,7 @@ function ErrorList({ errors }: { readonly errors: readonly Finding[] }) {
   );
 }
 
-export function StartScreen({ selectedId, onOpenContext }: { readonly selectedId?: string | undefined; readonly onOpenContext: (id: string) => void }) {
+export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: string | undefined; readonly onOpen: (id: string, screen: Exclude<ScreenName, 'start'>) => void }) {
   const [db, setDb] = useState<IDBDatabase>();
   const [documents, setDocuments] = useState<StoredDocument[]>([]);
   const [currentId, setCurrentId] = useState<string | undefined>(selectedId);
@@ -262,13 +263,18 @@ export function StartScreen({ selectedId, onOpenContext }: { readonly selectedId
         {current !== undefined && (
           <>
             <p class="muted">
-              Selected: <strong>{current.title}</strong>. Lint shows {warnings} {warnings === 1 ? 'warning' : 'warnings'}. Screens S3 to S7 come in the next build tasks.
+              Selected: <strong>{current.title}</strong>. Lint shows {warnings} {warnings === 1 ? 'warning' : 'warnings'}. Screens S4 to S7 come in the next build tasks.
             </p>
             <div class="button-row">
               <button type="button" onClick={() => {
-                  onOpenContext(current.id);
+                  onOpen(current.id, 'context');
                 }} disabled={busy}>
                 Context and strategy
+              </button>
+              <button type="button" onClick={() => {
+                  onOpen(current.id, 'identify');
+                }} disabled={busy}>
+                Identify and analyze
               </button>
             </div>
           </>

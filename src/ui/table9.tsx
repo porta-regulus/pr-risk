@@ -31,7 +31,8 @@ function Cell({ items }: { readonly items: readonly string[] }) {
 
 export function Table9View({ statements }: { readonly statements: readonly Statement[] }) {
   return (
-    <div class="table-box">
+    // Focusable, so a keyboard can scroll the table on a narrow screen (WCAG 2.1.1).
+    <div class="table-box" tabIndex={0} role="region" aria-label="Table 9 view">
       <table class="table9" aria-label="Appetite statements in the layout of Table 9">
         <thead>
           <tr>
