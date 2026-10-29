@@ -1,0 +1,11450 @@
+{
+ "examples": {
+  "example-1-sp800-221r1-fig10-table9.json": {
+   "risks": {
+    "1": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Mod, exposure Mod.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 500000,
+      "exposureRatingBeforeControls": 500000,
+      "finalExposureRating": 500000,
+      "followUpDate": "",
+      "impactAfterControls": 1000000,
+      "impactAfterControlsAreInPlace": 1000000,
+      "impactBeforeControls": 1000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.5,
+      "likelihoodAfterControlsWillBe": 0.5,
+      "likelihoodBeforeControls": 0.5,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Improve hiring diversity; Improve employee benefits per recent survey and discussions",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Operational Risk",
+      "riskIdNumbers": "1",
+      "riskOwnerPointOfContact": "Dwayne Rhodes (Human Resources Department)",
+      "riskScenarioDescription": "Retiring staff lead to personnel shortages",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 500000,
+      "riskCategory": "Operational Risk",
+      "riskDescription": "Retiring staff lead to personnel shortages",
+      "riskId": "1",
+      "riskImpact": 1000000,
+      "riskLikelihood": 0.5,
+      "riskOwnerPointOfContact": "Dwayne Rhodes (Human Resources Department)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Improve hiring diversity; Improve employee benefits per recent survey and discussions",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "10": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Mod, exposure Mod.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 500000,
+      "exposureRatingBeforeControls": 500000,
+      "finalExposureRating": 500000,
+      "followUpDate": "",
+      "impactAfterControls": 1000000,
+      "impactAfterControlsAreInPlace": 1000000,
+      "impactBeforeControls": 1000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.5,
+      "likelihoodAfterControlsWillBe": 0.5,
+      "likelihoodBeforeControls": 0.5,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Create & maintain a centralized register of compliance requirements; Update employee training based on updated privacy requirements; Review business impact assessment (BIA) templates to ensure ICT criteria are included.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Compliance Risk",
+      "riskIdNumbers": "10",
+      "riskOwnerPointOfContact": "Zoe Davidson (Chief Privacy Officer)",
+      "riskScenarioDescription": "Failure to implement California Consumer Privacy Act (CCPA) provisions exposes the company to fines, penalties, and legal fees.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 500000,
+      "riskCategory": "Compliance Risk",
+      "riskDescription": "Failure to implement California Consumer Privacy Act (CCPA) provisions exposes the company to fines, penalties, and legal fees.",
+      "riskId": "10",
+      "riskImpact": 1000000,
+      "riskLikelihood": 0.5,
+      "riskOwnerPointOfContact": "Zoe Davidson (Chief Privacy Officer)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Create & maintain a centralized register of compliance requirements; Update employee training based on updated privacy requirements; Review business impact assessment (BIA) templates to ensure ICT criteria are included.",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "2": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Mod, exposure Mod.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 500000,
+      "exposureRatingBeforeControls": 500000,
+      "finalExposureRating": 500000,
+      "followUpDate": "",
+      "impactAfterControls": 1000000,
+      "impactAfterControlsAreInPlace": 1000000,
+      "impactBeforeControls": 1000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.5,
+      "likelihoodAfterControlsWillBe": 0.5,
+      "likelihoodBeforeControls": 0.5,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Realize"
+      ],
+      "plannedRiskResponseDescription": "Allocate funds for compensation package; Initiate strategic recruiting plan",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Operational Risk",
+      "riskIdNumbers": "2",
+      "riskOwnerPointOfContact": "Dwayne Rhodes (Human Resources Department)",
+      "riskScenarioDescription": "A strategic opportunity to hire a famous technologist to establish a new satellite communications initiative.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 500000,
+      "riskCategory": "Operational Risk",
+      "riskDescription": "A strategic opportunity to hire a famous technologist to establish a new satellite communications initiative.",
+      "riskId": "2",
+      "riskImpact": 1000000,
+      "riskLikelihood": 0.5,
+      "riskOwnerPointOfContact": "Dwayne Rhodes (Human Resources Department)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Allocate funds for compensation package; Initiate strategic recruiting plan",
+      "riskResponseType": [
+       "Realize"
+      ],
+      "status": "Open"
+     }
+    },
+    "3": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood High, exposure High.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 5000000,
+      "exposureRatingBeforeControls": 5000000,
+      "finalExposureRating": 5000000,
+      "followUpDate": "",
+      "impactAfterControls": 5555556,
+      "impactAfterControlsAreInPlace": 5555556,
+      "impactBeforeControls": 5555556,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.9,
+      "likelihoodAfterControlsWillBe": 0.9,
+      "likelihoodBeforeControls": 0.9,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Update corporate IT security training; Implement phishing training service; Update email security products per recommendations from IT Risk Council",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Operational Risk",
+      "riskIdNumbers": "3",
+      "riskOwnerPointOfContact": "Carly Franklin (CISO)",
+      "riskScenarioDescription": "A social engineering attack on enterprise workforce leads staff to wire transfer significant funds.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 5000000,
+      "riskCategory": "Operational Risk",
+      "riskDescription": "A social engineering attack on enterprise workforce leads staff to wire transfer significant funds.",
+      "riskId": "3",
+      "riskImpact": 5555556,
+      "riskLikelihood": 0.9,
+      "riskOwnerPointOfContact": "Carly Franklin (CISO)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Update corporate IT security training; Implement phishing training service; Update email security products per recommendations from IT Risk Council",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "4": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Mod, exposure High.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 5000000,
+      "exposureRatingBeforeControls": 5000000,
+      "finalExposureRating": 5000000,
+      "followUpDate": "",
+      "impactAfterControls": 10000000,
+      "impactAfterControlsAreInPlace": 10000000,
+      "impactBeforeControls": 10000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.5,
+      "likelihoodAfterControlsWillBe": 0.5,
+      "likelihoodBeforeControls": 0.5,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "CFO and CEO to agree on plans for likely secondary financial impact from reputational risk impact.; Update procurement contract requirements to include clauses per 11/3/2019 report from Legal Dept; Implement 3rd Party Partner Assmt. for Tier 1 providers per CIO & CISO recommendations",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Operational Risk",
+      "riskIdNumbers": "4",
+      "riskOwnerPointOfContact": "Ernest Woods (Procurement)",
+      "riskScenarioDescription": "An employee of a third-party partner steals customer information.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 5000000,
+      "riskCategory": "Operational Risk",
+      "riskDescription": "An employee of a third-party partner steals customer information.",
+      "riskId": "4",
+      "riskImpact": 10000000,
+      "riskLikelihood": 0.5,
+      "riskOwnerPointOfContact": "Ernest Woods (Procurement)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "CFO and CEO to agree on plans for likely secondary financial impact from reputational risk impact.; Update procurement contract requirements to include clauses per 11/3/2019 report from Legal Dept; Implement 3rd Party Partner Assmt. for Tier 1 providers per CIO & CISO recommendations",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "5": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Low, exposure Low.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 50000,
+      "exposureRatingBeforeControls": 50000,
+      "finalExposureRating": 50000,
+      "followUpDate": "",
+      "impactAfterControls": 500000,
+      "impactAfterControlsAreInPlace": 500000,
+      "impactBeforeControls": 500000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.1,
+      "likelihoodAfterControlsWillBe": 0.1,
+      "likelihoodBeforeControls": 0.1,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Increase marketing in target areas; Ensure competitive pricing in target markets",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Financial Risk",
+      "riskIdNumbers": "5",
+      "riskOwnerPointOfContact": "Elaine Kim (VP Sales)",
+      "riskScenarioDescription": "Sales reduction due to tariffs leads to reduced revenues.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 50000,
+      "riskCategory": "Financial Risk",
+      "riskDescription": "Sales reduction due to tariffs leads to reduced revenues.",
+      "riskId": "5",
+      "riskImpact": 500000,
+      "riskLikelihood": 0.1,
+      "riskOwnerPointOfContact": "Elaine Kim (VP Sales)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Increase marketing in target areas; Ensure competitive pricing in target markets",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "6": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Mod, exposure Mod.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 500000,
+      "exposureRatingBeforeControls": 500000,
+      "finalExposureRating": 500000,
+      "followUpDate": "",
+      "impactAfterControls": 1000000,
+      "impactAfterControlsAreInPlace": 1000000,
+      "impactBeforeControls": 1000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.5,
+      "likelihoodAfterControlsWillBe": 0.5,
+      "likelihoodBeforeControls": 0.5,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Implement customer surveys to better forecast purchasing changes; Use cost-cutting measures to offset reductions and maintain profitability",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Financial Risk",
+      "riskIdNumbers": "6",
+      "riskOwnerPointOfContact": "Elaine Kim (VP Sales)",
+      "riskScenarioDescription": "Customer budget tightening results in reduced revenue and profits.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 500000,
+      "riskCategory": "Financial Risk",
+      "riskDescription": "Customer budget tightening results in reduced revenue and profits.",
+      "riskId": "6",
+      "riskImpact": 1000000,
+      "riskLikelihood": 0.5,
+      "riskOwnerPointOfContact": "Elaine Kim (VP Sales)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Implement customer surveys to better forecast purchasing changes; Use cost-cutting measures to offset reductions and maintain profitability",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "7": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Mod, exposure Low.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 50000,
+      "exposureRatingBeforeControls": 50000,
+      "finalExposureRating": 50000,
+      "followUpDate": "",
+      "impactAfterControls": 100000,
+      "impactAfterControlsAreInPlace": 100000,
+      "impactBeforeControls": 100000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.5,
+      "likelihoodAfterControlsWillBe": 0.5,
+      "likelihoodBeforeControls": 0.5,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Approve CIO proposal to increase internal R&D funding by 10% to spur internal innovation; Update technical training to include design thinking methodologies; Implement customer surveys in target marketing areas",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Strategic Risk",
+      "riskIdNumbers": "7",
+      "riskOwnerPointOfContact": "Sharika Grigsby (VP, Product Development)",
+      "riskScenarioDescription": "Failure to innovate results in market share erosion.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 50000,
+      "riskCategory": "Strategic Risk",
+      "riskDescription": "Failure to innovate results in market share erosion.",
+      "riskId": "7",
+      "riskImpact": 100000,
+      "riskLikelihood": 0.5,
+      "riskOwnerPointOfContact": "Sharika Grigsby (VP, Product Development)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Approve CIO proposal to increase internal R&D funding by 10% to spur internal innovation; Update technical training to include design thinking methodologies; Implement customer surveys in target marketing areas",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "8": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Mod, exposure Mod.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 500000,
+      "exposureRatingBeforeControls": 500000,
+      "finalExposureRating": 500000,
+      "followUpDate": "",
+      "impactAfterControls": 1000000,
+      "impactAfterControlsAreInPlace": 1000000,
+      "impactBeforeControls": 1000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.5,
+      "likelihoodAfterControlsWillBe": 0.5,
+      "likelihoodBeforeControls": 0.5,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Review and update (if needed) background screening controls; Update corporate security training to reinforce the need for diligence; Implement data loss prevention tools per CISO recommendation",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Operational Risk",
+      "riskIdNumbers": "8",
+      "riskOwnerPointOfContact": "Carly Franklin (CISO)",
+      "riskScenarioDescription": "Company intellectual property data is disclosed through employee error or malicious act.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 500000,
+      "riskCategory": "Operational Risk",
+      "riskDescription": "Company intellectual property data is disclosed through employee error or malicious act.",
+      "riskId": "8",
+      "riskImpact": 1000000,
+      "riskLikelihood": 0.5,
+      "riskOwnerPointOfContact": "Carly Franklin (CISO)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Review and update (if needed) background screening controls; Update corporate security training to reinforce the need for diligence; Implement data loss prevention tools per CISO recommendation",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Closed"
+     }
+    },
+    "9": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Low, exposure Low.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 50000,
+      "exposureRatingBeforeControls": 50000,
+      "finalExposureRating": 50000,
+      "followUpDate": "",
+      "impactAfterControls": 500000,
+      "impactAfterControlsAreInPlace": 500000,
+      "impactBeforeControls": 500000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.1,
+      "likelihoodAfterControlsWillBe": 0.1,
+      "likelihoodBeforeControls": 0.1,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Update continuous improvement process; Implement Baldrige Framework; Update external provider quality standards and monitoring",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Strategic Risk",
+      "riskIdNumbers": "9",
+      "riskOwnerPointOfContact": "Sharika Grigsby (VP, Product Development)",
+      "riskScenarioDescription": "A flaw in product quality leads to reputational damage, reducing sales.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional Enterprise Risk Register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 50000,
+      "riskCategory": "Strategic Risk",
+      "riskDescription": "A flaw in product quality leads to reputational damage, reducing sales.",
+      "riskId": "9",
+      "riskImpact": 500000,
+      "riskLikelihood": 0.1,
+      "riskOwnerPointOfContact": "Sharika Grigsby (VP, Product Development)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Update continuous improvement process; Implement Baldrige Framework; Update external provider quality standards and monitoring",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "F11-1": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Low, impact Medium.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 100000,
+      "exposureRatingBeforeControls": 100000,
+      "finalExposureRating": 100000,
+      "followUpDate": "",
+      "impactAfterControls": 1000000,
+      "impactAfterControlsAreInPlace": 1000000,
+      "impactBeforeControls": 1000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.1,
+      "likelihoodAfterControlsWillBe": 0.1,
+      "likelihoodBeforeControls": 0.1,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Agency X will begin allowing employees to work remotely one day per week and closely monitor employee productivity.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Not stated in Fig. 11",
+      "riskIdNumbers": "F11-1",
+      "riskOwnerPointOfContact": "Primary - Chief Operating Officer (COO)",
+      "riskScenarioDescription": "A global pandemic may necessitate a remote workforce where Agency X could face: \u2022 a forced reliance on potentially insecure networks; \u2022 a reduction in managerial oversight; and \u2022 a deterioration of Agency culture.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional enterprise risk profile (SP 800-221r1 Fig. 11)",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 100000,
+      "riskCategory": "Not stated in Fig. 11",
+      "riskDescription": "A global pandemic may necessitate a remote workforce where Agency X could face: \u2022 a forced reliance on potentially insecure networks; \u2022 a reduction in managerial oversight; and \u2022 a deterioration of Agency culture.",
+      "riskId": "F11-1",
+      "riskImpact": 1000000,
+      "riskLikelihood": 0.1,
+      "riskOwnerPointOfContact": "Primary - Chief Operating Officer (COO)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Agency X will begin allowing employees to work remotely one day per week and closely monitor employee productivity.",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "F11-2": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Medium, impact High.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 100000,
+      "exposureRatingBeforeControls": 5000000,
+      "finalExposureRating": 5000000,
+      "followUpDate": "",
+      "impactAfterControls": 1000000,
+      "impactAfterControlsAreInPlace": 10000000,
+      "impactBeforeControls": 10000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.5,
+      "likelihoodAfterControlsWillBe": 0.1,
+      "likelihoodBeforeControls": 0.5,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Agency X will establish a quarterly audit of PII processing and develop a privacy-specific change management plan for inclusion of any necessary updates.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Not stated in Fig. 11",
+      "riskIdNumbers": "F11-2",
+      "riskOwnerPointOfContact": "Primary - Chief Privacy Officer (CPO)",
+      "riskScenarioDescription": "Agency X's privacy policies and disclosures are found to inaccurately describe its collection, use, storage, and disclosure of personally identifiable information (PII).",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional enterprise risk profile (SP 800-221r1 Fig. 11)",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 5000000,
+      "riskCategory": "Not stated in Fig. 11",
+      "riskDescription": "Agency X's privacy policies and disclosures are found to inaccurately describe its collection, use, storage, and disclosure of personally identifiable information (PII).",
+      "riskId": "F11-2",
+      "riskImpact": 10000000,
+      "riskLikelihood": 0.5,
+      "riskOwnerPointOfContact": "Primary - Chief Privacy Officer (CPO)",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Agency X will establish a quarterly audit of PII processing and develop a privacy-specific change management plan for inclusion of any necessary updates.",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "F11-3": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Qualitative. Labels on the strategy scale, likelihood Medium, impact High.",
+      "currentStatusDate": "2026-10-22",
+      "dateOfRiskIdentification": "2026-10-22",
+      "dependencies": "",
+      "expectedExposureRating": 500000,
+      "exposureRatingBeforeControls": 5000000,
+      "finalExposureRating": 5000000,
+      "followUpDate": "",
+      "impactAfterControls": 1000000,
+      "impactAfterControlsAreInPlace": 10000000,
+      "impactBeforeControls": 10000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.5,
+      "likelihoodAfterControlsWillBe": 0.5,
+      "likelihoodBeforeControls": 0.5,
+      "organizationOrBusinessUnit": "Notional enterprise (NIST SP 800-221r1 ipd, October 2026)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Agency X is seeking to ensure redundancy within their supply chain by identifying backup/alternative suppliers and seeking to reduce the potential time needed to transition to a new supplier.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Not stated in Fig. 11",
+      "riskIdNumbers": "F11-3",
+      "riskOwnerPointOfContact": "Primary - Logistics Coordinator",
+      "riskScenarioDescription": "A key supplier of Agency X has abruptly gone bankrupt.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Notional enterprise risk profile (SP 800-221r1 Fig. 11)",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 5000000,
+      "riskCategory": "Not stated in Fig. 11",
+      "riskDescription": "A key supplier of Agency X has abruptly gone bankrupt.",
+      "riskId": "F11-3",
+      "riskImpact": 10000000,
+      "riskLikelihood": 0.5,
+      "riskOwnerPointOfContact": "Primary - Logistics Coordinator",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Agency X is seeking to ensure redundancy within their supply chain by identifying backup/alternative suppliers and seeking to reduce the potential time needed to transition to a new supplier.",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    }
+   },
+   "semanticErrors": []
+  },
+  "example-2-sme-quantitative.json": {
+   "risks": {
+    "R-01": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Quantitative, 12 months. Frequency per year lognormal 90% interval 0.02 to 0.15. Impact per event lognormal 90% interval 150000 to 2.5e+06 EUR. Drivers D-MSP (0.35), D-IDP (0.15). Seed 20261207, 100000 trials.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "Shared driver D-MSP Managed service provider admin access compromised; Shared driver D-IDP Identity provider control fails (MFA bypass or token theft)",
+      "expectedExposureRating": 97675,
+      "exposureRatingBeforeControls": 97675,
+      "finalExposureRating": 97675,
+      "followUpDate": "",
+      "impactAfterControls": 925833,
+      "impactAfterControlsAreInPlace": 925833,
+      "impactBeforeControls": 925833,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.1055,
+      "likelihoodAfterControlsWillBe": 0.1055,
+      "likelihoodBeforeControls": 0.1055,
+      "organizationOrBusinessUnit": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Interim acceptance pending the 2027 funding decision. Candidate responses O-1, O-2, O-3 and O-4.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "ICT risk",
+      "riskIdNumbers": "R-01",
+      "riskOwnerPointOfContact": "IT lead",
+      "riskScenarioDescription": "If ransomware encrypts the file servers and the ERP, then production planning and shipping stop for days and we pay recovery and overtime costs.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Company ICT and business risks",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 97675,
+      "riskCategory": "ICT risk",
+      "riskDescription": "If ransomware encrypts the file servers and the ERP, then production planning and shipping stop for days and we pay recovery and overtime costs.",
+      "riskId": "R-01",
+      "riskImpact": 925833,
+      "riskLikelihood": 0.1055,
+      "riskOwnerPointOfContact": "IT lead",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision. Candidate responses O-1, O-2, O-3 and O-4.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    },
+    "R-02": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Quantitative, 12 months. Frequency per year lognormal 90% interval 0.05 to 0.5. Impact per event lognormal 90% interval 15000 to 300000 EUR. Drivers D-IDP (0.5). Seed 20261207, 100000 trials.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "Shared driver D-IDP Identity provider control fails (MFA bypass or token theft)",
+      "expectedExposureRating": 26824,
+      "exposureRatingBeforeControls": 26824,
+      "finalExposureRating": 26824,
+      "followUpDate": "",
+      "impactAfterControls": 122426,
+      "impactAfterControlsAreInPlace": 122426,
+      "impactBeforeControls": 122426,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.2191,
+      "likelihoodAfterControlsWillBe": 0.2191,
+      "likelihoodBeforeControls": 0.2191,
+      "organizationOrBusinessUnit": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Interim acceptance pending the 2027 funding decision.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "ICT risk",
+      "riskIdNumbers": "R-02",
+      "riskOwnerPointOfContact": "CFO",
+      "riskScenarioDescription": "If an attacker takes over a mailbox and sends a changed bank account to a customer or to our accounts payable, then we lose a payment.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Company ICT and business risks",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 26824,
+      "riskCategory": "ICT risk",
+      "riskDescription": "If an attacker takes over a mailbox and sends a changed bank account to a customer or to our accounts payable, then we lose a payment.",
+      "riskId": "R-02",
+      "riskImpact": 122426,
+      "riskLikelihood": 0.2191,
+      "riskOwnerPointOfContact": "CFO",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    },
+    "R-03": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Quantitative, 12 months. Frequency per year constant 0.02. Impact per event lognormal 90% interval 20000 to 400000 EUR. Drivers D-SITE (0.6). Seed 20261207, 100000 trials.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "Shared driver D-SITE Main site server room outage (power, cooling, water)",
+      "expectedExposureRating": 16770,
+      "exposureRatingBeforeControls": 16770,
+      "finalExposureRating": 16770,
+      "followUpDate": "",
+      "impactAfterControls": 146720,
+      "impactAfterControlsAreInPlace": 146720,
+      "impactBeforeControls": 146720,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.1143,
+      "likelihoodAfterControlsWillBe": 0.1143,
+      "likelihoodBeforeControls": 0.1143,
+      "organizationOrBusinessUnit": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Interim acceptance pending the 2027 funding decision.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "ICT risk",
+      "riskIdNumbers": "R-03",
+      "riskOwnerPointOfContact": "IT lead",
+      "riskScenarioDescription": "If the server room fails, then the ERP and file services are down until power and cooling return.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Company ICT and business risks",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 16770,
+      "riskCategory": "ICT risk",
+      "riskDescription": "If the server room fails, then the ERP and file services are down until power and cooling return.",
+      "riskId": "R-03",
+      "riskImpact": 146720,
+      "riskLikelihood": 0.1143,
+      "riskOwnerPointOfContact": "IT lead",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    },
+    "R-04": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Quantitative, 12 months. Frequency per year lognormal 90% interval 0.005 to 0.05. Impact per event lognormal 90% interval 30000 to 400000 EUR. Drivers D-MSP (0.5). Secondary impact 'Customer claims under confidentiality clauses after disclosure' with probability 0.4, lognormal 90% interval 80000 to 1.5e+06. Seed 20261207, 100000 trials.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "Shared driver D-MSP Managed service provider admin access compromised",
+      "expectedExposureRating": 21557,
+      "exposureRatingBeforeControls": 21557,
+      "finalExposureRating": 21557,
+      "followUpDate": "",
+      "impactAfterControls": 366619,
+      "impactAfterControlsAreInPlace": 366619,
+      "impactBeforeControls": 366619,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.0588,
+      "likelihoodAfterControlsWillBe": 0.0588,
+      "likelihoodBeforeControls": 0.0588,
+      "organizationOrBusinessUnit": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Interim acceptance pending the 2027 funding decision.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "ICT risk",
+      "riskIdNumbers": "R-04",
+      "riskOwnerPointOfContact": "Managing director",
+      "riskScenarioDescription": "If our MSP is breached, then customer machine drawings that we store are disclosed and customers claim damages.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Company ICT and business risks",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 21557,
+      "riskCategory": "ICT risk",
+      "riskDescription": "If our MSP is breached, then customer machine drawings that we store are disclosed and customers claim damages.",
+      "riskId": "R-04",
+      "riskImpact": 366619,
+      "riskLikelihood": 0.0588,
+      "riskOwnerPointOfContact": "Managing director",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    },
+    "R-05": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Quantitative, 12 months. Frequency per year lognormal 90% interval 0.005 to 0.05. Impact per event PERT 10000, 40000, 400000 EUR. Drivers none. Seed 20261207, 100000 trials.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 1972,
+      "exposureRatingBeforeControls": 1972,
+      "finalExposureRating": 1972,
+      "followUpDate": "",
+      "impactAfterControls": 98096,
+      "impactAfterControlsAreInPlace": 98096,
+      "impactBeforeControls": 98096,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.0201,
+      "likelihoodAfterControlsWillBe": 0.0201,
+      "likelihoodBeforeControls": 0.0201,
+      "organizationOrBusinessUnit": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Accept. The incident reporting procedure is tested twice a year.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Legal risk",
+      "riskIdNumbers": "R-05",
+      "riskOwnerPointOfContact": "Managing director",
+      "riskScenarioDescription": "If we report a significant incident late or not at all, then the competent authority imposes a fine and we pay legal costs.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Company ICT and business risks",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 1972,
+      "riskCategory": "Legal risk",
+      "riskDescription": "If we report a significant incident late or not at all, then the competent authority imposes a fine and we pay legal costs.",
+      "riskId": "R-05",
+      "riskImpact": 98096,
+      "riskLikelihood": 0.0201,
+      "riskOwnerPointOfContact": "Managing director",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Accept. The incident reporting procedure is tested twice a year.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Accepted"
+     }
+    },
+    "R-06": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Quantitative, 12 months. Frequency per year lognormal 90% interval 0.2 to 1. Impact per event lognormal 90% interval 30000 to 250000 EUR. Drivers none. Seed 20261207, 100000 trials.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 53767,
+      "exposureRatingBeforeControls": 53767,
+      "finalExposureRating": 53767,
+      "followUpDate": "",
+      "impactAfterControls": 142619,
+      "impactAfterControlsAreInPlace": 142619,
+      "impactBeforeControls": 142619,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.377,
+      "likelihoodAfterControlsWillBe": 0.377,
+      "likelihoodBeforeControls": 0.377,
+      "organizationOrBusinessUnit": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Interim acceptance pending the 2027 funding decision. Candidate response O-5 enhances this opportunity.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Strategic risk",
+      "riskIdNumbers": "R-06",
+      "riskOwnerPointOfContact": "Head of sales",
+      "riskScenarioDescription": "If we can show CRA-ready secure updates before our competitors, then we win additional service contracts.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Company ICT and business risks",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 53767,
+      "riskCategory": "Strategic risk",
+      "riskDescription": "If we can show CRA-ready secure updates before our competitors, then we win additional service contracts.",
+      "riskId": "R-06",
+      "riskImpact": 142619,
+      "riskLikelihood": 0.377,
+      "riskOwnerPointOfContact": "Head of sales",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision. Candidate response O-5 enhances this opportunity.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    },
+    "R-07": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Quantitative, 12 months. Frequency per year lognormal 90% interval 0.003 to 0.03. Impact per event lognormal 90% interval 300000 to 6e+06 EUR. Drivers D-IDP (0.05). Seed 20261207, 100000 trials.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "Shared driver D-IDP Identity provider control fails (MFA bypass or token theft)",
+      "expectedExposureRating": 37501,
+      "exposureRatingBeforeControls": 37501,
+      "finalExposureRating": 37501,
+      "followUpDate": "",
+      "impactAfterControls": 2083395,
+      "impactAfterControlsAreInPlace": 2083395,
+      "impactBeforeControls": 2083395,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.018,
+      "likelihoodAfterControlsWillBe": 0.018,
+      "likelihoodBeforeControls": 0.018,
+      "organizationOrBusinessUnit": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Interim acceptance pending the 2027 funding decision. Candidate response O-6.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "ICT risk",
+      "riskIdNumbers": "R-07",
+      "riskOwnerPointOfContact": "Head of engineering",
+      "riskScenarioDescription": "If an attacker steals the firmware signing key, then customers install a malicious signed update and we must recall and re-key all controllers.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Product line A controller firmware and update service",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 37501,
+      "riskCategory": "ICT risk",
+      "riskDescription": "If an attacker steals the firmware signing key, then customers install a malicious signed update and we must recall and re-key all controllers.",
+      "riskId": "R-07",
+      "riskImpact": 2083395,
+      "riskLikelihood": 0.018,
+      "riskOwnerPointOfContact": "Head of engineering",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending the 2027 funding decision. Candidate response O-6.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    },
+    "R-08": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Quantitative, 12 months. Frequency per year lognormal 90% interval 0.05 to 0.4. Impact per event lognormal 90% interval 20000 to 500000 EUR. Drivers none. Seed 20261207, 100000 trials.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 27349,
+      "exposureRatingBeforeControls": 27349,
+      "finalExposureRating": 27349,
+      "followUpDate": "",
+      "impactAfterControls": 180878,
+      "impactAfterControlsAreInPlace": 180878,
+      "impactBeforeControls": 180878,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.1512,
+      "likelihoodAfterControlsWillBe": 0.1512,
+      "likelihoodBeforeControls": 0.1512,
+      "organizationOrBusinessUnit": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Fix the two open reports from CVD Portal in the next release.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "ICT risk",
+      "riskIdNumbers": "R-08",
+      "riskOwnerPointOfContact": "Head of engineering",
+      "riskScenarioDescription": "If an attacker exploits a known vulnerability in the controller web interface, then customer machines stop and we pay field service and penalties.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Product line A controller firmware and update service",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 27349,
+      "riskCategory": "ICT risk",
+      "riskDescription": "If an attacker exploits a known vulnerability in the controller web interface, then customer machines stop and we pay field service and penalties.",
+      "riskId": "R-08",
+      "riskImpact": 180878,
+      "riskLikelihood": 0.1512,
+      "riskOwnerPointOfContact": "Head of engineering",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Fix the two open reports from CVD Portal in the next release.",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "In treatment"
+     }
+    },
+    "R-09": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Quantitative, 12 months. Frequency per year lognormal 90% interval 2 to 12. Impact per event lognormal 90% interval 300 to 4000 EUR. Drivers none. Seed 20261207, 100000 trials.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 8445,
+      "exposureRatingBeforeControls": 8445,
+      "finalExposureRating": 8445,
+      "followUpDate": "",
+      "impactAfterControls": 8704,
+      "impactAfterControlsAreInPlace": 8704,
+      "impactBeforeControls": 8704,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.9702,
+      "likelihoodAfterControlsWillBe": 0.9702,
+      "likelihoodBeforeControls": 0.9702,
+      "organizationOrBusinessUnit": "Example Machinery GmbH (fictitious, 120 staff, EUR 30 M turnover, NIS2 important entity, Annex II manufacturing of machinery)",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Interim acceptance. Exists only if O-3 is funded.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "ICT risk",
+      "riskIdNumbers": "R-09",
+      "riskOwnerPointOfContact": "IT lead",
+      "riskScenarioDescription": "If staff cannot authenticate with their FIDO2 key (lost key, new device), then their work stops until the help desk restores access.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Company ICT and business risks",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 8445,
+      "riskCategory": "ICT risk",
+      "riskDescription": "If staff cannot authenticate with their FIDO2 key (lost key, new device), then their work stops until the help desk restores access.",
+      "riskId": "R-09",
+      "riskImpact": 8704,
+      "riskLikelihood": 0.9702,
+      "riskOwnerPointOfContact": "IT lead",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance. Exists only if O-3 is funded.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    }
+   },
+   "semanticErrors": []
+  },
+  "example-3-imports-table10.json": {
+   "risks": {
+    "17": {
+     "rdr": {
+      "actualResponseCost": 245000,
+      "assetsAffected": "DMZ Router; Core_Switch_1; Fiber_Circuit_Bldg3_to_HQ; ",
+      "comments": "Still need to evaluate other potential issues from natural disasters (e.g., flooding) that may impact this system.",
+      "currentRiskAnalysis": "Semi-quantitative. Point values as entered.",
+      "currentStatusDate": "2021-04-15",
+      "dateOfRiskIdentification": "2021-03-20",
+      "dependencies": "Availability of Construction Contractor",
+      "expectedExposureRating": 0,
+      "exposureRatingBeforeControls": 150000,
+      "finalExposureRating": 0,
+      "followUpDate": "2021-05-31",
+      "impactAfterControls": 1500000,
+      "impactAfterControlsAreInPlace": 1500000,
+      "impactBeforeControls": 1500000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0,
+      "likelihoodAfterControlsWillBe": 0,
+      "likelihoodBeforeControls": 0.1,
+      "organizationOrBusinessUnit": "Northeast Region Support Center",
+      "otherScenarioDetails": "Not Applicable",
+      "plannedResponseCost": 250000,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Having identified that the key vulnerability is to overhead communications wiring, these circuits will be buried underground.",
+      "primaryAdverseImpact": "Loss of communications to communcations center",
+      "resourceRequirementsForPlannedRisk": "Network architecture staff to plan and design the new infrastructure (existing labor budget). Contract to install underground fiber-optic cabling between headquarters and the communications center including necessary permits, trench construction, conduit materials, and new communications equipment.",
+      "riskCategory": "Contingency Planning",
+      "riskIdNumbers": "17",
+      "riskOwnerPointOfContact": "Mark Winters <WintersMX@example.com>",
+      "riskScenarioDescription": "A natural disaster disrupts communications circuits impeding customer access.",
+      "secondaryAdverseImpacts": "Customers unable to access service portal may be disgruntled; SLAs may be jeopardized",
+      "sourceOfRiskInformation": "Contingency Planning Annual Exercise",
+      "systemAffected": "Customer Service Portal",
+      "threatEvents": "",
+      "threatSourcesActors": "Natural Disaster - Hurricane",
+      "threatVectors": "Physical Connectivity Disruption",
+      "vulnerabilityPredisposingConditions": "Outdoor/Exposed Infrastructure"
+     },
+     "register": {
+      "exposureRating": 150000,
+      "riskCategory": "Contingency Planning",
+      "riskDescription": "A natural disaster disrupts communications circuits impeding customer access.",
+      "riskId": "17",
+      "riskImpact": 1500000,
+      "riskLikelihood": 0.1,
+      "riskOwnerPointOfContact": "Mark Winters <WintersMX@example.com>",
+      "riskResponseCost": 250000,
+      "riskResponseDescription": "Having identified that the key vulnerability is to overhead communications wiring, these circuits will be buried underground.",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "A-1": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Semi-quantitative. Point values as entered.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 200000,
+      "exposureRatingBeforeControls": 200000,
+      "finalExposureRating": 200000,
+      "followUpDate": "",
+      "impactAfterControls": 2000000,
+      "impactAfterControlsAreInPlace": 2000000,
+      "impactBeforeControls": 2000000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.1,
+      "likelihoodAfterControlsWillBe": 0.1,
+      "likelihoodBeforeControls": 0.1,
+      "organizationOrBusinessUnit": "Notional business unit",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Response per system owner. Detail not in the source CSV.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Information disclosure",
+      "riskIdNumbers": "A-1",
+      "riskOwnerPointOfContact": "Merger project lead",
+      "riskScenarioDescription": "An external attacker deploys a remote access tool and uses it to exfiltrate the plans for the company\u2019s upcoming merger.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Merger project file share",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 200000,
+      "riskCategory": "Information disclosure",
+      "riskDescription": "An external attacker deploys a remote access tool and uses it to exfiltrate the plans for the company\u2019s upcoming merger.",
+      "riskId": "A-1",
+      "riskImpact": 2000000,
+      "riskLikelihood": 0.1,
+      "riskOwnerPointOfContact": "Merger project lead",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Response per system owner. Detail not in the source CSV.",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "B-1": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Semi-quantitative. Point values as entered.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 120000,
+      "exposureRatingBeforeControls": 120000,
+      "finalExposureRating": 120000,
+      "followUpDate": "",
+      "impactAfterControls": 400000,
+      "impactAfterControlsAreInPlace": 400000,
+      "impactBeforeControls": 400000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.3,
+      "likelihoodAfterControlsWillBe": 0.3,
+      "likelihoodBeforeControls": 0.3,
+      "organizationOrBusinessUnit": "Notional business unit",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate"
+      ],
+      "plannedRiskResponseDescription": "Response per system owner. Detail not in the source CSV.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Information disclosure",
+      "riskIdNumbers": "B-1",
+      "riskOwnerPointOfContact": "Head of sales",
+      "riskScenarioDescription": "External threat actors steal information about marketing plans through malicious code deployed in the sales department.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Sales department systems",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 120000,
+      "riskCategory": "Information disclosure",
+      "riskDescription": "External threat actors steal information about marketing plans through malicious code deployed in the sales department.",
+      "riskId": "B-1",
+      "riskImpact": 400000,
+      "riskLikelihood": 0.3,
+      "riskOwnerPointOfContact": "Head of sales",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Response per system owner. Detail not in the source CSV.",
+      "riskResponseType": [
+       "Mitigate"
+      ],
+      "status": "Open"
+     }
+    },
+    "C-1": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Semi-quantitative. Point values as entered.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 160000,
+      "exposureRatingBeforeControls": 160000,
+      "finalExposureRating": 160000,
+      "followUpDate": "",
+      "impactAfterControls": 800000,
+      "impactAfterControlsAreInPlace": 800000,
+      "impactBeforeControls": 800000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.2,
+      "likelihoodAfterControlsWillBe": 0.2,
+      "likelihoodBeforeControls": 0.2,
+      "organizationOrBusinessUnit": "Notional business unit",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Response per system owner. Detail not in the source CSV.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Information disclosure",
+      "riskIdNumbers": "C-1",
+      "riskOwnerPointOfContact": "General counsel",
+      "riskScenarioDescription": "Malicious parties plant a web shell in an external site that enables them to access documents stored in the Legal Affairs shared document folder, resulting in the loss of critical corporate information.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Legal Affairs document system",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 160000,
+      "riskCategory": "Information disclosure",
+      "riskDescription": "Malicious parties plant a web shell in an external site that enables them to access documents stored in the Legal Affairs shared document folder, resulting in the loss of critical corporate information.",
+      "riskId": "C-1",
+      "riskImpact": 800000,
+      "riskLikelihood": 0.2,
+      "riskOwnerPointOfContact": "General counsel",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Response per system owner. Detail not in the source CSV.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    },
+    "GW-1": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Not estimated. Numeric fields are placeholders.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 0,
+      "exposureRatingBeforeControls": 0,
+      "finalExposureRating": 0,
+      "followUpDate": "",
+      "impactAfterControls": 0,
+      "impactAfterControlsAreInPlace": 0,
+      "impactBeforeControls": 0,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0,
+      "likelihoodAfterControlsWillBe": 0,
+      "likelihoodBeforeControls": 0,
+      "organizationOrBusinessUnit": "Notional business unit",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Interim acceptance pending estimate and decision.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Product vulnerability",
+      "riskIdNumbers": "GW-1",
+      "riskOwnerPointOfContact": "Unassigned",
+      "riskScenarioDescription": "If an attacker exploits a reported authentication bypass vulnerability in Gateway X1, then customer data or device control is compromised. Evidence 1 reports, 1 open.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Gateway X1 product",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 0,
+      "riskCategory": "Product vulnerability",
+      "riskDescription": "If an attacker exploits a reported authentication bypass vulnerability in Gateway X1, then customer data or device control is compromised. Evidence 1 reports, 1 open.",
+      "riskId": "GW-1",
+      "riskImpact": 0,
+      "riskLikelihood": 0,
+      "riskOwnerPointOfContact": "Unassigned",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending estimate and decision.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    },
+    "GW-2": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Not estimated. Numeric fields are placeholders.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 0,
+      "exposureRatingBeforeControls": 0,
+      "finalExposureRating": 0,
+      "followUpDate": "",
+      "impactAfterControls": 0,
+      "impactAfterControlsAreInPlace": 0,
+      "impactBeforeControls": 0,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0,
+      "likelihoodAfterControlsWillBe": 0,
+      "likelihoodBeforeControls": 0,
+      "organizationOrBusinessUnit": "Notional business unit",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Interim acceptance pending estimate and decision.",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Product vulnerability",
+      "riskIdNumbers": "GW-2",
+      "riskOwnerPointOfContact": "Unassigned",
+      "riskScenarioDescription": "If an attacker exploits a reported SQL injection vulnerability in Gateway X1, then customer data or device control is compromised. Evidence 2 reports, 1 open.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Gateway X1 product",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 0,
+      "riskCategory": "Product vulnerability",
+      "riskDescription": "If an attacker exploits a reported SQL injection vulnerability in Gateway X1, then customer data or device control is compromised. Evidence 2 reports, 1 open.",
+      "riskId": "GW-2",
+      "riskImpact": 0,
+      "riskLikelihood": 0,
+      "riskOwnerPointOfContact": "Unassigned",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Interim acceptance pending estimate and decision.",
+      "riskResponseType": [
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    },
+    "ORG-1": {
+     "rdr": {
+      "actualResponseCost": 0,
+      "assetsAffected": "",
+      "currentRiskAnalysis": "Semi-quantitative. Point values as entered.",
+      "currentStatusDate": "2026-10-27",
+      "dateOfRiskIdentification": "2026-10-27",
+      "dependencies": "",
+      "expectedExposureRating": 160000,
+      "exposureRatingBeforeControls": 160000,
+      "finalExposureRating": 160000,
+      "followUpDate": "",
+      "impactAfterControls": 800000,
+      "impactAfterControlsAreInPlace": 800000,
+      "impactBeforeControls": 800000,
+      "likelihoodAfterControlsAreInPlaceWillBe": 0.2,
+      "likelihoodAfterControlsWillBe": 0.2,
+      "likelihoodBeforeControls": 0.2,
+      "organizationOrBusinessUnit": "Notional business unit",
+      "otherScenarioDetails": "",
+      "plannedResponseCost": 0,
+      "plannedRiskResponse": [
+       "Mitigate",
+       "Accept"
+      ],
+      "plannedRiskResponseDescription": "Two system owners mitigate. One system owner accepts. Disparity resolved as one row with all responses (Table 10).",
+      "primaryAdverseImpact": "",
+      "resourceRequirementsForPlannedRisk": "",
+      "riskCategory": "Information disclosure",
+      "riskIdNumbers": "ORG-1; sources A-1, B-1, C-1",
+      "riskOwnerPointOfContact": "Business unit risk manager",
+      "riskScenarioDescription": "External malicious party uses malicious code to exfiltrate sensitive business-related documents.",
+      "secondaryAdverseImpacts": "",
+      "sourceOfRiskInformation": "Risk register entry",
+      "systemAffected": "Business unit risk register",
+      "threatEvents": "",
+      "threatSourcesActors": "",
+      "threatVectors": "",
+      "vulnerabilityPredisposingConditions": ""
+     },
+     "register": {
+      "exposureRating": 160000,
+      "riskCategory": "Information disclosure",
+      "riskDescription": "External malicious party uses malicious code to exfiltrate sensitive business-related documents.",
+      "riskId": "ORG-1",
+      "riskImpact": 800000,
+      "riskLikelihood": 0.2,
+      "riskOwnerPointOfContact": "Business unit risk manager",
+      "riskResponseCost": 0,
+      "riskResponseDescription": "Two system owners mitigate. One system owner accepts. Disparity resolved as one row with all responses (Table 10).",
+      "riskResponseType": [
+       "Mitigate",
+       "Accept"
+      ],
+      "status": "Open"
+     }
+    }
+   },
+   "semanticErrors": []
+  }
+ },
+ "formatG": [
+  [
+   0.0,
+   "0"
+  ],
+  [
+   -0.0,
+   "-0"
+  ],
+  [
+   1.0,
+   "1"
+  ],
+  [
+   0.1,
+   "0.1"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   2.5,
+   "2.5"
+  ],
+  [
+   1e-05,
+   "1e-05"
+  ],
+  [
+   1.5e-05,
+   "1.5e-05"
+  ],
+  [
+   0.0001,
+   "0.0001"
+  ],
+  [
+   0.00012345678,
+   "0.000123457"
+  ],
+  [
+   123456.0,
+   "123456"
+  ],
+  [
+   1234565.0,
+   "1.23456e+06"
+  ],
+  [
+   1234575.0,
+   "1.23458e+06"
+  ],
+  [
+   999999.5,
+   "1e+06"
+  ],
+  [
+   9999995.0,
+   "1e+07"
+  ],
+  [
+   1500000.0,
+   "1.5e+06"
+  ],
+  [
+   250000.0,
+   "250000"
+  ],
+  [
+   1e+21,
+   "1e+21"
+  ],
+  [
+   1e-300,
+   "1e-300"
+  ],
+  [
+   5e-324,
+   "4.94066e-324"
+  ],
+  [
+   0.25,
+   "0.25"
+  ],
+  [
+   0.125,
+   "0.125"
+  ],
+  [
+   2.675,
+   "2.675"
+  ],
+  [
+   123456.5,
+   "123456"
+  ],
+  [
+   100000.0,
+   "100000"
+  ],
+  [
+   999999.0,
+   "999999"
+  ],
+  [
+   1000000.0,
+   "1e+06"
+  ],
+  [
+   9.9999995e-05,
+   "0.0001"
+  ],
+  [
+   9120394.163579516,
+   "9.12039e+06"
+  ],
+  [
+   0.00026906928706843465,
+   "0.000269069"
+  ],
+  [
+   0.142847,
+   "0.142847"
+  ],
+  [
+   333465355.0,
+   "3.33465e+08"
+  ],
+  [
+   -4012025.8802424446,
+   "-4.01203e+06"
+  ],
+  [
+   1107.2871336662724,
+   "1107.29"
+  ],
+  [
+   0.975,
+   "0.975"
+  ],
+  [
+   576640678.0,
+   "5.76641e+08"
+  ],
+  [
+   735207.3306344878,
+   "735207"
+  ],
+  [
+   2.2847672828335192e-09,
+   "2.28477e-09"
+  ],
+  [
+   0.665914,
+   "0.665914"
+  ],
+  [
+   468215911.0,
+   "4.68216e+08"
+  ],
+  [
+   -7476883.946324626,
+   "-7.47688e+06"
+  ],
+  [
+   324675.0510115565,
+   "324675"
+  ],
+  [
+   0.86435632,
+   "0.864356"
+  ],
+  [
+   695870473.0,
+   "6.9587e+08"
+  ],
+  [
+   9662279.112271845,
+   "9.66228e+06"
+  ],
+  [
+   8.55205153047367e-05,
+   "8.55205e-05"
+  ],
+  [
+   0.98664,
+   "0.98664"
+  ],
+  [
+   667652021.0,
+   "6.67652e+08"
+  ],
+  [
+   -4179198.794267835,
+   "-4.1792e+06"
+  ],
+  [
+   9.860742987698079e-08,
+   "9.86074e-08"
+  ],
+  [
+   0.66,
+   "0.66"
+  ],
+  [
+   999311445.0,
+   "9.99311e+08"
+  ],
+  [
+   5892239.305288676,
+   "5.89224e+06"
+  ],
+  [
+   0.0021632908877401835,
+   "0.00216329"
+  ],
+  [
+   0.101,
+   "0.101"
+  ],
+  [
+   388200621.0,
+   "3.88201e+08"
+  ],
+  [
+   -7556119.909166468,
+   "-7.55612e+06"
+  ],
+  [
+   3.1765816908363847e-09,
+   "3.17658e-09"
+  ],
+  [
+   0.8659733,
+   "0.865973"
+  ],
+  [
+   722684613.0,
+   "7.22685e+08"
+  ],
+  [
+   6892414.36334971,
+   "6.89241e+06"
+  ],
+  [
+   1717565.943095116,
+   "1.71757e+06"
+  ],
+  [
+   0.656,
+   "0.656"
+  ],
+  [
+   926638040.0,
+   "9.26638e+08"
+  ],
+  [
+   -8350285.609781642,
+   "-8.35029e+06"
+  ],
+  [
+   63497396533.142075,
+   "6.34974e+10"
+  ],
+  [
+   0.70146605,
+   "0.701466"
+  ],
+  [
+   717053488.0,
+   "7.17053e+08"
+  ],
+  [
+   2958250.887660034,
+   "2.95825e+06"
+  ],
+  [
+   2053.3616796826504,
+   "2053.36"
+  ],
+  [
+   0.4916536,
+   "0.491654"
+  ],
+  [
+   924087926.0,
+   "9.24088e+08"
+  ],
+  [
+   6572393.271974474,
+   "6.57239e+06"
+  ],
+  [
+   1.298128778730972e-07,
+   "1.29813e-07"
+  ],
+  [
+   0.5812,
+   "0.5812"
+  ],
+  [
+   604715285.0,
+   "6.04715e+08"
+  ],
+  [
+   2566764.6384055335,
+   "2.56676e+06"
+  ],
+  [
+   1.268552921279584e-06,
+   "1.26855e-06"
+  ],
+  [
+   0.15484,
+   "0.15484"
+  ],
+  [
+   712085987.0,
+   "7.12086e+08"
+  ],
+  [
+   -8490026.63295431,
+   "-8.49003e+06"
+  ],
+  [
+   89.38921934823117,
+   "89.3892"
+  ],
+  [
+   0.793,
+   "0.793"
+  ],
+  [
+   661786885.0,
+   "6.61787e+08"
+  ],
+  [
+   6591254.976280902,
+   "6.59125e+06"
+  ],
+  [
+   4.41044710925798e-08,
+   "4.41045e-08"
+  ],
+  [
+   0.467,
+   "0.467"
+  ],
+  [
+   921224254.0,
+   "9.21224e+08"
+  ],
+  [
+   -3491346.1111302916,
+   "-3.49135e+06"
+  ],
+  [
+   0.0007590551673172061,
+   "0.000759055"
+  ],
+  [
+   0.741,
+   "0.741"
+  ],
+  [
+   159116113.0,
+   "1.59116e+08"
+  ],
+  [
+   4012581.636832455,
+   "4.01258e+06"
+  ],
+  [
+   1795791.0518722131,
+   "1.79579e+06"
+  ],
+  [
+   0.127,
+   "0.127"
+  ],
+  [
+   228094356.0,
+   "2.28094e+08"
+  ],
+  [
+   8757468.395857569,
+   "8.75747e+06"
+  ],
+  [
+   6218.704223092547,
+   "6218.7"
+  ],
+  [
+   0.670149,
+   "0.670149"
+  ],
+  [
+   29015993.0,
+   "2.9016e+07"
+  ],
+  [
+   2453571.4507881366,
+   "2.45357e+06"
+  ],
+  [
+   249358.9668248942,
+   "249359"
+  ],
+  [
+   0.898,
+   "0.898"
+  ],
+  [
+   702200057.0,
+   "7.022e+08"
+  ],
+  [
+   -2272320.173786224,
+   "-2.27232e+06"
+  ],
+  [
+   2.0259853851279286e-07,
+   "2.02599e-07"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   984073462.0,
+   "9.84073e+08"
+  ],
+  [
+   -3402186.308488711,
+   "-3.40219e+06"
+  ],
+  [
+   4.97112353003523e-05,
+   "4.97112e-05"
+  ],
+  [
+   0.24824,
+   "0.24824"
+  ],
+  [
+   583272822.0,
+   "5.83273e+08"
+  ],
+  [
+   5321845.788343975,
+   "5.32185e+06"
+  ],
+  [
+   1350257572.481801,
+   "1.35026e+09"
+  ],
+  [
+   0.40070179,
+   "0.400702"
+  ],
+  [
+   753601241.0,
+   "7.53601e+08"
+  ],
+  [
+   4566561.718272632,
+   "4.56656e+06"
+  ],
+  [
+   0.0016751823942431272,
+   "0.00167518"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   505870067.0,
+   "5.0587e+08"
+  ],
+  [
+   -5199182.179499026,
+   "-5.19918e+06"
+  ],
+  [
+   0.0677717695125902,
+   "0.0677718"
+  ],
+  [
+   0.6,
+   "0.6"
+  ],
+  [
+   928070458.0,
+   "9.2807e+08"
+  ],
+  [
+   -1734162.0467602285,
+   "-1.73416e+06"
+  ],
+  [
+   20413.3962571303,
+   "20413.4"
+  ],
+  [
+   0.323,
+   "0.323"
+  ],
+  [
+   102838082.0,
+   "1.02838e+08"
+  ],
+  [
+   6696144.329538209,
+   "6.69614e+06"
+  ],
+  [
+   7719.173925941418,
+   "7719.17"
+  ],
+  [
+   0.044545,
+   "0.044545"
+  ],
+  [
+   285673384.0,
+   "2.85673e+08"
+  ],
+  [
+   6984509.714226343,
+   "6.98451e+06"
+  ],
+  [
+   10.744333780420645,
+   "10.7443"
+  ],
+  [
+   0.32786,
+   "0.32786"
+  ],
+  [
+   412819549.0,
+   "4.1282e+08"
+  ],
+  [
+   8202393.913098618,
+   "8.20239e+06"
+  ],
+  [
+   6.319333290121429e-08,
+   "6.31933e-08"
+  ],
+  [
+   0.077629,
+   "0.077629"
+  ],
+  [
+   695908815.0,
+   "6.95909e+08"
+  ],
+  [
+   -7969885.010010529,
+   "-7.96989e+06"
+  ],
+  [
+   1.1010936917467374e-05,
+   "1.10109e-05"
+  ],
+  [
+   0.83,
+   "0.83"
+  ],
+  [
+   816267991.0,
+   "8.16268e+08"
+  ],
+  [
+   -2241670.701723708,
+   "-2.24167e+06"
+  ],
+  [
+   774990276909.4711,
+   "7.7499e+11"
+  ],
+  [
+   0.33818611,
+   "0.338186"
+  ],
+  [
+   319243676.0,
+   "3.19244e+08"
+  ],
+  [
+   3461083.8439424075,
+   "3.46108e+06"
+  ],
+  [
+   1.6896623242364383e-05,
+   "1.68966e-05"
+  ],
+  [
+   0.78344,
+   "0.78344"
+  ],
+  [
+   77015932.0,
+   "7.70159e+07"
+  ],
+  [
+   -2789128.2190016154,
+   "-2.78913e+06"
+  ],
+  [
+   0.00020720765032978747,
+   "0.000207208"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   469373773.0,
+   "4.69374e+08"
+  ],
+  [
+   2888227.6001314707,
+   "2.88823e+06"
+  ],
+  [
+   6.03410979676105e-06,
+   "6.03411e-06"
+  ],
+  [
+   0.4783271,
+   "0.478327"
+  ],
+  [
+   833867053.0,
+   "8.33867e+08"
+  ],
+  [
+   -9244209.5956149,
+   "-9.24421e+06"
+  ],
+  [
+   1.990008965332727e-09,
+   "1.99001e-09"
+  ],
+  [
+   0.8271,
+   "0.8271"
+  ],
+  [
+   237950322.0,
+   "2.3795e+08"
+  ],
+  [
+   -7620842.260238303,
+   "-7.62084e+06"
+  ],
+  [
+   177998367.4463638,
+   "1.77998e+08"
+  ],
+  [
+   0.01821785,
+   "0.0182179"
+  ],
+  [
+   581746547.0,
+   "5.81747e+08"
+  ],
+  [
+   463333.2519258261,
+   "463333"
+  ],
+  [
+   28.316992644788584,
+   "28.317"
+  ],
+  [
+   0.649371,
+   "0.649371"
+  ],
+  [
+   808263975.0,
+   "8.08264e+08"
+  ],
+  [
+   3985253.907988047,
+   "3.98525e+06"
+  ],
+  [
+   20752895.032823026,
+   "2.07529e+07"
+  ],
+  [
+   0.69679,
+   "0.69679"
+  ],
+  [
+   956655496.0,
+   "9.56655e+08"
+  ],
+  [
+   -9300235.540240169,
+   "-9.30024e+06"
+  ],
+  [
+   5839.02531467857,
+   "5839.03"
+  ],
+  [
+   0.721836,
+   "0.721836"
+  ],
+  [
+   114894131.0,
+   "1.14894e+08"
+  ],
+  [
+   -1681998.6642414797,
+   "-1.682e+06"
+  ],
+  [
+   4.122708156082642e-06,
+   "4.12271e-06"
+  ],
+  [
+   0.2,
+   "0.2"
+  ],
+  [
+   179467724.0,
+   "1.79468e+08"
+  ],
+  [
+   2935790.997158559,
+   "2.93579e+06"
+  ],
+  [
+   468948.6607602288,
+   "468949"
+  ],
+  [
+   0.31499,
+   "0.31499"
+  ],
+  [
+   94245129.0,
+   "9.42451e+07"
+  ],
+  [
+   -6426662.19318391,
+   "-6.42666e+06"
+  ],
+  [
+   1.4921170341674522e-09,
+   "1.49212e-09"
+  ],
+  [
+   0.5671,
+   "0.5671"
+  ],
+  [
+   148445079.0,
+   "1.48445e+08"
+  ],
+  [
+   8139581.789050322,
+   "8.13958e+06"
+  ],
+  [
+   2.44306184836238e-05,
+   "2.44306e-05"
+  ],
+  [
+   0.1233,
+   "0.1233"
+  ],
+  [
+   21673049.0,
+   "2.1673e+07"
+  ],
+  [
+   -9826230.716051947,
+   "-9.82623e+06"
+  ],
+  [
+   1.0418257709455838,
+   "1.04183"
+  ],
+  [
+   0.8486,
+   "0.8486"
+  ],
+  [
+   785019001.0,
+   "7.85019e+08"
+  ],
+  [
+   -443590.87371987663,
+   "-443591"
+  ],
+  [
+   0.049233554575366566,
+   "0.0492336"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   682599681.0,
+   "6.826e+08"
+  ],
+  [
+   -2612988.845549442,
+   "-2.61299e+06"
+  ],
+  [
+   0.011366866312296386,
+   "0.0113669"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   935909491.0,
+   "9.35909e+08"
+  ],
+  [
+   8499833.572166406,
+   "8.49983e+06"
+  ],
+  [
+   54395388.4855639,
+   "5.43954e+07"
+  ],
+  [
+   0.8,
+   "0.8"
+  ],
+  [
+   285735542.0,
+   "2.85736e+08"
+  ],
+  [
+   8658090.334691279,
+   "8.65809e+06"
+  ],
+  [
+   8.712157092662921e-07,
+   "8.71216e-07"
+  ],
+  [
+   0.189972,
+   "0.189972"
+  ],
+  [
+   902603135.0,
+   "9.02603e+08"
+  ],
+  [
+   2304092.6769790947,
+   "2.30409e+06"
+  ],
+  [
+   3.44013020289499e-08,
+   "3.44013e-08"
+  ],
+  [
+   0.491666,
+   "0.491666"
+  ],
+  [
+   150442480.0,
+   "1.50442e+08"
+  ],
+  [
+   -2143587.006315342,
+   "-2.14359e+06"
+  ],
+  [
+   12901.607978966927,
+   "12901.6"
+  ],
+  [
+   0.4,
+   "0.4"
+  ],
+  [
+   789962862.0,
+   "7.89963e+08"
+  ],
+  [
+   -2472984.534870293,
+   "-2.47298e+06"
+  ],
+  [
+   0.0007137003963193328,
+   "0.0007137"
+  ],
+  [
+   0.52043,
+   "0.52043"
+  ],
+  [
+   320512836.0,
+   "3.20513e+08"
+  ],
+  [
+   7395673.000533801,
+   "7.39567e+06"
+  ],
+  [
+   801632638798.5408,
+   "8.01633e+11"
+  ],
+  [
+   0.563235,
+   "0.563235"
+  ],
+  [
+   514648203.0,
+   "5.14648e+08"
+  ],
+  [
+   -1933654.3186745932,
+   "-1.93365e+06"
+  ],
+  [
+   0.013744147052889798,
+   "0.0137441"
+  ],
+  [
+   0.99797,
+   "0.99797"
+  ],
+  [
+   966493755.0,
+   "9.66494e+08"
+  ],
+  [
+   -5452427.224363418,
+   "-5.45243e+06"
+  ],
+  [
+   0.026226987816649016,
+   "0.026227"
+  ],
+  [
+   0.0936,
+   "0.0936"
+  ],
+  [
+   353115277.0,
+   "3.53115e+08"
+  ],
+  [
+   -4107500.2818231797,
+   "-4.1075e+06"
+  ],
+  [
+   0.0022946448694826605,
+   "0.00229464"
+  ],
+  [
+   0.37905,
+   "0.37905"
+  ],
+  [
+   547831750.0,
+   "5.47832e+08"
+  ],
+  [
+   -5386470.880995944,
+   "-5.38647e+06"
+  ],
+  [
+   8066652890.802471,
+   "8.06665e+09"
+  ],
+  [
+   0.5614033,
+   "0.561403"
+  ],
+  [
+   879201213.0,
+   "8.79201e+08"
+  ],
+  [
+   7098139.343773421,
+   "7.09814e+06"
+  ],
+  [
+   59996022.01978264,
+   "5.9996e+07"
+  ],
+  [
+   0.56,
+   "0.56"
+  ],
+  [
+   721775014.0,
+   "7.21775e+08"
+  ],
+  [
+   -6472770.468671672,
+   "-6.47277e+06"
+  ],
+  [
+   88.21209326086617,
+   "88.2121"
+  ],
+  [
+   0.132167,
+   "0.132167"
+  ],
+  [
+   159665053.0,
+   "1.59665e+08"
+  ],
+  [
+   843153.506205216,
+   "843154"
+  ],
+  [
+   0.046640820990424985,
+   "0.0466408"
+  ],
+  [
+   0.732749,
+   "0.732749"
+  ],
+  [
+   273525785.0,
+   "2.73526e+08"
+  ],
+  [
+   5948674.07468369,
+   "5.94867e+06"
+  ],
+  [
+   804856.044647073,
+   "804856"
+  ],
+  [
+   0.85606,
+   "0.85606"
+  ],
+  [
+   82543584.0,
+   "8.25436e+07"
+  ],
+  [
+   3795575.513088653,
+   "3.79558e+06"
+  ],
+  [
+   7.057876690181745e-06,
+   "7.05788e-06"
+  ],
+  [
+   0.40904978,
+   "0.40905"
+  ],
+  [
+   17416440.0,
+   "1.74164e+07"
+  ],
+  [
+   8137465.274340775,
+   "8.13747e+06"
+  ],
+  [
+   734441464.3588789,
+   "7.34441e+08"
+  ],
+  [
+   0.10688,
+   "0.10688"
+  ],
+  [
+   256780635.0,
+   "2.56781e+08"
+  ],
+  [
+   1020440.4189324286,
+   "1.02044e+06"
+  ],
+  [
+   0.00980276993377816,
+   "0.00980277"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   609892244.0,
+   "6.09892e+08"
+  ],
+  [
+   8362353.751373917,
+   "8.36235e+06"
+  ],
+  [
+   0.913370125359501,
+   "0.91337"
+  ],
+  [
+   0.183,
+   "0.183"
+  ],
+  [
+   964612369.0,
+   "9.64612e+08"
+  ],
+  [
+   -6676686.200455731,
+   "-6.67669e+06"
+  ],
+  [
+   0.04919326134479738,
+   "0.0491933"
+  ],
+  [
+   0.08,
+   "0.08"
+  ],
+  [
+   467442508.0,
+   "4.67443e+08"
+  ],
+  [
+   -6702248.841997592,
+   "-6.70225e+06"
+  ],
+  [
+   3.892231392567208e-09,
+   "3.89223e-09"
+  ],
+  [
+   0.3296737,
+   "0.329674"
+  ],
+  [
+   857571133.0,
+   "8.57571e+08"
+  ],
+  [
+   -2461466.5357693546,
+   "-2.46147e+06"
+  ],
+  [
+   8.793065816366679e-09,
+   "8.79307e-09"
+  ],
+  [
+   0.5276842,
+   "0.527684"
+  ],
+  [
+   323137770.0,
+   "3.23138e+08"
+  ],
+  [
+   9717087.95866977,
+   "9.71709e+06"
+  ],
+  [
+   1.0494525718105236e-09,
+   "1.04945e-09"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   773859636.0,
+   "7.7386e+08"
+  ],
+  [
+   4429846.9369523525,
+   "4.42985e+06"
+  ],
+  [
+   0.00010712667638634594,
+   "0.000107127"
+  ],
+  [
+   0.36098,
+   "0.36098"
+  ],
+  [
+   758649712.0,
+   "7.5865e+08"
+  ],
+  [
+   -6844533.801937909,
+   "-6.84453e+06"
+  ],
+  [
+   0.49935121468063726,
+   "0.499351"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   548026122.0,
+   "5.48026e+08"
+  ],
+  [
+   -507609.1847596299,
+   "-507609"
+  ],
+  [
+   25080.51333597017,
+   "25080.5"
+  ],
+  [
+   0.70841,
+   "0.70841"
+  ],
+  [
+   799649212.0,
+   "7.99649e+08"
+  ],
+  [
+   4863898.8823947925,
+   "4.8639e+06"
+  ],
+  [
+   14.586375711331119,
+   "14.5864"
+  ],
+  [
+   0.5096,
+   "0.5096"
+  ],
+  [
+   276275515.0,
+   "2.76276e+08"
+  ],
+  [
+   -5600199.685431682,
+   "-5.6002e+06"
+  ],
+  [
+   9669967.312890634,
+   "9.66997e+06"
+  ],
+  [
+   0.4,
+   "0.4"
+  ],
+  [
+   896614978.0,
+   "8.96615e+08"
+  ],
+  [
+   -3559037.0953910537,
+   "-3.55904e+06"
+  ],
+  [
+   27768731338.940697,
+   "2.77687e+10"
+  ],
+  [
+   0.9229,
+   "0.9229"
+  ],
+  [
+   227749955.0,
+   "2.2775e+08"
+  ],
+  [
+   2347810.744170245,
+   "2.34781e+06"
+  ],
+  [
+   12945981.024863819,
+   "1.2946e+07"
+  ],
+  [
+   0.42,
+   "0.42"
+  ],
+  [
+   225098724.0,
+   "2.25099e+08"
+  ],
+  [
+   -7478495.609465856,
+   "-7.4785e+06"
+  ],
+  [
+   3.416579085318912e-05,
+   "3.41658e-05"
+  ],
+  [
+   0.052,
+   "0.052"
+  ],
+  [
+   525547251.0,
+   "5.25547e+08"
+  ],
+  [
+   1388903.3689291868,
+   "1.3889e+06"
+  ],
+  [
+   0.03607399537733497,
+   "0.036074"
+  ],
+  [
+   0.2298419,
+   "0.229842"
+  ],
+  [
+   485401195.0,
+   "4.85401e+08"
+  ],
+  [
+   9815214.924079224,
+   "9.81521e+06"
+  ],
+  [
+   34684.15145792333,
+   "34684.2"
+  ],
+  [
+   0.756,
+   "0.756"
+  ],
+  [
+   968531694.0,
+   "9.68532e+08"
+  ],
+  [
+   -2340437.403990632,
+   "-2.34044e+06"
+  ],
+  [
+   99.62917757430007,
+   "99.6292"
+  ],
+  [
+   0.321988,
+   "0.321988"
+  ],
+  [
+   508044590.0,
+   "5.08045e+08"
+  ],
+  [
+   3689112.2420943007,
+   "3.68911e+06"
+  ],
+  [
+   2324.864614525312,
+   "2324.86"
+  ],
+  [
+   0.945,
+   "0.945"
+  ],
+  [
+   538450642.0,
+   "5.38451e+08"
+  ],
+  [
+   1503038.37331249,
+   "1.50304e+06"
+  ],
+  [
+   0.0005189092935290011,
+   "0.000518909"
+  ],
+  [
+   0.44785187,
+   "0.447852"
+  ],
+  [
+   258508976.0,
+   "2.58509e+08"
+  ],
+  [
+   8268039.445686471,
+   "8.26804e+06"
+  ],
+  [
+   0.18227262384702872,
+   "0.182273"
+  ],
+  [
+   0.53323133,
+   "0.533231"
+  ],
+  [
+   210512223.0,
+   "2.10512e+08"
+  ],
+  [
+   9540112.118157879,
+   "9.54011e+06"
+  ],
+  [
+   1390879.2325860693,
+   "1.39088e+06"
+  ],
+  [
+   0.287412,
+   "0.287412"
+  ],
+  [
+   512040182.0,
+   "5.1204e+08"
+  ],
+  [
+   -8769659.211584488,
+   "-8.76966e+06"
+  ],
+  [
+   33262828.342196193,
+   "3.32628e+07"
+  ],
+  [
+   0.70487723,
+   "0.704877"
+  ],
+  [
+   416342405.0,
+   "4.16342e+08"
+  ],
+  [
+   -9906208.292770086,
+   "-9.90621e+06"
+  ],
+  [
+   3.340516402372778e-07,
+   "3.34052e-07"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   597012951.0,
+   "5.97013e+08"
+  ],
+  [
+   -9320169.91910829,
+   "-9.32017e+06"
+  ],
+  [
+   9.627149092397728e-05,
+   "9.62715e-05"
+  ],
+  [
+   0.10689,
+   "0.10689"
+  ],
+  [
+   249352797.0,
+   "2.49353e+08"
+  ],
+  [
+   4737331.847264998,
+   "4.73733e+06"
+  ],
+  [
+   417368924.22739416,
+   "4.17369e+08"
+  ],
+  [
+   0.1652,
+   "0.1652"
+  ],
+  [
+   74498031.0,
+   "7.4498e+07"
+  ],
+  [
+   2445119.4170304257,
+   "2.44512e+06"
+  ],
+  [
+   73020342373.92123,
+   "7.30203e+10"
+  ],
+  [
+   0.4718,
+   "0.4718"
+  ],
+  [
+   243662550.0,
+   "2.43663e+08"
+  ],
+  [
+   3604497.039666122,
+   "3.6045e+06"
+  ],
+  [
+   1460019676.1875908,
+   "1.46002e+09"
+  ],
+  [
+   0.7194,
+   "0.7194"
+  ],
+  [
+   329737537.0,
+   "3.29738e+08"
+  ],
+  [
+   1131469.6993947625,
+   "1.13147e+06"
+  ],
+  [
+   0.007489470147219344,
+   "0.00748947"
+  ],
+  [
+   0.804,
+   "0.804"
+  ],
+  [
+   426305611.0,
+   "4.26306e+08"
+  ],
+  [
+   -4002116.820842647,
+   "-4.00212e+06"
+  ],
+  [
+   0.013347866008771334,
+   "0.0133479"
+  ],
+  [
+   0.63,
+   "0.63"
+  ],
+  [
+   881298129.0,
+   "8.81298e+08"
+  ],
+  [
+   -1632420.1549657835,
+   "-1.63242e+06"
+  ],
+  [
+   555.344398048476,
+   "555.344"
+  ],
+  [
+   0.6261,
+   "0.6261"
+  ],
+  [
+   574888923.0,
+   "5.74889e+08"
+  ],
+  [
+   8323834.469866384,
+   "8.32383e+06"
+  ],
+  [
+   562113875.2647728,
+   "5.62114e+08"
+  ],
+  [
+   0.104,
+   "0.104"
+  ],
+  [
+   251209546.0,
+   "2.5121e+08"
+  ],
+  [
+   7201880.7513137795,
+   "7.20188e+06"
+  ],
+  [
+   1.4963240319667716e-06,
+   "1.49632e-06"
+  ],
+  [
+   0.3347,
+   "0.3347"
+  ],
+  [
+   220793090.0,
+   "2.20793e+08"
+  ],
+  [
+   -9304720.901213244,
+   "-9.30472e+06"
+  ],
+  [
+   0.24022773686179089,
+   "0.240228"
+  ],
+  [
+   0.57,
+   "0.57"
+  ],
+  [
+   97782121.0,
+   "9.77821e+07"
+  ],
+  [
+   6930652.360227674,
+   "6.93065e+06"
+  ],
+  [
+   8262668089.388222,
+   "8.26267e+09"
+  ],
+  [
+   0.1614,
+   "0.1614"
+  ],
+  [
+   486773213.0,
+   "4.86773e+08"
+  ],
+  [
+   1637145.4373402465,
+   "1.63715e+06"
+  ],
+  [
+   0.005303444143962792,
+   "0.00530344"
+  ],
+  [
+   0.936,
+   "0.936"
+  ],
+  [
+   201288817.0,
+   "2.01289e+08"
+  ],
+  [
+   -1091439.561752053,
+   "-1.09144e+06"
+  ],
+  [
+   0.17651156893903225,
+   "0.176512"
+  ],
+  [
+   0.369,
+   "0.369"
+  ],
+  [
+   408271491.0,
+   "4.08271e+08"
+  ],
+  [
+   -3475010.609279436,
+   "-3.47501e+06"
+  ],
+  [
+   2119526.898885566,
+   "2.11953e+06"
+  ],
+  [
+   0.019,
+   "0.019"
+  ],
+  [
+   244364216.0,
+   "2.44364e+08"
+  ],
+  [
+   8322249.947099373,
+   "8.32225e+06"
+  ],
+  [
+   15.89024065993329,
+   "15.8902"
+  ],
+  [
+   0.8688128,
+   "0.868813"
+  ],
+  [
+   360440528.0,
+   "3.60441e+08"
+  ],
+  [
+   -3104455.54671585,
+   "-3.10446e+06"
+  ],
+  [
+   3.0475150748949164e-05,
+   "3.04752e-05"
+  ],
+  [
+   0.693,
+   "0.693"
+  ],
+  [
+   116866073.0,
+   "1.16866e+08"
+  ],
+  [
+   625339.8874532096,
+   "625340"
+  ],
+  [
+   1.5661735824432372e-07,
+   "1.56617e-07"
+  ],
+  [
+   0.77,
+   "0.77"
+  ],
+  [
+   988125477.0,
+   "9.88125e+08"
+  ],
+  [
+   -4061281.3944250736,
+   "-4.06128e+06"
+  ],
+  [
+   1.2406648332279582e-06,
+   "1.24066e-06"
+  ],
+  [
+   0.47048,
+   "0.47048"
+  ],
+  [
+   724477648.0,
+   "7.24478e+08"
+  ],
+  [
+   -7080625.612735486,
+   "-7.08063e+06"
+  ],
+  [
+   1003673558183.4841,
+   "1.00367e+12"
+  ],
+  [
+   0.8063552,
+   "0.806355"
+  ],
+  [
+   672526289.0,
+   "6.72526e+08"
+  ],
+  [
+   -3761366.2510804664,
+   "-3.76137e+06"
+  ],
+  [
+   12038042761.151978,
+   "1.2038e+10"
+  ],
+  [
+   0.2642168,
+   "0.264217"
+  ],
+  [
+   689204463.0,
+   "6.89204e+08"
+  ],
+  [
+   6651562.584345575,
+   "6.65156e+06"
+  ],
+  [
+   4.738218989658433,
+   "4.73822"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   215809870.0,
+   "2.1581e+08"
+  ],
+  [
+   -5620355.496305027,
+   "-5.62036e+06"
+  ],
+  [
+   325.70134222369586,
+   "325.701"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   533123212.0,
+   "5.33123e+08"
+  ],
+  [
+   -4143410.2257700544,
+   "-4.14341e+06"
+  ],
+  [
+   5.510897998997212,
+   "5.5109"
+  ],
+  [
+   0.8018,
+   "0.8018"
+  ],
+  [
+   364222583.0,
+   "3.64223e+08"
+  ],
+  [
+   -5776595.31182543,
+   "-5.7766e+06"
+  ],
+  [
+   39323577508.35793,
+   "3.93236e+10"
+  ],
+  [
+   0.4481,
+   "0.4481"
+  ],
+  [
+   543668943.0,
+   "5.43669e+08"
+  ],
+  [
+   -3434368.9231864857,
+   "-3.43437e+06"
+  ],
+  [
+   3.1482245103519053e-06,
+   "3.14822e-06"
+  ],
+  [
+   0.4522857,
+   "0.452286"
+  ],
+  [
+   87691179.0,
+   "8.76912e+07"
+  ],
+  [
+   -16326.889517892152,
+   "-16326.9"
+  ],
+  [
+   0.11248379763719125,
+   "0.112484"
+  ],
+  [
+   0.725,
+   "0.725"
+  ],
+  [
+   9621020.0,
+   "9.62102e+06"
+  ],
+  [
+   3720404.964578185,
+   "3.7204e+06"
+  ],
+  [
+   1420978096.5049522,
+   "1.42098e+09"
+  ],
+  [
+   0.81393597,
+   "0.813936"
+  ],
+  [
+   468032644.0,
+   "4.68033e+08"
+  ],
+  [
+   9887667.246739455,
+   "9.88767e+06"
+  ],
+  [
+   0.45412624032762483,
+   "0.454126"
+  ],
+  [
+   0.4539913,
+   "0.453991"
+  ],
+  [
+   514772394.0,
+   "5.14772e+08"
+  ],
+  [
+   310470.3186601456,
+   "310470"
+  ],
+  [
+   853180.9311767413,
+   "853181"
+  ],
+  [
+   0.081828,
+   "0.081828"
+  ],
+  [
+   364967048.0,
+   "3.64967e+08"
+  ],
+  [
+   -9347615.131917508,
+   "-9.34762e+06"
+  ],
+  [
+   98220583.39295107,
+   "9.82206e+07"
+  ],
+  [
+   0.2040476,
+   "0.204048"
+  ],
+  [
+   826896557.0,
+   "8.26897e+08"
+  ],
+  [
+   -5802445.31857856,
+   "-5.80245e+06"
+  ],
+  [
+   0.013422896737347551,
+   "0.0134229"
+  ],
+  [
+   0.314196,
+   "0.314196"
+  ],
+  [
+   158150740.0,
+   "1.58151e+08"
+  ],
+  [
+   -4739790.988521082,
+   "-4.73979e+06"
+  ],
+  [
+   1.8927241611735414e-09,
+   "1.89272e-09"
+  ],
+  [
+   0.4735,
+   "0.4735"
+  ],
+  [
+   753869574.0,
+   "7.5387e+08"
+  ],
+  [
+   3766095.6225958485,
+   "3.7661e+06"
+  ],
+  [
+   1.0973640834572995,
+   "1.09736"
+  ],
+  [
+   0.7595,
+   "0.7595"
+  ],
+  [
+   436808609.0,
+   "4.36809e+08"
+  ],
+  [
+   -5652208.834725631,
+   "-5.65221e+06"
+  ],
+  [
+   1293584808017.837,
+   "1.29358e+12"
+  ],
+  [
+   0.3506086,
+   "0.350609"
+  ],
+  [
+   51069928.0,
+   "5.10699e+07"
+  ],
+  [
+   -3974609.560028921,
+   "-3.97461e+06"
+  ],
+  [
+   37921426.734652735,
+   "3.79214e+07"
+  ],
+  [
+   0.714,
+   "0.714"
+  ],
+  [
+   843336307.0,
+   "8.43336e+08"
+  ],
+  [
+   7549347.019768372,
+   "7.54935e+06"
+  ],
+  [
+   0.5664501084821515,
+   "0.56645"
+  ],
+  [
+   0.4822,
+   "0.4822"
+  ],
+  [
+   218382511.0,
+   "2.18383e+08"
+  ],
+  [
+   -2430281.294974097,
+   "-2.43028e+06"
+  ],
+  [
+   722.7114786360636,
+   "722.711"
+  ],
+  [
+   0.201915,
+   "0.201915"
+  ],
+  [
+   13610605.0,
+   "1.36106e+07"
+  ],
+  [
+   4823182.051914623,
+   "4.82318e+06"
+  ],
+  [
+   4.8531594721311115e-09,
+   "4.85316e-09"
+  ],
+  [
+   0.84766658,
+   "0.847667"
+  ],
+  [
+   930282894.0,
+   "9.30283e+08"
+  ],
+  [
+   1637269.5025889557,
+   "1.63727e+06"
+  ],
+  [
+   23248.306397762535,
+   "23248.3"
+  ],
+  [
+   0.30967,
+   "0.30967"
+  ],
+  [
+   393752195.0,
+   "3.93752e+08"
+  ],
+  [
+   6059961.9807212,
+   "6.05996e+06"
+  ],
+  [
+   1.0439687528417023,
+   "1.04397"
+  ],
+  [
+   0.0553,
+   "0.0553"
+  ],
+  [
+   997196291.0,
+   "9.97196e+08"
+  ],
+  [
+   6157289.286270181,
+   "6.15729e+06"
+  ],
+  [
+   932.102480188814,
+   "932.102"
+  ],
+  [
+   0.92259,
+   "0.92259"
+  ],
+  [
+   922858770.0,
+   "9.22859e+08"
+  ],
+  [
+   9765319.796314977,
+   "9.76532e+06"
+  ],
+  [
+   4899979517.456559,
+   "4.89998e+09"
+  ],
+  [
+   0.9574377,
+   "0.957438"
+  ],
+  [
+   189265838.0,
+   "1.89266e+08"
+  ],
+  [
+   333234.97765022516,
+   "333235"
+  ],
+  [
+   4.6927936513048046e-05,
+   "4.69279e-05"
+  ],
+  [
+   0.999,
+   "0.999"
+  ],
+  [
+   486480061.0,
+   "4.8648e+08"
+  ],
+  [
+   -2578512.8207521653,
+   "-2.57851e+06"
+  ],
+  [
+   4262.353898919992,
+   "4262.35"
+  ],
+  [
+   0.06,
+   "0.06"
+  ],
+  [
+   751546513.0,
+   "7.51547e+08"
+  ],
+  [
+   7378150.673157752,
+   "7.37815e+06"
+  ],
+  [
+   123204429.69671912,
+   "1.23204e+08"
+  ],
+  [
+   0.20638,
+   "0.20638"
+  ],
+  [
+   737899729.0,
+   "7.379e+08"
+  ],
+  [
+   -649598.8361248765,
+   "-649599"
+  ],
+  [
+   99.40811512900017,
+   "99.4081"
+  ],
+  [
+   0.364087,
+   "0.364087"
+  ],
+  [
+   642796039.0,
+   "6.42796e+08"
+  ],
+  [
+   2492980.1821424086,
+   "2.49298e+06"
+  ],
+  [
+   2.8621305984199656e-08,
+   "2.86213e-08"
+  ],
+  [
+   0.6788,
+   "0.6788"
+  ],
+  [
+   193804335.0,
+   "1.93804e+08"
+  ],
+  [
+   9694224.340464376,
+   "9.69422e+06"
+  ],
+  [
+   5.6013041106938776e-05,
+   "5.6013e-05"
+  ],
+  [
+   0.639519,
+   "0.639519"
+  ],
+  [
+   459997457.0,
+   "4.59997e+08"
+  ],
+  [
+   7337388.212366704,
+   "7.33739e+06"
+  ],
+  [
+   3.206226376042266e-06,
+   "3.20623e-06"
+  ],
+  [
+   0.05927356,
+   "0.0592736"
+  ],
+  [
+   838311463.0,
+   "8.38311e+08"
+  ],
+  [
+   3395223.656866297,
+   "3.39522e+06"
+  ],
+  [
+   21.384005241277777,
+   "21.384"
+  ],
+  [
+   0.4206,
+   "0.4206"
+  ],
+  [
+   495784187.0,
+   "4.95784e+08"
+  ],
+  [
+   6627584.529282989,
+   "6.62758e+06"
+  ],
+  [
+   43373.678800354144,
+   "43373.7"
+  ],
+  [
+   0.83200135,
+   "0.832001"
+  ],
+  [
+   872269434.0,
+   "8.72269e+08"
+  ],
+  [
+   -9873983.644821193,
+   "-9.87398e+06"
+  ],
+  [
+   17103039.172504168,
+   "1.7103e+07"
+  ],
+  [
+   0.347,
+   "0.347"
+  ],
+  [
+   654880704.0,
+   "6.54881e+08"
+  ],
+  [
+   -744646.210169388,
+   "-744646"
+  ],
+  [
+   80.87420789872816,
+   "80.8742"
+  ],
+  [
+   0.9932044,
+   "0.993204"
+  ],
+  [
+   808206801.0,
+   "8.08207e+08"
+  ],
+  [
+   284921.6253206134,
+   "284922"
+  ],
+  [
+   7.635119949674796e-08,
+   "7.63512e-08"
+  ],
+  [
+   0.38009,
+   "0.38009"
+  ],
+  [
+   398385519.0,
+   "3.98386e+08"
+  ],
+  [
+   -6794265.456009889,
+   "-6.79427e+06"
+  ],
+  [
+   671667958893.6636,
+   "6.71668e+11"
+  ],
+  [
+   1.0,
+   "1"
+  ],
+  [
+   29145507.0,
+   "2.91455e+07"
+  ],
+  [
+   739785.1236177441,
+   "739785"
+  ],
+  [
+   4445130753.713813,
+   "4.44513e+09"
+  ],
+  [
+   0.2,
+   "0.2"
+  ],
+  [
+   144115518.0,
+   "1.44116e+08"
+  ],
+  [
+   -3557988.1339299437,
+   "-3.55799e+06"
+  ],
+  [
+   566.9049289307712,
+   "566.905"
+  ],
+  [
+   0.67,
+   "0.67"
+  ],
+  [
+   759140815.0,
+   "7.59141e+08"
+  ],
+  [
+   -3793674.210266076,
+   "-3.79367e+06"
+  ],
+  [
+   637387.8525806942,
+   "637388"
+  ],
+  [
+   0.416881,
+   "0.416881"
+  ],
+  [
+   16749899.0,
+   "1.67499e+07"
+  ],
+  [
+   -5742038.801223813,
+   "-5.74204e+06"
+  ],
+  [
+   510316.067874037,
+   "510316"
+  ],
+  [
+   0.1194,
+   "0.1194"
+  ],
+  [
+   278442316.0,
+   "2.78442e+08"
+  ],
+  [
+   -1662564.1331527308,
+   "-1.66256e+06"
+  ],
+  [
+   33185837093.494926,
+   "3.31858e+10"
+  ],
+  [
+   0.2,
+   "0.2"
+  ],
+  [
+   402763734.0,
+   "4.02764e+08"
+  ],
+  [
+   -1608835.0689559132,
+   "-1.60884e+06"
+  ],
+  [
+   642547.3511149103,
+   "642547"
+  ],
+  [
+   0.29575,
+   "0.29575"
+  ],
+  [
+   297304818.0,
+   "2.97305e+08"
+  ],
+  [
+   8062472.668726638,
+   "8.06247e+06"
+  ],
+  [
+   216598315301.6907,
+   "2.16598e+11"
+  ],
+  [
+   0.944,
+   "0.944"
+  ],
+  [
+   825393577.0,
+   "8.25394e+08"
+  ],
+  [
+   -2169475.8312753355,
+   "-2.16948e+06"
+  ],
+  [
+   6.795664954653509e-05,
+   "6.79566e-05"
+  ],
+  [
+   0.894,
+   "0.894"
+  ],
+  [
+   171163932.0,
+   "1.71164e+08"
+  ],
+  [
+   -3255016.2706159847,
+   "-3.25502e+06"
+  ],
+  [
+   140.51157944961858,
+   "140.512"
+  ],
+  [
+   0.0716,
+   "0.0716"
+  ],
+  [
+   509626230.0,
+   "5.09626e+08"
+  ],
+  [
+   8258989.902933493,
+   "8.25899e+06"
+  ],
+  [
+   0.21984906970665657,
+   "0.219849"
+  ],
+  [
+   0.5638953,
+   "0.563895"
+  ],
+  [
+   268711975.0,
+   "2.68712e+08"
+  ],
+  [
+   1097396.703679189,
+   "1.0974e+06"
+  ],
+  [
+   49797536646.9648,
+   "4.97975e+10"
+  ],
+  [
+   0.547578,
+   "0.547578"
+  ],
+  [
+   463962746.0,
+   "4.63963e+08"
+  ],
+  [
+   1093434.0702075101,
+   "1.09343e+06"
+  ],
+  [
+   9.062304854400041e-07,
+   "9.0623e-07"
+  ],
+  [
+   0.881367,
+   "0.881367"
+  ],
+  [
+   214516124.0,
+   "2.14516e+08"
+  ],
+  [
+   6882309.724543009,
+   "6.88231e+06"
+  ],
+  [
+   16557088.72977182,
+   "1.65571e+07"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   651923726.0,
+   "6.51924e+08"
+  ],
+  [
+   7302674.523865599,
+   "7.30267e+06"
+  ],
+  [
+   1610099062.1980662,
+   "1.6101e+09"
+  ],
+  [
+   0.8705,
+   "0.8705"
+  ],
+  [
+   96252222.0,
+   "9.62522e+07"
+  ],
+  [
+   -6665273.758052772,
+   "-6.66527e+06"
+  ],
+  [
+   31.37594133409459,
+   "31.3759"
+  ],
+  [
+   0.074,
+   "0.074"
+  ],
+  [
+   558041691.0,
+   "5.58042e+08"
+  ],
+  [
+   8355340.395723142,
+   "8.35534e+06"
+  ],
+  [
+   0.11378284179546076,
+   "0.113783"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   321818607.0,
+   "3.21819e+08"
+  ],
+  [
+   -4663630.228390429,
+   "-4.66363e+06"
+  ],
+  [
+   0.009398881981449541,
+   "0.00939888"
+  ],
+  [
+   0.51719,
+   "0.51719"
+  ],
+  [
+   864786118.0,
+   "8.64786e+08"
+  ],
+  [
+   -5984034.803598273,
+   "-5.98403e+06"
+  ],
+  [
+   102707008981.45172,
+   "1.02707e+11"
+  ],
+  [
+   0.99591791,
+   "0.995918"
+  ],
+  [
+   371125673.0,
+   "3.71126e+08"
+  ],
+  [
+   -9173638.716043407,
+   "-9.17364e+06"
+  ],
+  [
+   7.803820404522619e-08,
+   "7.80382e-08"
+  ],
+  [
+   0.421354,
+   "0.421354"
+  ],
+  [
+   171582989.0,
+   "1.71583e+08"
+  ],
+  [
+   8983912.93519855,
+   "8.98391e+06"
+  ],
+  [
+   1318763.1550647542,
+   "1.31876e+06"
+  ],
+  [
+   0.7163,
+   "0.7163"
+  ],
+  [
+   651142876.0,
+   "6.51143e+08"
+  ],
+  [
+   -7678762.256542855,
+   "-7.67876e+06"
+  ],
+  [
+   1.2295072162503633e-08,
+   "1.22951e-08"
+  ],
+  [
+   0.6535442,
+   "0.653544"
+  ],
+  [
+   373019963.0,
+   "3.7302e+08"
+  ],
+  [
+   2279916.898384718,
+   "2.27992e+06"
+  ],
+  [
+   0.00037044992619275104,
+   "0.00037045"
+  ],
+  [
+   0.004181,
+   "0.004181"
+  ],
+  [
+   315231176.0,
+   "3.15231e+08"
+  ],
+  [
+   -535770.6357467305,
+   "-535771"
+  ],
+  [
+   6.304483313778686e-06,
+   "6.30448e-06"
+  ],
+  [
+   0.86,
+   "0.86"
+  ],
+  [
+   42597813.0,
+   "4.25978e+07"
+  ],
+  [
+   -1495586.1868103165,
+   "-1.49559e+06"
+  ],
+  [
+   15581865271.94579,
+   "1.55819e+10"
+  ],
+  [
+   0.618,
+   "0.618"
+  ],
+  [
+   676092474.0,
+   "6.76092e+08"
+  ],
+  [
+   2008733.9215555694,
+   "2.00873e+06"
+  ],
+  [
+   6.159158195899234e-06,
+   "6.15916e-06"
+  ],
+  [
+   0.666885,
+   "0.666885"
+  ],
+  [
+   858904028.0,
+   "8.58904e+08"
+  ],
+  [
+   759669.2739774883,
+   "759669"
+  ],
+  [
+   21696.220975618457,
+   "21696.2"
+  ],
+  [
+   0.8668495,
+   "0.86685"
+  ],
+  [
+   334178389.0,
+   "3.34178e+08"
+  ],
+  [
+   1465388.8584469594,
+   "1.46539e+06"
+  ],
+  [
+   292.18579545730586,
+   "292.186"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   996253017.0,
+   "9.96253e+08"
+  ],
+  [
+   -6195585.020877905,
+   "-6.19559e+06"
+  ],
+  [
+   97876618.96777175,
+   "9.78766e+07"
+  ],
+  [
+   0.1487,
+   "0.1487"
+  ],
+  [
+   303684360.0,
+   "3.03684e+08"
+  ],
+  [
+   7918390.117582601,
+   "7.91839e+06"
+  ],
+  [
+   0.22198863499805802,
+   "0.221989"
+  ],
+  [
+   0.29,
+   "0.29"
+  ],
+  [
+   2442476.0,
+   "2.44248e+06"
+  ],
+  [
+   -5924050.129187916,
+   "-5.92405e+06"
+  ],
+  [
+   32683.18894529179,
+   "32683.2"
+  ],
+  [
+   0.84596467,
+   "0.845965"
+  ],
+  [
+   166475728.0,
+   "1.66476e+08"
+  ],
+  [
+   -4109441.9174534734,
+   "-4.10944e+06"
+  ],
+  [
+   98805.39337605264,
+   "98805.4"
+  ],
+  [
+   0.6139957,
+   "0.613996"
+  ],
+  [
+   372006540.0,
+   "3.72007e+08"
+  ],
+  [
+   8465654.149838809,
+   "8.46565e+06"
+  ],
+  [
+   8.341993205000194e-08,
+   "8.34199e-08"
+  ],
+  [
+   0.291,
+   "0.291"
+  ],
+  [
+   776266478.0,
+   "7.76266e+08"
+  ],
+  [
+   -917288.933309814,
+   "-917289"
+  ],
+  [
+   436093.3203852693,
+   "436093"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   622500512.0,
+   "6.22501e+08"
+  ],
+  [
+   -9360375.956106763,
+   "-9.36038e+06"
+  ],
+  [
+   9924066.973528525,
+   "9.92407e+06"
+  ],
+  [
+   0.19022,
+   "0.19022"
+  ],
+  [
+   657492168.0,
+   "6.57492e+08"
+  ],
+  [
+   -5692106.420840661,
+   "-5.69211e+06"
+  ],
+  [
+   1305.5018664297722,
+   "1305.5"
+  ],
+  [
+   0.3341,
+   "0.3341"
+  ],
+  [
+   84829543.0,
+   "8.48295e+07"
+  ],
+  [
+   9052617.986715432,
+   "9.05262e+06"
+  ],
+  [
+   0.0013188356337550486,
+   "0.00131884"
+  ],
+  [
+   0.013,
+   "0.013"
+  ],
+  [
+   663620117.0,
+   "6.6362e+08"
+  ],
+  [
+   -3471684.6565595614,
+   "-3.47168e+06"
+  ],
+  [
+   75.64562317349325,
+   "75.6456"
+  ],
+  [
+   0.689337,
+   "0.689337"
+  ],
+  [
+   9646419.0,
+   "9.64642e+06"
+  ],
+  [
+   5112047.598989869,
+   "5.11205e+06"
+  ],
+  [
+   68.12177391127717,
+   "68.1218"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   960184501.0,
+   "9.60185e+08"
+  ],
+  [
+   278486.65091518685,
+   "278487"
+  ],
+  [
+   84319736288.44774,
+   "8.43197e+10"
+  ],
+  [
+   0.7348163,
+   "0.734816"
+  ],
+  [
+   576373939.0,
+   "5.76374e+08"
+  ],
+  [
+   4481392.06317885,
+   "4.48139e+06"
+  ],
+  [
+   0.296086943588481,
+   "0.296087"
+  ],
+  [
+   0.0,
+   "0"
+  ],
+  [
+   884824047.0,
+   "8.84824e+08"
+  ],
+  [
+   4295385.2041417025,
+   "4.29539e+06"
+  ],
+  [
+   0.00016574161085506077,
+   "0.000165742"
+  ],
+  [
+   0.02465,
+   "0.02465"
+  ],
+  [
+   687913712.0,
+   "6.87914e+08"
+  ],
+  [
+   747881.0026253853,
+   "747881"
+  ],
+  [
+   151297.46626348194,
+   "151297"
+  ],
+  [
+   0.48946,
+   "0.48946"
+  ],
+  [
+   961337554.0,
+   "9.61338e+08"
+  ],
+  [
+   5137148.56833227,
+   "5.13715e+06"
+  ],
+  [
+   1.904017866827852e-05,
+   "1.90402e-05"
+  ],
+  [
+   0.28854,
+   "0.28854"
+  ],
+  [
+   713269616.0,
+   "7.1327e+08"
+  ],
+  [
+   4821712.412292669,
+   "4.82171e+06"
+  ],
+  [
+   3252.6551415826198,
+   "3252.66"
+  ],
+  [
+   0.1356903,
+   "0.13569"
+  ],
+  [
+   76504850.0,
+   "7.65048e+07"
+  ],
+  [
+   -357350.88345822133,
+   "-357351"
+  ],
+  [
+   5.049651422619918e-08,
+   "5.04965e-08"
+  ],
+  [
+   0.0044058,
+   "0.0044058"
+  ],
+  [
+   455314545.0,
+   "4.55315e+08"
+  ],
+  [
+   7031325.392210051,
+   "7.03133e+06"
+  ],
+  [
+   0.06165517959530842,
+   "0.0616552"
+  ],
+  [
+   0.6871,
+   "0.6871"
+  ],
+  [
+   968215542.0,
+   "9.68216e+08"
+  ],
+  [
+   3504336.9136648234,
+   "3.50434e+06"
+  ],
+  [
+   460004927.7982951,
+   "4.60005e+08"
+  ],
+  [
+   0.4235,
+   "0.4235"
+  ],
+  [
+   438044762.0,
+   "4.38045e+08"
+  ],
+  [
+   7693314.312290333,
+   "7.69331e+06"
+  ],
+  [
+   56163391061.35285,
+   "5.61634e+10"
+  ],
+  [
+   0.2211,
+   "0.2211"
+  ],
+  [
+   974583824.0,
+   "9.74584e+08"
+  ],
+  [
+   -198582.3267001994,
+   "-198582"
+  ],
+  [
+   0.0001310331931702746,
+   "0.000131033"
+  ],
+  [
+   0.24,
+   "0.24"
+  ],
+  [
+   885048548.0,
+   "8.85049e+08"
+  ],
+  [
+   5490059.608085072,
+   "5.49006e+06"
+  ],
+  [
+   2020947580356.0183,
+   "2.02095e+12"
+  ],
+  [
+   0.8241,
+   "0.8241"
+  ],
+  [
+   857414217.0,
+   "8.57414e+08"
+  ],
+  [
+   9195317.303003669,
+   "9.19532e+06"
+  ],
+  [
+   42545753.81702343,
+   "4.25458e+07"
+  ],
+  [
+   0.178,
+   "0.178"
+  ],
+  [
+   678487267.0,
+   "6.78487e+08"
+  ],
+  [
+   4683684.330252701,
+   "4.68368e+06"
+  ],
+  [
+   380310903444.6246,
+   "3.80311e+11"
+  ],
+  [
+   0.22025459,
+   "0.220255"
+  ],
+  [
+   410486725.0,
+   "4.10487e+08"
+  ],
+  [
+   6813241.669788893,
+   "6.81324e+06"
+  ],
+  [
+   17.945484887785675,
+   "17.9455"
+  ],
+  [
+   0.063602,
+   "0.063602"
+  ],
+  [
+   875882045.0,
+   "8.75882e+08"
+  ],
+  [
+   -2113213.0106308125,
+   "-2.11321e+06"
+  ],
+  [
+   243916700783.5937,
+   "2.43917e+11"
+  ],
+  [
+   0.1467,
+   "0.1467"
+  ],
+  [
+   164200373.0,
+   "1.642e+08"
+  ],
+  [
+   -3569965.23701002,
+   "-3.56997e+06"
+  ],
+  [
+   417381041227.58,
+   "4.17381e+11"
+  ],
+  [
+   0.651407,
+   "0.651407"
+  ],
+  [
+   524999016.0,
+   "5.24999e+08"
+  ],
+  [
+   -2758338.8725603437,
+   "-2.75834e+06"
+  ],
+  [
+   24835875.246540885,
+   "2.48359e+07"
+  ],
+  [
+   0.74897138,
+   "0.748971"
+  ],
+  [
+   115524647.0,
+   "1.15525e+08"
+  ],
+  [
+   -4279928.191998372,
+   "-4.27993e+06"
+  ],
+  [
+   0.0003257903497158387,
+   "0.00032579"
+  ],
+  [
+   0.802,
+   "0.802"
+  ],
+  [
+   225035.0,
+   "225035"
+  ],
+  [
+   -445110.4925055243,
+   "-445110"
+  ],
+  [
+   0.00036764394346774676,
+   "0.000367644"
+  ],
+  [
+   0.6,
+   "0.6"
+  ],
+  [
+   362633771.0,
+   "3.62634e+08"
+  ],
+  [
+   -4799570.563715272,
+   "-4.79957e+06"
+  ],
+  [
+   4.543083170598916e-05,
+   "4.54308e-05"
+  ],
+  [
+   0.64526458,
+   "0.645265"
+  ],
+  [
+   357511698.0,
+   "3.57512e+08"
+  ],
+  [
+   -7652306.667224236,
+   "-7.65231e+06"
+  ],
+  [
+   3.455951566963815,
+   "3.45595"
+  ],
+  [
+   0.4935,
+   "0.4935"
+  ],
+  [
+   766158691.0,
+   "7.66159e+08"
+  ],
+  [
+   9648549.355140477,
+   "9.64855e+06"
+  ],
+  [
+   0.2927598084768847,
+   "0.29276"
+  ],
+  [
+   0.92756,
+   "0.92756"
+  ],
+  [
+   360394009.0,
+   "3.60394e+08"
+  ],
+  [
+   9039616.360221088,
+   "9.03962e+06"
+  ],
+  [
+   1137.6592222974964,
+   "1137.66"
+  ],
+  [
+   0.3276184,
+   "0.327618"
+  ],
+  [
+   378209404.0,
+   "3.78209e+08"
+  ],
+  [
+   -8956183.463119332,
+   "-8.95618e+06"
+  ],
+  [
+   3.892655134552463e-07,
+   "3.89266e-07"
+  ],
+  [
+   0.01650886,
+   "0.0165089"
+  ],
+  [
+   270226649.0,
+   "2.70227e+08"
+  ],
+  [
+   5755834.189852798,
+   "5.75583e+06"
+  ],
+  [
+   93510898.33607438,
+   "9.35109e+07"
+  ],
+  [
+   0.633541,
+   "0.633541"
+  ],
+  [
+   944907041.0,
+   "9.44907e+08"
+  ],
+  [
+   411680.054672461,
+   "411680"
+  ],
+  [
+   0.00020471462329114644,
+   "0.000204715"
+  ],
+  [
+   0.7823628,
+   "0.782363"
+  ],
+  [
+   553841244.0,
+   "5.53841e+08"
+  ],
+  [
+   5132830.508770712,
+   "5.13283e+06"
+  ],
+  [
+   5.9928494945101044e-05,
+   "5.99285e-05"
+  ],
+  [
+   0.8899568,
+   "0.889957"
+  ],
+  [
+   842908613.0,
+   "8.42909e+08"
+  ],
+  [
+   -9467050.674412476,
+   "-9.46705e+06"
+  ],
+  [
+   65.41183624276064,
+   "65.4118"
+  ],
+  [
+   0.78814253,
+   "0.788143"
+  ],
+  [
+   661968204.0,
+   "6.61968e+08"
+  ],
+  [
+   3634684.403622303,
+   "3.63468e+06"
+  ],
+  [
+   3.03156832550544,
+   "3.03157"
+  ],
+  [
+   0.5196724,
+   "0.519672"
+  ],
+  [
+   353578884.0,
+   "3.53579e+08"
+  ],
+  [
+   2200370.615916161,
+   "2.20037e+06"
+  ],
+  [
+   0.0004389597653948932,
+   "0.00043896"
+  ],
+  [
+   0.8349,
+   "0.8349"
+  ],
+  [
+   736755956.0,
+   "7.36756e+08"
+  ],
+  [
+   -2476154.4927580915,
+   "-2.47615e+06"
+  ],
+  [
+   8335978.801680876,
+   "8.33598e+06"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   194584045.0,
+   "1.94584e+08"
+  ],
+  [
+   9557951.252490636,
+   "9.55795e+06"
+  ],
+  [
+   1.0087837220334142e-05,
+   "1.00878e-05"
+  ],
+  [
+   0.83790247,
+   "0.837902"
+  ],
+  [
+   770607346.0,
+   "7.70607e+08"
+  ],
+  [
+   -3655523.9113826966,
+   "-3.65552e+06"
+  ],
+  [
+   1666.381932372786,
+   "1666.38"
+  ],
+  [
+   0.9276021,
+   "0.927602"
+  ],
+  [
+   822534994.0,
+   "8.22535e+08"
+  ],
+  [
+   2439313.061385745,
+   "2.43931e+06"
+  ],
+  [
+   1959933571.1524804,
+   "1.95993e+09"
+  ],
+  [
+   0.0608647,
+   "0.0608647"
+  ],
+  [
+   112470003.0,
+   "1.1247e+08"
+  ],
+  [
+   6615940.470105104,
+   "6.61594e+06"
+  ],
+  [
+   49529828379.13615,
+   "4.95298e+10"
+  ],
+  [
+   0.2596,
+   "0.2596"
+  ],
+  [
+   55093652.0,
+   "5.50937e+07"
+  ],
+  [
+   9154302.411471613,
+   "9.1543e+06"
+  ],
+  [
+   0.0022874656154274436,
+   "0.00228747"
+  ],
+  [
+   0.5167,
+   "0.5167"
+  ],
+  [
+   119569579.0,
+   "1.1957e+08"
+  ],
+  [
+   -9974073.34218549,
+   "-9.97407e+06"
+  ],
+  [
+   26430522301.69792,
+   "2.64305e+10"
+  ],
+  [
+   0.410975,
+   "0.410975"
+  ],
+  [
+   331995335.0,
+   "3.31995e+08"
+  ],
+  [
+   -9180928.40924101,
+   "-9.18093e+06"
+  ],
+  [
+   3238707.810494223,
+   "3.23871e+06"
+  ],
+  [
+   0.3152,
+   "0.3152"
+  ],
+  [
+   723020116.0,
+   "7.2302e+08"
+  ],
+  [
+   3848008.929057276,
+   "3.84801e+06"
+  ],
+  [
+   11845.268834026414,
+   "11845.3"
+  ],
+  [
+   0.495,
+   "0.495"
+  ],
+  [
+   39083640.0,
+   "3.90836e+07"
+  ],
+  [
+   9023115.812374882,
+   "9.02312e+06"
+  ],
+  [
+   8.326543254858199e-09,
+   "8.32654e-09"
+  ],
+  [
+   0.558878,
+   "0.558878"
+  ],
+  [
+   603584540.0,
+   "6.03585e+08"
+  ],
+  [
+   -9770301.988593895,
+   "-9.7703e+06"
+  ],
+  [
+   35888881217.71988,
+   "3.58889e+10"
+  ],
+  [
+   0.274317,
+   "0.274317"
+  ],
+  [
+   922641346.0,
+   "9.22641e+08"
+  ],
+  [
+   -2593497.3194870083,
+   "-2.5935e+06"
+  ],
+  [
+   0.0018099952126672749,
+   "0.00181"
+  ],
+  [
+   0.061,
+   "0.061"
+  ],
+  [
+   871209359.0,
+   "8.71209e+08"
+  ],
+  [
+   9259554.00836365,
+   "9.25955e+06"
+  ],
+  [
+   0.0005373808317545775,
+   "0.000537381"
+  ],
+  [
+   0.4,
+   "0.4"
+  ],
+  [
+   147711628.0,
+   "1.47712e+08"
+  ],
+  [
+   -8968308.05537142,
+   "-8.96831e+06"
+  ],
+  [
+   226964.23222993128,
+   "226964"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   545577494.0,
+   "5.45577e+08"
+  ],
+  [
+   -9825911.464041267,
+   "-9.82591e+06"
+  ],
+  [
+   0.00011996012879827937,
+   "0.00011996"
+  ],
+  [
+   0.95033106,
+   "0.950331"
+  ],
+  [
+   353123190.0,
+   "3.53123e+08"
+  ],
+  [
+   8954710.820754565,
+   "8.95471e+06"
+  ],
+  [
+   0.021167980487040987,
+   "0.021168"
+  ],
+  [
+   0.4546,
+   "0.4546"
+  ],
+  [
+   821293905.0,
+   "8.21294e+08"
+  ],
+  [
+   -5177960.156152257,
+   "-5.17796e+06"
+  ],
+  [
+   3466418.852252,
+   "3.46642e+06"
+  ],
+  [
+   0.3135362,
+   "0.313536"
+  ],
+  [
+   174642075.0,
+   "1.74642e+08"
+  ],
+  [
+   5926104.98804366,
+   "5.9261e+06"
+  ],
+  [
+   0.0005812175942288775,
+   "0.000581218"
+  ],
+  [
+   0.18822,
+   "0.18822"
+  ],
+  [
+   960360126.0,
+   "9.6036e+08"
+  ],
+  [
+   -8854599.974527504,
+   "-8.8546e+06"
+  ],
+  [
+   13293.550809398932,
+   "13293.6"
+  ],
+  [
+   0.662106,
+   "0.662106"
+  ],
+  [
+   156395830.0,
+   "1.56396e+08"
+  ],
+  [
+   6314559.518145267,
+   "6.31456e+06"
+  ],
+  [
+   5.724776630398969e-05,
+   "5.72478e-05"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   59567843.0,
+   "5.95678e+07"
+  ],
+  [
+   -5671148.166512874,
+   "-5.67115e+06"
+  ],
+  [
+   33290356.59671661,
+   "3.32904e+07"
+  ],
+  [
+   0.384,
+   "0.384"
+  ],
+  [
+   699589982.0,
+   "6.9959e+08"
+  ],
+  [
+   -2557730.124079436,
+   "-2.55773e+06"
+  ],
+  [
+   1207591.1367873542,
+   "1.20759e+06"
+  ],
+  [
+   0.93,
+   "0.93"
+  ],
+  [
+   412746879.0,
+   "4.12747e+08"
+  ],
+  [
+   6919048.484339453,
+   "6.91905e+06"
+  ],
+  [
+   34.43084975772386,
+   "34.4308"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   395534658.0,
+   "3.95535e+08"
+  ],
+  [
+   9559004.42614241,
+   "9.559e+06"
+  ],
+  [
+   4157026714.986147,
+   "4.15703e+09"
+  ],
+  [
+   0.8471388,
+   "0.847139"
+  ],
+  [
+   868295722.0,
+   "8.68296e+08"
+  ],
+  [
+   3747692.147149671,
+   "3.74769e+06"
+  ],
+  [
+   14.136906387589502,
+   "14.1369"
+  ],
+  [
+   0.86326,
+   "0.86326"
+  ],
+  [
+   359421265.0,
+   "3.59421e+08"
+  ],
+  [
+   3976894.522538949,
+   "3.97689e+06"
+  ],
+  [
+   0.004409061942931288,
+   "0.00440906"
+  ],
+  [
+   0.073278,
+   "0.073278"
+  ],
+  [
+   519063580.0,
+   "5.19064e+08"
+  ],
+  [
+   -7812010.18642189,
+   "-7.81201e+06"
+  ],
+  [
+   108.20454613716724,
+   "108.205"
+  ],
+  [
+   0.6662,
+   "0.6662"
+  ],
+  [
+   819455902.0,
+   "8.19456e+08"
+  ],
+  [
+   -8466264.826808142,
+   "-8.46626e+06"
+  ],
+  [
+   6389576588.339134,
+   "6.38958e+09"
+  ],
+  [
+   0.02112,
+   "0.02112"
+  ],
+  [
+   174644201.0,
+   "1.74644e+08"
+  ],
+  [
+   -9808456.76496632,
+   "-9.80846e+06"
+  ],
+  [
+   1.0714128236575697,
+   "1.07141"
+  ],
+  [
+   0.63,
+   "0.63"
+  ],
+  [
+   649740620.0,
+   "6.49741e+08"
+  ],
+  [
+   725272.3284551911,
+   "725272"
+  ],
+  [
+   1.499709504963487e-08,
+   "1.49971e-08"
+  ],
+  [
+   0.565054,
+   "0.565054"
+  ],
+  [
+   808688779.0,
+   "8.08689e+08"
+  ],
+  [
+   7877172.329810437,
+   "7.87717e+06"
+  ],
+  [
+   1.4093334988339766e-08,
+   "1.40933e-08"
+  ],
+  [
+   0.63105,
+   "0.63105"
+  ],
+  [
+   679784060.0,
+   "6.79784e+08"
+  ],
+  [
+   6298013.640532611,
+   "6.29801e+06"
+  ],
+  [
+   8.448073786157194e-05,
+   "8.44807e-05"
+  ],
+  [
+   0.0781,
+   "0.0781"
+  ],
+  [
+   439752767.0,
+   "4.39753e+08"
+  ],
+  [
+   8704571.392906126,
+   "8.70457e+06"
+  ],
+  [
+   103751043.64516999,
+   "1.03751e+08"
+  ],
+  [
+   0.747,
+   "0.747"
+  ],
+  [
+   910164432.0,
+   "9.10164e+08"
+  ],
+  [
+   -5589878.380829865,
+   "-5.58988e+06"
+  ],
+  [
+   33160453.240135442,
+   "3.31605e+07"
+  ],
+  [
+   0.964977,
+   "0.964977"
+  ],
+  [
+   736221056.0,
+   "7.36221e+08"
+  ],
+  [
+   -615585.1405555103,
+   "-615585"
+  ],
+  [
+   5663763278.040682,
+   "5.66376e+09"
+  ],
+  [
+   0.205,
+   "0.205"
+  ],
+  [
+   205387953.0,
+   "2.05388e+08"
+  ],
+  [
+   -5481818.172401476,
+   "-5.48182e+06"
+  ],
+  [
+   4.12282471470666e-07,
+   "4.12282e-07"
+  ],
+  [
+   0.18788572,
+   "0.187886"
+  ],
+  [
+   388527991.0,
+   "3.88528e+08"
+  ],
+  [
+   -1115156.7068343237,
+   "-1.11516e+06"
+  ],
+  [
+   63956777569.18372,
+   "6.39568e+10"
+  ],
+  [
+   0.85552,
+   "0.85552"
+  ],
+  [
+   301277867.0,
+   "3.01278e+08"
+  ],
+  [
+   377946.27945140935,
+   "377946"
+  ],
+  [
+   7.699459907051288e-08,
+   "7.69946e-08"
+  ],
+  [
+   0.398,
+   "0.398"
+  ],
+  [
+   552551608.0,
+   "5.52552e+08"
+  ],
+  [
+   -3442661.115600263,
+   "-3.44266e+06"
+  ],
+  [
+   60.43313423405467,
+   "60.4331"
+  ],
+  [
+   0.283,
+   "0.283"
+  ],
+  [
+   694273685.0,
+   "6.94274e+08"
+  ],
+  [
+   8666138.844188664,
+   "8.66614e+06"
+  ],
+  [
+   0.00045644580978182817,
+   "0.000456446"
+  ],
+  [
+   0.939,
+   "0.939"
+  ],
+  [
+   424271713.0,
+   "4.24272e+08"
+  ],
+  [
+   -1451851.3290108796,
+   "-1.45185e+06"
+  ],
+  [
+   2529.1360044196967,
+   "2529.14"
+  ],
+  [
+   0.016,
+   "0.016"
+  ],
+  [
+   338635954.0,
+   "3.38636e+08"
+  ],
+  [
+   3710984.3086915333,
+   "3.71098e+06"
+  ],
+  [
+   2023346.5007593841,
+   "2.02335e+06"
+  ],
+  [
+   0.93,
+   "0.93"
+  ],
+  [
+   373154505.0,
+   "3.73155e+08"
+  ],
+  [
+   -3973707.022815289,
+   "-3.97371e+06"
+  ],
+  [
+   9.831685261135447e-08,
+   "9.83169e-08"
+  ],
+  [
+   0.81,
+   "0.81"
+  ],
+  [
+   442989326.0,
+   "4.42989e+08"
+  ],
+  [
+   -9818528.660110243,
+   "-9.81853e+06"
+  ],
+  [
+   6.938172795215238e-05,
+   "6.93817e-05"
+  ],
+  [
+   0.73,
+   "0.73"
+  ],
+  [
+   337176740.0,
+   "3.37177e+08"
+  ],
+  [
+   9223528.338391569,
+   "9.22353e+06"
+  ],
+  [
+   142239.07720813007,
+   "142239"
+  ],
+  [
+   0.71,
+   "0.71"
+  ],
+  [
+   513883591.0,
+   "5.13884e+08"
+  ],
+  [
+   -1095040.9208367243,
+   "-1.09504e+06"
+  ],
+  [
+   0.0001829321819281499,
+   "0.000182932"
+  ],
+  [
+   0.23047,
+   "0.23047"
+  ],
+  [
+   964481225.0,
+   "9.64481e+08"
+  ],
+  [
+   -4219300.254262593,
+   "-4.2193e+06"
+  ],
+  [
+   167845491.62289417,
+   "1.67845e+08"
+  ],
+  [
+   0.7898615,
+   "0.789861"
+  ],
+  [
+   903535850.0,
+   "9.03536e+08"
+  ],
+  [
+   -9582269.518820485,
+   "-9.58227e+06"
+  ],
+  [
+   745141407.8330442,
+   "7.45141e+08"
+  ],
+  [
+   0.80661,
+   "0.80661"
+  ],
+  [
+   286970851.0,
+   "2.86971e+08"
+  ],
+  [
+   2703904.451669937,
+   "2.7039e+06"
+  ],
+  [
+   6.740115393349023e-08,
+   "6.74012e-08"
+  ],
+  [
+   0.7408,
+   "0.7408"
+  ],
+  [
+   228908988.0,
+   "2.28909e+08"
+  ],
+  [
+   4401582.294185424,
+   "4.40158e+06"
+  ],
+  [
+   44660724.06773328,
+   "4.46607e+07"
+  ],
+  [
+   0.35,
+   "0.35"
+  ],
+  [
+   812180706.0,
+   "8.12181e+08"
+  ],
+  [
+   -3280970.5304867513,
+   "-3.28097e+06"
+  ],
+  [
+   428283116394.09814,
+   "4.28283e+11"
+  ],
+  [
+   0.62178,
+   "0.62178"
+  ],
+  [
+   176264854.0,
+   "1.76265e+08"
+  ],
+  [
+   250066.38316278718,
+   "250066"
+  ],
+  [
+   1114773339742.0835,
+   "1.11477e+12"
+  ],
+  [
+   0.6982,
+   "0.6982"
+  ],
+  [
+   9477586.0,
+   "9.47759e+06"
+  ],
+  [
+   -4692130.301392079,
+   "-4.69213e+06"
+  ],
+  [
+   15070318089.412481,
+   "1.50703e+10"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   588337721.0,
+   "5.88338e+08"
+  ],
+  [
+   -8226764.954489537,
+   "-8.22676e+06"
+  ],
+  [
+   130.57833195749947,
+   "130.578"
+  ],
+  [
+   0.729,
+   "0.729"
+  ],
+  [
+   753997138.0,
+   "7.53997e+08"
+  ],
+  [
+   -8082483.212616764,
+   "-8.08248e+06"
+  ],
+  [
+   13217721.378168605,
+   "1.32177e+07"
+  ],
+  [
+   0.0,
+   "0"
+  ],
+  [
+   138824492.0,
+   "1.38824e+08"
+  ],
+  [
+   572519.2775060441,
+   "572519"
+  ],
+  [
+   190918327668.97345,
+   "1.90918e+11"
+  ],
+  [
+   0.5285589,
+   "0.528559"
+  ],
+  [
+   14724133.0,
+   "1.47241e+07"
+  ],
+  [
+   947733.484167546,
+   "947733"
+  ],
+  [
+   423806449356.76465,
+   "4.23806e+11"
+  ],
+  [
+   0.07,
+   "0.07"
+  ],
+  [
+   377358872.0,
+   "3.77359e+08"
+  ],
+  [
+   -6487363.257660013,
+   "-6.48736e+06"
+  ],
+  [
+   3.5183251331470407e-09,
+   "3.51833e-09"
+  ],
+  [
+   0.35,
+   "0.35"
+  ],
+  [
+   898955311.0,
+   "8.98955e+08"
+  ],
+  [
+   7014603.121430479,
+   "7.0146e+06"
+  ],
+  [
+   3949016590.889973,
+   "3.94902e+09"
+  ],
+  [
+   0.4966,
+   "0.4966"
+  ],
+  [
+   699093830.0,
+   "6.99094e+08"
+  ],
+  [
+   6161707.778158896,
+   "6.16171e+06"
+  ],
+  [
+   33114417626.047756,
+   "3.31144e+10"
+  ],
+  [
+   0.0842696,
+   "0.0842696"
+  ],
+  [
+   959285791.0,
+   "9.59286e+08"
+  ],
+  [
+   -754678.3553605545,
+   "-754678"
+  ],
+  [
+   10.92204027768323,
+   "10.922"
+  ],
+  [
+   0.91581,
+   "0.91581"
+  ],
+  [
+   274443490.0,
+   "2.74443e+08"
+  ],
+  [
+   5697922.237717977,
+   "5.69792e+06"
+  ],
+  [
+   88432316684.74464,
+   "8.84323e+10"
+  ],
+  [
+   0.8515721,
+   "0.851572"
+  ],
+  [
+   107837073.0,
+   "1.07837e+08"
+  ],
+  [
+   -4082460.2506976863,
+   "-4.08246e+06"
+  ],
+  [
+   1.4582402535764172,
+   "1.45824"
+  ],
+  [
+   0.9873,
+   "0.9873"
+  ],
+  [
+   384326352.0,
+   "3.84326e+08"
+  ],
+  [
+   -3929276.4996587224,
+   "-3.92928e+06"
+  ],
+  [
+   0.015763324426687354,
+   "0.0157633"
+  ],
+  [
+   0.32821169,
+   "0.328212"
+  ],
+  [
+   212692189.0,
+   "2.12692e+08"
+  ],
+  [
+   895368.0751843136,
+   "895368"
+  ],
+  [
+   2.7546366950060157e-08,
+   "2.75464e-08"
+  ],
+  [
+   0.48026958,
+   "0.48027"
+  ],
+  [
+   212818012.0,
+   "2.12818e+08"
+  ],
+  [
+   3127119.4056927115,
+   "3.12712e+06"
+  ],
+  [
+   47.22592086931043,
+   "47.2259"
+  ],
+  [
+   0.94,
+   "0.94"
+  ],
+  [
+   463693762.0,
+   "4.63694e+08"
+  ],
+  [
+   180382.4366567135,
+   "180382"
+  ],
+  [
+   1.391746290795024,
+   "1.39175"
+  ],
+  [
+   0.6,
+   "0.6"
+  ],
+  [
+   927633053.0,
+   "9.27633e+08"
+  ],
+  [
+   9160776.873618655,
+   "9.16078e+06"
+  ],
+  [
+   889595209.5741975,
+   "8.89595e+08"
+  ],
+  [
+   0.179,
+   "0.179"
+  ],
+  [
+   46086457.0,
+   "4.60865e+07"
+  ],
+  [
+   -2564652.0549193146,
+   "-2.56465e+06"
+  ],
+  [
+   404976837.0563431,
+   "4.04977e+08"
+  ],
+  [
+   0.2681,
+   "0.2681"
+  ],
+  [
+   992379830.0,
+   "9.9238e+08"
+  ],
+  [
+   -6886644.787517633,
+   "-6.88664e+06"
+  ],
+  [
+   0.0001154761974789898,
+   "0.000115476"
+  ],
+  [
+   0.24145794,
+   "0.241458"
+  ],
+  [
+   290848036.0,
+   "2.90848e+08"
+  ],
+  [
+   2242089.9246237054,
+   "2.24209e+06"
+  ],
+  [
+   451058521.17397463,
+   "4.51059e+08"
+  ],
+  [
+   0.262,
+   "0.262"
+  ],
+  [
+   282523161.0,
+   "2.82523e+08"
+  ],
+  [
+   6751575.43953317,
+   "6.75158e+06"
+  ],
+  [
+   3381219535.8985796,
+   "3.38122e+09"
+  ],
+  [
+   0.48187,
+   "0.48187"
+  ],
+  [
+   943960041.0,
+   "9.4396e+08"
+  ],
+  [
+   -7263146.802721038,
+   "-7.26315e+06"
+  ],
+  [
+   23993566572.52525,
+   "2.39936e+10"
+  ],
+  [
+   0.593,
+   "0.593"
+  ],
+  [
+   891825727.0,
+   "8.91826e+08"
+  ],
+  [
+   9637250.989997808,
+   "9.63725e+06"
+  ],
+  [
+   9.555555451583626e-05,
+   "9.55556e-05"
+  ],
+  [
+   0.12,
+   "0.12"
+  ],
+  [
+   980659334.0,
+   "9.80659e+08"
+  ],
+  [
+   -9184332.77245669,
+   "-9.18433e+06"
+  ],
+  [
+   446.4836650110319,
+   "446.484"
+  ],
+  [
+   0.7553045,
+   "0.755305"
+  ],
+  [
+   970624576.0,
+   "9.70625e+08"
+  ],
+  [
+   1314942.568366086,
+   "1.31494e+06"
+  ],
+  [
+   3.7896486776886498,
+   "3.78965"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   320462528.0,
+   "3.20463e+08"
+  ],
+  [
+   5483669.481093876,
+   "5.48367e+06"
+  ],
+  [
+   32504087806.184772,
+   "3.25041e+10"
+  ],
+  [
+   0.5798,
+   "0.5798"
+  ],
+  [
+   902911122.0,
+   "9.02911e+08"
+  ],
+  [
+   7937923.857989319,
+   "7.93792e+06"
+  ],
+  [
+   141.47280414669092,
+   "141.473"
+  ],
+  [
+   0.998553,
+   "0.998553"
+  ],
+  [
+   925777872.0,
+   "9.25778e+08"
+  ],
+  [
+   4070827.52392854,
+   "4.07083e+06"
+  ],
+  [
+   119297.8786915776,
+   "119298"
+  ],
+  [
+   0.905259,
+   "0.905259"
+  ],
+  [
+   709311172.0,
+   "7.09311e+08"
+  ],
+  [
+   -540924.0076273456,
+   "-540924"
+  ],
+  [
+   233.72542237804868,
+   "233.725"
+  ],
+  [
+   0.7424003,
+   "0.7424"
+  ],
+  [
+   394814329.0,
+   "3.94814e+08"
+  ],
+  [
+   3563347.3648609426,
+   "3.56335e+06"
+  ],
+  [
+   0.42615577726666376,
+   "0.426156"
+  ],
+  [
+   0.3340369,
+   "0.334037"
+  ],
+  [
+   964654565.0,
+   "9.64655e+08"
+  ],
+  [
+   -1758461.5085506663,
+   "-1.75846e+06"
+  ],
+  [
+   204.68476514761,
+   "204.685"
+  ],
+  [
+   0.5857,
+   "0.5857"
+  ],
+  [
+   747567096.0,
+   "7.47567e+08"
+  ],
+  [
+   8603248.200303536,
+   "8.60325e+06"
+  ],
+  [
+   3875418.7952286904,
+   "3.87542e+06"
+  ],
+  [
+   0.07,
+   "0.07"
+  ],
+  [
+   956956228.0,
+   "9.56956e+08"
+  ],
+  [
+   -8435432.678291451,
+   "-8.43543e+06"
+  ],
+  [
+   8.54697310072207e-07,
+   "8.54697e-07"
+  ],
+  [
+   0.393011,
+   "0.393011"
+  ],
+  [
+   206449528.0,
+   "2.0645e+08"
+  ],
+  [
+   1664027.2222546432,
+   "1.66403e+06"
+  ],
+  [
+   777.1798883200446,
+   "777.18"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   171766527.0,
+   "1.71767e+08"
+  ],
+  [
+   6591247.4743143525,
+   "6.59125e+06"
+  ],
+  [
+   1131.8831004474107,
+   "1131.88"
+  ],
+  [
+   0.3649538,
+   "0.364954"
+  ],
+  [
+   579301511.0,
+   "5.79302e+08"
+  ],
+  [
+   3746061.865775779,
+   "3.74606e+06"
+  ],
+  [
+   0.009314721737892688,
+   "0.00931472"
+  ],
+  [
+   0.1222,
+   "0.1222"
+  ],
+  [
+   76475334.0,
+   "7.64753e+07"
+  ],
+  [
+   6966412.659490243,
+   "6.96641e+06"
+  ],
+  [
+   265301618.33987063,
+   "2.65302e+08"
+  ],
+  [
+   0.97387285,
+   "0.973873"
+  ],
+  [
+   675318506.0,
+   "6.75319e+08"
+  ],
+  [
+   -6340575.714214163,
+   "-6.34058e+06"
+  ],
+  [
+   4.738237597622168e-06,
+   "4.73824e-06"
+  ],
+  [
+   0.5114994,
+   "0.511499"
+  ],
+  [
+   591821541.0,
+   "5.91822e+08"
+  ],
+  [
+   -712815.6207827814,
+   "-712816"
+  ],
+  [
+   5.898967735607751e-09,
+   "5.89897e-09"
+  ],
+  [
+   0.690516,
+   "0.690516"
+  ],
+  [
+   454968860.0,
+   "4.54969e+08"
+  ],
+  [
+   7473382.311930329,
+   "7.47338e+06"
+  ],
+  [
+   2813316107.983769,
+   "2.81332e+09"
+  ],
+  [
+   0.01762309,
+   "0.0176231"
+  ],
+  [
+   647477858.0,
+   "6.47478e+08"
+  ],
+  [
+   6251996.98299031,
+   "6.252e+06"
+  ],
+  [
+   1.046520591037312e-07,
+   "1.04652e-07"
+  ],
+  [
+   0.131,
+   "0.131"
+  ],
+  [
+   676114801.0,
+   "6.76115e+08"
+  ],
+  [
+   299796.0700748563,
+   "299796"
+  ],
+  [
+   2.6888235052911185e-06,
+   "2.68882e-06"
+  ],
+  [
+   0.53561,
+   "0.53561"
+  ],
+  [
+   681499954.0,
+   "6.815e+08"
+  ],
+  [
+   2039236.6887004524,
+   "2.03924e+06"
+  ],
+  [
+   2.1163459599104617e-09,
+   "2.11635e-09"
+  ],
+  [
+   0.3611147,
+   "0.361115"
+  ],
+  [
+   663134041.0,
+   "6.63134e+08"
+  ],
+  [
+   -5548018.467186697,
+   "-5.54802e+06"
+  ],
+  [
+   398297.45610209566,
+   "398297"
+  ],
+  [
+   0.4,
+   "0.4"
+  ],
+  [
+   998212838.0,
+   "9.98213e+08"
+  ],
+  [
+   -853771.1096934583,
+   "-853771"
+  ],
+  [
+   0.0003146201988808716,
+   "0.00031462"
+  ],
+  [
+   0.4,
+   "0.4"
+  ],
+  [
+   684952503.0,
+   "6.84953e+08"
+  ],
+  [
+   -6267899.805436574,
+   "-6.2679e+06"
+  ],
+  [
+   947724231875.4976,
+   "9.47724e+11"
+  ],
+  [
+   0.0949,
+   "0.0949"
+  ],
+  [
+   276036222.0,
+   "2.76036e+08"
+  ],
+  [
+   -8424907.623781638,
+   "-8.42491e+06"
+  ],
+  [
+   219872.2776661912,
+   "219872"
+  ],
+  [
+   0.8786039,
+   "0.878604"
+  ],
+  [
+   626839119.0,
+   "6.26839e+08"
+  ],
+  [
+   1386110.5667739585,
+   "1.38611e+06"
+  ],
+  [
+   0.002521784059036963,
+   "0.00252178"
+  ],
+  [
+   0.0176,
+   "0.0176"
+  ],
+  [
+   901066783.0,
+   "9.01067e+08"
+  ],
+  [
+   4554148.673870981,
+   "4.55415e+06"
+  ],
+  [
+   14485144071.410631,
+   "1.44851e+10"
+  ],
+  [
+   0.1,
+   "0.1"
+  ],
+  [
+   746218486.0,
+   "7.46218e+08"
+  ],
+  [
+   -4210651.6129696295,
+   "-4.21065e+06"
+  ],
+  [
+   0.07924183708988555,
+   "0.0792418"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   689873791.0,
+   "6.89874e+08"
+  ],
+  [
+   4759903.634197859,
+   "4.7599e+06"
+  ],
+  [
+   7.433214107313703,
+   "7.43321"
+  ],
+  [
+   0.90584,
+   "0.90584"
+  ],
+  [
+   790171431.0,
+   "7.90171e+08"
+  ],
+  [
+   -5211339.873660124,
+   "-5.21134e+06"
+  ],
+  [
+   0.131900900372451,
+   "0.131901"
+  ],
+  [
+   0.067,
+   "0.067"
+  ],
+  [
+   693398618.0,
+   "6.93399e+08"
+  ],
+  [
+   1489309.8499751408,
+   "1.48931e+06"
+  ],
+  [
+   15832.52671097607,
+   "15832.5"
+  ],
+  [
+   0.77145,
+   "0.77145"
+  ],
+  [
+   728842313.0,
+   "7.28842e+08"
+  ],
+  [
+   -2262959.120397536,
+   "-2.26296e+06"
+  ],
+  [
+   4074265.3925178046,
+   "4.07427e+06"
+  ],
+  [
+   0.8377,
+   "0.8377"
+  ],
+  [
+   804981802.0,
+   "8.04982e+08"
+  ],
+  [
+   9324217.325896207,
+   "9.32422e+06"
+  ],
+  [
+   9.895269782831123e-05,
+   "9.89527e-05"
+  ],
+  [
+   0.53,
+   "0.53"
+  ],
+  [
+   369378373.0,
+   "3.69378e+08"
+  ],
+  [
+   8584897.975831822,
+   "8.5849e+06"
+  ],
+  [
+   1.6471199501394136e-09,
+   "1.64712e-09"
+  ],
+  [
+   0.96,
+   "0.96"
+  ],
+  [
+   172706045.0,
+   "1.72706e+08"
+  ],
+  [
+   -5185031.672943239,
+   "-5.18503e+06"
+  ],
+  [
+   23342.818560593827,
+   "23342.8"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   247146067.0,
+   "2.47146e+08"
+  ],
+  [
+   -8600264.523039965,
+   "-8.60026e+06"
+  ],
+  [
+   8.365609681571726e-09,
+   "8.36561e-09"
+  ],
+  [
+   0.208,
+   "0.208"
+  ],
+  [
+   296425670.0,
+   "2.96426e+08"
+  ],
+  [
+   -2848568.6392205255,
+   "-2.84857e+06"
+  ],
+  [
+   1.8837260769459776e-06,
+   "1.88373e-06"
+  ],
+  [
+   0.664,
+   "0.664"
+  ],
+  [
+   79880948.0,
+   "7.98809e+07"
+  ],
+  [
+   -9756784.498984497,
+   "-9.75678e+06"
+  ],
+  [
+   0.0008382338502552088,
+   "0.000838234"
+  ],
+  [
+   0.4252,
+   "0.4252"
+  ],
+  [
+   388153630.0,
+   "3.88154e+08"
+  ],
+  [
+   -8773655.720240548,
+   "-8.77366e+06"
+  ],
+  [
+   207853058.48816472,
+   "2.07853e+08"
+  ],
+  [
+   0.2979,
+   "0.2979"
+  ],
+  [
+   402513676.0,
+   "4.02514e+08"
+  ],
+  [
+   7164175.446199983,
+   "7.16418e+06"
+  ],
+  [
+   7.507994085872386e-05,
+   "7.50799e-05"
+  ],
+  [
+   0.4604,
+   "0.4604"
+  ],
+  [
+   389868952.0,
+   "3.89869e+08"
+  ],
+  [
+   1958965.717435876,
+   "1.95897e+06"
+  ],
+  [
+   57280.6932439149,
+   "57280.7"
+  ],
+  [
+   0.352594,
+   "0.352594"
+  ],
+  [
+   585724122.0,
+   "5.85724e+08"
+  ],
+  [
+   6049786.092762655,
+   "6.04979e+06"
+  ],
+  [
+   175560.50475176855,
+   "175561"
+  ],
+  [
+   0.566,
+   "0.566"
+  ],
+  [
+   220862737.0,
+   "2.20863e+08"
+  ],
+  [
+   2777088.542141266,
+   "2.77709e+06"
+  ],
+  [
+   148590.92410567414,
+   "148591"
+  ],
+  [
+   0.6156,
+   "0.6156"
+  ],
+  [
+   181288510.0,
+   "1.81289e+08"
+  ],
+  [
+   8105650.38479612,
+   "8.10565e+06"
+  ],
+  [
+   1403071989.0871663,
+   "1.40307e+09"
+  ],
+  [
+   0.361,
+   "0.361"
+  ],
+  [
+   259164131.0,
+   "2.59164e+08"
+  ],
+  [
+   2073178.670394238,
+   "2.07318e+06"
+  ],
+  [
+   1.0833460536402501e-06,
+   "1.08335e-06"
+  ],
+  [
+   0.3941498,
+   "0.39415"
+  ],
+  [
+   361163314.0,
+   "3.61163e+08"
+  ],
+  [
+   -7526396.218740736,
+   "-7.5264e+06"
+  ],
+  [
+   5.0475056257505886e-09,
+   "5.04751e-09"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   230786952.0,
+   "2.30787e+08"
+  ],
+  [
+   -734605.4177448377,
+   "-734605"
+  ],
+  [
+   7.050491584265921,
+   "7.05049"
+  ],
+  [
+   0.08587481,
+   "0.0858748"
+  ],
+  [
+   969516916.0,
+   "9.69517e+08"
+  ],
+  [
+   5617272.482816754,
+   "5.61727e+06"
+  ],
+  [
+   10911339.521130957,
+   "1.09113e+07"
+  ],
+  [
+   0.8,
+   "0.8"
+  ],
+  [
+   789398310.0,
+   "7.89398e+08"
+  ],
+  [
+   4687446.2239471,
+   "4.68745e+06"
+  ],
+  [
+   0.0029331283941553725,
+   "0.00293313"
+  ],
+  [
+   0.75316298,
+   "0.753163"
+  ],
+  [
+   167482158.0,
+   "1.67482e+08"
+  ],
+  [
+   6255814.999143103,
+   "6.25581e+06"
+  ],
+  [
+   3783576.5119427443,
+   "3.78358e+06"
+  ],
+  [
+   0.12631587,
+   "0.126316"
+  ],
+  [
+   827356560.0,
+   "8.27357e+08"
+  ],
+  [
+   505020.90045892633,
+   "505021"
+  ],
+  [
+   2.114285152370441e-09,
+   "2.11429e-09"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   877366998.0,
+   "8.77367e+08"
+  ],
+  [
+   -8181519.704918203,
+   "-8.18152e+06"
+  ],
+  [
+   7.613389364353773e-06,
+   "7.61339e-06"
+  ],
+  [
+   0.801,
+   "0.801"
+  ],
+  [
+   998627206.0,
+   "9.98627e+08"
+  ],
+  [
+   7734872.110937849,
+   "7.73487e+06"
+  ],
+  [
+   5.375176871374195e-07,
+   "5.37518e-07"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   806859812.0,
+   "8.0686e+08"
+  ],
+  [
+   1120795.5847950578,
+   "1.1208e+06"
+  ],
+  [
+   988147853.2151061,
+   "9.88148e+08"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   705787239.0,
+   "7.05787e+08"
+  ],
+  [
+   8188918.1271355115,
+   "8.18892e+06"
+  ],
+  [
+   7.449598427480903e-05,
+   "7.4496e-05"
+  ],
+  [
+   0.6976239,
+   "0.697624"
+  ],
+  [
+   920271426.0,
+   "9.20271e+08"
+  ],
+  [
+   6237326.790807687,
+   "6.23733e+06"
+  ],
+  [
+   0.015091344863651417,
+   "0.0150913"
+  ],
+  [
+   0.53298836,
+   "0.532988"
+  ],
+  [
+   698072915.0,
+   "6.98073e+08"
+  ],
+  [
+   349470.4050393123,
+   "349470"
+  ],
+  [
+   1.8145306817640503e-08,
+   "1.81453e-08"
+  ],
+  [
+   0.3332683,
+   "0.333268"
+  ],
+  [
+   595936867.0,
+   "5.95937e+08"
+  ],
+  [
+   -5596175.741740441,
+   "-5.59618e+06"
+  ],
+  [
+   514645.7822787185,
+   "514646"
+  ],
+  [
+   0.05646,
+   "0.05646"
+  ],
+  [
+   565358438.0,
+   "5.65358e+08"
+  ],
+  [
+   5754501.931198891,
+   "5.7545e+06"
+  ],
+  [
+   85029904.67199185,
+   "8.50299e+07"
+  ],
+  [
+   0.844914,
+   "0.844914"
+  ],
+  [
+   393288598.0,
+   "3.93289e+08"
+  ],
+  [
+   9555337.059380673,
+   "9.55534e+06"
+  ],
+  [
+   47642384.409976356,
+   "4.76424e+07"
+  ],
+  [
+   0.0783,
+   "0.0783"
+  ],
+  [
+   72371468.0,
+   "7.23715e+07"
+  ],
+  [
+   -5009572.452310355,
+   "-5.00957e+06"
+  ],
+  [
+   0.39130764427441256,
+   "0.391308"
+  ],
+  [
+   0.6278,
+   "0.6278"
+  ],
+  [
+   588959359.0,
+   "5.88959e+08"
+  ],
+  [
+   -5598511.639766608,
+   "-5.59851e+06"
+  ],
+  [
+   510.9819847675592,
+   "510.982"
+  ],
+  [
+   0.6038,
+   "0.6038"
+  ],
+  [
+   626000599.0,
+   "6.26001e+08"
+  ],
+  [
+   -8710425.709591405,
+   "-8.71043e+06"
+  ],
+  [
+   3.082495544961985e-07,
+   "3.0825e-07"
+  ],
+  [
+   0.6497,
+   "0.6497"
+  ],
+  [
+   299632357.0,
+   "2.99632e+08"
+  ],
+  [
+   -764519.5996235814,
+   "-764520"
+  ],
+  [
+   944848.5115369216,
+   "944849"
+  ],
+  [
+   0.34348,
+   "0.34348"
+  ],
+  [
+   443379216.0,
+   "4.43379e+08"
+  ],
+  [
+   5428787.960984884,
+   "5.42879e+06"
+  ],
+  [
+   6.224968169417996e-09,
+   "6.22497e-09"
+  ],
+  [
+   0.6863,
+   "0.6863"
+  ],
+  [
+   921230770.0,
+   "9.21231e+08"
+  ],
+  [
+   7425355.877605554,
+   "7.42536e+06"
+  ],
+  [
+   94615.53720823584,
+   "94615.5"
+  ],
+  [
+   0.345,
+   "0.345"
+  ],
+  [
+   596120610.0,
+   "5.96121e+08"
+  ],
+  [
+   -6882558.299960567,
+   "-6.88256e+06"
+  ],
+  [
+   0.06035323368417059,
+   "0.0603532"
+  ],
+  [
+   0.6949641,
+   "0.694964"
+  ],
+  [
+   987095907.0,
+   "9.87096e+08"
+  ],
+  [
+   2933050.834861355,
+   "2.93305e+06"
+  ],
+  [
+   130742340.5226645,
+   "1.30742e+08"
+  ],
+  [
+   0.8102696,
+   "0.81027"
+  ],
+  [
+   107617495.0,
+   "1.07617e+08"
+  ],
+  [
+   -5465874.37323895,
+   "-5.46587e+06"
+  ],
+  [
+   25507.660305409532,
+   "25507.7"
+  ],
+  [
+   0.0628568,
+   "0.0628568"
+  ],
+  [
+   81776082.0,
+   "8.17761e+07"
+  ],
+  [
+   -3192422.119145737,
+   "-3.19242e+06"
+  ],
+  [
+   442.3310263864765,
+   "442.331"
+  ],
+  [
+   0.3275229,
+   "0.327523"
+  ],
+  [
+   601137285.0,
+   "6.01137e+08"
+  ],
+  [
+   4261419.320018595,
+   "4.26142e+06"
+  ],
+  [
+   0.06592511422087015,
+   "0.0659251"
+  ],
+  [
+   0.178703,
+   "0.178703"
+  ],
+  [
+   516954094.0,
+   "5.16954e+08"
+  ],
+  [
+   669119.3409065809,
+   "669119"
+  ],
+  [
+   611782.9794706622,
+   "611783"
+  ],
+  [
+   0.61,
+   "0.61"
+  ],
+  [
+   933189278.0,
+   "9.33189e+08"
+  ],
+  [
+   -9578625.914050916,
+   "-9.57863e+06"
+  ],
+  [
+   1.59855799282543e-05,
+   "1.59856e-05"
+  ],
+  [
+   0.5958,
+   "0.5958"
+  ],
+  [
+   309904303.0,
+   "3.09904e+08"
+  ],
+  [
+   1046771.8557129186,
+   "1.04677e+06"
+  ],
+  [
+   706061872302.2286,
+   "7.06062e+11"
+  ],
+  [
+   0.84,
+   "0.84"
+  ],
+  [
+   625157444.0,
+   "6.25157e+08"
+  ],
+  [
+   -2538563.0861523636,
+   "-2.53856e+06"
+  ],
+  [
+   2.0918398009957617e-08,
+   "2.09184e-08"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   945565971.0,
+   "9.45566e+08"
+  ],
+  [
+   -2818871.54533502,
+   "-2.81887e+06"
+  ],
+  [
+   920.3419430369713,
+   "920.342"
+  ],
+  [
+   0.8465406,
+   "0.846541"
+  ],
+  [
+   664264594.0,
+   "6.64265e+08"
+  ],
+  [
+   7097315.254549447,
+   "7.09732e+06"
+  ],
+  [
+   14542.036539661258,
+   "14542"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   351008213.0,
+   "3.51008e+08"
+  ],
+  [
+   -486003.5764442086,
+   "-486004"
+  ],
+  [
+   2.785584386789701e-08,
+   "2.78558e-08"
+  ],
+  [
+   0.014,
+   "0.014"
+  ],
+  [
+   173146951.0,
+   "1.73147e+08"
+  ],
+  [
+   5624808.103843991,
+   "5.62481e+06"
+  ],
+  [
+   3.9448023980969786,
+   "3.9448"
+  ],
+  [
+   0.9953462,
+   "0.995346"
+  ],
+  [
+   252965083.0,
+   "2.52965e+08"
+  ],
+  [
+   1555334.3274848163,
+   "1.55533e+06"
+  ],
+  [
+   533346709.3005342,
+   "5.33347e+08"
+  ],
+  [
+   0.8,
+   "0.8"
+  ],
+  [
+   472660387.0,
+   "4.7266e+08"
+  ],
+  [
+   2214681.1547442675,
+   "2.21468e+06"
+  ],
+  [
+   6.17204787465739e-06,
+   "6.17205e-06"
+  ],
+  [
+   0.2391013,
+   "0.239101"
+  ],
+  [
+   366482477.0,
+   "3.66482e+08"
+  ],
+  [
+   -5141757.902838993,
+   "-5.14176e+06"
+  ],
+  [
+   3.695696168642331e-08,
+   "3.6957e-08"
+  ],
+  [
+   0.22850313,
+   "0.228503"
+  ],
+  [
+   771075982.0,
+   "7.71076e+08"
+  ],
+  [
+   5902388.761405416,
+   "5.90239e+06"
+  ],
+  [
+   0.0006227183587657851,
+   "0.000622718"
+  ],
+  [
+   0.2753,
+   "0.2753"
+  ],
+  [
+   490861750.0,
+   "4.90862e+08"
+  ],
+  [
+   -2336236.9379843436,
+   "-2.33624e+06"
+  ],
+  [
+   192.9829050902589,
+   "192.983"
+  ],
+  [
+   0.32431,
+   "0.32431"
+  ],
+  [
+   878916919.0,
+   "8.78917e+08"
+  ],
+  [
+   4704714.153478023,
+   "4.70471e+06"
+  ],
+  [
+   758603707.5413512,
+   "7.58604e+08"
+  ],
+  [
+   0.8401,
+   "0.8401"
+  ],
+  [
+   687987731.0,
+   "6.87988e+08"
+  ],
+  [
+   6265289.258808255,
+   "6.26529e+06"
+  ],
+  [
+   196259.844631368,
+   "196260"
+  ],
+  [
+   0.1030022,
+   "0.103002"
+  ],
+  [
+   239368926.0,
+   "2.39369e+08"
+  ],
+  [
+   -5755646.188575243,
+   "-5.75565e+06"
+  ],
+  [
+   0.000624321970459982,
+   "0.000624322"
+  ],
+  [
+   0.2,
+   "0.2"
+  ],
+  [
+   218369964.0,
+   "2.1837e+08"
+  ],
+  [
+   45330.0941359587,
+   "45330.1"
+  ],
+  [
+   1.0606085823750928e-09,
+   "1.06061e-09"
+  ],
+  [
+   0.97,
+   "0.97"
+  ],
+  [
+   841174404.0,
+   "8.41174e+08"
+  ],
+  [
+   -5746483.380796667,
+   "-5.74648e+06"
+  ],
+  [
+   2000.9414147759594,
+   "2000.94"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   601856938.0,
+   "6.01857e+08"
+  ],
+  [
+   324366.8294061981,
+   "324367"
+  ],
+  [
+   112000746517.75696,
+   "1.12001e+11"
+  ],
+  [
+   0.7611,
+   "0.7611"
+  ],
+  [
+   351173227.0,
+   "3.51173e+08"
+  ],
+  [
+   -6849666.649522315,
+   "-6.84967e+06"
+  ],
+  [
+   891.5912998816658,
+   "891.591"
+  ],
+  [
+   0.28,
+   "0.28"
+  ],
+  [
+   795739465.0,
+   "7.95739e+08"
+  ],
+  [
+   1918999.6790283434,
+   "1.919e+06"
+  ],
+  [
+   8.793188962361536e-05,
+   "8.79319e-05"
+  ],
+  [
+   0.3653,
+   "0.3653"
+  ],
+  [
+   103452739.0,
+   "1.03453e+08"
+  ],
+  [
+   -5688104.746591915,
+   "-5.6881e+06"
+  ],
+  [
+   6.842316938529441e-07,
+   "6.84232e-07"
+  ],
+  [
+   0.0135184,
+   "0.0135184"
+  ],
+  [
+   105220583.0,
+   "1.05221e+08"
+  ],
+  [
+   8884182.837202344,
+   "8.88418e+06"
+  ],
+  [
+   1645904249.1678073,
+   "1.6459e+09"
+  ],
+  [
+   0.2203,
+   "0.2203"
+  ],
+  [
+   123390025.0,
+   "1.2339e+08"
+  ],
+  [
+   -8355356.09455468,
+   "-8.35536e+06"
+  ],
+  [
+   1827835675.4969158,
+   "1.82784e+09"
+  ],
+  [
+   0.086265,
+   "0.086265"
+  ],
+  [
+   994329506.0,
+   "9.9433e+08"
+  ],
+  [
+   -6869956.067941907,
+   "-6.86996e+06"
+  ],
+  [
+   0.0017476794858386467,
+   "0.00174768"
+  ],
+  [
+   0.21238,
+   "0.21238"
+  ],
+  [
+   781704359.0,
+   "7.81704e+08"
+  ],
+  [
+   -1860593.3861874212,
+   "-1.86059e+06"
+  ],
+  [
+   89690.85403097382,
+   "89690.9"
+  ],
+  [
+   0.79313,
+   "0.79313"
+  ],
+  [
+   976195815.0,
+   "9.76196e+08"
+  ],
+  [
+   8146441.899706803,
+   "8.14644e+06"
+  ],
+  [
+   0.004598509101928818,
+   "0.00459851"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   742003199.0,
+   "7.42003e+08"
+  ],
+  [
+   -2082014.039350939,
+   "-2.08201e+06"
+  ],
+  [
+   929.6295439423598,
+   "929.63"
+  ],
+  [
+   0.60281956,
+   "0.60282"
+  ],
+  [
+   957967880.0,
+   "9.57968e+08"
+  ],
+  [
+   1612566.2241344359,
+   "1.61257e+06"
+  ],
+  [
+   0.0012993541602783713,
+   "0.00129935"
+  ],
+  [
+   0.8398,
+   "0.8398"
+  ],
+  [
+   622217197.0,
+   "6.22217e+08"
+  ],
+  [
+   -2739556.3464393094,
+   "-2.73956e+06"
+  ],
+  [
+   27382.130865635405,
+   "27382.1"
+  ],
+  [
+   0.815,
+   "0.815"
+  ],
+  [
+   275823170.0,
+   "2.75823e+08"
+  ],
+  [
+   -9754807.348544307,
+   "-9.75481e+06"
+  ],
+  [
+   15059133.05139341,
+   "1.50591e+07"
+  ],
+  [
+   0.788051,
+   "0.788051"
+  ],
+  [
+   839980475.0,
+   "8.3998e+08"
+  ],
+  [
+   -4808825.938198103,
+   "-4.80883e+06"
+  ],
+  [
+   454567.34421447036,
+   "454567"
+  ],
+  [
+   0.85,
+   "0.85"
+  ],
+  [
+   402606004.0,
+   "4.02606e+08"
+  ],
+  [
+   -3130282.5359930275,
+   "-3.13028e+06"
+  ],
+  [
+   6.335730195944951e-07,
+   "6.33573e-07"
+  ],
+  [
+   0.52,
+   "0.52"
+  ],
+  [
+   51894223.0,
+   "5.18942e+07"
+  ],
+  [
+   323970.5401649419,
+   "323971"
+  ],
+  [
+   426596657.2440386,
+   "4.26597e+08"
+  ],
+  [
+   0.349,
+   "0.349"
+  ],
+  [
+   425798067.0,
+   "4.25798e+08"
+  ],
+  [
+   -1069818.0542819947,
+   "-1.06982e+06"
+  ],
+  [
+   83802278729.75151,
+   "8.38023e+10"
+  ],
+  [
+   0.652,
+   "0.652"
+  ],
+  [
+   184769852.0,
+   "1.8477e+08"
+  ],
+  [
+   2686830.2990567964,
+   "2.68683e+06"
+  ],
+  [
+   117294.10023290176,
+   "117294"
+  ],
+  [
+   0.1,
+   "0.1"
+  ],
+  [
+   269135295.0,
+   "2.69135e+08"
+  ],
+  [
+   -4617982.642358977,
+   "-4.61798e+06"
+  ],
+  [
+   4167544176.233133,
+   "4.16754e+09"
+  ],
+  [
+   0.387,
+   "0.387"
+  ],
+  [
+   735520356.0,
+   "7.3552e+08"
+  ],
+  [
+   -9763303.019788604,
+   "-9.7633e+06"
+  ],
+  [
+   91918604305.66463,
+   "9.19186e+10"
+  ],
+  [
+   0.5187,
+   "0.5187"
+  ],
+  [
+   156606045.0,
+   "1.56606e+08"
+  ],
+  [
+   8203551.871961135,
+   "8.20355e+06"
+  ],
+  [
+   884.4160484937804,
+   "884.416"
+  ],
+  [
+   0.74534,
+   "0.74534"
+  ],
+  [
+   334190843.0,
+   "3.34191e+08"
+  ],
+  [
+   2811384.751781203,
+   "2.81138e+06"
+  ],
+  [
+   4099.806773738484,
+   "4099.81"
+  ],
+  [
+   0.793826,
+   "0.793826"
+  ],
+  [
+   319256060.0,
+   "3.19256e+08"
+  ],
+  [
+   -593549.9468395859,
+   "-593550"
+  ],
+  [
+   7.303568226237158e-05,
+   "7.30357e-05"
+  ],
+  [
+   0.173,
+   "0.173"
+  ],
+  [
+   908409940.0,
+   "9.0841e+08"
+  ],
+  [
+   -2326018.1270032953,
+   "-2.32602e+06"
+  ],
+  [
+   0.4149295186678647,
+   "0.41493"
+  ],
+  [
+   1.0,
+   "1"
+  ],
+  [
+   621569071.0,
+   "6.21569e+08"
+  ],
+  [
+   -4866502.197194744,
+   "-4.8665e+06"
+  ],
+  [
+   16941762.188415486,
+   "1.69418e+07"
+  ],
+  [
+   0.208,
+   "0.208"
+  ],
+  [
+   241946620.0,
+   "2.41947e+08"
+  ],
+  [
+   7023703.327738944,
+   "7.0237e+06"
+  ],
+  [
+   0.11555655987920337,
+   "0.115557"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   414003451.0,
+   "4.14003e+08"
+  ],
+  [
+   -355559.9774781279,
+   "-355560"
+  ],
+  [
+   2033.8222741157647,
+   "2033.82"
+  ],
+  [
+   0.1,
+   "0.1"
+  ],
+  [
+   313398842.0,
+   "3.13399e+08"
+  ],
+  [
+   -4765562.338862273,
+   "-4.76556e+06"
+  ],
+  [
+   2.9470812766057738e-08,
+   "2.94708e-08"
+  ],
+  [
+   0.1,
+   "0.1"
+  ],
+  [
+   81395592.0,
+   "8.13956e+07"
+  ],
+  [
+   2410112.353770964,
+   "2.41011e+06"
+  ],
+  [
+   8.472464057614912e-07,
+   "8.47246e-07"
+  ],
+  [
+   0.7922,
+   "0.7922"
+  ],
+  [
+   601026099.0,
+   "6.01026e+08"
+  ],
+  [
+   8173498.528162029,
+   "8.1735e+06"
+  ],
+  [
+   0.03685958552634056,
+   "0.0368596"
+  ],
+  [
+   0.7049,
+   "0.7049"
+  ],
+  [
+   831104002.0,
+   "8.31104e+08"
+  ],
+  [
+   625434.8312966712,
+   "625435"
+  ],
+  [
+   1823353637209.1265,
+   "1.82335e+12"
+  ],
+  [
+   0.09117267,
+   "0.0911727"
+  ],
+  [
+   336754314.0,
+   "3.36754e+08"
+  ],
+  [
+   3729988.4776957333,
+   "3.72999e+06"
+  ],
+  [
+   33.88747699391429,
+   "33.8875"
+  ],
+  [
+   0.6,
+   "0.6"
+  ],
+  [
+   837788374.0,
+   "8.37788e+08"
+  ],
+  [
+   7941470.936156593,
+   "7.94147e+06"
+  ],
+  [
+   4.606771313509358e-05,
+   "4.60677e-05"
+  ],
+  [
+   0.10326157,
+   "0.103262"
+  ],
+  [
+   931547353.0,
+   "9.31547e+08"
+  ],
+  [
+   962302.6296176165,
+   "962303"
+  ],
+  [
+   0.006608237766193892,
+   "0.00660824"
+  ],
+  [
+   0.410637,
+   "0.410637"
+  ],
+  [
+   935407465.0,
+   "9.35407e+08"
+  ],
+  [
+   5797099.068523444,
+   "5.7971e+06"
+  ],
+  [
+   4.652454855351114e-06,
+   "4.65245e-06"
+  ],
+  [
+   0.2629115,
+   "0.262912"
+  ],
+  [
+   994656677.0,
+   "9.94657e+08"
+  ],
+  [
+   -6304823.388217227,
+   "-6.30482e+06"
+  ],
+  [
+   6405334357.356443,
+   "6.40533e+09"
+  ],
+  [
+   0.11289444,
+   "0.112894"
+  ],
+  [
+   694661789.0,
+   "6.94662e+08"
+  ],
+  [
+   2104364.342623351,
+   "2.10436e+06"
+  ],
+  [
+   497017245281.1949,
+   "4.97017e+11"
+  ],
+  [
+   0.1,
+   "0.1"
+  ],
+  [
+   577411560.0,
+   "5.77412e+08"
+  ],
+  [
+   9889406.433204513,
+   "9.88941e+06"
+  ],
+  [
+   0.12074280171023079,
+   "0.120743"
+  ],
+  [
+   0.85,
+   "0.85"
+  ],
+  [
+   195231866.0,
+   "1.95232e+08"
+  ],
+  [
+   -1438562.6024569813,
+   "-1.43856e+06"
+  ],
+  [
+   4.300678849670511e-05,
+   "4.30068e-05"
+  ],
+  [
+   0.44042,
+   "0.44042"
+  ],
+  [
+   720818523.0,
+   "7.20819e+08"
+  ],
+  [
+   -5899195.816939736,
+   "-5.8992e+06"
+  ],
+  [
+   1.8061294361294947e-07,
+   "1.80613e-07"
+  ],
+  [
+   0.534431,
+   "0.534431"
+  ],
+  [
+   634077220.0,
+   "6.34077e+08"
+  ],
+  [
+   8514774.276677769,
+   "8.51477e+06"
+  ],
+  [
+   2878568.7079617837,
+   "2.87857e+06"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   720168161.0,
+   "7.20168e+08"
+  ],
+  [
+   3746612.714044841,
+   "3.74661e+06"
+  ],
+  [
+   5.890336325870217e-05,
+   "5.89034e-05"
+  ],
+  [
+   0.09,
+   "0.09"
+  ],
+  [
+   492284154.0,
+   "4.92284e+08"
+  ],
+  [
+   6838587.187165383,
+   "6.83859e+06"
+  ],
+  [
+   4.339694716910607e-08,
+   "4.33969e-08"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   935653858.0,
+   "9.35654e+08"
+  ],
+  [
+   1074600.4235445969,
+   "1.0746e+06"
+  ],
+  [
+   1.720246262335121e-05,
+   "1.72025e-05"
+  ],
+  [
+   0.6225082,
+   "0.622508"
+  ],
+  [
+   871073066.0,
+   "8.71073e+08"
+  ],
+  [
+   -3158291.854395101,
+   "-3.15829e+06"
+  ],
+  [
+   48903198964.64232,
+   "4.89032e+10"
+  ],
+  [
+   0.0031,
+   "0.0031"
+  ],
+  [
+   950656149.0,
+   "9.50656e+08"
+  ],
+  [
+   2267641.1826735344,
+   "2.26764e+06"
+  ],
+  [
+   0.11534587993969943,
+   "0.115346"
+  ],
+  [
+   0.91,
+   "0.91"
+  ],
+  [
+   617126732.0,
+   "6.17127e+08"
+  ],
+  [
+   -4824225.717847958,
+   "-4.82423e+06"
+  ],
+  [
+   1.0936526584164803e-09,
+   "1.09365e-09"
+  ],
+  [
+   0.029,
+   "0.029"
+  ],
+  [
+   493459433.0,
+   "4.93459e+08"
+  ],
+  [
+   5764458.358672665,
+   "5.76446e+06"
+  ],
+  [
+   5.645057853424757,
+   "5.64506"
+  ],
+  [
+   0.34731,
+   "0.34731"
+  ],
+  [
+   639282275.0,
+   "6.39282e+08"
+  ],
+  [
+   6100544.56758959,
+   "6.10054e+06"
+  ],
+  [
+   21551799.796454735,
+   "2.15518e+07"
+  ],
+  [
+   0.3551616,
+   "0.355162"
+  ],
+  [
+   441734036.0,
+   "4.41734e+08"
+  ],
+  [
+   1080448.2494872399,
+   "1.08045e+06"
+  ],
+  [
+   559151292691.8868,
+   "5.59151e+11"
+  ],
+  [
+   0.04777989,
+   "0.0477799"
+  ],
+  [
+   550952075.0,
+   "5.50952e+08"
+  ],
+  [
+   6808377.860601839,
+   "6.80838e+06"
+  ],
+  [
+   397898.80303223117,
+   "397899"
+  ],
+  [
+   0.1,
+   "0.1"
+  ],
+  [
+   457858872.0,
+   "4.57859e+08"
+  ],
+  [
+   -1125563.9118510447,
+   "-1.12556e+06"
+  ],
+  [
+   5500553.13020819,
+   "5.50055e+06"
+  ],
+  [
+   0.45121,
+   "0.45121"
+  ],
+  [
+   7129921.0,
+   "7.12992e+06"
+  ],
+  [
+   -1141986.291339619,
+   "-1.14199e+06"
+  ],
+  [
+   2.7282935092648277e-06,
+   "2.72829e-06"
+  ],
+  [
+   0.83,
+   "0.83"
+  ],
+  [
+   380251534.0,
+   "3.80252e+08"
+  ],
+  [
+   8664436.365435198,
+   "8.66444e+06"
+  ],
+  [
+   2.5221319792915884e-09,
+   "2.52213e-09"
+  ],
+  [
+   0.038,
+   "0.038"
+  ],
+  [
+   56420617.0,
+   "5.64206e+07"
+  ],
+  [
+   7186328.721085049,
+   "7.18633e+06"
+  ],
+  [
+   2035214.4052805856,
+   "2.03521e+06"
+  ],
+  [
+   0.0,
+   "0"
+  ],
+  [
+   437138940.0,
+   "4.37139e+08"
+  ],
+  [
+   -9691405.508987658,
+   "-9.69141e+06"
+  ],
+  [
+   16249.488313725158,
+   "16249.5"
+  ],
+  [
+   0.665106,
+   "0.665106"
+  ],
+  [
+   354309499.0,
+   "3.54309e+08"
+  ],
+  [
+   -8524328.739033634,
+   "-8.52433e+06"
+  ],
+  [
+   7232364.85115832,
+   "7.23236e+06"
+  ],
+  [
+   0.716852,
+   "0.716852"
+  ],
+  [
+   410633446.0,
+   "4.10633e+08"
+  ],
+  [
+   -8542821.0556469,
+   "-8.54282e+06"
+  ],
+  [
+   1.3343987454658774e-07,
+   "1.3344e-07"
+  ],
+  [
+   0.336,
+   "0.336"
+  ],
+  [
+   989363951.0,
+   "9.89364e+08"
+  ],
+  [
+   5697275.173297919,
+   "5.69728e+06"
+  ],
+  [
+   2797.908324895291,
+   "2797.91"
+  ],
+  [
+   0.49503,
+   "0.49503"
+  ],
+  [
+   9787390.0,
+   "9.78739e+06"
+  ],
+  [
+   -3244597.404102507,
+   "-3.2446e+06"
+  ],
+  [
+   2703215532.02629,
+   "2.70322e+09"
+  ],
+  [
+   0.86,
+   "0.86"
+  ],
+  [
+   73152298.0,
+   "7.31523e+07"
+  ],
+  [
+   3100059.081634674,
+   "3.10006e+06"
+  ],
+  [
+   9748588912.69267,
+   "9.74859e+09"
+  ],
+  [
+   0.20622,
+   "0.20622"
+  ],
+  [
+   194855358.0,
+   "1.94855e+08"
+  ],
+  [
+   -8214898.431921649,
+   "-8.2149e+06"
+  ],
+  [
+   13028803.08116392,
+   "1.30288e+07"
+  ],
+  [
+   0.89226299,
+   "0.892263"
+  ],
+  [
+   13879539.0,
+   "1.38795e+07"
+  ],
+  [
+   -2266087.6065413896,
+   "-2.26609e+06"
+  ],
+  [
+   1243.9108886226359,
+   "1243.91"
+  ],
+  [
+   0.35583,
+   "0.35583"
+  ],
+  [
+   708877016.0,
+   "7.08877e+08"
+  ],
+  [
+   5502126.281586971,
+   "5.50213e+06"
+  ],
+  [
+   0.09212206591996348,
+   "0.0921221"
+  ],
+  [
+   0.9476,
+   "0.9476"
+  ],
+  [
+   640762362.0,
+   "6.40762e+08"
+  ],
+  [
+   -9941729.858408391,
+   "-9.94173e+06"
+  ],
+  [
+   6.497467534671476e-09,
+   "6.49747e-09"
+  ],
+  [
+   0.5543,
+   "0.5543"
+  ],
+  [
+   790127226.0,
+   "7.90127e+08"
+  ],
+  [
+   220663.39443427324,
+   "220663"
+  ],
+  [
+   72810688811.187,
+   "7.28107e+10"
+  ],
+  [
+   0.7746933,
+   "0.774693"
+  ],
+  [
+   945348877.0,
+   "9.45349e+08"
+  ],
+  [
+   309344.1814311631,
+   "309344"
+  ],
+  [
+   260180.38989173886,
+   "260180"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   319557823.0,
+   "3.19558e+08"
+  ],
+  [
+   -515416.7577186525,
+   "-515417"
+  ],
+  [
+   6.405127553831731e-07,
+   "6.40513e-07"
+  ],
+  [
+   0.2,
+   "0.2"
+  ],
+  [
+   835914382.0,
+   "8.35914e+08"
+  ],
+  [
+   4256727.272793753,
+   "4.25673e+06"
+  ],
+  [
+   3.4001763374970827e-06,
+   "3.40018e-06"
+  ],
+  [
+   0.64539,
+   "0.64539"
+  ],
+  [
+   70804892.0,
+   "7.08049e+07"
+  ],
+  [
+   -2663126.2964144573,
+   "-2.66313e+06"
+  ],
+  [
+   85852410240.4796,
+   "8.58524e+10"
+  ],
+  [
+   0.4386,
+   "0.4386"
+  ],
+  [
+   9034511.0,
+   "9.03451e+06"
+  ],
+  [
+   -3899985.005440889,
+   "-3.89999e+06"
+  ],
+  [
+   0.03809537163800622,
+   "0.0380954"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   717807411.0,
+   "7.17807e+08"
+  ],
+  [
+   -8009101.677416992,
+   "-8.0091e+06"
+  ],
+  [
+   366315025.8498751,
+   "3.66315e+08"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   215392864.0,
+   "2.15393e+08"
+  ],
+  [
+   -4239977.572100704,
+   "-4.23998e+06"
+  ],
+  [
+   10988709.577664234,
+   "1.09887e+07"
+  ],
+  [
+   0.1,
+   "0.1"
+  ],
+  [
+   770527370.0,
+   "7.70527e+08"
+  ],
+  [
+   -9552423.641731152,
+   "-9.55242e+06"
+  ],
+  [
+   2.7804114419971404e-08,
+   "2.78041e-08"
+  ],
+  [
+   0.04067,
+   "0.04067"
+  ],
+  [
+   111429089.0,
+   "1.11429e+08"
+  ],
+  [
+   -6450654.775635239,
+   "-6.45065e+06"
+  ],
+  [
+   95044.81174813566,
+   "95044.8"
+  ],
+  [
+   0.5144,
+   "0.5144"
+  ],
+  [
+   540276500.0,
+   "5.40276e+08"
+  ],
+  [
+   -794417.4234619457,
+   "-794417"
+  ],
+  [
+   0.0003179975677450386,
+   "0.000317998"
+  ],
+  [
+   0.94,
+   "0.94"
+  ],
+  [
+   967848213.0,
+   "9.67848e+08"
+  ],
+  [
+   9957896.024721019,
+   "9.9579e+06"
+  ],
+  [
+   115339157.44682088,
+   "1.15339e+08"
+  ],
+  [
+   0.21,
+   "0.21"
+  ],
+  [
+   792428257.0,
+   "7.92428e+08"
+  ],
+  [
+   -4157766.092982864,
+   "-4.15777e+06"
+  ],
+  [
+   208317.5366968694,
+   "208318"
+  ],
+  [
+   0.19378242,
+   "0.193782"
+  ],
+  [
+   405169638.0,
+   "4.0517e+08"
+  ],
+  [
+   -6745231.503066147,
+   "-6.74523e+06"
+  ],
+  [
+   661690.7886365033,
+   "661691"
+  ],
+  [
+   0.86524995,
+   "0.86525"
+  ],
+  [
+   840792938.0,
+   "8.40793e+08"
+  ],
+  [
+   -2362971.12902933,
+   "-2.36297e+06"
+  ],
+  [
+   9558193.43876446,
+   "9.55819e+06"
+  ],
+  [
+   0.04,
+   "0.04"
+  ],
+  [
+   102532793.0,
+   "1.02533e+08"
+  ],
+  [
+   8357453.408841372,
+   "8.35745e+06"
+  ],
+  [
+   1065934.790888538,
+   "1.06593e+06"
+  ],
+  [
+   0.46341,
+   "0.46341"
+  ],
+  [
+   864375739.0,
+   "8.64376e+08"
+  ],
+  [
+   2600207.60308828,
+   "2.60021e+06"
+  ],
+  [
+   8.063115796695877e-07,
+   "8.06312e-07"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   3074426.0,
+   "3.07443e+06"
+  ],
+  [
+   -1094664.0525964275,
+   "-1.09466e+06"
+  ],
+  [
+   417437055.04182976,
+   "4.17437e+08"
+  ],
+  [
+   0.15,
+   "0.15"
+  ],
+  [
+   495526380.0,
+   "4.95526e+08"
+  ],
+  [
+   1388114.3760979269,
+   "1.38811e+06"
+  ],
+  [
+   23794073.754838314,
+   "2.37941e+07"
+  ],
+  [
+   0.07,
+   "0.07"
+  ],
+  [
+   698874351.0,
+   "6.98874e+08"
+  ],
+  [
+   4262105.558318943,
+   "4.26211e+06"
+  ],
+  [
+   722104525.7757944,
+   "7.22105e+08"
+  ],
+  [
+   0.4,
+   "0.4"
+  ],
+  [
+   839859683.0,
+   "8.3986e+08"
+  ],
+  [
+   9652081.186641145,
+   "9.65208e+06"
+  ],
+  [
+   0.09971637198369407,
+   "0.0997164"
+  ],
+  [
+   0.65365,
+   "0.65365"
+  ],
+  [
+   768306508.0,
+   "7.68307e+08"
+  ],
+  [
+   9688315.15764273,
+   "9.68832e+06"
+  ],
+  [
+   2.83010085664585e-08,
+   "2.8301e-08"
+  ],
+  [
+   0.0614272,
+   "0.0614272"
+  ],
+  [
+   245731770.0,
+   "2.45732e+08"
+  ],
+  [
+   -589303.9641531967,
+   "-589304"
+  ],
+  [
+   0.005108218271084362,
+   "0.00510822"
+  ],
+  [
+   0.75,
+   "0.75"
+  ],
+  [
+   774518261.0,
+   "7.74518e+08"
+  ],
+  [
+   -470335.11792783067,
+   "-470335"
+  ],
+  [
+   200627655.8325202,
+   "2.00628e+08"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   195903621.0,
+   "1.95904e+08"
+  ],
+  [
+   -8816400.058225118,
+   "-8.8164e+06"
+  ],
+  [
+   6.902072640193209,
+   "6.90207"
+  ],
+  [
+   0.99224,
+   "0.99224"
+  ],
+  [
+   279047765.0,
+   "2.79048e+08"
+  ],
+  [
+   -4637665.691955417,
+   "-4.63767e+06"
+  ],
+  [
+   0.0009963092944347213,
+   "0.000996309"
+  ],
+  [
+   0.22888056,
+   "0.228881"
+  ],
+  [
+   383074118.0,
+   "3.83074e+08"
+  ],
+  [
+   2767754.6381554157,
+   "2.76775e+06"
+  ],
+  [
+   335199.3530191101,
+   "335199"
+  ],
+  [
+   0.8614,
+   "0.8614"
+  ],
+  [
+   594427489.0,
+   "5.94427e+08"
+  ],
+  [
+   6048175.179731777,
+   "6.04818e+06"
+  ],
+  [
+   0.00021353668261405893,
+   "0.000213537"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   742389034.0,
+   "7.42389e+08"
+  ],
+  [
+   806459.9491936173,
+   "806460"
+  ],
+  [
+   7949432.75639723,
+   "7.94943e+06"
+  ],
+  [
+   0.17,
+   "0.17"
+  ],
+  [
+   959193771.0,
+   "9.59194e+08"
+  ],
+  [
+   9586700.948362838,
+   "9.5867e+06"
+  ],
+  [
+   1.0336810706297994e-07,
+   "1.03368e-07"
+  ],
+  [
+   0.89155,
+   "0.89155"
+  ],
+  [
+   648987030.0,
+   "6.48987e+08"
+  ],
+  [
+   4213271.208094211,
+   "4.21327e+06"
+  ],
+  [
+   2018739.6595444276,
+   "2.01874e+06"
+  ],
+  [
+   0.126,
+   "0.126"
+  ],
+  [
+   650804903.0,
+   "6.50805e+08"
+  ],
+  [
+   -6090289.198991105,
+   "-6.09029e+06"
+  ],
+  [
+   2.749693919313042e-06,
+   "2.74969e-06"
+  ],
+  [
+   0.93461,
+   "0.93461"
+  ],
+  [
+   833092359.0,
+   "8.33092e+08"
+  ],
+  [
+   5798031.316476187,
+   "5.79803e+06"
+  ],
+  [
+   1.8186073617842826e-09,
+   "1.81861e-09"
+  ],
+  [
+   0.6601,
+   "0.6601"
+  ],
+  [
+   370106901.0,
+   "3.70107e+08"
+  ],
+  [
+   -1620405.7853861079,
+   "-1.62041e+06"
+  ],
+  [
+   936.6281862175559,
+   "936.628"
+  ],
+  [
+   0.01,
+   "0.01"
+  ],
+  [
+   252047227.0,
+   "2.52047e+08"
+  ],
+  [
+   -382920.6592307482,
+   "-382921"
+  ],
+  [
+   32260281833.341007,
+   "3.22603e+10"
+  ],
+  [
+   0.45,
+   "0.45"
+  ],
+  [
+   338780178.0,
+   "3.3878e+08"
+  ],
+  [
+   -8176751.193408509,
+   "-8.17675e+06"
+  ],
+  [
+   1.0071672989961975,
+   "1.00717"
+  ],
+  [
+   0.427525,
+   "0.427525"
+  ],
+  [
+   305161040.0,
+   "3.05161e+08"
+  ],
+  [
+   6581493.572090242,
+   "6.58149e+06"
+  ],
+  [
+   0.00035003206059580985,
+   "0.000350032"
+  ],
+  [
+   0.86687,
+   "0.86687"
+  ],
+  [
+   365818510.0,
+   "3.65819e+08"
+  ],
+  [
+   -4356848.722347569,
+   "-4.35685e+06"
+  ],
+  [
+   0.10685544356287008,
+   "0.106855"
+  ],
+  [
+   0.739509,
+   "0.739509"
+  ],
+  [
+   352678927.0,
+   "3.52679e+08"
+  ],
+  [
+   -6721795.867681779,
+   "-6.7218e+06"
+  ],
+  [
+   1.179506347561488,
+   "1.17951"
+  ],
+  [
+   0.18648129,
+   "0.186481"
+  ],
+  [
+   309609936.0,
+   "3.0961e+08"
+  ],
+  [
+   231490.03047541901,
+   "231490"
+  ],
+  [
+   0.09662488475068451,
+   "0.0966249"
+  ],
+  [
+   0.89,
+   "0.89"
+  ],
+  [
+   866225670.0,
+   "8.66226e+08"
+  ],
+  [
+   6887076.840840768,
+   "6.88708e+06"
+  ],
+  [
+   3114487575.97069,
+   "3.11449e+09"
+  ],
+  [
+   0.51,
+   "0.51"
+  ],
+  [
+   921187616.0,
+   "9.21188e+08"
+  ],
+  [
+   -2511472.9374804543,
+   "-2.51147e+06"
+  ],
+  [
+   11.442643078497037,
+   "11.4426"
+  ],
+  [
+   0.7739,
+   "0.7739"
+  ],
+  [
+   634316648.0,
+   "6.34317e+08"
+  ],
+  [
+   8782167.909443833,
+   "8.78217e+06"
+  ],
+  [
+   0.00047620381005538775,
+   "0.000476204"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   710934235.0,
+   "7.10934e+08"
+  ],
+  [
+   4771192.241191445,
+   "4.77119e+06"
+  ],
+  [
+   0.006362057080313348,
+   "0.00636206"
+  ],
+  [
+   0.83528438,
+   "0.835284"
+  ],
+  [
+   971902967.0,
+   "9.71903e+08"
+  ],
+  [
+   -4757914.229626803,
+   "-4.75791e+06"
+  ],
+  [
+   4.3143374609052e-06,
+   "4.31434e-06"
+  ],
+  [
+   0.0092983,
+   "0.0092983"
+  ],
+  [
+   510393360.0,
+   "5.10393e+08"
+  ],
+  [
+   -3958411.3463565186,
+   "-3.95841e+06"
+  ],
+  [
+   8.964842555001103e-07,
+   "8.96484e-07"
+  ],
+  [
+   0.671397,
+   "0.671397"
+  ],
+  [
+   559739182.0,
+   "5.59739e+08"
+  ],
+  [
+   4902106.228336316,
+   "4.90211e+06"
+  ],
+  [
+   18284581263.79697,
+   "1.82846e+10"
+  ],
+  [
+   0.314,
+   "0.314"
+  ],
+  [
+   736299914.0,
+   "7.363e+08"
+  ],
+  [
+   -4494536.5134693,
+   "-4.49454e+06"
+  ],
+  [
+   8468559908.002996,
+   "8.46856e+09"
+  ],
+  [
+   0.633813,
+   "0.633813"
+  ],
+  [
+   837195195.0,
+   "8.37195e+08"
+  ],
+  [
+   7960336.105155889,
+   "7.96034e+06"
+  ],
+  [
+   8214980153.237089,
+   "8.21498e+09"
+  ],
+  [
+   0.153,
+   "0.153"
+  ],
+  [
+   221968322.0,
+   "2.21968e+08"
+  ],
+  [
+   2747881.193167694,
+   "2.74788e+06"
+  ],
+  [
+   110.63432124018667,
+   "110.634"
+  ],
+  [
+   0.046949,
+   "0.046949"
+  ],
+  [
+   20580088.0,
+   "2.05801e+07"
+  ],
+  [
+   -7009443.7665355215,
+   "-7.00944e+06"
+  ],
+  [
+   2.2987556497860405e-09,
+   "2.29876e-09"
+  ],
+  [
+   0.202,
+   "0.202"
+  ],
+  [
+   23803266.0,
+   "2.38033e+07"
+  ],
+  [
+   5277060.0857424885,
+   "5.27706e+06"
+  ],
+  [
+   141515.69309423742,
+   "141516"
+  ],
+  [
+   0.1543,
+   "0.1543"
+  ],
+  [
+   24861266.0,
+   "2.48613e+07"
+  ],
+  [
+   8904375.94212449,
+   "8.90438e+06"
+  ],
+  [
+   0.979341176159717,
+   "0.979341"
+  ],
+  [
+   0.867965,
+   "0.867965"
+  ],
+  [
+   379407633.0,
+   "3.79408e+08"
+  ],
+  [
+   -2168480.0612825854,
+   "-2.16848e+06"
+  ],
+  [
+   1.0691240035441759e-05,
+   "1.06912e-05"
+  ],
+  [
+   0.21,
+   "0.21"
+  ],
+  [
+   309846419.0,
+   "3.09846e+08"
+  ],
+  [
+   -4835396.931549023,
+   "-4.8354e+06"
+  ],
+  [
+   138137040.64508718,
+   "1.38137e+08"
+  ],
+  [
+   0.24713487,
+   "0.247135"
+  ],
+  [
+   334448115.0,
+   "3.34448e+08"
+  ],
+  [
+   1729481.6901087593,
+   "1.72948e+06"
+  ],
+  [
+   7.124858659152964e-06,
+   "7.12486e-06"
+  ],
+  [
+   0.8,
+   "0.8"
+  ],
+  [
+   368899756.0,
+   "3.689e+08"
+  ],
+  [
+   827615.0614327043,
+   "827615"
+  ],
+  [
+   487462393.73384446,
+   "4.87462e+08"
+  ],
+  [
+   0.2283895,
+   "0.228389"
+  ],
+  [
+   259231123.0,
+   "2.59231e+08"
+  ],
+  [
+   2035015.3451915234,
+   "2.03502e+06"
+  ],
+  [
+   342091.94862738106,
+   "342092"
+  ],
+  [
+   0.643137,
+   "0.643137"
+  ],
+  [
+   968213995.0,
+   "9.68214e+08"
+  ],
+  [
+   4418552.139097031,
+   "4.41855e+06"
+  ],
+  [
+   18343587.419591226,
+   "1.83436e+07"
+  ],
+  [
+   0.77084,
+   "0.77084"
+  ],
+  [
+   836958001.0,
+   "8.36958e+08"
+  ],
+  [
+   2530961.641432043,
+   "2.53096e+06"
+  ],
+  [
+   23206107.537898276,
+   "2.32061e+07"
+  ],
+  [
+   0.47,
+   "0.47"
+  ],
+  [
+   777084124.0,
+   "7.77084e+08"
+  ],
+  [
+   8530431.778177157,
+   "8.53043e+06"
+  ],
+  [
+   7.163693061767266e-07,
+   "7.16369e-07"
+  ],
+  [
+   0.17396487,
+   "0.173965"
+  ],
+  [
+   79689577.0,
+   "7.96896e+07"
+  ],
+  [
+   8147100.330357637,
+   "8.1471e+06"
+  ],
+  [
+   0.011551086209772075,
+   "0.0115511"
+  ],
+  [
+   0.711,
+   "0.711"
+  ],
+  [
+   290128001.0,
+   "2.90128e+08"
+  ],
+  [
+   4013117.7587787453,
+   "4.01312e+06"
+  ],
+  [
+   0.007511314585084294,
+   "0.00751131"
+  ],
+  [
+   0.43,
+   "0.43"
+  ],
+  [
+   131808483.0,
+   "1.31808e+08"
+  ],
+  [
+   -1426194.659483986,
+   "-1.42619e+06"
+  ],
+  [
+   0.05688213978465978,
+   "0.0568821"
+  ],
+  [
+   0.878354,
+   "0.878354"
+  ],
+  [
+   254552337.0,
+   "2.54552e+08"
+  ],
+  [
+   -9837943.941715047,
+   "-9.83794e+06"
+  ],
+  [
+   0.09815312424181367,
+   "0.0981531"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   859280852.0,
+   "8.59281e+08"
+  ],
+  [
+   -8885493.845113242,
+   "-8.88549e+06"
+  ],
+  [
+   15837.496390236509,
+   "15837.5"
+  ],
+  [
+   0.632878,
+   "0.632878"
+  ],
+  [
+   554883951.0,
+   "5.54884e+08"
+  ],
+  [
+   3166647.5494409055,
+   "3.16665e+06"
+  ],
+  [
+   0.00013819795372388815,
+   "0.000138198"
+  ],
+  [
+   0.72472,
+   "0.72472"
+  ],
+  [
+   280379041.0,
+   "2.80379e+08"
+  ],
+  [
+   -1311731.2435778696,
+   "-1.31173e+06"
+  ],
+  [
+   0.0005675260312296776,
+   "0.000567526"
+  ],
+  [
+   0.152,
+   "0.152"
+  ],
+  [
+   357216905.0,
+   "3.57217e+08"
+  ],
+  [
+   -7244329.43725819,
+   "-7.24433e+06"
+  ],
+  [
+   4.551322725398519,
+   "4.55132"
+  ],
+  [
+   0.632281,
+   "0.632281"
+  ],
+  [
+   276454837.0,
+   "2.76455e+08"
+  ],
+  [
+   -4295648.697374057,
+   "-4.29565e+06"
+  ],
+  [
+   4.702946827387918,
+   "4.70295"
+  ],
+  [
+   0.62137,
+   "0.62137"
+  ],
+  [
+   660898828.0,
+   "6.60899e+08"
+  ],
+  [
+   -143869.83831473812,
+   "-143870"
+  ],
+  [
+   3101.7646517403946,
+   "3101.76"
+  ],
+  [
+   0.41194064,
+   "0.411941"
+  ],
+  [
+   63348086.0,
+   "6.33481e+07"
+  ],
+  [
+   -6955363.333146399,
+   "-6.95536e+06"
+  ],
+  [
+   0.027988170545283932,
+   "0.0279882"
+  ],
+  [
+   0.44712367,
+   "0.447124"
+  ],
+  [
+   669493643.0,
+   "6.69494e+08"
+  ],
+  [
+   9538160.615834825,
+   "9.53816e+06"
+  ],
+  [
+   0.00011407546419939795,
+   "0.000114075"
+  ],
+  [
+   0.6246293,
+   "0.624629"
+  ],
+  [
+   192542596.0,
+   "1.92543e+08"
+  ],
+  [
+   -3163642.8599234056,
+   "-3.16364e+06"
+  ],
+  [
+   656711.5996507542,
+   "656712"
+  ],
+  [
+   0.9217187,
+   "0.921719"
+  ],
+  [
+   812762648.0,
+   "8.12763e+08"
+  ],
+  [
+   -5441301.268877024,
+   "-5.4413e+06"
+  ],
+  [
+   2.955387681356314e-08,
+   "2.95539e-08"
+  ],
+  [
+   0.742501,
+   "0.742501"
+  ],
+  [
+   28383934.0,
+   "2.83839e+07"
+  ],
+  [
+   -313899.8320707027,
+   "-313900"
+  ],
+  [
+   1.9182331793275351,
+   "1.91823"
+  ],
+  [
+   0.39308,
+   "0.39308"
+  ],
+  [
+   806058611.0,
+   "8.06059e+08"
+  ],
+  [
+   -1381664.218179958,
+   "-1.38166e+06"
+  ],
+  [
+   8363084.734765847,
+   "8.36308e+06"
+  ],
+  [
+   0.41,
+   "0.41"
+  ],
+  [
+   830365587.0,
+   "8.30366e+08"
+  ],
+  [
+   -3154177.227676071,
+   "-3.15418e+06"
+  ],
+  [
+   3.653932693622548e-05,
+   "3.65393e-05"
+  ],
+  [
+   0.977626,
+   "0.977626"
+  ],
+  [
+   621468010.0,
+   "6.21468e+08"
+  ],
+  [
+   -8043722.128248898,
+   "-8.04372e+06"
+  ],
+  [
+   0.0012396309923949805,
+   "0.00123963"
+  ],
+  [
+   0.349136,
+   "0.349136"
+  ],
+  [
+   373779269.0,
+   "3.73779e+08"
+  ],
+  [
+   -7097916.0627802005,
+   "-7.09792e+06"
+  ],
+  [
+   494.683824129435,
+   "494.684"
+  ],
+  [
+   0.001,
+   "0.001"
+  ],
+  [
+   604801395.0,
+   "6.04801e+08"
+  ],
+  [
+   6308632.555295359,
+   "6.30863e+06"
+  ],
+  [
+   0.008736920828629497,
+   "0.00873692"
+  ],
+  [
+   0.81963318,
+   "0.819633"
+  ],
+  [
+   501973085.0,
+   "5.01973e+08"
+  ],
+  [
+   -8673960.391570475,
+   "-8.67396e+06"
+  ],
+  [
+   198529744082.0619,
+   "1.9853e+11"
+  ],
+  [
+   0.9927,
+   "0.9927"
+  ],
+  [
+   286153109.0,
+   "2.86153e+08"
+  ],
+  [
+   -3496134.694103621,
+   "-3.49613e+06"
+  ],
+  [
+   2041.9012612388494,
+   "2041.9"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   862954655.0,
+   "8.62955e+08"
+  ],
+  [
+   4250348.236446487,
+   "4.25035e+06"
+  ],
+  [
+   0.23553587062345377,
+   "0.235536"
+  ],
+  [
+   0.681,
+   "0.681"
+  ],
+  [
+   976513577.0,
+   "9.76514e+08"
+  ],
+  [
+   7140916.860916816,
+   "7.14092e+06"
+  ],
+  [
+   8.276673245939912e-08,
+   "8.27667e-08"
+  ],
+  [
+   0.2783,
+   "0.2783"
+  ],
+  [
+   446244998.0,
+   "4.46245e+08"
+  ],
+  [
+   385480.4365951065,
+   "385480"
+  ],
+  [
+   0.05516265059189109,
+   "0.0551627"
+  ],
+  [
+   0.8,
+   "0.8"
+  ],
+  [
+   150716050.0,
+   "1.50716e+08"
+  ],
+  [
+   8477518.420555804,
+   "8.47752e+06"
+  ],
+  [
+   25896.01963653223,
+   "25896"
+  ],
+  [
+   0.8,
+   "0.8"
+  ],
+  [
+   477072576.0,
+   "4.77073e+08"
+  ],
+  [
+   -7121244.431990311,
+   "-7.12124e+06"
+  ],
+  [
+   3.443028002495624e-07,
+   "3.44303e-07"
+  ],
+  [
+   0.04,
+   "0.04"
+  ],
+  [
+   92052029.0,
+   "9.2052e+07"
+  ],
+  [
+   687908.9843607415,
+   "687909"
+  ],
+  [
+   21295.19576638662,
+   "21295.2"
+  ],
+  [
+   0.49139108,
+   "0.491391"
+  ],
+  [
+   660762483.0,
+   "6.60762e+08"
+  ],
+  [
+   -7681069.707529349,
+   "-7.68107e+06"
+  ],
+  [
+   39213.27702817546,
+   "39213.3"
+  ],
+  [
+   0.23,
+   "0.23"
+  ],
+  [
+   626015496.0,
+   "6.26015e+08"
+  ],
+  [
+   -8484692.60591172,
+   "-8.48469e+06"
+  ],
+  [
+   2.131846647695606e-09,
+   "2.13185e-09"
+  ],
+  [
+   0.016,
+   "0.016"
+  ],
+  [
+   414022445.0,
+   "4.14022e+08"
+  ],
+  [
+   -3150113.7119143466,
+   "-3.15011e+06"
+  ],
+  [
+   1840.4568023389554,
+   "1840.46"
+  ],
+  [
+   0.37528,
+   "0.37528"
+  ],
+  [
+   33457443.0,
+   "3.34574e+07"
+  ],
+  [
+   2102365.1741248276,
+   "2.10237e+06"
+  ],
+  [
+   83149092.87373535,
+   "8.31491e+07"
+  ],
+  [
+   0.56262,
+   "0.56262"
+  ],
+  [
+   966299213.0,
+   "9.66299e+08"
+  ],
+  [
+   -2417338.3148614345,
+   "-2.41734e+06"
+  ],
+  [
+   3.7858247946384915e-06,
+   "3.78582e-06"
+  ],
+  [
+   0.57387435,
+   "0.573874"
+  ],
+  [
+   799508139.0,
+   "7.99508e+08"
+  ],
+  [
+   -6462532.722625525,
+   "-6.46253e+06"
+  ],
+  [
+   109.42720960693737,
+   "109.427"
+  ],
+  [
+   0.1873581,
+   "0.187358"
+  ],
+  [
+   503777174.0,
+   "5.03777e+08"
+  ],
+  [
+   4957784.818546593,
+   "4.95778e+06"
+  ],
+  [
+   1.0763183561109146e-09,
+   "1.07632e-09"
+  ],
+  [
+   0.4,
+   "0.4"
+  ],
+  [
+   22571075.0,
+   "2.25711e+07"
+  ],
+  [
+   -2374824.2979830205,
+   "-2.37482e+06"
+  ],
+  [
+   0.016247884994615148,
+   "0.0162479"
+  ],
+  [
+   0.33292,
+   "0.33292"
+  ],
+  [
+   625936055.0,
+   "6.25936e+08"
+  ],
+  [
+   4215470.252729543,
+   "4.21547e+06"
+  ],
+  [
+   4312178422.516915,
+   "4.31218e+09"
+  ],
+  [
+   0.9505048,
+   "0.950505"
+  ],
+  [
+   499683342.0,
+   "4.99683e+08"
+  ],
+  [
+   6046133.936710851,
+   "6.04613e+06"
+  ],
+  [
+   512124049.8809345,
+   "5.12124e+08"
+  ],
+  [
+   0.29,
+   "0.29"
+  ],
+  [
+   889403975.0,
+   "8.89404e+08"
+  ],
+  [
+   9389187.475097846,
+   "9.38919e+06"
+  ],
+  [
+   0.03573593161526836,
+   "0.0357359"
+  ],
+  [
+   0.95176,
+   "0.95176"
+  ],
+  [
+   485891436.0,
+   "4.85891e+08"
+  ],
+  [
+   -7481184.272700449,
+   "-7.48118e+06"
+  ],
+  [
+   468562195.6521002,
+   "4.68562e+08"
+  ],
+  [
+   0.8426851,
+   "0.842685"
+  ],
+  [
+   342869816.0,
+   "3.4287e+08"
+  ],
+  [
+   8161801.016763795,
+   "8.1618e+06"
+  ],
+  [
+   63.97639721660591,
+   "63.9764"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   579248286.0,
+   "5.79248e+08"
+  ],
+  [
+   8519945.35789277,
+   "8.51995e+06"
+  ],
+  [
+   2.263833843599948e-06,
+   "2.26383e-06"
+  ],
+  [
+   0.363118,
+   "0.363118"
+  ],
+  [
+   115747252.0,
+   "1.15747e+08"
+  ],
+  [
+   -9454313.122311234,
+   "-9.45431e+06"
+  ],
+  [
+   167.9843060766106,
+   "167.984"
+  ],
+  [
+   0.8582464,
+   "0.858246"
+  ],
+  [
+   630786941.0,
+   "6.30787e+08"
+  ],
+  [
+   -3007312.747826934,
+   "-3.00731e+06"
+  ],
+  [
+   322374.4830139457,
+   "322374"
+  ],
+  [
+   0.84,
+   "0.84"
+  ],
+  [
+   783210367.0,
+   "7.8321e+08"
+  ],
+  [
+   -6021957.267959752,
+   "-6.02196e+06"
+  ],
+  [
+   0.0002157862149192077,
+   "0.000215786"
+  ],
+  [
+   0.99607,
+   "0.99607"
+  ],
+  [
+   480975659.0,
+   "4.80976e+08"
+  ],
+  [
+   860542.6536339652,
+   "860543"
+  ],
+  [
+   2.1873735864624345e-08,
+   "2.18737e-08"
+  ],
+  [
+   0.23,
+   "0.23"
+  ],
+  [
+   188072453.0,
+   "1.88072e+08"
+  ],
+  [
+   -7842788.859792374,
+   "-7.84279e+06"
+  ],
+  [
+   2.081554121820921e-05,
+   "2.08155e-05"
+  ],
+  [
+   0.0660309,
+   "0.0660309"
+  ],
+  [
+   953779575.0,
+   "9.5378e+08"
+  ],
+  [
+   -6780209.133353106,
+   "-6.78021e+06"
+  ],
+  [
+   8.27638097265609e-06,
+   "8.27638e-06"
+  ],
+  [
+   0.367013,
+   "0.367013"
+  ],
+  [
+   822714933.0,
+   "8.22715e+08"
+  ],
+  [
+   -6221592.806443166,
+   "-6.22159e+06"
+  ],
+  [
+   1.7418460696506674e-09,
+   "1.74185e-09"
+  ],
+  [
+   0.42608537,
+   "0.426085"
+  ],
+  [
+   653656819.0,
+   "6.53657e+08"
+  ],
+  [
+   8526222.084474068,
+   "8.52622e+06"
+  ],
+  [
+   7.462346925750322e-08,
+   "7.46235e-08"
+  ],
+  [
+   0.62733407,
+   "0.627334"
+  ],
+  [
+   771638492.0,
+   "7.71638e+08"
+  ],
+  [
+   1336497.1834215913,
+   "1.3365e+06"
+  ],
+  [
+   3.881237371808e-09,
+   "3.88124e-09"
+  ],
+  [
+   0.23,
+   "0.23"
+  ],
+  [
+   406651190.0,
+   "4.06651e+08"
+  ],
+  [
+   1858756.883690605,
+   "1.85876e+06"
+  ],
+  [
+   0.00023477535308132245,
+   "0.000234775"
+  ],
+  [
+   0.0866074,
+   "0.0866074"
+  ],
+  [
+   675568064.0,
+   "6.75568e+08"
+  ],
+  [
+   -493604.6424788572,
+   "-493605"
+  ],
+  [
+   2.3489427441751455e-09,
+   "2.34894e-09"
+  ],
+  [
+   0.125,
+   "0.125"
+  ],
+  [
+   810588280.0,
+   "8.10588e+08"
+  ],
+  [
+   6082227.350393649,
+   "6.08223e+06"
+  ],
+  [
+   0.007148951993616326,
+   "0.00714895"
+  ],
+  [
+   0.12653,
+   "0.12653"
+  ],
+  [
+   265916624.0,
+   "2.65917e+08"
+  ],
+  [
+   -2730375.58050053,
+   "-2.73038e+06"
+  ],
+  [
+   12981571553.374224,
+   "1.29816e+10"
+  ],
+  [
+   0.655593,
+   "0.655593"
+  ],
+  [
+   320855836.0,
+   "3.20856e+08"
+  ],
+  [
+   6359770.633382555,
+   "6.35977e+06"
+  ],
+  [
+   6.898867512588351e-07,
+   "6.89887e-07"
+  ],
+  [
+   0.42,
+   "0.42"
+  ],
+  [
+   300052110.0,
+   "3.00052e+08"
+  ],
+  [
+   -354890.979761295,
+   "-354891"
+  ],
+  [
+   7.266184930150751e-07,
+   "7.26618e-07"
+  ],
+  [
+   0.0639,
+   "0.0639"
+  ],
+  [
+   80313462.0,
+   "8.03135e+07"
+  ],
+  [
+   -3731139.2804785036,
+   "-3.73114e+06"
+  ],
+  [
+   3.2031093893842243e-06,
+   "3.20311e-06"
+  ],
+  [
+   0.810689,
+   "0.810689"
+  ],
+  [
+   260451842.0,
+   "2.60452e+08"
+  ],
+  [
+   9761491.952164672,
+   "9.76149e+06"
+  ],
+  [
+   1.3526657931622051e-05,
+   "1.35267e-05"
+  ],
+  [
+   0.3,
+   "0.3"
+  ],
+  [
+   893631691.0,
+   "8.93632e+08"
+  ],
+  [
+   -4996469.443807134,
+   "-4.99647e+06"
+  ],
+  [
+   0.38268907607925534,
+   "0.382689"
+  ],
+  [
+   0.78468948,
+   "0.784689"
+  ],
+  [
+   494128075.0,
+   "4.94128e+08"
+  ],
+  [
+   5941072.57391797,
+   "5.94107e+06"
+  ],
+  [
+   1.6761549168685579,
+   "1.67615"
+  ],
+  [
+   0.81849935,
+   "0.818499"
+  ],
+  [
+   700257848.0,
+   "7.00258e+08"
+  ],
+  [
+   -9527582.879373537,
+   "-9.52758e+06"
+  ],
+  [
+   0.0017650814567781834,
+   "0.00176508"
+  ],
+  [
+   0.364886,
+   "0.364886"
+  ],
+  [
+   125140615.0,
+   "1.25141e+08"
+  ],
+  [
+   9762815.49322728,
+   "9.76282e+06"
+  ],
+  [
+   3953658505.2558303,
+   "3.95366e+09"
+  ],
+  [
+   0.045,
+   "0.045"
+  ],
+  [
+   14050152.0,
+   "1.40502e+07"
+  ],
+  [
+   -817462.9342366457,
+   "-817463"
+  ],
+  [
+   7371062904.076551,
+   "7.37106e+09"
+  ],
+  [
+   0.2457,
+   "0.2457"
+  ],
+  [
+   442641326.0,
+   "4.42641e+08"
+  ],
+  [
+   -2259377.711792549,
+   "-2.25938e+06"
+  ],
+  [
+   1.7785751200625643e-09,
+   "1.77858e-09"
+  ],
+  [
+   0.81814884,
+   "0.818149"
+  ],
+  [
+   55609825.0,
+   "5.56098e+07"
+  ],
+  [
+   -9582873.920012897,
+   "-9.58287e+06"
+  ],
+  [
+   2.2703277789891824e-05,
+   "2.27033e-05"
+  ],
+  [
+   0.42,
+   "0.42"
+  ],
+  [
+   290462928.0,
+   "2.90463e+08"
+  ],
+  [
+   4982388.673710501,
+   "4.98239e+06"
+  ],
+  [
+   4861445.050629047,
+   "4.86145e+06"
+  ],
+  [
+   0.826,
+   "0.826"
+  ],
+  [
+   810514945.0,
+   "8.10515e+08"
+  ],
+  [
+   -8328514.878886102,
+   "-8.32851e+06"
+  ],
+  [
+   0.0450780969006458,
+   "0.0450781"
+  ],
+  [
+   0.84,
+   "0.84"
+  ],
+  [
+   172914182.0,
+   "1.72914e+08"
+  ],
+  [
+   -2251206.993363943,
+   "-2.25121e+06"
+  ],
+  [
+   1.9738162091136715,
+   "1.97382"
+  ],
+  [
+   0.16803314,
+   "0.168033"
+  ],
+  [
+   443584193.0,
+   "4.43584e+08"
+  ],
+  [
+   -9961795.268950421,
+   "-9.9618e+06"
+  ],
+  [
+   1634331818234.5698,
+   "1.63433e+12"
+  ],
+  [
+   0.6,
+   "0.6"
+  ],
+  [
+   182403845.0,
+   "1.82404e+08"
+  ],
+  [
+   -5206092.525949602,
+   "-5.20609e+06"
+  ],
+  [
+   4.350580078621009e-07,
+   "4.35058e-07"
+  ],
+  [
+   0.074,
+   "0.074"
+  ],
+  [
+   606596060.0,
+   "6.06596e+08"
+  ],
+  [
+   2446.1083655226976,
+   "2446.11"
+  ],
+  [
+   763770306827.1041,
+   "7.6377e+11"
+  ],
+  [
+   0.9,
+   "0.9"
+  ],
+  [
+   113344467.0,
+   "1.13344e+08"
+  ],
+  [
+   -651778.8342284597,
+   "-651779"
+  ],
+  [
+   1781.549889183663,
+   "1781.55"
+  ],
+  [
+   1.0,
+   "1"
+  ],
+  [
+   563607542.0,
+   "5.63608e+08"
+  ],
+  [
+   -8067086.566976862,
+   "-8.06709e+06"
+  ],
+  [
+   1.0792461316695604e-06,
+   "1.07925e-06"
+  ],
+  [
+   0.22405,
+   "0.22405"
+  ],
+  [
+   970933166.0,
+   "9.70933e+08"
+  ],
+  [
+   -570296.6342913471,
+   "-570297"
+  ],
+  [
+   7.294732735649894e-07,
+   "7.29473e-07"
+  ],
+  [
+   0.95983,
+   "0.95983"
+  ],
+  [
+   75503150.0,
+   "7.55032e+07"
+  ],
+  [
+   9633972.985419657,
+   "9.63397e+06"
+  ],
+  [
+   0.001274104911887155,
+   "0.0012741"
+  ],
+  [
+   0.5,
+   "0.5"
+  ],
+  [
+   643564420.0,
+   "6.43564e+08"
+  ],
+  [
+   -9489813.206967361,
+   "-9.48981e+06"
+  ],
+  [
+   0.12357581967542154,
+   "0.123576"
+  ],
+  [
+   0.8626,
+   "0.8626"
+  ],
+  [
+   340670577.0,
+   "3.40671e+08"
+  ],
+  [
+   1439637.7064183988,
+   "1.43964e+06"
+  ],
+  [
+   490426631581.1662,
+   "4.90427e+11"
+  ],
+  [
+   0.7,
+   "0.7"
+  ],
+  [
+   619922752.0,
+   "6.19923e+08"
+  ],
+  [
+   -1718992.8951786477,
+   "-1.71899e+06"
+  ],
+  [
+   1095400.6300222122,
+   "1.0954e+06"
+  ],
+  [
+   0.776767,
+   "0.776767"
+  ],
+  [
+   634346621.0,
+   "6.34347e+08"
+  ],
+  [
+   -177895.6692997571,
+   "-177896"
+  ],
+  [
+   4.833146966468966,
+   "4.83315"
+  ],
+  [
+   0.62,
+   "0.62"
+  ],
+  [
+   895234773.0,
+   "8.95235e+08"
+  ],
+  [
+   -4431260.317375181,
+   "-4.43126e+06"
+  ],
+  [
+   1.60352604396327e-06,
+   "1.60353e-06"
+  ],
+  [
+   0.78335,
+   "0.78335"
+  ],
+  [
+   448612697.0,
+   "4.48613e+08"
+  ],
+  [
+   1511344.2220538892,
+   "1.51134e+06"
+  ],
+  [
+   78.29634811656939,
+   "78.2963"
+  ],
+  [
+   0.12673224,
+   "0.126732"
+  ],
+  [
+   100285048.0,
+   "1.00285e+08"
+  ],
+  [
+   -1206292.3903535623,
+   "-1.20629e+06"
+  ],
+  [
+   7.074744192388711e-07,
+   "7.07474e-07"
+  ],
+  [
+   0.35997586,
+   "0.359976"
+  ],
+  [
+   255256002.0,
+   "2.55256e+08"
+  ],
+  [
+   -8288977.417669922,
+   "-8.28898e+06"
+  ],
+  [
+   7650182008.744422,
+   "7.65018e+09"
+  ],
+  [
+   0.4,
+   "0.4"
+  ],
+  [
+   937898601.0,
+   "9.37899e+08"
+  ],
+  [
+   3791435.1475040633,
+   "3.79144e+06"
+  ],
+  [
+   1484.5317793496663,
+   "1484.53"
+  ],
+  [
+   0.14693,
+   "0.14693"
+  ],
+  [
+   769909657.0,
+   "7.6991e+08"
+  ],
+  [
+   7726990.212240927,
+   "7.72699e+06"
+  ],
+  [
+   0.014766000898324182,
+   "0.014766"
+  ],
+  [
+   0.838,
+   "0.838"
+  ],
+  [
+   338182861.0,
+   "3.38183e+08"
+  ],
+  [
+   -5683985.813361945,
+   "-5.68399e+06"
+  ],
+  [
+   1.4761566939051221e-08,
+   "1.47616e-08"
+  ],
+  [
+   0.1282,
+   "0.1282"
+  ],
+  [
+   212541090.0,
+   "2.12541e+08"
+  ],
+  [
+   1788611.173280185,
+   "1.78861e+06"
+  ],
+  [
+   0.028697667355051974,
+   "0.0286977"
+  ],
+  [
+   0.57,
+   "0.57"
+  ],
+  [
+   898516462.0,
+   "8.98516e+08"
+  ],
+  [
+   3294303.820701752,
+   "3.2943e+06"
+  ],
+  [
+   14347122.627833232,
+   "1.43471e+07"
+  ],
+  [
+   0.9419,
+   "0.9419"
+  ],
+  [
+   187046170.0,
+   "1.87046e+08"
+  ],
+  [
+   -722402.5669687968,
+   "-722403"
+  ],
+  [
+   0.23980663536409372,
+   "0.239807"
+  ],
+  [
+   0.14220129,
+   "0.142201"
+  ],
+  [
+   795752121.0,
+   "7.95752e+08"
+  ],
+  [
+   4334286.389088213,
+   "4.33429e+06"
+  ],
+  [
+   0.0001332858943286003,
+   "0.000133286"
+  ],
+  [
+   0.2898,
+   "0.2898"
+  ],
+  [
+   386745216.0,
+   "3.86745e+08"
+  ],
+  [
+   -501379.4666736815,
+   "-501379"
+  ],
+  [
+   9.18529593951441e-08,
+   "9.1853e-08"
+  ],
+  [
+   0.4454,
+   "0.4454"
+  ],
+  [
+   384259401.0,
+   "3.84259e+08"
+  ],
+  [
+   -9642991.778868712,
+   "-9.64299e+06"
+  ],
+  [
+   8033.529113850775,
+   "8033.53"
+  ],
+  [
+   0.0124129,
+   "0.0124129"
+  ],
+  [
+   655740375.0,
+   "6.5574e+08"
+  ],
+  [
+   7906947.903938267,
+   "7.90695e+06"
+  ],
+  [
+   2385034.078589364,
+   "2.38503e+06"
+  ],
+  [
+   0.0,
+   "0"
+  ],
+  [
+   291686486.0,
+   "2.91686e+08"
+  ],
+  [
+   -7241664.1192140635,
+   "-7.24166e+06"
+  ],
+  [
+   0.05703998484405118,
+   "0.05704"
+  ],
+  [
+   0.5006,
+   "0.5006"
+  ],
+  [
+   977587910.0,
+   "9.77588e+08"
+  ],
+  [
+   -3091878.292691461,
+   "-3.09188e+06"
+  ],
+  [
+   560357824.2492177,
+   "5.60358e+08"
+  ],
+  [
+   0.6,
+   "0.6"
+  ],
+  [
+   284097765.0,
+   "2.84098e+08"
+  ],
+  [
+   -18978.043605279177,
+   "-18978"
+  ],
+  [
+   1728872.0034918787,
+   "1.72887e+06"
+  ],
+  [
+   0.2822,
+   "0.2822"
+  ],
+  [
+   964486984.0,
+   "9.64487e+08"
+  ],
+  [
+   -7268005.649398854,
+   "-7.26801e+06"
+  ],
+  [
+   129583950392.29596,
+   "1.29584e+11"
+  ],
+  [
+   0.35293,
+   "0.35293"
+  ],
+  [
+   838722503.0,
+   "8.38723e+08"
+  ],
+  [
+   -9447927.343339691,
+   "-9.44793e+06"
+  ],
+  [
+   764118309438.725,
+   "7.64118e+11"
+  ],
+  [
+   0.9372,
+   "0.9372"
+  ],
+  [
+   915862747.0,
+   "9.15863e+08"
+  ],
+  [
+   8417940.780698504,
+   "8.41794e+06"
+  ],
+  [
+   1758634.2700754027,
+   "1.75863e+06"
+  ],
+  [
+   0.0,
+   "0"
+  ],
+  [
+   526067132.0,
+   "5.26067e+08"
+  ],
+  [
+   -1582400.6549565103,
+   "-1.5824e+06"
+  ],
+  [
+   0.06454651261331253,
+   "0.0645465"
+  ],
+  [
+   0.0,
+   "0"
+  ],
+  [
+   10228765.0,
+   "1.02288e+07"
+  ],
+  [
+   3698859.0223473255,
+   "3.69886e+06"
+  ],
+  [
+   5.745480278400046e-09,
+   "5.74548e-09"
+  ],
+  [
+   0.109276,
+   "0.109276"
+  ],
+  [
+   899732126.0,
+   "8.99732e+08"
+  ],
+  [
+   814544.1552969944,
+   "814544"
+  ],
+  [
+   4.416896318138099,
+   "4.4169"
+  ],
+  [
+   0.09182,
+   "0.09182"
+  ],
+  [
+   452880469.0,
+   "4.5288e+08"
+  ],
+  [
+   6681329.29469228,
+   "6.68133e+06"
+  ],
+  [
+   205.89769009091452,
+   "205.898"
+  ],
+  [
+   0.87732,
+   "0.87732"
+  ],
+  [
+   206856826.0,
+   "2.06857e+08"
+  ]
+ ],
+ "g4": {
+  "document": {
+   "document": {
+    "createdOn": "2026-10-27T00:00:00Z",
+    "currency": "USD",
+    "id": "G4",
+    "title": "G4"
+   },
+   "registers": [
+    {
+     "asOf": "2021-04-15",
+     "id": "NE",
+     "level": "system",
+     "method": "semi-quantitative",
+     "timeframeMonths": 12,
+     "title": "Customer Service Portal"
+    }
+   ],
+   "risks": [
+    {
+     "category": {
+      "code": "ict"
+     },
+     "defaultedFields": [
+      "/polarity",
+      "/category",
+      "/status"
+     ],
+     "detail": {
+      "assetsAffected": "DMZ Router; Core_Switch_1; Fiber_Circuit_Bldg3_to_HQ; ",
+      "comments": "Still need to evaluate other potential issues from natural disasters (e.g., flooding) that may impact this system.",
+      "currentStatusDate": "2021-04-15",
+      "dateOfRiskIdentification": "2021-03-20",
+      "dependencies": "Availability of Construction Contractor",
+      "followUpDate": "2021-05-31",
+      "measured": {
+       "actualResponseCost": 245000,
+       "exposureRating": 0,
+       "impact": 1500000,
+       "likelihood": 0
+      },
+      "organizationOrBusinessUnit": "Northeast Region Support Center",
+      "otherScenarioDetails": "Not Applicable",
+      "planned": {
+       "exposureRating": 0,
+       "impact": 1500000,
+       "likelihood": 0
+      },
+      "primaryAdverseImpact": "Loss of communications to communcations center",
+      "resourceRequirementsForPlannedRisk": "Network architecture staff to plan and design the new infrastructure (existing labor budget). Contract to install underground fiber-optic cabling between headquarters and the communications center including necessary permits, trench construction, conduit materials, and new communications equipment.",
+      "riskScenarioDescription": "A natural disaster disrupts communications circuits impeding customer access.",
+      "secondaryAdverseImpacts": "Customers unable to access service portal may be disgruntled; SLAs may be jeopardized",
+      "sourceOfRiskInformation": "Contingency Planning Annual Exercise",
+      "systemAffected": "Customer Service Portal",
+      "threatEvents": "",
+      "threatSourcesActors": "Natural Disaster - Hurricane",
+      "threatVectors": "Physical Connectivity Disruption",
+      "vulnerabilityPredisposingConditions": "Outdoor/Exposed Infrastructure"
+     },
+     "exposureRating": 150000,
+     "polarity": "negative",
+     "registerId": "NE",
+     "responseDecision": "decided",
+     "riskCategory": "Contingency Planning",
+     "riskDescription": "A natural disaster disrupts communications circuits impeding customer access.",
+     "riskId": "17",
+     "riskImpact": 1500000,
+     "riskLikelihood": 0.1,
+     "riskOwnerPointOfContact": "Mark Winters <WintersMX@example.com>",
+     "riskResponseCost": 250000,
+     "riskResponseDescription": "Having identified that the key vulnerability is to overhead communications wiring, these circuits will be buried underground.",
+     "riskResponseType": [
+      "Mitigate"
+     ],
+     "status": "Open"
+    }
+   ],
+   "schemaVersion": "1.0.0"
+  },
+  "rdr": {
+   "actualResponseCost": 245000,
+   "assetsAffected": "DMZ Router; Core_Switch_1; Fiber_Circuit_Bldg3_to_HQ; ",
+   "comments": "Still need to evaluate other potential issues from natural disasters (e.g., flooding) that may impact this system.",
+   "currentRiskAnalysis": "Semi-quantitative. Point values as entered.",
+   "currentStatusDate": "2021-04-15",
+   "dateOfRiskIdentification": "2021-03-20",
+   "dependencies": "Availability of Construction Contractor",
+   "expectedExposureRating": 0,
+   "exposureRatingBeforeControls": 150000,
+   "finalExposureRating": 0,
+   "followUpDate": "2021-05-31",
+   "impactAfterControls": 1500000,
+   "impactAfterControlsAreInPlace": 1500000,
+   "impactBeforeControls": 1500000,
+   "likelihoodAfterControlsAreInPlaceWillBe": 0,
+   "likelihoodAfterControlsWillBe": 0,
+   "likelihoodBeforeControls": 0.1,
+   "organizationOrBusinessUnit": "Northeast Region Support Center",
+   "otherScenarioDetails": "Not Applicable",
+   "plannedResponseCost": 250000,
+   "plannedRiskResponse": [
+    "Mitigate"
+   ],
+   "plannedRiskResponseDescription": "Having identified that the key vulnerability is to overhead communications wiring, these circuits will be buried underground.",
+   "primaryAdverseImpact": "Loss of communications to communcations center",
+   "resourceRequirementsForPlannedRisk": "Network architecture staff to plan and design the new infrastructure (existing labor budget). Contract to install underground fiber-optic cabling between headquarters and the communications center including necessary permits, trench construction, conduit materials, and new communications equipment.",
+   "riskCategory": "Contingency Planning",
+   "riskIdNumbers": "17",
+   "riskOwnerPointOfContact": "Mark Winters <WintersMX@example.com>",
+   "riskScenarioDescription": "A natural disaster disrupts communications circuits impeding customer access.",
+   "secondaryAdverseImpacts": "Customers unable to access service portal may be disgruntled; SLAs may be jeopardized",
+   "sourceOfRiskInformation": "Contingency Planning Annual Exercise",
+   "systemAffected": "Customer Service Portal",
+   "threatEvents": "",
+   "threatSourcesActors": "Natural Disaster - Hurricane",
+   "threatVectors": "Physical Connectivity Disruption",
+   "vulnerabilityPredisposingConditions": "Outdoor/Exposed Infrastructure"
+  }
+ }
+}
