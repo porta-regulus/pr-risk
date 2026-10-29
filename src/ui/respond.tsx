@@ -165,6 +165,9 @@ function OptionEditor({ doc, option, update }: { readonly doc: RiskDocument; rea
       responses: (current.responses ?? []).map((item) => (item.id === option.id ? change(item) : item)),
     }));
   };
+  // A new option opens once. After that the user opens and closes it, so typing the title
+  // does not close the form.
+  const [startsOpen] = useState(option.title === '');
   const costs = option.costs as Partial<ResponseOption['costs']>;
   const setCost = (key: keyof ResponseOption['costs'], value: number | undefined): void => {
     set((current) => ({
@@ -176,7 +179,7 @@ function OptionEditor({ doc, option, update }: { readonly doc: RiskDocument; rea
   const usedBy = others.filter((item) => (item.bundleOf ?? []).includes(option.id)).map((item) => item.id);
   const introducible = doc.risks.filter((risk) => risk.onlyWithResponse === undefined || risk.onlyWithResponse === option.id);
   return (
-    <details class="editor" open={option.title === ''}>
+    <details class="editor" open={startsOpen}>
       <summary>
         {option.id} {option.title || 'New option'}, {option.status}, first-year cash {money((costs.oneOff ?? 0) + (costs.annual ?? 0) + (costs.reserveAmount ?? 0))} {currency}
       </summary>

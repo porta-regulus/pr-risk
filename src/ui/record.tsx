@@ -1,5 +1,6 @@
 // The decision record (SPEC.md Sec. 4) in the layout of Sec. 4.1. Two A4 pages at most. Every
 // table and figure has a number and a source line. Status is a dot and a word.
+import type { ComponentChildren } from 'preact';
 import type { DecisionRecord, PortfolioRow, RiskRow } from '../engine/decision';
 import type { Risk, RiskDocument } from '../schema/types';
 import { LecChart, money, probability, sourceLine, STATUS_TEXT, StatusText } from './report';
@@ -10,6 +11,15 @@ const BASIS: Readonly<Record<NonNullable<Risk['estimate']>['method'], string>> =
   mixed: 'mixed',
   'expert-calibrated': 'expert range',
 };
+
+// A table that scrolls on a narrow screen, focusable for the keyboard (WCAG 2.1.1).
+function Scroll({ label, children }: { readonly label: string; readonly children: ComponentChildren }) {
+  return (
+    <div class="table-box" tabIndex={0} role="region" aria-label={label}>
+      {children}
+    </div>
+  );
+}
 
 const KIND_TEXT = {
   strategic: 'Strategic',
@@ -50,7 +60,13 @@ function summary(doc: RiskDocument, record: DecisionRecord): string[] {
     best.ids.length === 0
       ? `No option adds more than it costs within the budget of ${money(record.budget)} ${currency}.`
       : `Fund ${names(doc, best.ids)} for ${money(best.cash)} ${currency} first-year cash, within the budget of ${money(record.budget)} ${currency}.`;
-  const second = `The roll-up goes from ${STATUS_TEXT[record.before.status].toLowerCase()} to ${STATUS_TEXT[record.after.status].toLowerCase()}, and the expected annual loss falls from ${money(record.before.eal)} to ${money(record.after.eal)} ${currency}.`;
+  const loss = `the expected annual loss ${record.after.eal < record.before.eal ? 'falls' : 'goes'} from ${money(record.before.eal)} to ${money(record.after.eal)} ${currency}`;
+  const curve = (doc.appetite?.toleranceCurve?.points ?? []).length > 0;
+  const second = !curve
+    ? `Without a tolerance curve, ${loss}.`
+    : record.before.status === record.after.status
+      ? `The roll-up stays ${STATUS_TEXT[record.after.status].toLowerCase()}, and ${loss}.`
+      : `The roll-up goes from ${STATUS_TEXT[record.before.status].toLowerCase()} to ${STATUS_TEXT[record.after.status].toLowerCase()}, and ${loss}.`;
   const same = record.fiscal.ids.join() === best.ids.join();
   const third = same
     ? `The net benefit is ${money(best.net)} ${currency} per year, and the fiscal baseline funds the same options.`
@@ -68,39 +84,41 @@ function PortfolioTable({ doc, record, number }: { readonly doc: RiskDocument; r
     [`Best at ${money(record.upper.budget)}`, record.upper.row],
   ];
   return (
-    <table class="compact">
-      <caption>
-        Table {number}. Alternatives, the fiscal baseline (Sec. 5.3.2) and the budget at minus and plus 20% ({currency} per year, first-year cash in {currency}).
-      </caption>
-      <thead>
-        <tr>
-          <th scope="col">Portfolio</th>
-          <th scope="col">Options</th>
-          <th scope="col">First-year cash</th>
-          <th scope="col">Annualised cost</th>
-          <th scope="col">Annual benefit</th>
-          <th scope="col">Net benefit</th>
-          <th scope="col">Tolerance</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map(([label, row]) => (
-          <tr key={label}>
-            <th scope="row">{label}</th>
-            <td>{row.ids.length === 0 ? 'None' : row.ids.join(', ')}</td>
-            <td>{money(row.cash)}</td>
-            <td>{money(row.cost)}</td>
-            <td>
-              {money(row.benefit)} ± {money(row.benefitSe)}
-            </td>
-            <td>{money(row.net)}</td>
-            <td>
-              <StatusText status={row.status} />
-            </td>
+    <Scroll label="Table 3">
+      <table class="compact">
+        <caption>
+          Table {number}. Alternatives, the fiscal baseline (Sec. 5.3.2) and the budget at minus and plus 20% ({currency} per year, first-year cash in {currency}).
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Portfolio</th>
+            <th scope="col">Options</th>
+            <th scope="col">First-year cash</th>
+            <th scope="col">Annualised cost</th>
+            <th scope="col">Annual benefit</th>
+            <th scope="col">Net benefit</th>
+            <th scope="col">Tolerance</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map(([label, row]) => (
+            <tr key={label}>
+              <th scope="row">{label}</th>
+              <td>{row.ids.length === 0 ? 'None' : row.ids.join(', ')}</td>
+              <td>{money(row.cash)}</td>
+              <td>{money(row.cost)}</td>
+              <td>
+                {money(row.benefit)} ± {money(row.benefitSe)}
+              </td>
+              <td>{money(row.net)}</td>
+              <td>
+                <StatusText status={row.status} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Scroll>
   );
 }
 
@@ -175,48 +193,50 @@ export function DecisionRecordView({ doc, record }: { readonly doc: RiskDocument
       <section>
         <h3>01 Summary</h3>
         <p class="record-summary">{summary(doc, record).join(' ')}</p>
-        <table class="compact status-table">
-          <caption>Table 1. Status of the roll-up and of each risk against the tolerance curve.</caption>
-          <thead>
-            <tr>
-              <th scope="col">Risk or register</th>
-              <th scope="col">Status</th>
-              <th scope="col">Evidence</th>
-              <th scope="col">After funding</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">All registers</th>
-              <td>
-                <StatusText status={points.length === 0 ? undefined : record.before.status} />
-              </td>
-              <td>
-                EAL {money(record.before.eal)} ± {money(record.before.ealSe)}.
-                {record.before.pAboveCapacity === undefined ? '' : ` P(loss above capacity) ${probability(record.before.pAboveCapacity)}.`}
-              </td>
-              <td>
-                EAL {money(record.after.eal)}. <StatusText status={points.length === 0 ? undefined : record.after.status} />
-              </td>
-            </tr>
-            {statusRows.map((row) => {
-              const later = after.get(row.riskId);
-              return (
-                <tr key={row.riskId}>
-                  <th scope="row">
-                    {row.riskId} {risks.get(row.riskId)?.riskDescription ?? ''}
-                  </th>
-                  <td>{row.polarity === 'positive' ? 'Opportunity' : <StatusText status={row.status} />}</td>
-                  <td>{evidence(row)}</td>
-                  <td>
-                    {later === undefined ? '' : `${row.polarity === 'positive' ? 'EAG' : 'EAL'} ${money(later.expectedAnnual)}. `}
-                    {later !== undefined && later.polarity === 'negative' && <StatusText status={later.status} />}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <Scroll label="Table 1">
+          <table class="compact status-table">
+            <caption>Table 1. Status of the roll-up and of each risk against the tolerance curve.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Risk or register</th>
+                <th scope="col">Status</th>
+                <th scope="col">Evidence</th>
+                <th scope="col">After funding</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">All registers</th>
+                <td>
+                  <StatusText status={points.length === 0 ? undefined : record.before.status} />
+                </td>
+                <td>
+                  EAL {money(record.before.eal)} ± {money(record.before.ealSe)}.
+                  {record.before.pAboveCapacity === undefined ? '' : ` P(loss above capacity) ${probability(record.before.pAboveCapacity)}.`}
+                </td>
+                <td>
+                  EAL {money(record.after.eal)}. <StatusText status={points.length === 0 ? undefined : record.after.status} />
+                </td>
+              </tr>
+              {statusRows.map((row) => {
+                const later = after.get(row.riskId);
+                return (
+                  <tr key={row.riskId}>
+                    <th scope="row">
+                      {row.riskId} {risks.get(row.riskId)?.riskDescription ?? ''}
+                    </th>
+                    <td>{row.polarity === 'positive' ? 'Opportunity' : <StatusText status={row.status} />}</td>
+                    <td>{evidence(row)}</td>
+                    <td>
+                      {later === undefined ? '' : `${row.polarity === 'positive' ? 'EAG' : 'EAL'} ${money(later.expectedAnnual)}. `}
+                      {later !== undefined && later.polarity === 'negative' && <StatusText status={later.status} />}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </Scroll>
         <p class="source">
           Source. {source} EAL and EAG in {currency} per year.
         </p>
@@ -251,61 +271,63 @@ export function DecisionRecordView({ doc, record }: { readonly doc: RiskDocument
             source={source}
           />
           <div>
-            <table class="compact">
-              <caption>Table 2. Metrics of the roll-up before and after funding.</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Metric</th>
-                  <th scope="col">Before</th>
-                  <th scope="col">After</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th scope="row">Expected annual loss ({currency})</th>
-                  <td>
-                    {money(record.before.eal)} ± {money(record.before.ealSe)}
-                  </td>
-                  <td>
-                    {money(record.after.eal)} ± {money(record.after.ealSe)}
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Expected annual gain ({currency})</th>
-                  <td>
-                    {money(record.before.eag)} ± {money(record.before.eagSe)}
-                  </td>
-                  <td>
-                    {money(record.after.eag)} ± {money(record.after.eagSe)}
-                  </td>
-                </tr>
-                {record.before.pAboveCapacity !== undefined && (
+            <Scroll label="Table 2">
+              <table class="compact">
+                <caption>Table 2. Metrics of the roll-up before and after funding.</caption>
+                <thead>
                   <tr>
-                    <th scope="row">P(loss above capacity)</th>
-                    <td>{probability(record.before.pAboveCapacity)}</td>
-                    <td>{probability(record.after.pAboveCapacity ?? 0)}</td>
+                    <th scope="col">Metric</th>
+                    <th scope="col">Before</th>
+                    <th scope="col">After</th>
                   </tr>
-                )}
-                {record.before.atPoints.map((point, i) => (
-                  <tr key={point.loss}>
-                    <th scope="row">
-                      P(loss above {money(point.loss)}), tolerance {probability(point.tolerance)}
-                    </th>
-                    <td>{probability(point.probability)}</td>
-                    <td>{probability(record.after.atPoints[i]?.probability ?? 0)}</td>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Expected annual loss ({currency})</th>
+                    <td>
+                      {money(record.before.eal)} ± {money(record.before.ealSe)}
+                    </td>
+                    <td>
+                      {money(record.after.eal)} ± {money(record.after.ealSe)}
+                    </td>
                   </tr>
-                ))}
-                <tr>
-                  <th scope="row">Tolerance gap</th>
-                  <td>
-                    {probability(record.before.gap)}. <StatusText status={points.length === 0 ? undefined : record.before.status} />
-                  </td>
-                  <td>
-                    {probability(record.after.gap)}. <StatusText status={points.length === 0 ? undefined : record.after.status} />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  <tr>
+                    <th scope="row">Expected annual gain ({currency})</th>
+                    <td>
+                      {money(record.before.eag)} ± {money(record.before.eagSe)}
+                    </td>
+                    <td>
+                      {money(record.after.eag)} ± {money(record.after.eagSe)}
+                    </td>
+                  </tr>
+                  {record.before.pAboveCapacity !== undefined && (
+                    <tr>
+                      <th scope="row">P(loss above capacity)</th>
+                      <td>{probability(record.before.pAboveCapacity)}</td>
+                      <td>{probability(record.after.pAboveCapacity ?? 0)}</td>
+                    </tr>
+                  )}
+                  {record.before.atPoints.map((point, i) => (
+                    <tr key={point.loss}>
+                      <th scope="row">
+                        P(loss above {money(point.loss)}), tolerance {probability(point.tolerance)}
+                      </th>
+                      <td>{probability(point.probability)}</td>
+                      <td>{probability(record.after.atPoints[i]?.probability ?? 0)}</td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <th scope="row">Tolerance gap</th>
+                    <td>
+                      {probability(record.before.gap)} <StatusText status={points.length === 0 ? undefined : record.before.status} />
+                    </td>
+                    <td>
+                      {probability(record.after.gap)} <StatusText status={points.length === 0 ? undefined : record.after.status} />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </Scroll>
             <p class="source">Source. {source}</p>
           </div>
         </div>
@@ -361,58 +383,62 @@ export function DecisionRecordView({ doc, record }: { readonly doc: RiskDocument
         {record.notFunded.length === 0 ? (
           <p>Every candidate is funded.</p>
         ) : (
-          <table class="compact">
-            <caption>Table 4. Candidates that are not in the best portfolio, with the reason.</caption>
-            <thead>
-              <tr>
-                <th scope="col">Option</th>
-                <th scope="col">Reason</th>
-              </tr>
-            </thead>
-            <tbody>
-              {record.notFunded.map((item) => (
-                <tr key={item.id}>
-                  <th scope="row">
-                    {item.id} {responses.get(item.id)?.title}
-                  </th>
-                  <td>{item.text}</td>
+          <Scroll label="Table 4">
+            <table class="compact">
+              <caption>Table 4. Candidates that are not in the best portfolio, with the reason.</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Option</th>
+                  <th scope="col">Reason</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {record.notFunded.map((item) => (
+                  <tr key={item.id}>
+                    <th scope="row">
+                      {item.id} {responses.get(item.id)?.title}
+                    </th>
+                    <td>{item.text}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Scroll>
         )}
       </section>
 
       <section>
         <h3>07 Objectives view</h3>
-        <table class="compact">
-          <caption>Table 5. Expected annual loss and gain by enterprise objective ({currency}). A risk that supports objectives of two kinds counts in both.</caption>
-          <thead>
-            <tr>
-              <th scope="col">Objective</th>
-              <th scope="col">Risks</th>
-              <th scope="col">EAL before</th>
-              <th scope="col">EAL after</th>
-              <th scope="col">EAG before</th>
-              <th scope="col">EAG after</th>
-            </tr>
-          </thead>
-          <tbody>
-            {record.objectives.map((row) => (
-              <tr key={row.kind}>
-                <th scope="row">{KIND_TEXT[row.kind]}</th>
-                <td>
-                  {row.risks}
-                  {row.notEstimated > 0 && `, ${String(row.notEstimated)} not estimated`}
-                </td>
-                <td>{money(row.ealBefore)}</td>
-                <td>{money(row.ealAfter)}</td>
-                <td>{money(row.eagBefore)}</td>
-                <td>{money(row.eagAfter)}</td>
+        <Scroll label="Table 5">
+          <table class="compact">
+            <caption>Table 5. Expected annual loss and gain by enterprise objective ({currency}). A risk that supports objectives of two kinds counts in both.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Objective</th>
+                <th scope="col">Risks</th>
+                <th scope="col">EAL before</th>
+                <th scope="col">EAL after</th>
+                <th scope="col">EAG before</th>
+                <th scope="col">EAG after</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {record.objectives.map((row) => (
+                <tr key={row.kind}>
+                  <th scope="row">{KIND_TEXT[row.kind]}</th>
+                  <td>
+                    {row.risks}
+                    {row.notEstimated > 0 && `, ${String(row.notEstimated)} not estimated`}
+                  </td>
+                  <td>{money(row.ealBefore)}</td>
+                  <td>{money(row.ealAfter)}</td>
+                  <td>{money(row.eagBefore)}</td>
+                  <td>{money(row.eagAfter)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Scroll>
         <p class="source">Source. {source}</p>
       </section>
 
@@ -421,33 +447,35 @@ export function DecisionRecordView({ doc, record }: { readonly doc: RiskDocument
         {residual.length === 0 ? (
           <p>No risk stays accepted.</p>
         ) : (
-          <table class="compact">
-            <caption>Table 6. Risks with Accept, a pending decision, or no funded option (Sec. 5.1.2).</caption>
-            <thead>
-              <tr>
-                <th scope="col">Risk</th>
-                <th scope="col">Owner</th>
-                <th scope="col">Reason</th>
-                <th scope="col">Acceptance record</th>
-              </tr>
-            </thead>
-            <tbody>
-              {residual.map((risk) => (
-                <tr key={risk.riskId}>
-                  <th scope="row">
-                    {risk.riskId} {risk.riskDescription}
-                  </th>
-                  <td>{risk.riskOwnerPointOfContact}</td>
-                  <td>{risk.acceptance?.rationale ?? (risk.responseDecision === 'pending' ? 'Decision pending.' : 'No option is funded.')}</td>
-                  <td>
-                    {risk.acceptance === undefined
-                      ? 'Missing'
-                      : `${risk.acceptance.kind === 'tolerance-exception' ? 'Tolerance exception' : 'Accepted'} by ${risk.acceptance.acceptedBy} on ${risk.acceptance.acceptedOn}${risk.acceptance.validUntil === undefined ? '' : `, until ${risk.acceptance.validUntil}`}`}
-                  </td>
+          <Scroll label="Table 6">
+            <table class="compact">
+              <caption>Table 6. Risks with Accept, a pending decision, or no funded option (Sec. 5.1.2).</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Risk</th>
+                  <th scope="col">Owner</th>
+                  <th scope="col">Reason</th>
+                  <th scope="col">Acceptance record</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {residual.map((risk) => (
+                  <tr key={risk.riskId}>
+                    <th scope="row">
+                      {risk.riskId} {risk.riskDescription}
+                    </th>
+                    <td>{risk.riskOwnerPointOfContact}</td>
+                    <td>{risk.acceptance?.rationale ?? (risk.responseDecision === 'pending' ? 'Decision pending.' : 'No option is funded.')}</td>
+                    <td>
+                      {risk.acceptance === undefined
+                        ? 'Missing'
+                        : `${risk.acceptance.kind === 'tolerance-exception' ? 'Tolerance exception' : 'Accepted'} by ${risk.acceptance.acceptedBy} on ${risk.acceptance.acceptedOn}${risk.acceptance.validUntil === undefined ? '' : `, until ${risk.acceptance.validUntil}`}`}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Scroll>
         )}
         {overrides.length > 0 && (
           <p>
@@ -466,27 +494,29 @@ export function DecisionRecordView({ doc, record }: { readonly doc: RiskDocument
       <div class="closing">
         <section class="approval">
           <h3>09 Approval</h3>
-          <table class="compact sign">
-            <caption>Table 7. Approval by the management body (Sec. 4.4).</caption>
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Role</th>
-                <th scope="col">Signature</th>
-                <th scope="col">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[1, 2, 3].map((line) => (
-                <tr key={line}>
-                  <td aria-label={`Name ${String(line)}`} />
-                  <td aria-label={`Role ${String(line)}`} />
-                  <td aria-label={`Signature ${String(line)}`} />
-                  <td aria-label={`Date ${String(line)}`} />
+          <Scroll label="Table 7">
+            <table class="compact sign">
+              <caption>Table 7. Approval by the management body (Sec. 4.4).</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Signature</th>
+                  <th scope="col">Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {[1, 2, 3].map((line) => (
+                  <tr key={line}>
+                    <td aria-label={`Name ${String(line)}`} />
+                    <td aria-label={`Role ${String(line)}`} />
+                    <td aria-label={`Signature ${String(line)}`} />
+                    <td aria-label={`Date ${String(line)}`} />
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Scroll>
         </section>
 
         <section>

@@ -72,6 +72,12 @@ test('S5 finds the best portfolio of example 2 and prints the decision record on
   await expect(record).toContainText('Draft. 4 accepted residual risks need an acceptance record');
   await expectAccessible(page, 'S5 with the decision record');
 
+  // At phone width the tables scroll in their boxes, and the page does not.
+  const size = page.viewportSize();
+  await page.setViewportSize({ width: 375, height: 812 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+  if (size !== null) await page.setViewportSize(size);
+
   // The print view shows the record only, and it fits on 2 A4 pages.
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.save-bar')).toBeHidden();

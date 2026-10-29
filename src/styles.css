@@ -888,6 +888,9 @@ table.sign td {
   details.chart-table {
     display: none;
   }
+  .record .table-box {
+    overflow: visible;
+  }
   .record table,
   .action-box,
   .limits,
