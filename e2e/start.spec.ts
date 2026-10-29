@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
+import { expectAccessible } from './axe';
 
 // Screen S1 under the production CSP and Trusted Types: open, create, import, export, restore, remove all.
 test('start screen works end to end with no CSP violation', async ({ page }) => {
@@ -17,6 +18,7 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
   await expect(page.getByText('You have not saved a copy of this document yet.')).toBeVisible();
+  await expectAccessible(page, 'S1 with a document');
 
   // Export the app file. The reminder goes away.
   const downloadPromise = page.waitForEvent('download');

@@ -115,6 +115,8 @@ p {
 
 .table-box {
   overflow-x: auto;
+  /* Contains the absolute visually-hidden labels, so they cannot widen the page. */
+  position: relative;
 }
 
 table {
@@ -197,6 +199,7 @@ button:disabled {
 }
 
 button:focus-visible,
+.table-box:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
@@ -402,4 +405,78 @@ summary {
 .save-error {
   color: var(--error-text);
   font-weight: 600;
+}
+
+/* Screen S3 */
+.tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.tree-item {
+  background: transparent;
+  color: var(--accent);
+  border-color: transparent;
+  padding: 0.2rem 0.4rem;
+}
+.tree-item.active {
+  border-color: var(--accent);
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.tab {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid transparent;
+  border-radius: 8px 8px 0 0;
+}
+.tab.active {
+  border-color: var(--border);
+  border-bottom-color: var(--surface);
+  color: var(--text);
+  margin-bottom: -1px;
+  background: var(--surface);
+}
+.tab-body {
+  display: grid;
+  gap: 0.6rem;
+  padding-top: 0.75rem;
+}
+.tab-body > * {
+  min-width: 0;
+}
+fieldset.distribution,
+fieldset.scenario {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+fieldset.distribution legend,
+fieldset.scenario legend {
+  font-weight: 600;
+  padding: 0 0.25rem;
+}
+.feedback {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+}
+.feedback ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+}
+details.help {
+  border-left: 3px solid var(--border);
+  padding-left: 0.75rem;
 }

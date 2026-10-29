@@ -1,4 +1,5 @@
 // The engine Web Worker. One worker per job, so that cancel is terminate().
+import { numbersOf } from './numbers';
 import { fiscal, measure, optimize } from './optimize';
 import type { EngineRequest, EngineResponse } from './protocol';
 import { summarize } from './summary';
@@ -26,6 +27,8 @@ addEventListener('message', (event: MessageEvent<EngineRequest>) => {
         },
       });
       post({ kind: 'optimize', result: { ...result, marginal: Object.fromEntries(result.marginal) } });
+    } else if (request.kind === 'riskNumbers') {
+      post({ kind: 'riskNumbers', result: numbersOf(request.doc, request.riskIds) });
     } else {
       post({ kind: 'fiscal', result: fiscal(request.doc, request.budget, request.trials, request.seed) });
     }

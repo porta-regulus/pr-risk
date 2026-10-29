@@ -59,37 +59,75 @@ export function defaultTolerancePoints(capacity: number): TolerancePoint[] {
 }
 
 export function changedSections(before: RiskDocument, after: RiskDocument): Section[] {
-  return SECTIONS.filter((section) => canonicalize(before[section] ?? null) !== canonicalize(after[section] ?? null));
+  return SECTIONS.filter((section) => before[section] !== after[section] && canonicalize(before[section] ?? null) !== canonicalize(after[section] ?? null));
+}
+
+type EntityKind = 'register' | 'risk' | 'asset' | 'driver';
+type Keyed = { readonly id?: string; readonly riskId?: string };
+
+export interface Change {
+  readonly entityKind: 'context' | 'strategy' | 'appetite' | EntityKind;
+  readonly entityId: string;
+  readonly path: string;
+  readonly before?: unknown;
+  readonly after?: unknown;
+}
+
+const ENTITY_LISTS: readonly (readonly ['registers' | 'risks' | 'assets' | 'drivers', EntityKind])[] = [
+  ['registers', 'register'],
+  ['risks', 'risk'],
+  ['assets', 'asset'],
+  ['drivers', 'driver'],
+];
+
+const keyOf = (item: Keyed): string => item.riskId ?? item.id ?? '';
+
+// Every change between two versions: one per changed section and one per added, removed or
+// changed register, risk, asset or driver. Unchanged objects keep their identity through the
+// immutable edits, so most comparisons end at the reference check.
+export function documentChanges(before: RiskDocument, after: RiskDocument): Change[] {
+  const changes: Change[] = changedSections(before, after).map((section) => ({
+    entityKind: section === 'governance' ? 'context' : section,
+    entityId: before.document.id,
+    path: `/${section}`,
+    ...(before[section] === undefined ? {} : { before: before[section] }),
+    ...(after[section] === undefined ? {} : { after: after[section] }),
+  }));
+  for (const [list, entityKind] of ENTITY_LISTS) {
+    const old = new Map<string, Keyed>(((before[list] ?? []) as readonly Keyed[]).map((item) => [keyOf(item), item]));
+    const next = new Map<string, Keyed>(((after[list] ?? []) as readonly Keyed[]).map((item) => [keyOf(item), item]));
+    for (const id of new Set([...old.keys(), ...next.keys()])) {
+      const a = old.get(id);
+      const b = next.get(id);
+      if (a === b || (a !== undefined && b !== undefined && canonicalize(a) === canonicalize(b))) continue;
+      changes.push({ entityKind, entityId: id, path: '', ...(a === undefined ? {} : { before: a }), ...(b === undefined ? {} : { after: b }) });
+    }
+  }
+  return changes;
 }
 
 const COALESCE_MS = 10 * 60 * 1000;
 
-// SPEC.md Sec. 6.18. One change log entry per changed section, built on the saved log. A
-// second change of the same section by the same actor within 10 minutes updates that entry
-// and keeps its "before", so autosave does not add an entry per pause in typing.
+// SPEC.md Sec. 6.18. One change log entry per change, built on the saved log. A second change
+// of the same entity and path by the same actor within 10 minutes updates that entry and keeps
+// its "before", so autosave does not add an entry per pause in typing.
 export function withChangeLog(saved: RiskDocument, draft: RiskDocument, at: string, actor?: string): RiskDocument {
   const log = [...(saved.changeLog ?? [])];
-  const entityId = saved.document.id;
-  for (const section of changedSections(saved, draft)) {
-    const entityKind = section === 'governance' ? 'context' : section;
-    const path = `/${section}`;
+  for (const change of documentChanges(saved, draft)) {
     const last = log.at(-1);
     const recent =
-      last !== undefined && last.entityKind === entityKind && last.entityId === entityId && last.path === path && last.actor === actor && Date.parse(at) - Date.parse(last.at) < COALESCE_MS;
-    const after = draft[section] === undefined ? {} : { after: draft[section] };
+      last !== undefined &&
+      last.entityKind === change.entityKind &&
+      last.entityId === change.entityId &&
+      last.path === change.path &&
+      last.actor === actor &&
+      Date.parse(at) - Date.parse(last.at) < COALESCE_MS;
+    const after = 'after' in change ? { after: change.after } : {};
     if (recent) {
       const { after: _old, ...rest } = last;
       log[log.length - 1] = { ...rest, at, ...after };
     } else {
-      log.push({
-        at,
-        entityKind,
-        entityId,
-        path,
-        ...(actor === undefined ? {} : { actor }),
-        ...(saved[section] === undefined ? {} : { before: saved[section] }),
-        ...after,
-      });
+      log.push({ at, entityKind: change.entityKind, entityId: change.entityId, path: change.path, ...(actor === undefined ? {} : { actor }), ...('before' in change ? { before: change.before } : {}), ...after });
     }
   }
   return withValue(draft, 'changeLog', log);
