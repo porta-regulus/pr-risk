@@ -134,3 +134,19 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
   await expect(page.getByRole('heading', { level: 1, name: 'PortaRegulus Risk' })).toBeVisible();
   expect(problems, 'errors, warnings and CSP violations').toEqual([]);
 });
+
+// SPEC.md Sec. 6.5 item 4. The five pairs of SP 800-221r1 Table 2 are templates for a statement.
+test('S2 adds a statement from a Table 2 template', async ({ page }) => {
+  await page.goto('/');
+  await page.getByLabel('Title', { exact: true }).fill('Template check');
+  await page.getByRole('button', { name: 'Create', exact: true }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'is created.' })).toBeVisible();
+  await page.getByRole('button', { name: 'Context and strategy' }).click();
+  await page.getByText('Examples from SP 800-221r1 Table 2').click();
+  await expectAccessible(page, 'S2 with the Table 2 examples open');
+  await page.getByRole('button', { name: 'Use the Government Agency example as a new statement' }).click();
+  const table = page.getByRole('table', { name: 'Appetite statements in the layout of Table 9' });
+  await expect(table).toContainText('Mission-critical systems must be protected from known ICT vulnerabilities.');
+  await expect(table).toContainText('within 14 days of discovery');
+  await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
+});

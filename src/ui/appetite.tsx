@@ -4,6 +4,7 @@ import type { RiskDocument } from '../schema/types';
 import { defaultTolerancePoints, draftList, nextId, type TolerancePoint, withSection, withValue } from './edit';
 import { Checkboxes, LinesField, NumberField, SelectField, TextField } from './fields';
 import { Table9View, TriggerCheck } from './table9';
+import { TABLE_2, templateStatement } from './templates';
 
 type Appetite = NonNullable<RiskDocument['appetite']>;
 type Statement = NonNullable<Appetite['statements']>[number];
@@ -366,6 +367,27 @@ export function AppetiteSection({ doc, update }: { readonly doc: RiskDocument; r
         }}>
         Add a statement
       </button>
+      <details class="help">
+        <summary>Examples from SP 800-221r1 Table 2</summary>
+        <p class="hint">
+          The five example pairs of Table 2 (SP 800-221r1, p. 17, line 654), quoted exactly. Use one as a starting point, then change the words to fit your organization and add the
+          triggers that measure the tolerance. Table 9 example 3 gives 2 hours for a similar website tolerance (NIST comment N24).
+        </p>
+        {TABLE_2.map((template) => (
+          <div class="sub-editor" key={template.enterprise}>
+            <p>
+              <strong>{template.enterprise}</strong>
+            </p>
+            <p>Risk appetite. {template.appetite}</p>
+            <p>Risk tolerance. {template.tolerance}</p>
+            <button type="button" class="quiet" onClick={() => {
+                setAppetite('statements', [...statements, templateStatement(statements, template)]);
+              }}>
+              Use the {template.enterprise} example as a new statement
+            </button>
+          </div>
+        ))}
+      </details>
     </section>
   );
 }

@@ -1,11 +1,12 @@
 // Rules of screens S4 and S5 that the record and the change log depend on.
 import { describe, expect, it } from 'vitest';
 import { priorityNumbers } from '../src/engine';
-import type { ResponseOption, RiskDocument } from '../src/schema';
+import { documentErrors, type ResponseOption, type RiskDocument } from '../src/schema';
 import { documentChanges, withChangeLog } from '../src/ui/edit';
 import { proposedPriorities, simulationKey } from '../src/ui/prioritize';
 import { residualRisks } from '../src/ui/record';
-import { example, EXAMPLE_2 } from './schema-helpers';
+import { TABLE_2, templateStatement } from '../src/ui/templates';
+import { example, EXAMPLE_1, EXAMPLE_2 } from './schema-helpers';
 
 const doc = example(EXAMPLE_2);
 
@@ -59,5 +60,25 @@ describe('change log of response options (SPEC.md Sec. 6.18)', () => {
     expect(changes).toHaveLength(1);
     expect(changes[0]).toMatchObject({ entityKind: 'response', entityId: options[0]?.id });
     expect(withChangeLog(doc, changed, '2026-10-29T12:00:00Z').changeLog?.at(-1)).toMatchObject({ entityKind: 'response' });
+  });
+});
+
+describe('S2 templates of SP 800-221r1 Table 2 (SPEC.md Sec. 6.5 item 4)', () => {
+  it('has the five example pairs, and each one gives a valid statement with a new id', () => {
+    expect(TABLE_2.map((template) => template.enterprise)).toEqual([
+      'Global Retail Firm',
+      'Government Agency',
+      'Internet Service Provider',
+      'Academic Institution',
+      'Healthcare Provider',
+    ]);
+    let current = example(EXAMPLE_1);
+    for (const template of TABLE_2) {
+      const statements = current.appetite?.statements ?? [];
+      const added = templateStatement(statements, template);
+      expect(statements.map((item) => item.id)).not.toContain(added.id);
+      current = { ...current, appetite: { ...current.appetite, statements: [...statements, added] } };
+    }
+    expect(documentErrors(current)).toEqual([]);
   });
 });
