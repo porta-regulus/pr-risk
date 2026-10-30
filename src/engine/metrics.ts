@@ -10,7 +10,8 @@ export interface TolerancePoint {
   readonly maxExceedanceProbability: number;
 }
 
-function subtree(doc: RiskDocument, registerId: string): Set<string> {
+// The register and every register below it.
+export function subtree(doc: RiskDocument, registerId: string): Set<string> {
   const ids = new Set([registerId]);
   let changed = true;
   while (changed) {

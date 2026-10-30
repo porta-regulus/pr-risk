@@ -223,6 +223,26 @@ What the screen does.
 
 Open for the product owner. Sec. 6.11 item 2 says a risk "goes to" status "Review needed". The screen asks for one click instead of a silent change when the screen opens. Say if the change must be automatic, and if a breached tolerance must start a review too.
 
+### Task 7. S7 Enterprise view
+
+Status 2026-10-30. Screen S7 works (`src/ui/enterprise.tsx`, rules in `src/enterprise/profile.ts` and `src/enterprise/normalize.ts`). The start screen and the editor navigation open it. The screen reads the stored numbers and labels, so it runs no engine job and works for qualitative registers too. All three golden tests pass.
+1. G1 (b) passes in `test/enterprise.test.ts` and `e2e/enterprise.spec.ts`, on S7 and on S4. The test moved from `e2e/respond.spec.ts`. S4 keeps the Fig. 10 view, because S4 shows nothing else for a register without a simulation.
+2. G3 (a) to (e) pass. (a) stays in `test/import-golden.test.ts`. On S7 the user removes ORG-1 of example 3 and merges A-1, B-1 and C-1 again, with both layouts of Table 10. The result equals ORG-1, and lint L-10 flags it only in the layout with all responses (`test/enterprise.test.ts`, `e2e/enterprise.spec.ts`).
+3. G5 (a) to (d) pass in `test/enterprise.test.ts`, and (a) to (c) in `e2e/enterprise.spec.ts`. The expected cells were compared with Fig. 11 on p. 42 of the PDF.
+
+What the screen does.
+1. ERR. The Fig. 10 view of S4 (`src/ui/err.tsx`), one register at a time.
+2. ERP. One block per objective in the order of `context.objectives`, in the layout of Fig. 11 (Exposure Factors, then Assessment with Last, Current and Residual). The scope is all registers, or one register with the registers below it. A summary entry stands for its sources, so no risk shows twice. Closed risks and risks that a response causes are not in the profile. A risk without a label shows its number, and a placeholder number shows "Not set". The view lists the risks without an objective (L-09).
+3. Aggregate and normalize (Sec. 6.15). A parent register lists the entries of the registers below it by category code, then subcode. The user selects entries and merges them into summary entries with `summarize` of `src/import/rollup.ts`. The merge refuses an empty selection, an empty description or owner, an id in use and mixed polarity. A summary entry now gets the objectives of its sources. The table of summary entries shows the three-point values, the raw source entries, the priority (editable), lint L-10 and a remove button. An entry at or above `strategy.escalationThreshold` that no summary entry of the parent holds is marked "Escalate".
+4. Portfolio (Sec. 6.13 item 3). Rows are the registers in tree order, with "All registers" first when the tree has more than one root. A row covers the register and the registers below it. The financial profile is the sum of the exposure ratings of the negative risks, for the current period and from `previousAssessment` for the previous period. This sum is the expected annual loss, because expected values add up. The reputation and mission profiles give the highest label on the impact scale.
+5. Print. The print button prints the ERR, the ERP and the portfolio without the form fields (SPEC.md Sec. 9.8).
+
+Open for the product owner.
+1. Sec. 6.15 item 4 and SP 800-221r1 lines 1661 to 1664 allow "a statistically weighted average of the risk response costs". Neither text names the weight. The merge writes the total. Say which weight to use, for example the likelihood of each source, or keep the total only.
+2. Sec. 6.13 item 3 asks for the previous period of the reputation and mission profiles. `previousAssessment` holds likelihood, impact and exposure only, so these two profiles show the current period. Say if the schema must keep previous reputation and mission labels. NIST comment N9 asks NIST for the same.
+3. The portfolio sums the stored exposure ratings. For a quantitative register this equals the simulated expected annual loss within Monte Carlo error, and S4 shows the curves. Say if the portfolio must show the simulated value with its standard error instead.
+4. Task 7 "merge" is read as the Table 10 merge of Sec. 6.15. The import merge of Sec. 9.7 is in `src/import/pipeline.ts` (task 4) with the choice per entity (keep current, take incoming, keep both). S1 shows only the number of changed fields and has no control for that choice yet. Say if it belongs to a later task.
+
 ## 6. Rules for the build session
 
 1. Write all prose (UI text, docs, commit messages) in ASD-STE100 Simplified Technical English. No em dashes, semicolons or colons in prose.

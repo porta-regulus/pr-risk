@@ -1,7 +1,7 @@
 // Labelled form fields for the screens. Every field has a visible label or, inside a
 // table, an aria-label (WCAG 2.2 AA, SPEC.md Sec. 10 item 2).
 import { type ComponentChildren, createContext } from 'preact';
-import { useContext, useEffect, useState } from 'preact/hooks';
+import { useCallback, useContext, useEffect, useState } from 'preact/hooks';
 import { lines } from './edit';
 
 interface Base {
@@ -58,6 +58,22 @@ export const InvalidFields = createContext<InvalidReport>(ignore);
 // For fields whose value is not part of the document, such as a trigger check.
 export function IgnoreInvalid({ children }: { readonly children: ComponentChildren }) {
   return <InvalidFields.Provider value={ignore}>{children}</InvalidFields.Provider>;
+}
+
+// Number fields of a form that is not part of the document. Text that is not a number stops
+// the form, not the save of the document.
+export function useInvalid(): readonly [InvalidReport, boolean] {
+  const [fields, setFields] = useState<ReadonlySet<string>>(new Set());
+  const report = useCallback((field: string, label: string | undefined) => {
+    setFields((current) => {
+      if ((label !== undefined) === current.has(field)) return current;
+      const next = new Set(current);
+      if (label === undefined) next.delete(field);
+      else next.add(field);
+      return next;
+    });
+  }, []);
+  return [report, fields.size > 0];
 }
 
 // Keeps the typed text, so "0." or "1e" can be typed. Calls onChange with a finite number,
