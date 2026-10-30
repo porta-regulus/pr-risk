@@ -2,11 +2,11 @@
 // KPIs and KRIs with their triggers, review triggers, acceptance records, the tolerance what-if
 // on the kept per-trial totals, and the forecast log with the Brier score.
 import type { ComponentChildren } from 'preact';
-import { useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { exceedance, lossGrid, type TolerancePoint } from '../engine/metrics';
 import { brierScores, withForecasts, withOutcome } from '../monitor/forecasts';
 import type { MonitorNumbers } from '../monitor/numbers';
-import { acceptanceState, itemState, latestInGap, reviewTriggers, withObservation, withReviewNeeded, type ItemState } from '../monitor/review';
+import { acceptanceState, APP_ACTOR, automaticReviews, itemState, latestInGap, reasonKey, reviewTriggers, withAutomaticReview, withObservation, type ItemState } from '../monitor/review';
 import { checkCurve, curveProblems, samePoints, withPoints, withToleranceChange } from '../monitor/tolerance';
 import { canonicalize } from '../schema/canonical';
 import type { Risk, RiskDocument } from '../schema/types';
@@ -203,67 +203,61 @@ function IndicatorsPanel({ doc, update }: { readonly doc: RiskDocument; readonly
   );
 }
 
-function ReviewPanel({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
+// The risks that the app set to "Review needed" since this screen opened. Undo removes the
+// entries, so the list follows it.
+function automaticSince(doc: RiskDocument, since: string): string[] {
+  return (doc.changeLog ?? []).filter((entry) => entry.entityKind === 'risk' && entry.actor?.startsWith(APP_ACTOR) === true && entry.at >= since).map((entry) => entry.entityId);
+}
+
+function ReviewPanel({ doc, openedAt }: { readonly doc: RiskDocument; readonly openedAt: string }) {
   const triggers = reviewTriggers(doc, today());
   const byId = new Map(doc.risks.map((risk) => [risk.riskId, risk]));
-  const pending = triggers.filter((item) => byId.get(item.riskId)?.status !== 'Review needed');
+  const set = automaticSince(doc, openedAt);
   return (
     <section aria-labelledby="review-title" class="panel">
       <h2 id="review-title">Review triggers</h2>
       <p class="hint">
         A risk needs a review when a KRI of its appetite statement fires, when its review date passes, when its acceptance expires, or when a new emerging or horizon risk appears in its
-        category after the as-of date of its register (Sec. 3.7.1 and 5.1.2). New evidence sets "Review needed" when it comes in.
+        category after the as-of date of its register (Sec. 3.7.1 and 5.1.2). The app then sets the status "Review needed" itself. It checks when this screen opens and after each saved
+        change on it. The change log entry names the app and the reasons. Each reason acts once, so a person ends the review with another status. New evidence sets "Review needed" when
+        it comes in.
       </p>
+      {set.length > 0 && (
+        <p role="status">
+          The app set {set.join(', ')} to Review needed. Undo last change takes this back.
+        </p>
+      )}
       {triggers.length === 0 ? (
         <p>No review trigger holds today.</p>
       ) : (
-        <>
-          <div class="table-box" tabIndex={0} role="region" aria-label="Risks with a review trigger">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Description</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Reasons</th>
+        <div class="table-box" tabIndex={0} role="region" aria-label="Risks with a review trigger">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Description</th>
+                <th scope="col">Status</th>
+                <th scope="col">Reasons</th>
+              </tr>
+            </thead>
+            <tbody>
+              {triggers.map((item) => (
+                <tr key={item.riskId}>
+                  <th scope="row" class="id">{item.riskId}</th>
+                  <td>{byId.get(item.riskId)?.riskDescription}</td>
+                  <td>{byId.get(item.riskId)?.status}</td>
+                  <td>
+                    <ul class="cell-list">
+                      {item.reasons.map((reason) => (
+                        <li key={reason.text}>{reason.text}</li>
+                      ))}
+                    </ul>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {triggers.map((item) => (
-                  <tr key={item.riskId}>
-                    <th scope="row" class="id">{item.riskId}</th>
-                    <td>{byId.get(item.riskId)?.riskDescription}</td>
-                    <td>{byId.get(item.riskId)?.status}</td>
-                    <td>
-                      <ul class="cell-list">
-                        {item.reasons.map((reason) => (
-                          <li key={reason.text}>{reason.text}</li>
-                        ))}
-                      </ul>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div class="button-row">
-            <button
-              type="button"
-              disabled={pending.length === 0}
-              onClick={() => {
-                update((current) =>
-                  withReviewNeeded(
-                    current,
-                    pending.map((item) => item.riskId),
-                  ),
-                );
-              }}
-            >
-              Set {pending.length} {pending.length === 1 ? 'risk' : 'risks'} to Review needed
-            </button>
-            {pending.length === 0 && <span class="hint">Every risk with a trigger has the status Review needed.</span>}
-          </div>
-        </>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   );
@@ -737,7 +731,25 @@ function ForecastPanel({ doc, update, numbers, simulated }: { readonly doc: Risk
   );
 }
 
-function MonitorBody({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
+interface Visit {
+  readonly openedAt: string;
+  // Keys of the reasons that acted in this visit. Undo takes a change back, and the reason
+  // does not act again before the screen opens next.
+  readonly done: Set<string>;
+}
+
+function MonitorBody({ doc, update, blocked, visit }: { readonly doc: RiskDocument; readonly update: Update; readonly blocked: boolean; readonly visit: Visit }) {
+  // Sec. 6.11 item 2 and Sec. 6.14 item 1. The check runs on each version that the screen
+  // shows: on opening, after a save and after undo. A new log means a new version. The
+  // change waits while a field blocks the save, and then follows the next save.
+  const log = doc.changeLog;
+  useEffect(() => {
+    if (blocked) return;
+    const reviews = automaticReviews(doc, today(), visit.done);
+    if (reviews.length === 0) return;
+    for (const review of reviews) for (const reason of review.reasons) visit.done.add(reasonKey(review.riskId, reason));
+    update((current) => withAutomaticReview(current, reviews, isoSeconds()));
+  }, [log]);
   const key = monitorKey(doc);
   const job = useEngine(
     key,
@@ -755,7 +767,7 @@ function MonitorBody({ doc, update }: { readonly doc: RiskDocument; readonly upd
   return (
     <div class="monitor">
       <IndicatorsPanel doc={doc} update={update} />
-      <ReviewPanel doc={doc} update={update} />
+      <ReviewPanel doc={doc} openedAt={visit.openedAt} />
       <AcceptancePanel doc={doc} update={update} />
       <p role="status" class="muted">
         {key === undefined
@@ -775,6 +787,8 @@ function MonitorBody({ doc, update }: { readonly doc: RiskDocument; readonly upd
 }
 
 export function MonitorScreen({ id, onNavigate }: { readonly id: string; readonly onNavigate: (screen: ScreenName) => void }) {
+  // Kept outside the frame, so undo, which remounts the body, does not reset it.
+  const visit = useRef<Visit>({ openedAt: isoSeconds(), done: new Set() });
   return (
     <DocumentScreen
       id={id}
@@ -783,7 +797,7 @@ export function MonitorScreen({ id, onNavigate }: { readonly id: string; readonl
       lede="Record the indicators, review the risks that need it, keep the acceptances current, test another tolerance curve and score the forecasts."
       onNavigate={onNavigate}
     >
-      {(doc, update) => <MonitorBody doc={doc} update={update} />}
+      {(doc, update, { blocked }) => <MonitorBody doc={doc} update={update} blocked={blocked} visit={visit.current} />}
     </DocumentScreen>
   );
 }

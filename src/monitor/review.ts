@@ -90,6 +90,14 @@ export function acceptanceState(risk: Risk, today: string): AcceptanceState | un
   return acceptance.validUntil < today ? 'expired' : 'valid';
 }
 
+// The words for one observation of an item. A second observation on the same date gets its
+// number, so it is a new reason.
+function observationName(item: Tolerance | Indicator, observation: Observation): string {
+  const sameDay = (item.observations ?? []).filter((other) => other.observedOn === observation.observedOn);
+  const n = sameDay.indexOf(observation) + 1;
+  return sameDay.length === 1 ? `the observation of ${observation.observedOn}` : `observation ${String(n)} of ${observation.observedOn}`;
+}
+
 export interface ReviewReason {
   readonly kind: 'kri' | 'review-due' | 'acceptance-expired' | 'emerging';
   readonly text: string;
@@ -122,10 +130,15 @@ export function emergedOn(doc: RiskDocument, riskId: string): string | undefined
 // of the other risk's register, because that date is the last assessment.
 export function reviewTriggers(doc: RiskDocument, today: string): ReviewTrigger[] {
   const asOf = new Map(doc.registers.map((register) => [register.id, register.asOf]));
+  // One reason per fired KRI, named by the observation that fires it. A KRI without a new
+  // observation keeps its reason, so the app does not act on it again.
   const fired = new Map(
     (doc.appetite?.statements ?? []).map((statement) => [
       statement.id,
-      (statement.indicators ?? []).filter((item) => item.kind !== 'kpi' && itemState(item).state === 'fired').map((item) => item.id),
+      (statement.indicators ?? []).flatMap((item) => {
+        const state = item.kind === 'kpi' ? undefined : itemState(item);
+        return state?.state === 'fired' && state.observation !== undefined ? [`${item.id} of appetite statement ${statement.id} fires on ${observationName(item, state.observation)}.`] : [];
+      }),
     ]),
   );
   const emerged = doc.risks
@@ -139,8 +152,7 @@ export function reviewTriggers(doc: RiskDocument, today: string): ReviewTrigger[
     if (risk.status === 'Closed') continue;
     const reasons: ReviewReason[] = [];
     for (const statement of statementsOf(doc, risk)) {
-      const ids = fired.get(statement.id) ?? [];
-      if (ids.length > 0) reasons.push({ kind: 'kri', text: `${ids.join(' and ')} of appetite statement ${statement.id} ${ids.length === 1 ? 'fires' : 'fire'}.` });
+      for (const text of fired.get(statement.id) ?? []) reasons.push({ kind: 'kri', text });
     }
     if (risk.reviewDue !== undefined && risk.reviewDue < today) reasons.push({ kind: 'review-due', text: `The review was due on ${risk.reviewDue}.` });
     if (acceptanceState(risk, today) === 'expired') reasons.push({ kind: 'acceptance-expired', text: `The acceptance expired on ${risk.acceptance?.validUntil ?? ''}.` });
@@ -154,7 +166,40 @@ export function reviewTriggers(doc: RiskDocument, today: string): ReviewTrigger[
   return out;
 }
 
-export function withReviewNeeded(doc: RiskDocument, riskIds: readonly string[]): RiskDocument {
-  const ids = new Set(riskIds);
-  return { ...doc, risks: doc.risks.map((risk) => (ids.has(risk.riskId) && risk.status !== 'Review needed' ? { ...risk, status: 'Review needed' } : risk)) };
+// The actor of the change log entries that the app writes itself. A person never has it.
+export const APP_ACTOR = 'PortaRegulus Risk (automatic review)';
+
+export const reasonKey = (riskId: string, reason: ReviewReason): string => `${riskId} ${reason.text}`;
+
+// True when the app set "Review needed" for this reason before. The change log keeps it.
+function actedOn(doc: RiskDocument, riskId: string, reason: ReviewReason): boolean {
+  return (doc.changeLog ?? []).some((entry) => entry.entityKind === 'risk' && entry.entityId === riskId && entry.actor?.startsWith(APP_ACTOR) === true && `${entry.actor} `.includes(` ${reason.text} `));
+}
+
+// The reviews that the app starts itself (Sec. 6.11 item 2, Sec. 6.14 item 1). A risk with the
+// status "Review needed" gets none. A reason acts once, so a person ends the review with
+// another status. A new observation, review date, acceptance end or risk is a new reason.
+// done holds the keys of reasons that acted earlier, also when undo took the change back.
+export function automaticReviews(doc: RiskDocument, today: string, done: ReadonlySet<string> = new Set()): ReviewTrigger[] {
+  const status = new Map(doc.risks.map((risk) => [risk.riskId, risk.status]));
+  return reviewTriggers(doc, today).flatMap((trigger) => {
+    if (status.get(trigger.riskId) === 'Review needed') return [];
+    const reasons = trigger.reasons.filter((reason) => !done.has(reasonKey(trigger.riskId, reason)) && !actedOn(doc, trigger.riskId, reason));
+    return reasons.length === 0 ? [] : [{ riskId: trigger.riskId, reasons }];
+  });
+}
+
+// Sets "Review needed" with one change log entry per risk. The entry names the app and the
+// reasons, so nobody takes it for the change of a person.
+export function withAutomaticReview(doc: RiskDocument, reviews: readonly ReviewTrigger[], at: string): RiskDocument {
+  const reasons = new Map(reviews.map((review) => [review.riskId, review.reasons]));
+  const entries: NonNullable<RiskDocument['changeLog']> = [];
+  const risks = doc.risks.map((risk) => {
+    const list = reasons.get(risk.riskId);
+    if (list === undefined || risk.status === 'Review needed') return risk;
+    const after: Risk = { ...risk, status: 'Review needed' };
+    entries.push({ at, actor: `${APP_ACTOR}. ${list.map((reason) => reason.text).join(' ')}`, entityKind: 'risk', entityId: risk.riskId, path: '', before: risk, after });
+    return after;
+  });
+  return entries.length === 0 ? doc : { ...doc, risks, changeLog: [...(doc.changeLog ?? []), ...entries] };
 }

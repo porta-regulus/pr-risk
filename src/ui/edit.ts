@@ -109,14 +109,35 @@ export function documentChanges(before: RiskDocument, after: RiskDocument): Chan
   return changes;
 }
 
+type LogEntry = NonNullable<RiskDocument['changeLog']>[number];
+const LIST_OF = new Map<string, (typeof ENTITY_LISTS)[number][0]>(ENTITY_LISTS.map(([list, kind]) => [kind, list]));
+
+// The document with each entity in the state that an entry of the whole entity records.
+function withEntries(doc: RiskDocument, entries: readonly LogEntry[]): RiskDocument {
+  let next = doc;
+  for (const entry of entries) {
+    const list = LIST_OF.get(entry.entityKind);
+    if (list === undefined || entry.path !== '' || !('after' in entry)) continue;
+    const items = (next[list] ?? []) as readonly Keyed[];
+    next = { ...next, [list]: items.map((item) => (keyOf(item, list) === entry.entityId ? entry.after : item)) };
+  }
+  return next;
+}
+
 const COALESCE_MS = 10 * 60 * 1000;
 
 // SPEC.md Sec. 6.18. One change log entry per change, built on the saved log. A second change
 // of the same entity and path by the same actor within 10 minutes updates that entry and keeps
-// its "before", so autosave does not add an entry per pause in typing.
+// its "before", so autosave does not add an entry per pause in typing. Entries that the draft
+// added after the saved log, such as the automatic reviews of screen S6, come first. The other
+// changes start from the state that those entries record. A draft log that does not start
+// with the saved log is an older copy of it and adds nothing.
 export function withChangeLog(saved: RiskDocument, draft: RiskDocument, at: string, actor?: string): RiskDocument {
-  const log = [...(saved.changeLog ?? [])];
-  for (const change of documentChanges(saved, draft)) {
+  const savedLog = saved.changeLog ?? [];
+  const draftLog = draft.changeLog ?? [];
+  const own = draftLog.length > savedLog.length && savedLog.every((entry, i) => draftLog[i] === entry) ? draftLog.slice(savedLog.length) : [];
+  const log = [...savedLog, ...own];
+  for (const change of documentChanges(withEntries(saved, own), draft)) {
     const last = log.at(-1);
     const recent =
       last !== undefined &&
