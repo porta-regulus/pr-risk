@@ -188,6 +188,32 @@ describe('automatic Review needed (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
     expect(automaticReviews(later, '2026-11-15').map((review) => review.reasons[0]?.text)).toEqual(ICT.map(() => 'KRI-1 of appetite statement AP-1 fires on the observation of 2026-11-15.'));
   });
 
+  it('a second firing observation on the same date is a new reason', () => {
+    const closed = withStatus(reviewed(doc), ICT, 'Monitored');
+    const statement = withObservation(statementOf(closed, 'AP-1'), { observedOn: '2026-10-27', values: { days_since_restore_test: 215 } });
+    const again: RiskDocument = { ...closed, appetite: { ...closed.appetite, statements: (closed.appetite?.statements ?? []).map((item) => (item.id === 'AP-1' ? statement : item)) } };
+    expect(automaticReviews(again, '2026-10-30')[0]?.reasons.map((reason) => reason.text)).toEqual(['KRI-1 of appetite statement AP-1 fires on observation 2 of 2026-10-27.']);
+  });
+
+  it('each KRI is its own reason, so a KRI without a new observation does not reopen a review', () => {
+    // A second KRI of AP-1 with its own metric. Both fire on 2026-10-28.
+    const kri2: NonNullable<Statement['indicators']>[number] = { id: 'KRI-2', kind: 'lagging-kri', text: 'Open audit findings.', firesWhen: { combine: 'all', conditions: [{ metric: 'open_findings', operator: '>', threshold: 3 }] } };
+    const ap1 = statementOf(doc, 'AP-1');
+    const two = withObservation({ ...ap1, indicators: [...(ap1.indicators ?? []), kri2] }, { observedOn: '2026-10-28', values: { days_since_restore_test: 220, open_findings: 5 } });
+    const put = (d: RiskDocument, statement: Statement): RiskDocument => ({ ...d, appetite: { ...d.appetite, statements: (d.appetite?.statements ?? []).map((item) => (item.id === 'AP-1' ? statement : item)) } });
+    const first = reviewed(put(doc, two));
+    expect(documentErrors(first)).toEqual([]);
+    expect(automaticReviews(put(doc, two), '2026-10-30')[0]?.reasons.map((reason) => reason.text)).toEqual([
+      'KRI-1 of appetite statement AP-1 fires on the observation of 2026-10-28.',
+      'KRI-2 of appetite statement AP-1 fires on the observation of 2026-10-28.',
+    ]);
+    // A person ends the review. Then a restore test stops KRI-1. KRI-2 has no new observation.
+    const closed = withStatus(first, ICT, 'Monitored');
+    const restored = withObservation(statementOf(closed, 'AP-1'), { observedOn: '2026-10-29', values: { days_since_restore_test: 1 } });
+    expect(reviewTriggers(put(closed, restored), '2026-10-30')[0]?.reasons.map((reason) => reason.text)).toEqual(['KRI-2 of appetite statement AP-1 fires on the observation of 2026-10-28.']);
+    expect(automaticReviews(put(closed, restored), '2026-10-30')).toEqual([]);
+  });
+
   it('skips the reasons that acted in this visit, so undo keeps the change back', () => {
     const done = new Set(automaticReviews(doc, '2026-10-30').flatMap((review) => review.reasons.map((reason) => reasonKey(review.riskId, reason))));
     expect(automaticReviews(doc, '2026-10-30', done)).toEqual([]);
@@ -210,11 +236,22 @@ describe('automatic Review needed (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
     const draft = reviewed(doc);
     const saved = withChangeLog(doc, draft, '2026-10-30T09:00:05Z');
     expect(saved.changeLog).toEqual(draft.changeLog);
-    // A change of a person in the same save gets its own entry, after the entries of the app.
+    // A person changes R-02 before the save. The entries of the app come first, and the entry of
+    // the person starts from the state after the change of the app.
     const both: RiskDocument = { ...draft, risks: draft.risks.map((risk) => (risk.riskId === 'R-02' ? { ...risk, notes: 'Checked.' } : risk)) };
     const log = withChangeLog(doc, both, '2026-10-30T09:00:05Z').changeLog ?? [];
-    expect(log.filter((entry) => entry.actor === undefined).map((entry) => entry.entityId)).toEqual(['R-02']);
-    expect(log.slice(-ICT.length).every((entry) => entry.actor?.startsWith(APP_ACTOR) === true)).toBe(true);
+    expect(log.slice(0, ICT.length)).toEqual(appEntries(draft));
+    expect(log.slice(ICT.length)).toEqual([
+      {
+        at: '2026-10-30T09:00:05Z',
+        entityKind: 'risk',
+        entityId: 'R-02',
+        path: '',
+        before: draft.risks.find((risk) => risk.riskId === 'R-02'),
+        after: both.risks.find((risk) => risk.riskId === 'R-02'),
+      },
+    ]);
+    expect(log.map((entry) => entry.at)).toEqual([...log.map((entry) => entry.at)].sort());
   });
 
   it('a draft log that is an older copy of the saved log adds no entry', () => {

@@ -109,7 +109,9 @@ test('S6 evaluates the Table 9 triggers on recorded observations (G2 b) and star
   // The status is Review needed already, so the next reason writes nothing.
   await record(page, 'T9-EX3', { outage_hours: 2.5, customers_affected_percent: 6 });
   await expectStates(page, 'T9-EX3', { ...none, 'T9-EX3-LKRI1': 'Fires', 'T9-EX3-GKRI': 'Fires', 'T9-EX3-TOL': 'Breached' });
-  await expect(review.locator('tbody tr').first()).toContainText('T9-EX3-LKRI1 and T9-EX3-GKRI of appetite statement T9-EX3 fire on the observation of 2026-10-30.');
+  // Each KRI is its own reason, named by its own observation. This is the third of the day.
+  await expect(review.locator('tbody tr').first()).toContainText('T9-EX3-LKRI1 of appetite statement T9-EX3 fires on observation 3 of 2026-10-30.');
+  await expect(review.locator('tbody tr').first()).toContainText('T9-EX3-GKRI of appetite statement T9-EX3 fires on observation 3 of 2026-10-30.');
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
   expect(await appEntries(page)).toHaveLength(operational.length);
 
