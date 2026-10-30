@@ -36,6 +36,7 @@ These are the only packages that reach the user's browser.
 | Tool | Version | Licence | Why | Pin |
 |---|---|---|---|---|
 | oscal-cli (metaschema-framework) | 3.2.0 | CC0-1.0 | Validates the OSCAL POA&M exports (AT-4) | SHA-256 e001b353ee245da6f4ff0ad930c4dfaa88083c63243ca004bd5f5bcef44e8ec8 of the Maven Central zip |
+| gitleaks | 8.30.1 | MIT | Scans every commit of every branch for secrets, also inside archives such as a saved Terraform plan. Offline, it sends nothing. | SHA-256 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb of the GitHub release tarball `gitleaks_8.30.1_linux_x64.tar.gz` |
 | OSCAL POA&M JSON schema | 1.2.3 | Public domain (NIST) | Test-time schema check of the exports | SHA-256 f4fd94487408a9589954b5b92d88965c984d4f79b85365cc574b860898759437, in `test/fixtures/oscal/` |
 
 ## Docs checks (Python, CI only)
