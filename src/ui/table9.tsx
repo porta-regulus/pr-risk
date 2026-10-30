@@ -71,7 +71,7 @@ export function metricsOf(statement: Statement): { metric: string; unit?: string
   return [...seen].map(([metric, unit]) => (unit === undefined ? { metric } : { metric, unit }));
 }
 
-const KIND_TEXT: Readonly<Record<string, string>> = { kpi: 'KPI', 'leading-kri': 'Leading KRI', 'lagging-kri': 'Lagging KRI' };
+export const KIND_TEXT: Readonly<Record<string, string>> = { kpi: 'KPI', 'leading-kri': 'Leading KRI', 'lagging-kri': 'Lagging KRI' };
 
 export function TriggerCheck({ statement }: { readonly statement: Statement }) {
   const [values, setValues] = useState<Values>({});

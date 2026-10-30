@@ -142,3 +142,19 @@ export function brierScores(forecasts: readonly Forecast[]): BrierScores | undef
     ...(withInterval.length > 0 ? { intervalHitRate: hits / withInterval.length } : {}),
   };
 }
+
+// Adds the frozen forecasts whose id is not taken and whose window has not ended. A forecast
+// made after its window is hindsight, and a frozen forecast is never replaced.
+export function withForecasts(doc: RiskDocument, candidates: readonly Forecast[], createdOn: string): RiskDocument {
+  const taken = new Set((doc.forecasts ?? []).map((forecast) => forecast.id));
+  const today = createdOn.slice(0, 10);
+  const added = candidates.filter((forecast) => !taken.has(forecast.id) && forecast.windowEnd >= today).map((forecast) => ({ ...forecast, createdOn }));
+  return added.length === 0 ? doc : { ...doc, forecasts: [...(doc.forecasts ?? []), ...added] };
+}
+
+export type Outcome = NonNullable<Forecast['outcome']>;
+
+// Resolve (Sec. 8.14). The outcome is the one thing added to a frozen forecast.
+export function withOutcome(doc: RiskDocument, id: string, outcome: Outcome): RiskDocument {
+  return { ...doc, forecasts: (doc.forecasts ?? []).map((forecast) => (forecast.id === id && forecast.outcome === undefined ? { ...forecast, outcome } : forecast)) };
+}

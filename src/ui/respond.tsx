@@ -4,17 +4,17 @@
 import { useMemo, useState } from 'preact/hooks';
 import { documentHash } from '../engine/decision';
 import { documentErrors } from '../schema/document';
-import type { ResponseOption, Risk, RiskDocument } from '../schema/types';
+import type { ResponseOption, RiskDocument } from '../schema/types';
 import { DistributionField, formatNumber } from './distribution';
 import { nextId, withSection, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
 import { Checkboxes, LinesField, NumberField, SelectField, TextField } from './fields';
 import { useEngine } from './jobs';
+import { AcceptanceEditor } from './acceptance';
 import { DecisionRecordView, residualRisks } from './record';
 import { money, StatusText } from './report';
 
 type Effect = ResponseOption['effects'][number];
-type Acceptance = NonNullable<Risk['acceptance']>;
 
 const RESPONSE_TYPES: readonly (readonly [ResponseOption['responseType'], string])[] = [
   ['Mitigate', 'Mitigate (negative risk)'],
@@ -38,8 +38,6 @@ const CONTROL_TYPES: readonly (readonly [NonNullable<ResponseOption['controlType
   ['corrective', 'Corrective'],
   ['compensating', 'Compensating'],
 ];
-
-const today = (): string => new Date().toISOString().slice(0, 10);
 
 const replaceAt = <T,>(items: readonly T[], index: number, item: T | undefined): T[] =>
   item === undefined ? items.filter((_, i) => i !== index) : items.map((old, i) => (i === index ? item : old));
@@ -466,105 +464,6 @@ function OptionEditor({ doc, option, update }: { readonly doc: RiskDocument; rea
       </button>
       {(usedBy.length > 0 || (option.introducesRisks ?? []).length > 0) && <span class="hint">A bundle or an introduced risk uses this option, so it cannot be removed.</span>}
     </details>
-  );
-}
-
-function AcceptanceEditor({ risk, update }: { readonly risk: Risk; readonly update: Update }) {
-  const id = `accept-${risk.riskId}`;
-  const acceptance = risk.acceptance;
-  const set = (next: Acceptance | undefined): void => {
-    update((current) => ({
-      ...current,
-      risks: current.risks.map((item) => (item.riskId === risk.riskId ? withValue(item, 'acceptance', next) : item)),
-    }));
-  };
-  if (acceptance === undefined) {
-    return (
-      <button
-        type="button"
-        class="quiet"
-        onClick={() => {
-          set({
-            kind: 'acceptance',
-            acceptedBy: '',
-            acceptedOn: today(),
-            rationale: '',
-          });
-        }}
-      >
-        Record the acceptance of {risk.riskId}
-      </button>
-    );
-  }
-  return (
-    <fieldset class="sub-editor">
-      <legend>Acceptance of {risk.riskId}</legend>
-      <div class="field-row">
-        <div class="field">
-          <SelectField
-            id={`${id}-kind`}
-            label="Kind"
-            value={acceptance.kind}
-            options={[
-              ['acceptance', 'Acceptance of the risk'],
-              ['tolerance-exception', 'Exception to a tolerance'],
-            ]}
-            onChange={(kind) => {
-              set({ ...acceptance, kind: kind ?? 'acceptance' });
-            }}
-          />
-        </div>
-        <div class="field">
-          <TextField
-            id={`${id}-by`}
-            label="Accepted by"
-            value={acceptance.acceptedBy}
-            onChange={(acceptedBy) => {
-              set({ ...acceptance, acceptedBy });
-            }}
-          />
-        </div>
-        <div class="field">
-          <TextField
-            id={`${id}-on`}
-            label="Accepted on"
-            type="date"
-            value={acceptance.acceptedOn}
-            onChange={(acceptedOn) => {
-              set({ ...acceptance, acceptedOn });
-            }}
-          />
-        </div>
-        <div class="field">
-          <TextField
-            id={`${id}-until`}
-            label="Valid until"
-            type="date"
-            value={acceptance.validUntil}
-            onChange={(validUntil) => {
-              set(withValue(acceptance, 'validUntil', validUntil));
-            }}
-          />
-        </div>
-      </div>
-      <TextField
-        id={`${id}-rationale`}
-        label="Rationale"
-        value={acceptance.rationale}
-        onChange={(rationale) => {
-          set({ ...acceptance, rationale });
-        }}
-      />
-      <button
-        type="button"
-        class="quiet"
-        onClick={() => {
-          set(undefined);
-        }}
-      >
-        Remove the acceptance of {risk.riskId}
-      </button>
-    </fieldset>
   );
 }
 
