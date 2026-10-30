@@ -34,11 +34,11 @@ Fix the cause of the fail first. Never test the same user again.
 | 7 | U7 | | | | | | | | | | |
 | 8 | U8 | | | | | | | | | | |
 
-When a fix changes a screen that the task uses, write here which earlier passed sessions still count, and why (README.md Sec. 8 item 4).
+Sessions that passed before a fix still count. When a fix changes a screen that the task uses, write here why each earlier pass still counts (README.md Sec. 8 item 4).
 
-| Fix (commit) | Earlier passed sessions that still count | Reason |
-|---|---|---|
-| | | |
+| Fix (commit) | Screens that the fix changes | Earlier passed sessions | Why each earlier pass still counts |
+|---|---|---|---|
+| | | | |
 
 ## 4. AT-5 result
 

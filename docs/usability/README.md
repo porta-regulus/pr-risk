@@ -121,7 +121,7 @@ Do not tell the user the time. At 30:00 the session fails the pass rule, but the
    4. No other help occurred.
 2. AT-5 passes when 5 counted sessions pass. The counted sessions are sessions 1 to 5, each failed session replaced by its new user (results.md).
 3. When a session fails, find the cause and fix it. Then test with a new user (SPEC.md Sec. 12.5). Never test the same user again. A pilot user is never an AT-5 user.
-4. Write the commit of each session in results.md. If a fix changes a screen that the task uses, the product owner decides whether the sessions that passed before the fix still count, and writes the reason in results.md.
+4. Write the commit of each session in results.md. Sessions that passed before a fix still count (Sec. 10). If the fix changes a screen that the task uses, the product owner writes in results.md why each earlier pass still counts.
 
 ## 9. Checks of ADR-0001
 
@@ -136,9 +136,9 @@ The sessions also check 3 assumptions of ADR-0001. Write the answers in results.
 | Date | Decision |
 |---|---|
 | 2026-10-30 | Keep the two fixed sentences of Sec. 3. They are not interventions. |
+| 2026-10-30 | Sessions that passed before a fix still count (Sec. 8 item 4). When the fix changes a screen that the task uses, the product owner writes in results.md why each earlier pass still counts. |
 
 ## 11. Open decisions for the product owner
 
-1. Sessions that passed before a fix (Sec. 8 item 4). The strict option is to count only sessions on the last commit. That can need up to 5 new users for each fix.
-2. A thank-you payment for the users. Use a fixed amount that does not depend on the result, so that no user hurries to finish.
-3. The contact details of the controller in `docs/pilot/consent.md`.
+1. A thank-you payment for the users. Use a fixed amount that does not depend on the result, so that no user hurries to finish.
+2. The contact details of the controller in `docs/pilot/consent.md`.
