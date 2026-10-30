@@ -82,10 +82,10 @@ it('lists, deletes and removes everything', async () => {
 });
 
 // A change outside the app, for example in the developer tools or by a browser extension.
-const putRaw = (db: IDBDatabase, record: unknown): Promise<void> =>
+const putRaw = (db: IDBDatabase, record: unknown, store: 'documents' | 'versions' = 'documents'): Promise<void> =>
   new Promise((resolve, reject) => {
-    const tx = db.transaction('documents', 'readwrite');
-    tx.objectStore('documents').put(record);
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).put(record);
     tx.oncomplete = () => {
       resolve();
     };
@@ -131,5 +131,18 @@ it('restores nothing when no kept version is valid', async () => {
   const still = await loadDocument(db, record.id);
   if (still === undefined) throw new Error('not stored');
   expect(storedProblem(still)).toMatch(/^Rule /);
+  db.close();
+});
+
+it('does not restore a kept version with a version number below 1 or a damaged document', async () => {
+  await removeAll();
+  const db = await openDb();
+  const id = 'doc-with-bad-versions';
+  const valid = { ...doc, document: { ...doc.document, id } };
+  const key = (version: number): string => `${id}\u0000${String(version).padStart(10, '0')}`;
+  await putRaw(db, { id, title: 'Damaged', version: 3, savedOn: '2026-10-30T00:00:00Z', doc: { ...valid, risks: 'none' } });
+  await putRaw(db, { key: key(2), id, version: 2, doc: { ...valid, document: 'none' } }, 'versions');
+  await putRaw(db, { key: key(0), id, version: 0, doc: valid }, 'versions');
+  expect(await restoreLastValid(db, id)).toBeUndefined();
   db.close();
 });

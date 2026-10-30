@@ -200,7 +200,7 @@ test('a damaged stored record is not opened or exported, and its last valid vers
   // A change outside the app while an editor screen is open. The next screen checks the record.
   await page.getByRole('button', { name: 'Context and strategy' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Context and strategy' })).toBeVisible();
-  await page.evaluate(damageStoredDocument);
+  await page.evaluate(damageStoredDocument, false);
   await page.getByRole('navigation', { name: 'Screens' }).getByRole('button', { name: 'Identify and analyze' }).click();
   await expect(page.getByRole('alert')).toContainText('The stored copy of this document is damaged, so this screen does not open it.');
   await expectAccessible(page, 'editor with a damaged document');
@@ -219,8 +219,33 @@ test('a damaged stored record is not opened or exported, and its last valid vers
   expect((await page.evaluate(storedDocument))['risks']).toHaveLength(9);
 });
 
+// Codex review of pull request 17. With no valid kept version, a saved copy still restores the document.
+test('a saved copy restores a damaged document that has no valid kept version', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'App file (JSON)' }).click();
+  const copy = readFileSync(await (await downloadPromise).path());
+
+  await page.evaluate(damageStoredDocument, true);
+  await page.reload();
+  await page.getByRole('button', { name: 'Restore the last valid version' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: 'No kept version of this document is valid.' })).toBeVisible();
+
+  await page.setInputFiles('#import-file', { name: 'copy.json', mimeType: 'application/json', buffer: copy });
+  await expect(page.getByRole('heading', { name: 'Preview of copy.json' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Add to / })).toBeHidden();
+  await page.getByRole('button', { name: 'Save the file as a document' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'risks from copy.json are saved.' })).toBeVisible();
+  await expect(page.getByText('The stored copy is damaged.')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Context and strategy' })).toBeVisible();
+  expect((await page.evaluate(storedDocument))['risks']).toHaveLength(9);
+});
+
 // Breaks the risk list of the first stored document, as a change in the developer tools would. Runs in the page.
-async function damageStoredDocument(): Promise<void> {
+// With versionsToo, the kept versions are broken as well, so no valid version is left.
+async function damageStoredDocument(versionsToo = false): Promise<void> {
   const db = await new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open('pr-risk');
     request.onsuccess = () => {
@@ -231,15 +256,17 @@ async function damageStoredDocument(): Promise<void> {
     };
   });
   await new Promise<void>((resolve, reject) => {
-    const tx = db.transaction('documents', 'readwrite');
-    const store = tx.objectStore('documents');
-    const cursor = store.openCursor();
-    cursor.onsuccess = () => {
-      const found = cursor.result;
-      if (found === null) return;
-      const record = found.value as { doc: Record<string, unknown> };
-      found.update({ ...record, doc: { ...record.doc, risks: 'none' } });
-    };
+    const tx = db.transaction(['documents', 'versions'], 'readwrite');
+    for (const name of versionsToo ? ['documents', 'versions'] : ['documents']) {
+      const cursor = tx.objectStore(name).openCursor();
+      cursor.onsuccess = () => {
+        const found = cursor.result;
+        if (found === null) return;
+        const record = found.value as { doc: Record<string, unknown> };
+        found.update({ ...record, doc: { ...record.doc, risks: 'none' } });
+        found.continue();
+      };
+    }
     tx.oncomplete = () => {
       resolve();
     };

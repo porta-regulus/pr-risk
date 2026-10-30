@@ -113,12 +113,14 @@ export async function restoreLastValid(db: IDBDatabase, id: string, now = new Da
   const documents = tx.objectStore('documents');
   const current = (await request(documents.get(id))) as Partial<StoredDocument> | undefined;
   const records = (await request(tx.objectStore('versions').index('byDocument').getAll(id))) as VersionRecord[];
+  const lastExportOn = typeof current?.lastExportOn === 'string' ? { lastExportOn: current.lastExportOn } : {};
+  // The same check as on read, so a restored record never fails it (for example a version of 0).
   const valid = records
-    .filter((record) => Number.isSafeInteger(record.version) && documentErrors(record.doc).length === 0 && record.doc.document.id === id)
-    .sort((a, b) => b.version - a.version)[0];
+    .filter((record) => Number.isSafeInteger(record.version))
+    .sort((a, b) => b.version - a.version)
+    .find((record) => storedProblem({ id, title: '', version: record.version, savedOn: now, doc: record.doc }) === undefined);
   let stored: StoredDocument | undefined;
   if (valid !== undefined) {
-    const lastExportOn = typeof current?.lastExportOn === 'string' ? { lastExportOn: current.lastExportOn } : {};
     stored = { id, title: valid.doc.document.title, version: valid.version, savedOn: now, ...lastExportOn, doc: valid.doc };
     documents.put(stored);
   }

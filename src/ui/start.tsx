@@ -193,6 +193,8 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   // A damaged record is shown, but not opened, merged into or exported (gap F4).
   const problems = useMemo(() => new Map(documents.map((item) => [item.id, storedProblem(item)])), [documents]);
   const damaged = current === undefined ? undefined : problems.get(current.id);
+  // With no selected document, or a damaged one, an import starts from a new document and never merges.
+  const fresh = current === undefined || damaged !== undefined;
 
   const refresh = async (database: IDBDatabase, select?: string): Promise<void> => {
     const list = await listDocuments(database);
@@ -268,7 +270,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
         if (openPassphrase === '') throw new Error('The file is encrypted. Type its passphrase, then choose the file again.');
         bytes = new TextEncoder().encode(await decrypt(value, openPassphrase));
       }
-      const base = current?.doc ?? newDocument(file.name.replace(/\.[^.]+$/, '') || 'Imported register', '', 'EUR');
+      const base = current === undefined || fresh ? newDocument(file.name.replace(/\.[^.]+$/, '') || 'Imported register', '', 'EUR') : current.doc;
       // A document always has at least one register. The first one takes rows without a register column.
       const result = await runImport({ doc: base, file: { fileName: file.name, bytes }, options: { register: base.registers[0] } });
       setPreview({ preview: result, fileName: file.name, targetId: current?.id, targetVersion: current?.version });
@@ -286,9 +288,8 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
       if (preview === undefined) return;
       if (isStale(preview, current)) throw new Error(STALE_TEXT);
       // With no open document, a whole document is restored as it is.
-      const replace = preview.preview.document !== undefined && (mode === 'replace' || current === undefined);
-      if (!replace && damaged !== undefined) throw new Error('The selected document is damaged. Restore its last valid version first.');
-      const base = replace || current === undefined ? (preview.preview.document ?? newDocument(preview.fileName, '', 'EUR')) : current.doc;
+      const replace = preview.preview.document !== undefined && (mode === 'replace' || fresh);
+      const base = replace || current === undefined || fresh ? (preview.preview.document ?? newDocument(preview.fileName, '', 'EUR')) : current.doc;
       const chosen = replace ? {} : importChoices(base, preview.preview, choices);
       const doc = commitImport(base, preview.preview, chosen, undefined, replace ? 'replace' : 'merge');
       setPreview(undefined);
@@ -344,7 +345,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
 
   const warnings = current === undefined || damaged !== undefined ? 0 : lint(current.doc).length;
   // With no open document, a whole document file is restored on its own (no merge).
-  const restoreOnly = current === undefined && preview?.preview.document !== undefined;
+  const restoreOnly = fresh && preview?.preview.document !== undefined;
   const restoreErrors = preview?.preview.documentErrors?.length ?? 0;
   const entities = current === undefined || damaged !== undefined || preview === undefined ? [] : mergeEntities(current.doc, preview.preview);
   const same = current === undefined || damaged !== undefined || preview === undefined ? 0 : unchangedRisks(current.doc, preview.preview);
@@ -523,7 +524,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                   ))}
                 </ul>
               )}
-              {!restoreOnly && current !== undefined && (
+              {!fresh && (
                 <MergeChoices
                   title={current.title}
                   entities={entities}
@@ -536,9 +537,9 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
               )}
               <div class="button-row">
                 <button type="button" onClick={commit('merge')} disabled={busy || (restoreOnly ? restoreErrors : preview.preview.errors.length) > 0}>
-                  {current === undefined ? 'Save as a new document' : `Add to ${current.title}`}
+                  {current === undefined ? 'Save as a new document' : fresh ? 'Save the file as a document' : `Add to ${current.title}`}
                 </button>
-                {preview.preview.document !== undefined && current !== undefined && (
+                {preview.preview.document !== undefined && !fresh && (
                   <button type="button" class="quiet" onClick={commit('replace')} disabled={busy || restoreErrors > 0}>
                     Open as its own document
                   </button>
