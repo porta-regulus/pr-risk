@@ -61,6 +61,10 @@ terraform -chdir=infra/gcp output -json github_variables
 | Created | 2026-10-27 with `bootstrap.sh` and `terraform apply` |
 | Load balancer IP | `136.82.106.15` (also `terraform output ip_address`) |
 | Budget alert | EUR 50 on the billing account of the bootstrap step |
+| Domain | `risk.portaregulus.com`, A record DNS only, managed certificate `ACTIVE` |
+| Main page | Not applied on 2026-10-30. `main.tf` sets `main_page_suffix`, but "/" still returns the XML object listing. Run `terraform apply` before the first tag, or the deploy check fails |
+| GitHub | On 2026-10-30 the environment `production` and the repository variables do not exist. Do step 6 before the first tag |
+| Plan files | Do not commit `terraform plan -out` files. `.gitignore` excludes them |
 
 ## Domain-restricted sharing
 

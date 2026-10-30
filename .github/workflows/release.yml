@@ -27,6 +27,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - name: Check that the tag names the package version
+        run: |
+          version="v$(node -p "require('./package.json').version")"
+          if [[ "$TAG" != "$version" ]]; then echo "::error::Tag $TAG is not package.json $version"; exit 1; fi
       - run: npm ci --ignore-scripts
       - run: npm test
       - run: npm run build
