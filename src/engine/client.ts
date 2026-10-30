@@ -1,4 +1,5 @@
 // Run engine jobs in a Web Worker with progress and cancel (SPEC.md Sec. 8.16).
+import type { MonitorNumbers } from '../monitor/numbers';
 import { scriptUrl } from '../trusted-types';
 import type { DecisionRecord } from './decision';
 import type { RiskNumbers } from './numbers';
@@ -30,7 +31,9 @@ export type ResultOf<K extends EngineRequest['kind']> = K extends 'simulate'
         ? PriorityNumbers
         : K extends 'decision'
           ? DecisionRecord
-          : readonly string[];
+          : K extends 'monitor'
+            ? MonitorNumbers
+            : readonly string[];
 
 export function runJob<R extends EngineRequest>(request: R, onProgress?: (done: number, total: number) => void): Job<ResultOf<R['kind']>> {
   const worker = new Worker(scriptUrl(workerUrl), { type: 'module', name: `engine-${request.kind}` });

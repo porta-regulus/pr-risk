@@ -788,6 +788,23 @@ table.sign td {
   display: grid;
   gap: 0.4rem;
 }
+.monitor {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+.monitor tbody th[scope='row'] {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: inherit;
+  color: var(--text);
+  font-weight: 600;
+  vertical-align: top;
+}
+.monitor th.id,
+.monitor td.item-state {
+  white-space: nowrap;
+}
 .record .status-table th[scope='row'] {
   width: 46%;
 }

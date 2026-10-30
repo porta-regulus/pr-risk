@@ -206,7 +206,22 @@ Status 2026-10-28. Some library parts of later tasks are done early, with tests 
 
 Task 8 (OSCAL) is also done as library code (`src/oscal/`). The exports of the 3 examples pass the OSCAL 1.2.3 draft-07 schema (`test/fixtures/oscal/`, pinned by SHA-256). The lossless path restores each document exactly. The native path restores every risk field. The CI job `oscal` runs NIST oscal-cli 3.2.0 on the exports. It has not run yet, because this Mac has no Java and the repository is not on GitHub.
 
-Task 6 library parts are done too (`src/monitor/`). G2 (b) passes, including the boundary gap of Table 9 example 3 at 5 percent. Forecasts freeze with the input hash of SPEC.md Sec. 8.14, which reproduces both hashes stored in example 2. The Brier score, skill score, Murphy decomposition and the hit rate of the 90 percent interval have exact unit tests. Screen S6 is still to build.
+Task 6 library parts are done too (`src/monitor/`). G2 (b) passes, including the boundary gap of Table 9 example 3 at 5 percent. Forecasts freeze with the input hash of SPEC.md Sec. 8.14, which reproduces both hashes stored in example 2. The Brier score, skill score, Murphy decomposition and the hit rate of the 90 percent interval have exact unit tests.
+
+### Task 6. S6 Monitor and adjust
+
+Status 2026-10-30. Screen S6 works (`src/ui/monitor.tsx`, rules in `src/monitor/review.ts` and `src/monitor/tolerance.ts`, engine job `monitor` in `src/monitor/numbers.ts`). The start screen and the editor navigation open it. Both done criteria pass.
+1. G2 (b) passes on recorded observations, in `e2e/monitor.spec.ts` and `test/monitor-s6.test.ts`. The screen shows "Fires", "Does not fire" or "No data" for each tolerance and indicator, and it flags the boundary gap of Table 9 example 3 at 5 percent.
+2. The Sec. 8.14 unit tests pass in `test/monitor.test.ts` and `test/monitor-s6.test.ts`. They cover the input hash, the window, the freeze, a frozen forecast that is never edited, the outcome with rule V-15, BS with SE(BS) and its 95% interval, the skill score, the Murphy decomposition with its difference, and the hit rate of the 90% interval.
+
+What the screen does.
+1. KPIs, KRIs and tolerances. One observation of a statement goes to each tolerance and indicator whose trigger uses one of its metrics, with only those values. Each trigger is checked on its own latest observation. On the same date, the observation recorded last counts.
+2. Review triggers. The screen lists each risk that needs a review, with the reasons of Sec. 6.11 item 2 and Sec. 6.14 item 1. One button sets the listed risks to "Review needed", so each status change is a change log entry that a person started. A KRI is a leading or lagging KRI of a statement whose `categoryCodes` hold the category code of the risk. A KPI and a breached tolerance do not start a review, because Sec. 6.11 names KRIs only. An emerging or horizon risk is "new" when the change log shows that it became emerging or horizon after the as-of date of the register of the other risk. Closed risks get no trigger.
+3. Acceptance records. Every risk that is accepted or has the response Accept, with the state Valid, Expired or No end date. The editor is shared with S5 (`src/ui/acceptance.tsx`).
+4. Tolerance what-if. The job keeps the sorted annual losses of the roll-up, so a changed curve gives status, gap, excess area and P(loss above capacity) at once. Saving moves the old curve into `appetite.history`. The new curve has no approval until S2 sets it.
+5. Forecasts. "Freeze forecasts" adds a forecast for each simulated leaf risk that has none for its current window. It adds no forecast for a window that has ended, because that would be hindsight. After the window ends, the screen asks for the outcome. The change log now keys forecasts by their own id (`src/ui/edit.ts`), so two forecasts of one risk do not collide.
+
+Open for the product owner. Sec. 6.11 item 2 says a risk "goes to" status "Review needed". The screen asks for one click instead of a silent change when the screen opens. Say if the change must be automatic, and if a breached tolerance must start a review too.
 
 ## 6. Rules for the build session
 

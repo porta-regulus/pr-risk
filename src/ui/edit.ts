@@ -62,7 +62,7 @@ export function changedSections(before: RiskDocument, after: RiskDocument): Sect
   return SECTIONS.filter((section) => before[section] !== after[section] && canonicalize(before[section] ?? null) !== canonicalize(after[section] ?? null));
 }
 
-type EntityKind = 'register' | 'risk' | 'asset' | 'driver' | 'response';
+type EntityKind = 'register' | 'risk' | 'asset' | 'driver' | 'response' | 'forecast';
 type Keyed = { readonly id?: string; readonly riskId?: string };
 
 export interface Change {
@@ -73,19 +73,21 @@ export interface Change {
   readonly after?: unknown;
 }
 
-const ENTITY_LISTS: readonly (readonly ['registers' | 'risks' | 'assets' | 'drivers' | 'responses', EntityKind])[] = [
+const ENTITY_LISTS: readonly (readonly ['registers' | 'risks' | 'assets' | 'drivers' | 'responses' | 'forecasts', EntityKind])[] = [
   ['registers', 'register'],
   ['risks', 'risk'],
   ['assets', 'asset'],
   ['drivers', 'driver'],
   ['responses', 'response'],
+  ['forecasts', 'forecast'],
 ];
 
-const keyOf = (item: Keyed): string => item.riskId ?? item.id ?? '';
+// A risk is keyed by riskId. A forecast also holds a riskId, but its key is its own id.
+const keyOf = (item: Keyed, list: (typeof ENTITY_LISTS)[number][0]): string => (list === 'risks' ? item.riskId : item.id) ?? '';
 
 // Every change between two versions: one per changed section and one per added, removed or
-// changed register, risk, asset or driver. Unchanged objects keep their identity through the
-// immutable edits, so most comparisons end at the reference check.
+// changed register, risk, asset, driver, response or forecast. Unchanged objects keep their
+// identity through the immutable edits, so most comparisons end at the reference check.
 export function documentChanges(before: RiskDocument, after: RiskDocument): Change[] {
   const changes: Change[] = changedSections(before, after).map((section) => ({
     entityKind: section === 'governance' ? 'context' : section,
@@ -95,8 +97,8 @@ export function documentChanges(before: RiskDocument, after: RiskDocument): Chan
     ...(after[section] === undefined ? {} : { after: after[section] }),
   }));
   for (const [list, entityKind] of ENTITY_LISTS) {
-    const old = new Map<string, Keyed>(((before[list] ?? []) as readonly Keyed[]).map((item) => [keyOf(item), item]));
-    const next = new Map<string, Keyed>(((after[list] ?? []) as readonly Keyed[]).map((item) => [keyOf(item), item]));
+    const old = new Map<string, Keyed>(((before[list] ?? []) as readonly Keyed[]).map((item) => [keyOf(item, list), item]));
+    const next = new Map<string, Keyed>(((after[list] ?? []) as readonly Keyed[]).map((item) => [keyOf(item, list), item]));
     for (const id of new Set([...old.keys(), ...next.keys()])) {
       const a = old.get(id);
       const b = next.get(id);
