@@ -35,6 +35,18 @@ export function checkCurve(doc: RiskDocument, points: readonly TolerancePoint[],
   };
 }
 
+// True when both lists hold the same points. An empty field of the editor is NaN, which
+// differs from every saved value. Canonical JSON has no form for NaN, so it cannot compare.
+export function samePoints(a: readonly TolerancePoint[], b: readonly TolerancePoint[]): boolean {
+  return (
+    a.length === b.length &&
+    a.every((point, i) => {
+      const other = b[i];
+      return other !== undefined && point.loss === other.loss && point.maxExceedanceProbability === other.maxExceedanceProbability;
+    })
+  );
+}
+
 // Rule V-12 and the schema limits, in words for the what-if editor.
 export function curveProblems(points: readonly TolerancePoint[]): string[] {
   const problems: string[] = [];

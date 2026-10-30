@@ -6,7 +6,7 @@ import { measure, sortedCopy, statusOf, tolerance } from '../src/engine';
 import { brierScores, freezeForecasts, withForecasts, withOutcome } from '../src/monitor/forecasts';
 import { monitorNumbers } from '../src/monitor/numbers';
 import { acceptanceState, emergedOn, itemState, latestInGap, reviewTriggers, withObservation, withReviewNeeded } from '../src/monitor/review';
-import { checkCurve, curveProblems, withPoints, withToleranceChange } from '../src/monitor/tolerance';
+import { checkCurve, curveProblems, samePoints, withPoints, withToleranceChange } from '../src/monitor/tolerance';
 import { documentErrors, type RiskDocument } from '../src/schema';
 import { documentChanges, withChangeLog } from '../src/ui/edit';
 import { monitorKey, triggerText } from '../src/ui/monitor';
@@ -179,6 +179,14 @@ describe('tolerance what-if (Sec. 6.17 item 2)', () => {
       'V-12. The loss must go up and the probability must go down from each point to the next.',
     ]);
     expect(curveProblems([{ loss: 100, maxExceedanceProbability: 0.1 }])).toContain('A curve needs at least 2 points.');
+  });
+
+  it('an empty field is a change and a problem, not an error', () => {
+    const cleared = saved.map((point, i) => (i === 1 ? { ...point, loss: Number.NaN } : point));
+    expect(samePoints(saved, saved.map((point) => ({ ...point })))).toBe(true);
+    expect(samePoints(cleared, saved)).toBe(false);
+    expect(samePoints(saved.slice(0, 2), saved)).toBe(false);
+    expect(curveProblems(cleared)).toContain('The loss of point 2 must be more than 0.');
   });
 
   it('a saved change moves the old curve into the history with date, person and reason', () => {

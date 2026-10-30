@@ -7,7 +7,7 @@ import { exceedance, lossGrid, type TolerancePoint } from '../engine/metrics';
 import { brierScores, withForecasts, withOutcome } from '../monitor/forecasts';
 import type { MonitorNumbers } from '../monitor/numbers';
 import { acceptanceState, itemState, latestInGap, reviewTriggers, withObservation, withReviewNeeded, type ItemState } from '../monitor/review';
-import { checkCurve, curveProblems, withPoints, withToleranceChange } from '../monitor/tolerance';
+import { checkCurve, curveProblems, samePoints, withPoints, withToleranceChange } from '../monitor/tolerance';
 import { canonicalize } from '../schema/canonical';
 import type { Risk, RiskDocument } from '../schema/types';
 import { AcceptanceEditor } from './acceptance';
@@ -375,7 +375,7 @@ function WhatIfPanel({ doc, update, numbers }: { readonly doc: RiskDocument; rea
     );
   }
   const problems = curveProblems(points);
-  const changed = canonicalize(points) !== canonicalize(saved);
+  const changed = !samePoints(points, saved);
   const setPoint = (i: number, key: keyof TolerancePoint, value: number | undefined): void => {
     setNote(undefined);
     setPoints(points.map((point, j) => (j === i ? { ...point, [key]: value ?? Number.NaN } : point)));

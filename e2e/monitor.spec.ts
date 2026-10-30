@@ -104,6 +104,11 @@ test('S6 tests a tolerance curve, freezes forecasts and scores them after the wi
   await expect(page.getByText('Simulated with 100,000 trials.')).toBeVisible({ timeout: 30_000 });
   const result = page.getByRole('region', { name: 'What-if result' });
   await expect(result.getByRole('row', { name: /^Status/ })).toHaveText(/Clear breach.*Clear breach/);
+  // An empty field shows the problem and keeps the screen working.
+  await page.getByLabel('What-if point 2 loss').fill('');
+  await expect(page.getByText('The loss of point 2 must be more than 0.')).toBeVisible();
+  await expect(result.getByRole('row', { name: /^Status/ })).toHaveText(/Clear breach.*Not valid/);
+  await page.getByLabel('What-if point 2 loss').fill('250000');
   for (const [i, p] of [0.99, 0.4, 0.1, 0.02].entries()) await page.getByLabel(`What-if point ${String(i + 1)} probability`).fill(String(p));
   await expect(result.getByRole('row', { name: /^Status/ })).toHaveText(/Clear breach.*Within tolerance/);
   await expect(page.getByRole('figure', { name: /against the what-if curve/ })).toBeVisible();
