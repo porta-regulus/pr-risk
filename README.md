@@ -24,7 +24,7 @@ npm ci --ignore-scripts
 npm run build && npm run preview
 ```
 
-To self-host, download a release bundle, check it, and serve the files from any web server with the headers in [deploy/headers.json](deploy/headers.json).
+To self-host, download a release bundle, check it, and serve the files with the headers of [docs/self-host.md](docs/self-host.md). It has examples for nginx, Apache httpd and Caddy.
 
 ```bash
 gh attestation verify pr-risk-v0.1.0.tar.gz --repo porta-regulus/pr-risk

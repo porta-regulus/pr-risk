@@ -322,7 +322,7 @@ Plan.
 4. Same day. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Expected 7.2.
 5. Same day, after approval (D3). Push the test tag `v0.1.0-rc.1`. Check that the prerelease has 6 files, and run the verify commands of the release notes. This meets task 1 done criterion 3. Expected Scorecard 7.4.
 6. Day 1 to 2. The product owner makes the entry on https://www.bestpractices.dev (D5). The answers with evidence URLs are in [`docs/release/best-practices-answers.md`](release/best-practices-answers.md) (draft 2026-10-30). Its section 1 lists 5 steps to do before the entry.
-7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are for the build session. F5, F6 and F8 to F11 need the product owner.
+7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are closed (S1 notices on storage encryption and browser extensions, a check of each stored record on read, `docs/self-host.md`, 3 statements in `SECURITY.md`). F5, F6 and F8 to F11 need the product owner.
 8. Tag release 1 when AT-5 and AT-6 pass (D7).
 
 Earliest date. If the repository becomes public on Monday 2026-11-02, AT-7 can pass on Wednesday 2026-11-04. Release 1 is on that date or on the date that AT-5 and AT-6 pass, whichever is later.

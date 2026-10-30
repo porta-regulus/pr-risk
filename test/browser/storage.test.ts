@@ -11,8 +11,11 @@ import {
   openDb,
   recordExport,
   removeAll,
+  restoreLastValid,
   saveDocument,
   storageStatus,
+  storedProblem,
+  type StoredDocument,
   undo,
   UNDO_VERSIONS,
 } from '../../src/storage/db';
@@ -76,4 +79,57 @@ it('lists, deletes and removes everything', async () => {
   fresh.close();
   const status = await storageStatus();
   expect(typeof status.persisted).toBe('boolean');
+});
+
+// A change outside the app, for example in the developer tools or by a browser extension.
+const putRaw = (db: IDBDatabase, record: unknown): Promise<void> =>
+  new Promise((resolve, reject) => {
+    const tx = db.transaction('documents', 'readwrite');
+    tx.objectStore('documents').put(record);
+    tx.oncomplete = () => {
+      resolve();
+    };
+    tx.onerror = () => {
+      reject(tx.error ?? new Error('put failed'));
+    };
+  });
+
+it('finds a damaged record and restores the last valid version (CRA Annex I gap F4)', async () => {
+  await removeAll();
+  const db = await openDb();
+  await saveDocument(db, withTitle('Valid 1'), '2026-10-30T00:00:01Z');
+  await saveDocument(db, withTitle('Valid 2'), '2026-10-30T00:00:02Z');
+  const stored = await loadDocument(db, doc.document.id);
+  if (stored === undefined) throw new Error('not saved');
+  expect(storedProblem(stored)).toBeUndefined();
+  expect(storedProblem({ ...stored, version: Number.NaN })).toBe('The stored record has no valid version number.');
+  expect(storedProblem({ ...stored, id: 'another-id' })).toBe('The stored record has the id of another document.');
+
+  await putRaw(db, { ...stored, lastExportOn: '2026-10-29T00:00:00Z', doc: { ...stored.doc, risks: 'none' } });
+  const damaged = await loadDocument(db, doc.document.id);
+  if (damaged === undefined) throw new Error('not stored');
+  expect(storedProblem(damaged)).toMatch(/^Rule .+\. \/risks /);
+
+  const restored = await restoreLastValid(db, doc.document.id, '2026-10-30T00:00:03Z');
+  expect(restored?.version).toBe(2);
+  expect(restored?.doc.document.title).toBe('Valid 2');
+  expect(restored?.lastExportOn).toBe('2026-10-29T00:00:00Z');
+  const reloaded = await loadDocument(db, doc.document.id);
+  if (reloaded === undefined) throw new Error('not restored');
+  expect(storedProblem(reloaded)).toBeUndefined();
+  // Undo still works from the restored version.
+  expect((await undo(db, doc.document.id))?.doc.document.title).toBe('Valid 1');
+  db.close();
+});
+
+it('restores nothing when no kept version is valid', async () => {
+  await removeAll();
+  const db = await openDb();
+  const record: StoredDocument = { id: 'doc-without-versions', title: 'Only a damaged copy', version: 1, savedOn: '2026-10-30T00:00:00Z', doc: { ...doc, document: { ...doc.document, id: 'doc-without-versions' } } };
+  await putRaw(db, { ...record, doc: { ...record.doc, registers: 7 } });
+  expect(await restoreLastValid(db, record.id)).toBeUndefined();
+  const still = await loadDocument(db, record.id);
+  if (still === undefined) throw new Error('not stored');
+  expect(storedProblem(still)).toMatch(/^Rule /);
+  db.close();
 });

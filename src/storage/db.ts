@@ -92,6 +92,40 @@ export async function saveDocument(db: IDBDatabase, doc: RiskDocument, now = new
   return stored;
 }
 
+// CRA Annex I Part I point 2(f). A stored record can change outside the app, for example in the
+// developer tools or through a browser extension. The screens check each record that they read
+// before they show or export it (docs/release/annex-i-self-check.md, gap F4).
+export function storedProblem(stored: StoredDocument): string | undefined {
+  // The type says what the app wrote, not what the browser holds now.
+  const record: { readonly [K in keyof StoredDocument]?: unknown } = stored;
+  const version = record.version;
+  if (typeof version !== 'number' || !Number.isSafeInteger(version) || version < 1 || typeof record.savedOn !== 'string') return 'The stored record has no valid version number.';
+  const error = documentErrors(record.doc)[0];
+  if (error !== undefined) return `Rule ${error.rule}. ${error.message.replace(/\.$/, '')}.`;
+  if (stored.doc.document.id !== record.id) return 'The stored record has the id of another document.';
+  return undefined;
+}
+
+// Makes the newest kept version that passes the checks current again, as undo does. It writes
+// no new version. Returns undefined when no kept version is valid.
+export async function restoreLastValid(db: IDBDatabase, id: string, now = new Date().toISOString()): Promise<StoredDocument | undefined> {
+  const tx = db.transaction(['documents', 'versions'], 'readwrite');
+  const documents = tx.objectStore('documents');
+  const current = (await request(documents.get(id))) as Partial<StoredDocument> | undefined;
+  const records = (await request(tx.objectStore('versions').index('byDocument').getAll(id))) as VersionRecord[];
+  const valid = records
+    .filter((record) => Number.isSafeInteger(record.version) && documentErrors(record.doc).length === 0 && record.doc.document.id === id)
+    .sort((a, b) => b.version - a.version)[0];
+  let stored: StoredDocument | undefined;
+  if (valid !== undefined) {
+    const lastExportOn = typeof current?.lastExportOn === 'string' ? { lastExportOn: current.lastExportOn } : {};
+    stored = { id, title: valid.doc.document.title, version: valid.version, savedOn: now, ...lastExportOn, doc: valid.doc };
+    documents.put(stored);
+  }
+  await done(tx);
+  return stored;
+}
+
 export async function loadDocument(db: IDBDatabase, id: string): Promise<StoredDocument | undefined> {
   return (await request(db.transaction('documents').objectStore('documents').get(id))) as StoredDocument | undefined;
 }

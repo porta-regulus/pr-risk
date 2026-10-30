@@ -39,6 +39,12 @@ Do not send real risk registers. Use the example files in `docs/schema/examples/
 
 We tell you about progress at each step. We name you in the advisory, unless you ask us not to.
 
+A security fix comes as its own patch release, with no new functions, when this is technically possible. The release notes and the advisory tell users what to do.
+
+If the vulnerability is in a third-party component, we report it to the maintainers of that component and tell you that we did. We also release a fix or a mitigation for this software.
+
+The app makes no network request, so it cannot tell you about a fix. To learn about fixes, watch the releases of https://github.com/porta-regulus/pr-risk. The hosted app at https://risk.portaregulus.com loads a new version when you next start it.
+
 If we find that a vulnerability in this software is actively exploited, we report it as Article 14(1) of the Cyber Resilience Act requires, to the extent that Article 24(3) applies it to stewards.
 
 ## Supported versions

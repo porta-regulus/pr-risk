@@ -1,7 +1,7 @@
 // Screen S1 Start (SPEC.md Sec. 5). Open, create, import, export, storage status,
 // last-export date and remove all data. Everything stays in this browser.
 import { Fragment } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useMemo, useState } from 'preact/hooks';
 import { decrypt, encrypt, isEncryptedFile } from '../export/encryption';
 import { exportCsv, exportIr8286, exportNative } from '../export/export';
 import { runImport } from '../import/client';
@@ -17,8 +17,10 @@ import {
   recordExport,
   removeAll,
   requestPersistence,
+  restoreLastValid,
   saveDocument,
   storageStatus,
+  storedProblem,
   type StorageStatus,
   type StoredDocument,
 } from '../storage/db';
@@ -188,6 +190,9 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   const [newCurrency, setNewCurrency] = useState('EUR');
 
   const current = documents.find((item) => item.id === currentId) ?? documents[0];
+  // A damaged record is shown, but not opened, merged into or exported (gap F4).
+  const problems = useMemo(() => new Map(documents.map((item) => [item.id, storedProblem(item)])), [documents]);
+  const damaged = current === undefined ? undefined : problems.get(current.id);
 
   const refresh = async (database: IDBDatabase, select?: string): Promise<void> => {
     const list = await listDocuments(database);
@@ -282,6 +287,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
       if (isStale(preview, current)) throw new Error(STALE_TEXT);
       // With no open document, a whole document is restored as it is.
       const replace = preview.preview.document !== undefined && (mode === 'replace' || current === undefined);
+      if (!replace && damaged !== undefined) throw new Error('The selected document is damaged. Restore its last valid version first.');
       const base = replace || current === undefined ? (preview.preview.document ?? newDocument(preview.fileName, '', 'EUR')) : current.doc;
       const chosen = replace ? {} : importChoices(base, preview.preview, choices);
       const doc = commitImport(base, preview.preview, chosen, undefined, replace ? 'replace' : 'merge');
@@ -311,6 +317,14 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
       if (kind !== 'ir8286') report('ok', 'The file is saved to your downloads.');
     });
 
+  const restoreValid = guard(async () => {
+    if (current === undefined || db === undefined) return;
+    const restored = await restoreLastValid(db, current.id);
+    await refresh(db, current.id);
+    if (restored === undefined) throw new Error('No kept version of this document is valid. Import a saved copy, or delete the document.');
+    report('ok', `Version ${String(restored.version)} is restored. It is the last valid version.`);
+  });
+
   const remove = (id: string) =>
     guard(async () => {
       if (db === undefined) return;
@@ -328,12 +342,12 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
     report('ok', 'All data is removed from this browser.');
   });
 
-  const warnings = current === undefined ? 0 : lint(current.doc).length;
+  const warnings = current === undefined || damaged !== undefined ? 0 : lint(current.doc).length;
   // With no open document, a whole document file is restored on its own (no merge).
   const restoreOnly = current === undefined && preview?.preview.document !== undefined;
   const restoreErrors = preview?.preview.documentErrors?.length ?? 0;
-  const entities = current === undefined || preview === undefined ? [] : mergeEntities(current.doc, preview.preview);
-  const same = current === undefined || preview === undefined ? 0 : unchangedRisks(current.doc, preview.preview);
+  const entities = current === undefined || damaged !== undefined || preview === undefined ? [] : mergeEntities(current.doc, preview.preview);
+  const same = current === undefined || damaged !== undefined || preview === undefined ? 0 : unchangedRisks(current.doc, preview.preview);
 
   return (
     <main class="screen">
@@ -374,7 +388,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                     <td>
                       <strong>{item.title}</strong>
                       <span class="sub">
-                        {item.doc.registers.length} registers, {item.doc.risks.length} risks, version {item.version}
+                        {problems.get(item.id) === undefined ? `${String(item.doc.registers.length)} registers, ${String(item.doc.risks.length)} risks, version ${String(item.version)}` : 'The stored copy is damaged.'}
                       </span>
                     </td>
                     <td>{dateText(item.savedOn)}</td>
@@ -395,7 +409,19 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
             </table>
           </div>
         )}
-        {current !== undefined && (
+        {current !== undefined && damaged !== undefined && (
+          <>
+            <p class="message message-error" role="alert">
+              The stored copy of {current.title} is damaged. {damaged} The app does not open or export it.
+            </p>
+            <div class="button-row">
+              <button type="button" onClick={restoreValid} disabled={busy}>
+                Restore the last valid version
+              </button>
+            </div>
+          </>
+        )}
+        {current !== undefined && damaged === undefined && (
           <>
             <p class="muted">
               Selected: <strong>{current.title}</strong>. Lint shows {warnings} {warnings === 1 ? 'warning' : 'warnings'}.
@@ -530,8 +556,8 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
 
         <section aria-labelledby="export-title" class="panel">
           <h2 id="export-title">Export</h2>
-          {current === undefined ? (
-            <p class="muted">Select a document first.</p>
+          {current === undefined || damaged !== undefined ? (
+            <p class="muted">{current === undefined ? 'Select a document first.' : 'Restore a valid version of the selected document first.'}</p>
           ) : (
             <>
               <p class="muted">Files go to your downloads. Keep a copy, because browsers can delete stored data.</p>
@@ -566,6 +592,9 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
             {status?.persisted === true ? 'The browser keeps this data.' : 'The browser can delete this data when space is low or after 7 days without a visit (Safari).'} Used{' '}
             {megabytes(status?.usage)}.
           </p>
+          {/* ADR-0004 decision 5 and threat I1 (docs/release/annex-i-self-check.md, gaps F1 and F2). */}
+          <p>The app does not encrypt the data in this browser. Turn on the disk encryption of this computer, for example BitLocker or FileVault.</p>
+          <p>A browser extension that can read all sites can also read this page. For a sensitive register, use a browser profile with no extensions.</p>
           <label for="remove-confirm">Type REMOVE to delete every document, cache and the offline copy from this browser</label>
           <input id="remove-confirm" value={confirmText} onInput={(event) => {
             setConfirmText(event.currentTarget.value);
