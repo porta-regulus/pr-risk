@@ -12,6 +12,9 @@ permissions: read-all
 jobs:
   analyze:
     name: Analyze ${{ matrix.language }}
+    # Code scanning on a private repository needs a Code Security licence (Team plan).
+    # Run only while the repository is public. A missing field runs the job.
+    if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-24.04
     permissions:
       security-events: write
