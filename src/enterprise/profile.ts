@@ -4,6 +4,7 @@
 import { subtree } from '../engine/metrics';
 import { rankOf } from '../schema/rules';
 import type { Risk, RiskDocument } from '../schema/types';
+import { numbersSource } from '../ui/analysis';
 
 export type Objective = NonNullable<NonNullable<RiskDocument['context']>['objectives']>[number];
 
@@ -47,23 +48,29 @@ export interface ErpBlock {
 const assessed = (label: string | undefined, value: number | undefined): Assessed | undefined =>
   label !== undefined && label !== '' ? { label } : value === undefined ? undefined : { value };
 
-// A number that an importer or a new risk filled as a placeholder is not an assessment.
-function current(risk: Risk, field: 'riskImpact' | 'riskLikelihood', label: string | undefined): Assessed | undefined {
+// The numbers that an importer or a new risk filled as placeholders (rule D-Q2) are not an
+// assessment. Numbers from an estimate, from labels (rules D-Q1 and D-Q3, the source of S3) or
+// from the roll-up of a summary entry are.
+export function isPlaceholder(doc: RiskDocument, risk: Risk): boolean {
+  return risk.rollUp === undefined && numbersSource(doc, risk) === 'placeholder';
+}
+
+function current(doc: RiskDocument, risk: Risk, field: 'riskImpact' | 'riskLikelihood', label: string | undefined): Assessed | undefined {
   if (label !== undefined && label !== '') return { label };
-  return (risk.defaultedFields ?? []).includes(`/${field}`) ? undefined : { value: risk[field] };
+  return isPlaceholder(doc, risk) ? undefined : { value: risk[field] };
 }
 
 // Last comes from previousAssessment, Current from the register entry and Residual from the
 // planned values of the risk detail record (SPEC.md Sec. 6.13 item 2).
-export function erpRow(risk: Risk): ErpRow {
+export function erpRow(doc: RiskDocument, risk: Risk): ErpRow {
   const last = risk.previousAssessment;
   const planned = risk.detail?.planned;
   return {
     risk,
-    impact: [assessed(last?.riskImpactLabel, last?.riskImpact), current(risk, 'riskImpact', risk.riskImpactLabel), assessed(planned?.impactLabel, planned?.impact)],
+    impact: [assessed(last?.riskImpactLabel, last?.riskImpact), current(doc, risk, 'riskImpact', risk.riskImpactLabel), assessed(planned?.impactLabel, planned?.impact)],
     likelihood: [
       assessed(last?.riskLikelihoodLabel, last?.riskLikelihood),
-      current(risk, 'riskLikelihood', risk.riskLikelihoodLabel),
+      current(doc, risk, 'riskLikelihood', risk.riskLikelihoodLabel),
       assessed(planned?.likelihoodLabel, planned?.likelihood),
     ],
     currentResponse: risk.detail?.implementedResponseDescription ?? '',
@@ -84,7 +91,7 @@ export function erpBlocks(doc: RiskDocument, registerId?: string): ErpBlock[] {
       .filter((risk) => (risk.objectiveIds ?? []).includes(objective.id))
       .map((risk, index) => ({ risk, index }))
       .sort((a, b) => priorityOf(a.risk) - priorityOf(b.risk) || a.index - b.index)
-      .map(({ risk }) => erpRow(risk));
+      .map(({ risk }) => erpRow(doc, risk));
     return rows.length === 0 ? [] : [{ objective, heading: `${objective.kind.toUpperCase()} OBJECTIVE`, rows }];
   });
 }

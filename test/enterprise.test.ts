@@ -108,7 +108,7 @@ describe('G3 merge and normalization in the parent register (Table 10)', () => {
 
   it('refuses a merge without sources, text or owner, with a taken id or with mixed polarity', () => {
     const problems = (merge: Parameters<typeof mergeResult>[1]): string[] => {
-      const result = mergeResult(source, merge);
+      const result = mergeResult(doc, merge);
       return 'problems' in result ? result.problems : [];
     };
     expect(problems({ sources: [], options: { ...options, id: 'ORG-2', riskDescription: ' ', riskOwnerPointOfContact: '' } })).toEqual([
@@ -116,11 +116,43 @@ describe('G3 merge and normalization in the parent register (Table 10)', () => {
       'Write the combined risk description.',
       'Name the risk owner at the level of the parent register.',
     ]);
-    expect(problems({ sources, options })).toEqual(['The id ORG-1 is in use.']);
+    expect(problems({ sources, options: { ...options, id: 'GW-1' } })).toEqual(['The id GW-1 is in use.']);
     expect(problems({ sources, options: { ...options, id: 'ORG 2' } })[0]).toMatch(/^The id must start/);
     expect(problems({ sources: [...sources, { ...riskOf(source, 'B-1'), riskId: 'P-1', polarity: 'positive' }], options: { ...options, id: 'ORG-2' } })).toEqual([
       'Select only negative or only positive entries.',
     ]);
+  });
+
+  it('refuses entries that a summary entry holds already, so the profile never counts them twice', () => {
+    const again = mergeResult(source, { sources: ['A-1', 'B-1', 'C-1'].map((id) => riskOf(source, id)), options: { ...options, id: 'ORG-2' } });
+    expect(again).toEqual({
+      problems: ['A-1', 'B-1', 'C-1'].map((id) => `${id} is in ORG-1 already. Do not select it, or remove ORG-1 first.`),
+    });
+    expect(childEntries(source, 'ORG').flatMap((group) => group.entries).filter((entry) => entry.summarizedBy.length > 0).map((entry) => entry.risk.riskId)).toEqual(['A-1', 'B-1', 'C-1']);
+    expect(portfolioRow(source, 'ORG').current).toBe(310_000);
+  });
+
+  it('refuses entries with placeholder numbers, because a summary would show them as values', () => {
+    const merge = (ids: readonly string[]) => mergeResult(doc, { sources: ids.map((id) => riskOf(doc, id)), options: { ...options, id: 'ORG-2' } });
+    expect(merge(['GW-1'])).toEqual({ problems: ['GW-1 has no estimate yet. Estimate it on the screen Identify and analyze, or do not select it.'] });
+    expect(merge(['A-1', 'GW-1', 'GW-2'])).toEqual({ problems: ['GW-1, GW-2 have no estimate yet. Estimate them on the screen Identify and analyze, or do not select them.'] });
+  });
+
+  it('a summary of numbers from labels keeps them marked as defaulted and shows them in the profile', () => {
+    const qualitative = example(EXAMPLE_1);
+    const result = mergeResult(qualitative, {
+      sources: [riskOf(qualitative, '6'), riskOf(qualitative, '7')],
+      options: { ...options, id: 'ERR-S1', registerId: 'ERR', riskDescription: 'Staff and recruiting risks.', riskOwnerPointOfContact: 'Chief Human Capital Officer' },
+    });
+    if (!('rows' in result)) throw new Error(result.problems.join(' '));
+    const [summary] = result.rows;
+    expect(summary?.defaultedFields).toEqual(['/riskLikelihood', '/riskImpact', '/exposureRating']);
+    const merged = withMerge(qualitative, result.rows);
+    expect(documentErrors(merged)).toEqual([]);
+    expect(portfolioRow(merged, 'ERR')).toMatchObject({ entries: 7, defaulted: 7 });
+    const withObjective: RiskDocument = { ...merged, risks: merged.risks.map((risk) => (risk.riskId === 'ERR-S1' ? { ...risk, objectiveIds: ['OBJ-F11-1'] } : risk)) };
+    const row = erpBlocks(withObjective, 'ERR')[0]?.rows[0];
+    expect(row?.impact.map((value) => assessedText(value, 'impact'))[1]).toBe((summary?.riskImpact ?? 0).toLocaleString('en'));
   });
 
   it('a summary that something refers to cannot be removed, and its sources stay', () => {

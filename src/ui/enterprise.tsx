@@ -5,7 +5,7 @@
 // labels, so the screen runs no simulation.
 import { useState } from 'preact/hooks';
 import { childEntries, type ChildEntry, mergeResult, parentRegisters, referencesTo, summaryEntries, withMerge, withoutRisk } from '../enterprise/normalize';
-import { type Assessed, type ErpBlock, erpBlocks, portfolioRow, withoutObjective } from '../enterprise/profile';
+import { type Assessed, type ErpBlock, erpBlocks, isPlaceholder, portfolioRow, withoutObjective } from '../enterprise/profile';
 import type { DisparityLayout } from '../import/rollup';
 import { lint } from '../schema/rules';
 import type { Register, Risk, RiskDocument } from '../schema/types';
@@ -31,10 +31,9 @@ export function assessedText(value: Assessed | undefined, factor: 'impact' | 'li
 }
 
 // The stored number of an entry, with its label. A placeholder is not an estimate.
-function entryText(risk: Risk, field: 'riskLikelihood' | 'riskImpact' | 'exposureRating'): string {
+function entryText(doc: RiskDocument, risk: Risk, field: 'riskLikelihood' | 'riskImpact' | 'exposureRating'): string {
   const label = field === 'riskLikelihood' ? risk.riskLikelihoodLabel : field === 'riskImpact' ? risk.riskImpactLabel : risk.exposureRatingLabel;
-  const defaulted = (risk.defaultedFields ?? []).includes(`/${field}`);
-  if (defaulted && label === undefined) return 'Not estimated';
+  if (isPlaceholder(doc, risk)) return label ?? 'Not estimated';
   const number = field === 'riskLikelihood' ? probability(risk[field]) : money(risk[field]);
   return label === undefined ? number : `${label} (${number})`;
 }
@@ -141,7 +140,19 @@ function ErpView({ doc }: { readonly doc: RiskDocument }) {
   );
 }
 
-function EntryTable({ code, entries, selected, onToggle }: { readonly code: string; readonly entries: readonly ChildEntry[]; readonly selected: ReadonlySet<string>; readonly onToggle: (riskId: string, on: boolean) => void }) {
+function EntryTable({
+  doc,
+  code,
+  entries,
+  selected,
+  onToggle,
+}: {
+  readonly doc: RiskDocument;
+  readonly code: string;
+  readonly entries: readonly ChildEntry[];
+  readonly selected: ReadonlySet<string>;
+  readonly onToggle: (riskId: string, on: boolean) => void;
+}) {
   const caption = `entries-${code}`;
   return (
     <div class="table-box" tabIndex={0} role="region" aria-labelledby={caption}>
@@ -170,7 +181,8 @@ function EntryTable({ code, entries, selected, onToggle }: { readonly code: stri
                 <input
                   type="checkbox"
                   aria-label={`Select ${risk.riskId}`}
-                  checked={selected.has(risk.riskId)}
+                  disabled={summarizedBy.length > 0}
+                  checked={selected.has(risk.riskId) && summarizedBy.length === 0}
                   onChange={(event) => {
                     onToggle(risk.riskId, event.currentTarget.checked);
                   }}
@@ -179,9 +191,9 @@ function EntryTable({ code, entries, selected, onToggle }: { readonly code: stri
               <td>{risk.riskId}</td>
               <td>{risk.registerId}</td>
               <td>{risk.riskDescription}</td>
-              <td>{entryText(risk, 'riskLikelihood')}</td>
-              <td>{entryText(risk, 'riskImpact')}</td>
-              <td>{entryText(risk, 'exposureRating')}</td>
+              <td>{entryText(doc, risk, 'riskLikelihood')}</td>
+              <td>{entryText(doc, risk, 'riskImpact')}</td>
+              <td>{entryText(doc, risk, 'exposureRating')}</td>
               <td>{risk.riskResponseType.join(', ')}</td>
               <td>{risk.riskOwnerPointOfContact}</td>
               <td class="note">
@@ -198,7 +210,8 @@ function EntryTable({ code, entries, selected, onToggle }: { readonly code: stri
 
 function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readonly parent: Register; readonly update: Update }) {
   const groups = childEntries(doc, parent.id);
-  const known = new Set(groups.flatMap((group) => group.entries.map((entry) => entry.risk.riskId)));
+  // An entry that a summary entry holds cannot go into a second merge.
+  const known = new Set(groups.flatMap((group) => group.entries.filter((entry) => entry.summarizedBy.length === 0).map((entry) => entry.risk.riskId)));
   const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
   const selected = new Set([...picked].filter((id) => known.has(id)));
   const defaultId = nextId(
@@ -261,6 +274,7 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
         groups.map((group) => (
           <EntryTable
             key={group.code}
+            doc={doc}
             code={group.code}
             entries={group.entries}
             selected={selected}
@@ -411,7 +425,7 @@ function SummaryTable({ doc, parent, update }: { readonly doc: RiskDocument; rea
                               {ref.label ?? ref.riskId}
                               {source !== undefined && (
                                 <span class="sub">
-                                  {source.riskResponseType.join(', ')}. Likelihood {entryText(source, 'riskLikelihood')}, impact {entryText(source, 'riskImpact')}.
+                                  {source.riskResponseType.join(', ')}. Likelihood {entryText(doc, source, 'riskLikelihood')}, impact {entryText(doc, source, 'riskImpact')}.
                                 </span>
                               )}
                             </li>
