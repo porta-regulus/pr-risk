@@ -131,9 +131,14 @@ The sessions also check 3 assumptions of ADR-0001. Write the answers in results.
 2. Assumption 2. Budget for risk responses is set once a year. Session question 1 checks it. If 3 of the AT-5 users say that budget is set by auditor findings only, the decision framing is wrong, and ADR-0001 must be reopened. ADR-0001 says "3 of the 5". When new users replace failed sessions, count the answers of all AT-5 users.
 3. Assumption 3. The company has one currency and one risk appetite. Session question 5 checks it.
 
-## 10. Decisions for the product owner
+## 10. Decisions of the product owner
 
-1. The two fixed sentences of Sec. 3. If you read "any intervention" more strictly, remove them. Then the facilitator says nothing after T0.
-2. Sessions that passed before a fix (Sec. 8 item 4). The strict option is to count only sessions on the last commit. That can need up to 5 new users for each fix.
-3. A thank-you payment for the users. Use a fixed amount that does not depend on the result, so that no user hurries to finish.
-4. The contact details of the controller in `docs/pilot/consent.md`.
+| Date | Decision |
+|---|---|
+| 2026-10-30 | Keep the two fixed sentences of Sec. 3. They are not interventions. |
+
+## 11. Open decisions for the product owner
+
+1. Sessions that passed before a fix (Sec. 8 item 4). The strict option is to count only sessions on the last commit. That can need up to 5 new users for each fix.
+2. A thank-you payment for the users. Use a fixed amount that does not depend on the result, so that no user hurries to finish.
+3. The contact details of the controller in `docs/pilot/consent.md`.
