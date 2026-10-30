@@ -2,7 +2,7 @@
 
 A free, open-source risk register for the risk components of NIST SP 800-221r1. It helps the IT lead of a company with 50 to 249 staff decide which risk responses to fund, so that the annual loss exceedance curve stays below the risk tolerance curve.
 
-**Status.** Build task 1 of 13. The app shell, supply chain and hosting are in place. The screens come next. See [docs/HANDOFF.md](docs/HANDOFF.md).
+**Status.** All screens of release 1 work. Release 1 waits for the usability test, the expert review and the release checks (AT-5, AT-6 and AT-7). See [docs/HANDOFF.md](docs/HANDOFF.md).
 
 ## Your data stays with you
 
@@ -30,6 +30,14 @@ To self-host, download a release bundle, check it, and serve the files from any 
 gh attestation verify pr-risk-v0.1.0.tar.gz --repo porta-regulus/pr-risk
 ```
 
+## Report a problem or ask for a change
+
+Open an issue at https://github.com/porta-regulus/pr-risk/issues. Do not attach a real risk register. Use the example files in [docs/schema/examples/](docs/schema/examples/).
+
+For a security problem, do not open an issue. Follow [SECURITY.md](SECURITY.md).
+
+To contribute code or text, read [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Documents
 
 | Document | Content |
@@ -39,6 +47,7 @@ gh attestation verify pr-risk-v0.1.0.tar.gz --repo porta-regulus/pr-risk
 | [docs/schema/](docs/schema/) | Exchange schema (JSON Schema 2020-12) and examples |
 | [infra/gcp/](infra/gcp/) | Hosting on GCP |
 | [SECURITY.md](SECURITY.md) | How to report a vulnerability |
+| [docs/release/](docs/release/) | CRA Annex I self-check and OpenSSF Best Practices answers (drafts) |
 
 ## Licence
 
