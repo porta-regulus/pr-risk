@@ -200,7 +200,7 @@ Done criteria.
 | 10 | Usability test with 5 users | AT-5 |
 | 11 | Expert review by a CISO and an auditor | AT-6 |
 | 12 | Release 1. SBOM, signatures, Scorecard 7 or more, Best Practices badge, Annex I self-check | AT-7 |
-| 13 | Send NIST comments N1 to N27 (SPEC.md Sec. 14) before 7 December 2026 | Product owner sends. Time-critical. |
+| 13 | Send NIST comments N1 to N27 (SPEC.md Sec. 14) before 7 December 2026 | Done. The product owner sent them (reported 2026-10-30). |
 
 Status 2026-10-28. Some library parts of later tasks are done early, with tests and without screens. Task 9 has the encrypted export file (`src/export/encryption.ts`, known-answer test against node:crypto). The exports of SPEC.md Sec. 9.8 exist except OSCAL (`src/export/export.ts`, rules E-01 and E-02, CSV injection guard). Durability banners and remove-all need the screens of task 5.
 

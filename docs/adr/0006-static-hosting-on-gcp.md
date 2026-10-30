@@ -36,7 +36,7 @@ The product owner asked to host the app and a database in GCP. A server database
 2. **A service worker exception in the CSP.** A service worker uses the CSP of its own script response. With `connect-src 'none'` it cannot fetch the files that it must cache, and the app does not work offline. Build task 1 found this with `e2e/offline.spec.ts`. `/sw.js` therefore has `connect-src 'self'`. Pages keep `connect-src 'none'`. ADR-0004 records the exception. The backend bucket for `/sw.js` is a second backend bucket on the same storage bucket.
 3. **US provider.** Google is a US company. The bucket is in the EU, but CDN edges are global. The files are public code, so this matters only for the request metadata that the edges see. Users who do not accept this can self-host the same bundle (ADR-0004 decision 2b).
 4. **DNS stays at Cloudflare, DNS only.** A proxied record would end TLS at Cloudflare and lets Cloudflare features add scripts to the page.
-5. **Domain-restricted sharing.** The project is in the cvdportal.com organization, which allows IAM grants to its own customer only. The grant for Google's load balancer service agent needed a short project exception, removed right after the grant. `infra/gcp/README.md` gives the steps. A later rewrite of the bucket IAM policy may need them again.
+5. **Domain-restricted sharing.** The organization of the project allows IAM grants to its own customer ID only. The grant for Google's load balancer service agent needed a short project exception, removed right after the grant. `infra/gcp/README.md` gives the steps. A later rewrite of the bucket IAM policy may need them again.
 
 ## Review triggers
 

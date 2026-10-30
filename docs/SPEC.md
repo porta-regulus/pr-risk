@@ -1135,7 +1135,7 @@ Use the NIST comment template (E editorial, T technical, G general). Page and li
 | Q3 | Does PortaRegulus own the Risklet catalogue (119 names)? | Answered 2026-10-29. Yes. The 119 names ship under CC BY 4.0 in `src/catalogue/risklet.json`. |
 | Q4 | Real SME registers for the importer (assumption A7) | Gate G-A blocks the end of build task 4 |
 | Q5 | Second maintainer for Code-Review and Branch-Protection (Scorecard) | Without one, Scorecard 7.0 is at risk |
-| Q6 | Who sends the NIST comments, and under which name | PortaRegulus, by 30 November 2026 |
+| Q6 | Who sends the NIST comments, and under which name | Answered 2026-10-30. The product owner has sent the comments. |
 | Q7 | Check `date` and `date-time` values on import, as a V rule or in the import step | A V rule in task 4, with the same check added to `schema/validate.py` |
 | Q8 | Drivers are shared by all registers. Which timeframe scales a driver rate when registers have different timeframes? | The first register without a parent. The engine says so in the record. |
 | Q9 | Ship a table of cited reference ranges (claims frequency and loss per event type) in the S3 estimate help | Help text only, with the source and its bias. Never prefilled into an estimate (hard rule 2). |
