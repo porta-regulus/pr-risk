@@ -40,25 +40,49 @@ jobs:
           (cd dist && find . -type f -print0 | sort -z | xargs -0 sha256sum) > "pr-risk-${TAG}-files.sha256"
       - name: CycloneDX 1.6 SBOM
         run: npx --no-install cyclonedx-npm --omit dev --spec-version 1.6 --output-format JSON --output-reproducible --output-file "pr-risk-${TAG}.cdx.json"
-      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+      - name: SHA-256 values of the release files
+        run: sha256sum "pr-risk-${TAG}.tar.gz" "pr-risk-${TAG}.cdx.json" "pr-risk-${TAG}-files.sha256" > SHA256SUMS
+      # On a public repository the attestations are signed with the Sigstore public-good
+      # instance and logged in Rekor. On a private repository they need GitHub Enterprise Cloud.
+      - id: provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: |
             pr-risk-${{ github.ref_name }}.tar.gz
             pr-risk-${{ github.ref_name }}.cdx.json
-      - uses: actions/attest-sbom@c604332985a26aa8cf1bdc465b92731239ec6b9e # v4.1.0
+            pr-risk-${{ github.ref_name }}-files.sha256
+            SHA256SUMS
+      - id: sbom
+        uses: actions/attest-sbom@c604332985a26aa8cf1bdc465b92731239ec6b9e # v4.1.0
         with:
           subject-path: pr-risk-${{ github.ref_name }}.tar.gz
           sbom-path: pr-risk-${{ github.ref_name }}.cdx.json
+      # Scorecard Signed-Releases reads release assets only, not the attestation API.
+      # A .intoto.jsonl asset in each release gives it the score 10.
+      - name: Attach the Sigstore bundles as release files
+        env:
+          PROVENANCE_BUNDLE: ${{ steps.provenance.outputs.bundle-path }}
+          SBOM_BUNDLE: ${{ steps.sbom.outputs.bundle-path }}
+        run: |
+          cp "$PROVENANCE_BUNDLE" "pr-risk-${TAG}.intoto.jsonl"
+          cp "$SBOM_BUNDLE" "pr-risk-${TAG}.sbom.intoto.jsonl"
       - name: Publish the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          sha256sum "pr-risk-${TAG}.tar.gz" "pr-risk-${TAG}.cdx.json" "pr-risk-${TAG}-files.sha256" > SHA256SUMS
           prerelease=()
           if [[ "$TAG" == *-* ]]; then prerelease=(--prerelease); fi
+          notes="## Verify this release
+
+          1. \`sha256sum -c SHA256SUMS\`
+          2. \`gh attestation verify pr-risk-${TAG}.tar.gz --repo ${GITHUB_REPOSITORY}\`
+          3. With the attached Sigstore bundle, \`gh attestation verify pr-risk-${TAG}.tar.gz --repo ${GITHUB_REPOSITORY} --bundle pr-risk-${TAG}.intoto.jsonl\`
+          4. SBOM, \`gh attestation verify pr-risk-${TAG}.tar.gz --repo ${GITHUB_REPOSITORY} --predicate-type https://cyclonedx.org/bom --bundle pr-risk-${TAG}.sbom.intoto.jsonl\`
+          "
           gh release create "$TAG" --verify-tag --title "$TAG" "${prerelease[@]}" \
-            --notes "Verify with: gh attestation verify pr-risk-${TAG}.tar.gz --repo ${GITHUB_REPOSITORY}" \
-            "pr-risk-${TAG}.tar.gz" "pr-risk-${TAG}.cdx.json" "pr-risk-${TAG}-files.sha256" SHA256SUMS
+            --notes "$notes" --generate-notes \
+            "pr-risk-${TAG}.tar.gz" "pr-risk-${TAG}.cdx.json" "pr-risk-${TAG}-files.sha256" SHA256SUMS \
+            "pr-risk-${TAG}.intoto.jsonl" "pr-risk-${TAG}.sbom.intoto.jsonl"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dist

@@ -1,0 +1,12 @@
+# OSV-Scanner and the OpenSSF Scorecard Vulnerabilities check read this file.
+# The OSV records for npm xlsx have no fixed version, because SheetJS publishes
+# its fixed releases on cdn.sheetjs.com and not on npm. This project installs
+# xlsx 0.20.3 from cdn.sheetjs.com (package-lock.json, DEPENDENCIES.md).
+
+[[IgnoredVulns]]
+id = "GHSA-4r6h-8v6p-xvw6"
+reason = "CVE-2023-30533, prototype pollution. SheetJS fixed it in 0.19.3. The lockfile pins xlsx 0.20.3 from cdn.sheetjs.com."
+
+[[IgnoredVulns]]
+id = "GHSA-5pgg-2g8v-p4x9"
+reason = "CVE-2024-22363, ReDoS. SheetJS fixed it in 0.20.2. The lockfile pins xlsx 0.20.3 from cdn.sheetjs.com."

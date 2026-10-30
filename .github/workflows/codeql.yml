@@ -10,11 +10,27 @@ on:
 permissions: read-all
 
 jobs:
+  visibility:
+    name: Repository visibility
+    # A schedule event has no webhook payload, so github.event.repository is empty there.
+    # Ask the API. An empty or failed answer counts as private.
+    runs-on: ubuntu-24.04
+    outputs:
+      private: ${{ steps.repo.outputs.private }}
+    steps:
+      - id: repo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          private="$(gh api "repos/${GITHUB_REPOSITORY}" --jq .private)"
+          echo "private=${private}" >> "$GITHUB_OUTPUT"
+
   analyze:
     name: Analyze ${{ matrix.language }}
     # Code scanning on a private repository needs a Code Security licence (Team plan).
-    # Run only while the repository is public. A missing field runs the job.
-    if: ${{ !github.event.repository.private }}
+    # Run only while the repository is public.
+    needs: visibility
+    if: needs.visibility.outputs.private == 'false'
     runs-on: ubuntu-24.04
     permissions:
       security-events: write
