@@ -125,6 +125,7 @@ async function merge(page: Page, layout: string, added: string): Promise<void> {
   await page.getByLabel('Different responses').selectOption({ label: layout });
   await page.getByRole('button', { name: 'Merge the 3 selected entries' }).click();
   await expect(page.getByRole('status').filter({ hasText: added })).toBeVisible();
+  await expect(page.locator('section[aria-labelledby="normalize-title"] ul.errors')).toHaveCount(0);
 }
 
 const sourcesOf = (page: Page, id: string) => page.locator(`table.summaries tr[data-risk="${id}"] [data-source]`);
@@ -137,6 +138,20 @@ test('G3. S7 merges A-1, B-1 and C-1 of example 3 with both layouts of Table 10'
   await expect(page.locator('table.entries tr[data-risk="A-1"] .note')).toHaveText('In ORG-1');
   const warning = page.locator('.warnings').filter({ hasText: 'L-10 ORG-1' });
   await expect(warning).toBeVisible();
+
+  // Review finding 1. An entry that ORG-1 holds cannot go into a second summary, so the
+  // portfolio never counts it twice.
+  for (const id of ['A-1', 'B-1', 'C-1']) await expect(page.getByRole('checkbox', { name: `Select ${id}` })).toBeDisabled();
+  await expect(page.locator('table.portfolio tr[data-register="ORG"] td.current')).toHaveText('310,000');
+
+  // Review finding 2. An entry with placeholder numbers (rule D-Q2) cannot go into a merge.
+  const errors = page.locator('section[aria-labelledby="normalize-title"] ul.errors');
+  await page.getByRole('checkbox', { name: 'Select GW-1' }).check();
+  await page.getByLabel('Combined risk description').fill('Gateway X1 vulnerabilities.');
+  await page.getByRole('button', { name: 'Merge the selected entry' }).click();
+  await expect(errors).toHaveText('GW-1 has no estimate yet. Estimate it on the screen Identify and analyze, or do not select it.');
+  await expect(page.locator('table.summaries tbody tr')).toHaveCount(1);
+  await page.getByRole('checkbox', { name: 'Select GW-1' }).uncheck();
 
   await page.getByRole('button', { name: 'Remove ORG-1' }).click();
   await expect(page.getByText('This register has no summary entry.')).toBeVisible();
