@@ -17,7 +17,7 @@ These are the only packages that reach the user's browser.
 | Package | Version | Licence | Why |
 |---|---|---|---|
 | vite | 8.3.5 | MIT | Build and preview server |
-| typescript | 6.0.3 | Apache-2.0 | Type check. Not 7.x, because typescript-eslint 8.72 supports TypeScript below 6.1 only. |
+| typescript | 6.0.3 | Apache-2.0 | Type check. Not 7.x, because typescript-eslint 8.72 supports TypeScript below 6.1 only. `.github/dependabot.yml` ignores TypeScript 6.1 and later until typescript-eslint supports them. |
 | vitest | 5.0.5 | MIT | Unit tests |
 | fast-check | 4.10.2 | MIT | Property tests (SPEC.md Sec. 12.3) |
 | @playwright/test | 1.64.1 | Apache-2.0 | Browser tests, header test, offline test |
@@ -25,7 +25,7 @@ These are the only packages that reach the user's browser.
 | @eslint/js | 10.0.1 | MIT | ESLint base rules |
 | typescript-eslint | 8.72.1 | MIT | Type-aware lint rules |
 | globals | 17.13.0 | MIT | Global names for ESLint (browser, service worker, Node) |
-| @types/node | 24.19.2 | MIT | Node types for build scripts and tests |
+| @types/node | 24.19.2 | MIT | Node types for build scripts and tests. The major follows the Node runtime in `.nvmrc` (24), so Dependabot ignores major updates. |
 | @vitest/browser-playwright | 5.0.5 | MIT | Runs `test/browser/` in Chromium, so the engine is checked in a real Web Worker (build task 3, done criterion 5) |
 | json-schema-to-typescript | 16.0.0 | MIT | TypeScript types from the exchange schema (`npm run gen:schema`). It reads the vendored NIST schemas, never the network. |
 | @axe-core/playwright | 4.14.0 | MPL-2.0 | WCAG 2.2 level A and AA check in the Playwright tests (build task 5, done criterion 3, `e2e/axe.ts`). It pulls `axe-core` 4.14.0 (MPL-2.0). Test only, never in the bundle. |
