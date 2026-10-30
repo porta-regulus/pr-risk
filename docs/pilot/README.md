@@ -8,6 +8,8 @@ Done criterion 5 says that a pilot session with one target user finds no blocker
 | [task-sheet.md](task-sheet.md) | Give it to the participant on paper. It holds the task and the fictitious company profile. |
 | [log.md](log.md) | The facilitator fills it in during and after the session. |
 
+The AT-5 kit in [`docs/usability/`](../usability/README.md) uses the same consent text and task sheet, with a stricter help rule.
+
 ## 1. The participant
 
 1. The person matches ADR-0001. They prepare the NIS2 risk analysis, usually as IT lead or part-time CISO, in an EU company with 50 to 249 staff.
@@ -20,8 +22,10 @@ Done criterion 5 says that a pilot session with one target user finds no blocker
 1. Use the hosted app if it is live, or build it on the facilitator laptop.
 
 ```bash
-npm ci --ignore-scripts && npm run build && npm run preview
+npm ci --ignore-scripts && GITHUB_SHA=$(git rev-parse HEAD) npm run build && npm run preview
 ```
+
+   `GITHUB_SHA` puts the commit on the start screen. Without it, the start screen shows "build local".
 
 2. Open the app at `http://localhost:4173` in a new browser profile, so no document and no service worker from an earlier run exists.
 3. Start the screen recording. Record the screen and the voice, not the face.

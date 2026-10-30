@@ -197,8 +197,8 @@ Done criteria.
 | 7 | S7 Enterprise view. ERR, ERP by objective, portfolio view, merge and normalization | G1 (b), G3, G5 |
 | 8 | OSCAL POA&M export and import, oscal-cli in CI | AT-4 |
 | 9 | Encrypted export, durability banners, remove-all | ADR-0004 I2, I5, D3 |
-| 10 | Usability test with 5 users | AT-5 |
-| 11 | Expert review by a CISO and an auditor | AT-6 |
+| 10 | Usability test with 5 users. Session kit in [`docs/usability/`](usability/README.md) (screener, help rule, measures, session log, results sheet). It reuses the consent text and the task sheet of [`docs/pilot/`](pilot/README.md). | AT-5 |
+| 11 | Expert review by a CISO and an auditor. Review kit in [`docs/review/`](review/README.md) (reviewer profile, material, checklist, findings log, sign-off form). | AT-6 |
 | 12 | Release 1. SBOM, signatures, Scorecard 7 or more, Best Practices badge, Annex I self-check | AT-7 |
 | 13 | Send NIST comments N1 to N27 (SPEC.md Sec. 14) before 7 December 2026 | Done. The product owner sent them (reported 2026-10-30). |
 
