@@ -2,8 +2,9 @@ import { expect, type Page, test } from '@playwright/test';
 import { expectAccessible } from './axe';
 
 // Screen S6 Monitor and adjust under the production CSP (build task 6). Golden test G2 (b) on
-// recorded observations, review triggers, acceptance records, the tolerance what-if and the
-// forecast log. The clock is fixed, so the windows of example 2 do not depend on the run date.
+// recorded observations, the automatic review triggers, acceptance records, the tolerance
+// what-if and the forecast log. The clock is fixed, so the windows of example 2 do not depend
+// on the run date.
 
 function watchProblems(page: Page): string[] {
   const problems: string[] = [];
@@ -26,6 +27,32 @@ async function expectStates(page: Page, statement: string, states: Readonly<Reco
   for (const [item, text] of Object.entries(states)) await expect(state(page, statement, item), item).toHaveText(text);
 }
 
+// The change log entries that the app wrote itself, from the stored documents.
+async function appEntries(page: Page): Promise<string[]> {
+  return page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const open = indexedDB.open('pr-risk');
+      open.onsuccess = () => {
+        resolve(open.result);
+      };
+      open.onerror = () => {
+        reject(new Error(String(open.error)));
+      };
+    });
+    const stored = await new Promise<{ doc: { changeLog?: { actor?: string; entityId: string }[] } }[]>((resolve, reject) => {
+      const all = db.transaction('documents').objectStore('documents').getAll();
+      all.onsuccess = () => {
+        resolve(all.result as { doc: { changeLog?: { actor?: string; entityId: string }[] } }[]);
+      };
+      all.onerror = () => {
+        reject(new Error(String(all.error)));
+      };
+    });
+    db.close();
+    return stored.flatMap((item) => (item.doc.changeLog ?? []).filter((entry) => entry.actor?.startsWith('PortaRegulus Risk (automatic review)') === true).map((entry) => `${entry.entityId} ${entry.actor ?? ''}`));
+  });
+}
+
 async function expectNoOverflow(page: Page): Promise<void> {
   const size = page.viewportSize();
   await page.setViewportSize({ width: 375, height: 812 });
@@ -33,7 +60,7 @@ async function expectNoOverflow(page: Page): Promise<void> {
   if (size !== null) await page.setViewportSize(size);
 }
 
-test('S6 evaluates the Table 9 triggers on recorded observations (G2 b) and starts reviews', async ({ page }) => {
+test('S6 evaluates the Table 9 triggers on recorded observations (G2 b) and starts reviews itself', async ({ page }) => {
   const problems = watchProblems(page);
   await page.clock.setFixedTime(new Date('2026-10-30T09:00:00Z'));
   await page.goto('/');
@@ -49,23 +76,44 @@ test('S6 evaluates the Table 9 triggers on recorded observations (G2 b) and star
   await expectStates(page, 'T9-EX1', { 'T9-EX1-TOL': 'Breached', 'T9-EX1-LKRI': 'Fires', 'T9-EX1-GKRI': 'Fires', 'T9-EX1-KPI': 'Not checked' });
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
 
-  // Example 3, in the order of Table 9. The observation recorded last on a date counts.
+  // Example 3, in the order of Table 9. T9-EX3 covers ict and operational. LKRI1 fires, so the
+  // app sets the open operational risks to Review needed after the save. Risk 8 is closed.
   const none = { 'T9-EX3-TOL': 'Not breached', 'T9-EX3-LKRI1': 'Does not fire', 'T9-EX3-LKRI2': 'Does not fire', 'T9-EX3-GKRI': 'Does not fire' };
+  const review = page.getByRole('region', { name: 'Risks with a review trigger' });
+  const statuses = review.locator('tbody td:nth-child(3)');
+  const operational = ['1', '2', '3', '4', 'F11-1', 'F11-3'];
   await record(page, 'T9-EX3', { outage_hours: 1.6, customers_affected_percent: 6 });
   await expectStates(page, 'T9-EX3', { ...none, 'T9-EX3-LKRI1': 'Fires' });
+  await expect(page.getByText('The app set 1, 2, 3, 4, F11-1, F11-3 to Review needed. Undo last change takes this back.')).toBeVisible();
+  await expect(review.locator('tbody th')).toHaveText(operational);
+  await expect(statuses).toHaveText(operational.map(() => 'Review needed'));
+  await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
+  expect(await appEntries(page)).toEqual(operational.map((id) => `${id} PortaRegulus Risk (automatic review). T9-EX3-LKRI1 of appetite statement T9-EX3 fires on the observation of 2026-10-30.`));
+
+  // Undo takes the change back, and the same reason does not act again in this visit.
+  await page.getByRole('button', { name: 'Undo last change' }).click();
+  await expect(page.getByText(/Version \d+ is back\./)).toBeVisible();
+  await expect(statuses).toHaveText(operational.map(() => 'Open'));
+  await page.waitForTimeout(1_000);
+  await expect(statuses).toHaveText(operational.map(() => 'Open'));
+  await expect(page.getByText(/^Saved as version \d+\. Version \d+ is back\./)).toBeVisible();
+  await expect(page.getByText(/^The app set/)).toHaveCount(0);
+  expect(await appEntries(page)).toEqual([]);
+
+  // A new reason acts. LKRI2 fires on the next observation.
   await record(page, 'T9-EX3', { outage_hours: 2.5, customers_affected_percent: 4 });
   await expectStates(page, 'T9-EX3', { ...none, 'T9-EX3-LKRI2': 'Fires' });
+  await expect(statuses).toHaveText(operational.map(() => 'Review needed'));
+  await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
+  expect(await appEntries(page)).toHaveLength(operational.length);
+  // The status is Review needed already, so the next reason writes nothing.
   await record(page, 'T9-EX3', { outage_hours: 2.5, customers_affected_percent: 6 });
   await expectStates(page, 'T9-EX3', { ...none, 'T9-EX3-LKRI1': 'Fires', 'T9-EX3-GKRI': 'Fires', 'T9-EX3-TOL': 'Breached' });
-
-  // T9-EX3 covers ict and operational. The open operational risks need a review. Risk 8 is closed.
-  const review = page.getByRole('region', { name: 'Risks with a review trigger' });
-  await expect(review.locator('tbody th')).toHaveText(['1', '2', '3', '4', 'F11-1', 'F11-3']);
-  await expect(review.locator('tbody tr').first()).toContainText('T9-EX3-LKRI1 and T9-EX3-GKRI of appetite statement T9-EX3 fire.');
-  await page.getByRole('button', { name: 'Set 6 risks to Review needed' }).click();
-  await expect(page.getByText('Every risk with a trigger has the status Review needed.')).toBeVisible();
-  await expect(review.locator('tbody tr').first()).toContainText('Review needed');
+  // Each KRI is its own reason, named by its own observation. This is the third of the day.
+  await expect(review.locator('tbody tr').first()).toContainText('T9-EX3-LKRI1 of appetite statement T9-EX3 fires on observation 3 of 2026-10-30.');
+  await expect(review.locator('tbody tr').first()).toContainText('T9-EX3-GKRI of appetite statement T9-EX3 fires on observation 3 of 2026-10-30.');
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
+  expect(await appEntries(page)).toHaveLength(operational.length);
 
   // At 5 percent nothing fires, and the screen flags the boundary gap of Table 9.
   await record(page, 'T9-EX3', { outage_hours: 2.5, customers_affected_percent: 5 });
@@ -94,9 +142,10 @@ test('S6 tests a tolerance curve, freezes forecasts and scores them after the wi
   await page.getByRole('navigation', { name: 'Screens' }).getByRole('button', { name: 'Monitor and adjust' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Monitor and adjust' })).toBeFocused();
 
-  // KRI-1 of example 2 fires (210 days since the last restore test), so the ict risks need a review.
+  // KRI-1 of example 2 fires (210 days since the last restore test), so on opening the app sets
+  // the ict risks to Review needed.
   await expect(state(page, 'AP-1', 'KRI-1')).toHaveText('Fires');
-  await expect(page.getByRole('button', { name: 'Set 7 risks to Review needed' })).toBeVisible();
+  await expect(page.getByText('The app set R-01, R-02, R-03, R-04, R-07, R-08, R-09 to Review needed. Undo last change takes this back.')).toBeVisible();
   const acceptances = page.getByRole('region', { name: 'Acceptance records' });
   await expect(acceptances.getByRole('row', { name: /^R-05/ })).toContainText('Valid');
 
@@ -138,6 +187,7 @@ test('S6 tests a tolerance curve, freezes forecasts and scores them after the wi
   await page.getByRole('button', { name: 'Monitor and adjust' }).click();
   await expect(acceptances.getByRole('row', { name: /^R-05/ })).toContainText('Expired');
   await expect(page.getByRole('region', { name: 'Risks with a review trigger' })).toContainText('The acceptance expired on 2027-10-20.');
+  await expect(page.getByText('The app set R-05 to Review needed. Undo last change takes this back.')).toBeVisible();
   await expect(log.getByRole('row', { name: /^F-2027-R-01/ })).toContainText('Due. Record the outcome.');
   const outcome = page.getByRole('group', { name: 'Outcome of F-2027-R-01' });
   await outcome.getByLabel('Did the event occur?').selectOption('yes');
