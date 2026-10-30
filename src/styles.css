@@ -1017,3 +1017,51 @@ table.sign td {
     break-inside: avoid;
   }
 }
+
+/* Screen S1, the merge choice of an import (SPEC.md Sec. 9.7) */
+.preview > *,
+.merge > * {
+  min-width: 0;
+}
+.merge {
+  display: grid;
+  gap: 0.5rem;
+}
+/* A fieldset is min-content wide by default, which can widen the page. */
+.merge-entity {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+.merge-entity legend {
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0 0.25rem;
+}
+.merge-diff table {
+  table-layout: fixed;
+  font-size: 0.85rem;
+}
+.merge-diff thead th:first-child {
+  width: 30%;
+}
+.merge-diff th[scope='row'] {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.8rem;
+  color: var(--text);
+  vertical-align: top;
+}
+.merge-diff th,
+.merge-diff td {
+  overflow-wrap: anywhere;
+}
+.merge-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}

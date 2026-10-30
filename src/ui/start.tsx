@@ -1,10 +1,11 @@
 // Screen S1 Start (SPEC.md Sec. 5). Open, create, import, export, storage status,
 // last-export date and remove all data. Everything stays in this browser.
+import { Fragment } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import { decrypt, encrypt, isEncryptedFile } from '../export/encryption';
 import { exportCsv, exportIr8286, exportNative } from '../export/export';
 import { runImport } from '../import/client';
-import { commitImport, type ImportPreview } from '../import/pipeline';
+import { commitImport, type Choice, type ImportPreview } from '../import/pipeline';
 import { exportPoam } from '../oscal/poam';
 import { lint } from '../schema/rules';
 import type { Finding, RiskDocument } from '../schema/types';
@@ -23,6 +24,7 @@ import {
 } from '../storage/db';
 import type { ScreenName } from './editor';
 import { downloadText, newDocument, slug } from './files';
+import { CHOICE_TEXT, fieldParts, importChoices, mergeEntities, mergeResultText, unchangedRisks, type MergeEntity } from './merge';
 
 const EXAMPLES = {
   'example-2': { label: 'SME with numbers (example 2)', load: () => import('../../docs/schema/examples/example-2-sme-quantitative.json') },
@@ -38,6 +40,18 @@ interface Message {
   readonly text: string;
 }
 
+// An import preview and the stored document version that its diff and errors were made against.
+interface Pending {
+  readonly preview: ImportPreview;
+  readonly fileName: string;
+  readonly targetId: string | undefined;
+  readonly targetVersion: number | undefined;
+}
+
+// The diff is valid only for the document version it was made against (Sec. 9.7).
+const isStale = (pending: Pending, target: StoredDocument | undefined): boolean => pending.targetId !== target?.id || pending.targetVersion !== target?.version;
+const STALE_TEXT = 'The selected document changed, so the preview is closed. Choose the file again.';
+
 function ErrorList({ errors }: { readonly errors: readonly Finding[] }) {
   if (errors.length === 0) return null;
   return (
@@ -51,13 +65,120 @@ function ErrorList({ errors }: { readonly errors: readonly Finding[] }) {
   );
 }
 
+// Sec. 9.7. One block per entity of the open document that the file changes, with the
+// fields side by side. A risk gets the choice of keep current, take incoming or keep both.
+function MergeChoices({
+  title,
+  entities,
+  same,
+  choices,
+  onChoose,
+}: {
+  readonly title: string;
+  readonly entities: readonly MergeEntity[];
+  readonly same: number;
+  readonly choices: Readonly<Record<string, Choice>>;
+  readonly onChoose: (id: string, choice: Choice) => void;
+}) {
+  const risks = entities.filter((entity) => entity.kind === 'risk');
+  const registers = entities.filter((entity) => entity.kind === 'register');
+  if (entities.length === 0 && same === 0) return null;
+  return (
+    <section class="merge" aria-labelledby="merge-title">
+      <h4 id="merge-title">Ids that {title} already uses</h4>
+      {risks.length > 0 && (
+        <p class="hint">
+          {risks.length} {risks.length === 1 ? 'risk has' : 'risks have'} other values in the file. Choose what to keep for each risk. Keep both adds the incoming risk with a new id.
+        </p>
+      )}
+      {same > 0 && (
+        <p class="hint">
+          {same} {same === 1 ? 'risk is' : 'risks are'} the same in the file and stay as they are.
+        </p>
+      )}
+      {registers.length > 0 && (
+        <p class="hint">The import keeps the registers of the open document. To change a register, use the screen Identify and analyze.</p>
+      )}
+      {entities.map((entity) => {
+        const label = `${entity.kind === 'risk' ? 'Risk' : 'Register'} ${entity.id}`;
+        const table = (
+          <div class="table-box merge-diff" tabIndex={0} role="region" aria-label={`Changed fields of ${label}`}>
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Field</th>
+                  <th scope="col">Current</th>
+                  <th scope="col">Incoming</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entity.rows.map((row) => (
+                  <tr key={row.field}>
+                    <th scope="row">
+                      {fieldParts(row.field).map((part, i) => (
+                        <Fragment key={i}>
+                          {i > 0 && <wbr />}
+                          {part}
+                        </Fragment>
+                      ))}
+                    </th>
+                    <td>{row.current}</td>
+                    <td>{row.incoming}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+        if (entity.kind === 'register') {
+          return (
+            <div class="merge-entity" key={`register ${entity.id}`}>
+              <p>
+                <strong>{label}</strong>
+                <span class="sub">{entity.title}</span>
+              </p>
+              {table}
+            </div>
+          );
+        }
+        const choice = choices[entity.id] ?? 'incoming';
+        return (
+          <fieldset class="merge-entity" key={`risk ${entity.id}`}>
+            <legend>{label}</legend>
+            <p class="sub">{entity.title}</p>
+            {table}
+            <div class="merge-options">
+              {(Object.keys(CHOICE_TEXT) as Choice[]).map((option) => (
+                <label key={option} class="check">
+                  <input
+                    type="radio"
+                    name={`merge-${entity.id}`}
+                    value={option}
+                    checked={choice === option}
+                    onChange={() => {
+                      onChoose(entity.id, option);
+                    }}
+                  />
+                  {CHOICE_TEXT[option]}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        );
+      })}
+    </section>
+  );
+}
+
 export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: string | undefined; readonly onOpen: (id: string, screen: Exclude<ScreenName, 'start'>) => void }) {
   const [db, setDb] = useState<IDBDatabase>();
   const [documents, setDocuments] = useState<StoredDocument[]>([]);
   const [currentId, setCurrentId] = useState<string | undefined>(selectedId);
   const [status, setStatus] = useState<StorageStatus>();
   const [message, setMessage] = useState<Message>();
-  const [preview, setPreview] = useState<{ preview: ImportPreview; fileName: string }>();
+  const [preview, setPreview] = useState<Pending>();
+  // The merge choice per matched risk id (Sec. 9.7). An id that is not here takes incoming.
+  const [choices, setChoices] = useState<Record<string, Choice>>({});
   const [busy, setBusy] = useState(false);
   const [passphrase, setPassphrase] = useState('');
   const [openPassphrase, setOpenPassphrase] = useState('');
@@ -85,6 +206,14 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   const report = (kind: Message['kind'], text: string): void => {
     setMessage({ kind, text });
   };
+
+  // A preview made against another document, or another version of it, must not be committed.
+  useEffect(() => {
+    if (preview === undefined || !isStale(preview, current)) return;
+    setPreview(undefined);
+    setChoices({});
+    report('ok', STALE_TEXT);
+  }, [current?.id, current?.version, preview]);
 
   const store = async (doc: RiskDocument, text: string): Promise<void> => {
     if (db === undefined) return;
@@ -137,7 +266,8 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
       const base = current?.doc ?? newDocument(file.name.replace(/\.[^.]+$/, '') || 'Imported register', '', 'EUR');
       // A document always has at least one register. The first one takes rows without a register column.
       const result = await runImport({ doc: base, file: { fileName: file.name, bytes }, options: { register: base.registers[0] } });
-      setPreview({ preview: result, fileName: file.name });
+      setPreview({ preview: result, fileName: file.name, targetId: current?.id, targetVersion: current?.version });
+      setChoices({});
       setMessage(undefined);
     } catch (error) {
       report('error', error instanceof Error ? error.message : String(error));
@@ -149,12 +279,15 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   const commit = (mode: 'merge' | 'replace') =>
     guard(async () => {
       if (preview === undefined) return;
+      if (isStale(preview, current)) throw new Error(STALE_TEXT);
       // With no open document, a whole document is restored as it is.
       const replace = preview.preview.document !== undefined && (mode === 'replace' || current === undefined);
       const base = replace || current === undefined ? (preview.preview.document ?? newDocument(preview.fileName, '', 'EUR')) : current.doc;
-      const doc = commitImport(base, preview.preview, {}, undefined, replace ? 'replace' : 'merge');
+      const chosen = replace ? {} : importChoices(base, preview.preview, choices);
+      const doc = commitImport(base, preview.preview, chosen, undefined, replace ? 'replace' : 'merge');
       setPreview(undefined);
-      await store(doc, `${String(preview.preview.risks.length)} risks from ${preview.fileName} are saved.`);
+      setChoices({});
+      await store(doc, replace ? `${String(preview.preview.risks.length)} risks from ${preview.fileName} are saved.` : mergeResultText(preview.fileName, preview.preview, chosen));
     });
 
   const exportAs = (kind: 'native' | 'encrypted' | 'ir8286' | 'csv' | 'oscal') =>
@@ -199,6 +332,8 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   // With no open document, a whole document file is restored on its own (no merge).
   const restoreOnly = current === undefined && preview?.preview.document !== undefined;
   const restoreErrors = preview?.preview.documentErrors?.length ?? 0;
+  const entities = current === undefined || preview === undefined ? [] : mergeEntities(current.doc, preview.preview);
+  const same = current === undefined || preview === undefined ? 0 : unchangedRisks(current.doc, preview.preview);
 
   return (
     <main class="screen">
@@ -362,6 +497,17 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                   ))}
                 </ul>
               )}
+              {!restoreOnly && current !== undefined && (
+                <MergeChoices
+                  title={current.title}
+                  entities={entities}
+                  same={same}
+                  choices={choices}
+                  onChoose={(id, choice) => {
+                    setChoices((old) => ({ ...old, [id]: choice }));
+                  }}
+                />
+              )}
               <div class="button-row">
                 <button type="button" onClick={commit('merge')} disabled={busy || (restoreOnly ? restoreErrors : preview.preview.errors.length) > 0}>
                   {current === undefined ? 'Save as a new document' : `Add to ${current.title}`}
@@ -373,6 +519,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                 )}
                 <button type="button" class="quiet" onClick={() => {
                         setPreview(undefined);
+                        setChoices({});
                       }}>
                   Cancel
                 </button>

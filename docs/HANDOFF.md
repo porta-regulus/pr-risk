@@ -252,7 +252,7 @@ Answers of the product owner, 2026-10-30, and what follows from them.
 1. Weighted average of the response costs (Sec. 6.15 item 4, SP 800-221r1 lines 1661 to 1664). The owner asked for a proposal. Proposal. Weight the cost of each source by its exposure rating, so that a source with a larger expected loss counts more, and use the plain mean when every exposure rating is 0. The total stays the default. The summary must record which rule gave its cost, which needs a new optional field in `rollUp`. Not built. It goes with item 2.
 2. Previous reputation and mission labels. The owner wants them if this is possible. It is possible, but it is a minor schema version (Sec. 7.7 item 2). `schemaVersion` and `$id` go to 1.1.0, documents of 1.0.0 must still open, `validate.py` and rule V-11 check the new labels, and the generated files and pinned fixtures change. No screen edits `previousAssessment` yet, so the task also needs a way to fill the previous period. Not built. Proposed as a separate task.
 3. Simulated value in the portfolio. The owner prefers it. Done, see item 4 of the list above.
-4. The per-entity choice of the import merge (Sec. 9.7). The owner does not know which task owns it. `src/import/pipeline.ts` (task 4) has the choice (keep current, take incoming, keep both), but S1 shows only the number of changed fields. Proposal. Build the control on S1 before the usability test of task 10, because a parent register takes its child registers as files (Sec. 6.1 item 4), and the import of a newer child file needs the choice. Not built. Proposed as a separate task.
+4. The per-entity choice of the import merge (Sec. 9.7). The owner does not know which task owns it. `src/import/pipeline.ts` (task 4) has the choice (keep current, take incoming, keep both), but S1 shows only the number of changed fields. Proposal. Build the control on S1 before the usability test of task 10, because a parent register takes its child registers as files (Sec. 6.1 item 4), and the import of a newer child file needs the choice. Built 2026-10-30, see "Import merge choice on S1" after task 9.
 
 ### Task 8. OSCAL POA&M export and import
 
@@ -270,6 +270,20 @@ Status 2026-10-30. Done, apart from the manual test of D3 in Safari.
 3. ADR-0004 D3. The app requests persistent storage on the first save. S1 and the editor screens show the last-export date, and a banner when there is no export or the last one is older than 7 days (`exportOverdue`, `test/browser/storage.test.ts`). S1 says whether the browser keeps the data.
 
 Open for the product owner. ADR-0004 D3 asks for a manual test in Safari. Open the hosted app in Safari, save a document and export it. Check that S1 shows the last-export date and says whether Safari keeps the data. Write the result here.
+
+### Import merge choice on S1 (SPEC.md Sec. 9.7)
+
+Status 2026-10-30. Done. This is item 4 of the answers in task 7.
+1. When the user imports a file into an open document, S1 shows one block for each risk that has an id of the open document and other values. The block has a table with field, current and incoming, and the choice keep current, take incoming or keep both. Take incoming is the default, as in `commitImport`. A new risk gets no choice. The helpers are in `src/ui/merge.ts`. The diff is valid only for the document version that it was made against. When the user selects another document, or the selected document gets a new version, S1 closes the preview and asks for the file again.
+2. Each table is a scroll region that the keyboard can focus, as in `src/ui/record.tsx`. It scrolls to the side only. A height limit would hide changed fields under a second scroll bar. The screen has no horizontal overflow at 375 px.
+3. A risk with an id of the open document and no changed field gets keep current. It stays as it is and gets no change log entry. Before this change, it got an entry with equal before and after.
+4. The change log records the result. Take incoming gives an entry with before and after. Keep both gives an entry for the new id (for example C-1-2) with after only. Keep current gives no entry, because nothing changes. The provenance record lists the file for each choice.
+5. Tests. `test/ui-merge.test.ts` checks the diff rows, the choice mapping, the stored document and the change log for each choice. `e2e/start.spec.ts` opens example 3 and imports a newer Table 10 CSV. It chooses keep current for A-1 with the keyboard, take incoming for B-1 and keep both for C-1. Then it checks the stored document, the change log, axe-core and the 375 px width. A second test selects another document and checks that the preview closes. No child register of example 3 has 3 risks, so the test uses the Table 10 file, which holds the child registers SYS-A, SYS-B and SYS-C.
+
+Open for the product owner.
+1. Registers. The diff also shows a register with changed fields, but S1 gives it no choice. `commitImport` keeps the register of the open document and adds only new registers. The user changes a register on S3. Must a newer child file also update its register, for example the as-of date? That needs a register choice in `commitImport`. Keep both is not clear for a register, because its risks point to its id.
+2. Keep current in the change log. Schema 1.0.0 has no field for a value that the user did not take. If an auditor must see the incoming values that the user did not take, that needs a new optional field (schema 1.1.0, Sec. 7.7).
+3. Take incoming replaces the whole risk. A CSV row has fewer fields than a risk in the app, so in the test take incoming removes the notes and the category subcode of B-1. The diff shows this before the commit. A choice for each field is a possible change after the usability test of task 10.
 
 ## 6. Rules for the build session
 
