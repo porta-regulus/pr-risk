@@ -318,7 +318,7 @@ The Maintained clock started on 2026-10-30, the creation date. A change of visib
 Plan.
 1. Merge the workflow change.
 2. The product owner makes the repository public (D1). CI already scans every commit for secrets with gitleaks.
-3. Same day. The product owner adds ruleset A (D2), sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
+3. Same day. The product owner sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
 4. Same day. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Expected 7.2.
 5. Same day, after approval (D3). Push the test tag `v0.1.0-rc.1`. Check that the prerelease has 6 files, and run the verify commands of the release notes. This meets task 1 done criterion 3. Expected Scorecard 7.4.
 6. Day 1 to 2. The product owner makes the entry on https://www.bestpractices.dev (D5). The build session can prepare the answers with evidence URLs.
@@ -329,7 +329,7 @@ Earliest date. If the repository becomes public on Monday 2026-11-02, AT-7 can p
 
 Decisions for the product owner.
 1. D1. The date to make the repository public. AT-7 cannot pass before that date.
-2. D2. Ruleset A or B on `main`. Recommendation A until a second maintainer exists. A gives 7.2 before the first release, and 7.4 after it.
+2. D2. Done 2026-10-30. Ruleset A is active on `main` (ruleset ID 26223939, no bypass actor). It requires 5 checks from the GitHub Actions app. These are "Lint, type check and unit tests", "Build and Playwright", "OSCAL POA&M exports pass oscal-cli (AT-4)", "Schema and reference model checks" and "No secret in the git history (gitleaks)". The performance job and CodeQL are not required, because they run only while the repository is public and a slow runner must not block a merge. Change to ruleset B when a second maintainer exists.
 3. D3. Approval of the test tag `v0.1.0-rc.1`. The deploy job is skipped while the repository variables are empty. If you set the variables first, the test tag deploys to production.
 4. D4. Immutable releases. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number, for example `v0.1.0-rc.2`.
 5. D5. The Best Practices entry needs the GitHub account of a project member.
