@@ -254,6 +254,23 @@ Answers of the product owner, 2026-10-30, and what follows from them.
 3. Simulated value in the portfolio. The owner prefers it. Done, see item 4 of the list above.
 4. The per-entity choice of the import merge (Sec. 9.7). The owner does not know which task owns it. `src/import/pipeline.ts` (task 4) has the choice (keep current, take incoming, keep both), but S1 shows only the number of changed fields. Proposal. Build the control on S1 before the usability test of task 10, because a parent register takes its child registers as files (Sec. 6.1 item 4), and the import of a newer child file needs the choice. Not built. Proposed as a separate task.
 
+### Task 8. OSCAL POA&M export and import
+
+Status 2026-10-30. Done. AT-4 passes.
+1. S1 exports the open document as OSCAL POA&M 1.2.3 (`src/oscal/poam.ts`). The import pipeline reads a POA&M file as format `oscal-poam`.
+2. The exports of the 3 examples pass the OSCAL 1.2.3 JSON schema (`test/oscal.test.ts`) and NIST oscal-cli 3.2.0 (CI job `oscal`).
+3. Lossless path. The unit test restores each example exactly, apart from the change log and the new provenance record. `e2e/start.spec.ts` does the same for example 2 through screen S1 and compares the whole document, because the native path also restores every risk.
+4. Native path. Without the payload, every risk field comes back, and the import report lists the rest (`test/oscal.test.ts`).
+
+### Task 9. Encrypted export, durability banners, remove-all
+
+Status 2026-10-30. Done, apart from the manual test of D3 in Safari.
+1. ADR-0004 I2. The encrypted copy uses AES-256-GCM with a key from PBKDF2-HMAC-SHA-256, 600 000 iterations, a 16-byte random salt and a 12-byte random IV, all through WebCrypto (`src/export/encryption.ts`). `test/export.test.ts` has the known-answer test against node:crypto and the wrong passphrase test. `e2e/start.spec.ts` saves an encrypted copy on S1 and restores it in an empty browser.
+2. ADR-0004 I5. "Remove all data from this browser" needs the typed word REMOVE. `e2e/start.spec.ts` checks that after it the browser holds no document, no version, no cache, no service worker and no local storage entry. A test run with the cache step removed from `removeAll` fails, so the check works.
+3. ADR-0004 D3. The app requests persistent storage on the first save. S1 and the editor screens show the last-export date, and a banner when there is no export or the last one is older than 7 days (`exportOverdue`, `test/browser/storage.test.ts`). S1 says whether the browser keeps the data.
+
+Open for the product owner. ADR-0004 D3 asks for a manual test in Safari. Open the hosted app in Safari, save a document and export it. Check that S1 shows the last-export date and says whether Safari keeps the data. Write the result here.
+
 ## 6. Rules for the build session
 
 1. Write all prose (UI text, docs, commit messages) in ASD-STE100 Simplified Technical English. No em dashes, semicolons or colons in prose.

@@ -4,6 +4,8 @@ import { expect, test } from '@playwright/test';
 import { expectAccessible } from './axe';
 
 // Screen S1 under the production CSP and Trusted Types: open, create, import, export, restore, remove all.
+// Also AT-4 through the screen (OSCAL export and lossless import) and ADR-0004 I5 (remove all leaves
+// no document, no version, no cache and no service worker).
 test('start screen works end to end with no CSP violation', async ({ page }) => {
   const problems: string[] = [];
   page.on('pageerror', (error) => problems.push(error.message));
@@ -36,6 +38,12 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   await page.getByRole('button', { name: 'Encrypted copy' }).click();
   const encrypted = readFileSync(await (await encryptedPromise).path());
 
+  // Save an OSCAL POA&M copy for the AT-4 import below.
+  const oscalPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'OSCAL POA&M' }).click();
+  const oscal = readFileSync(await (await oscalPromise).path());
+  expect((JSON.parse(oscal.toString('utf8')) as Record<string, unknown>)['plan-of-action-and-milestones']).toBeDefined();
+
   // Create a new document and import the Table 10 CSV into it through the import worker.
   await page.getByLabel('Title', { exact: true }).fill('Test register');
   await page.getByLabel('Organization').fill('Example GmbH');
@@ -48,13 +56,16 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   await expect(page.getByText('3 risks from table10-system-registers.csv are saved.')).toBeVisible();
   await expect(page.getByText('4 registers, 3 risks')).toBeVisible();
 
-  // Remove everything after a typed confirmation.
+  // Remove everything after a typed confirmation (ADR-0004 I5). The service worker and its cache exist first.
+  await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBeGreaterThan(0);
+  await expect.poll(() => page.evaluate(async () => (await caches.keys()).length)).toBeGreaterThan(0);
   const remove = page.getByRole('button', { name: 'Remove all data from this browser' });
   await expect(remove).toBeDisabled();
   await page.getByLabel(/Type REMOVE/).fill('REMOVE');
   await remove.click();
   await expect(page.getByText('All data is removed from this browser.')).toBeVisible();
   await expect(page.getByText('No document is stored in this browser.')).toBeVisible();
+  expect(await page.evaluate(storedData)).toEqual({ documents: 0, versions: 0, caches: 0, workers: 0, local: 0 });
 
   // In an empty browser, restore the encrypted copy as a whole document.
   await page.getByLabel('Passphrase, only for an encrypted file').fill(passphrase);
@@ -62,6 +73,18 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   await expect(page.getByText('Format native. 9 risks')).toBeVisible();
   await page.getByRole('button', { name: 'Save as a new document' }).click();
   await expect(page.getByText('9 risks from backup.encrypted.json are saved.')).toBeVisible();
+  await page.getByLabel(/Type REMOVE/).fill('REMOVE');
+  await remove.click();
+  await expect(page.getByText('All data is removed from this browser.')).toBeVisible();
+
+  // AT-4 through the screen. In an empty browser, the OSCAL copy restores example 2 by the lossless path.
+  await page.setInputFiles('#import-file', { name: 'example-2.oscal-poam.json', mimeType: 'application/json', buffer: oscal });
+  await expect(page.getByText('Format oscal-poam. 9 risks')).toBeVisible();
+  await page.getByRole('button', { name: 'Save as a new document' }).click();
+  await expect(page.getByText('9 risks from example-2.oscal-poam.json are saved.')).toBeVisible();
+  // Lossless means the whole document, not only the risks: the native path restores the risks too.
+  const original = JSON.parse(readFileSync(fileURLToPath(new URL('../docs/schema/examples/example-2-sme-quantitative.json', import.meta.url)), 'utf8')) as Record<string, unknown>;
+  expect(withoutLogs(await page.evaluate(storedDocument))).toEqual(withoutLogs(original));
   await page.getByLabel(/Type REMOVE/).fill('REMOVE');
   await remove.click();
   await expect(page.getByText('All data is removed from this browser.')).toBeVisible();
@@ -77,3 +100,68 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
 
   expect(problems, 'errors, warnings and CSP violations').toEqual([]);
 });
+
+// What the browser still holds for this origin. Runs in the page.
+async function storedData(): Promise<Record<string, number>> {
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open('pr-risk');
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+    request.onerror = () => {
+      reject(request.error ?? new Error('open failed'));
+    };
+  });
+  const count = (store: string) =>
+    db.objectStoreNames.contains(store)
+      ? new Promise<number>((resolve, reject) => {
+          const request = db.transaction(store).objectStore(store).count();
+          request.onsuccess = () => {
+            resolve(request.result);
+          };
+          request.onerror = () => {
+            reject(request.error ?? new Error('count failed'));
+          };
+        })
+      : Promise.resolve(0);
+  const result = {
+    documents: await count('documents'),
+    versions: await count('versions'),
+    caches: (await caches.keys()).length,
+    workers: (await navigator.serviceWorker.getRegistrations()).length,
+    local: localStorage.length,
+  };
+  db.close();
+  return result;
+}
+
+// AT-4 step 3 compares without the change log and the provenance record of the import.
+function withoutLogs(doc: Record<string, unknown>): Record<string, unknown> {
+  const { changeLog, provenance, ...rest } = doc;
+  return rest;
+}
+
+// The one stored document. Runs in the page.
+async function storedDocument(): Promise<Record<string, unknown>> {
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open('pr-risk');
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+    request.onerror = () => {
+      reject(request.error ?? new Error('open failed'));
+    };
+  });
+  const all = await new Promise<{ doc: Record<string, unknown> }[]>((resolve, reject) => {
+    const request = db.transaction('documents').objectStore('documents').getAll();
+    request.onsuccess = () => {
+      resolve(request.result as { doc: Record<string, unknown> }[]);
+    };
+    request.onerror = () => {
+      reject(request.error ?? new Error('read failed'));
+    };
+  });
+  db.close();
+  if (all.length !== 1 || all[0] === undefined) throw new Error(`Expected one stored document, found ${String(all.length)}`);
+  return all[0].doc;
+}
