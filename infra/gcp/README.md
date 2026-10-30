@@ -62,7 +62,8 @@ terraform -chdir=infra/gcp output -json github_variables
 | Load balancer IP | `136.82.106.15` (also `terraform output ip_address`) |
 | Budget alert | EUR 50 on the billing account of the bootstrap step |
 | Domain | `risk.portaregulus.com`, A record DNS only, managed certificate `ACTIVE` |
-| Main page | Not applied on 2026-10-30. `main.tf` sets `main_page_suffix`, but "/" still returns the XML object listing. Run `terraform apply` before the first tag, or the deploy check fails |
+| Main page | Applied on 2026-10-30. "/" serves `index.html`, and returns 404 until the first deploy |
+| Load balancer read | Applied on 2026-10-30. The load balancer has `roles/storage.legacyObjectReader`, so it cannot list the bucket |
 | GitHub | On 2026-10-30 the environment `production` and the repository variables do not exist. Do step 6 before the first tag |
 | Plan files | Do not commit `terraform plan -out` files. `.gitignore` excludes them |
 
@@ -70,11 +71,11 @@ terraform -chdir=infra/gcp output -json github_variables
 
 The organization policy `iam.allowedPolicyMemberDomains` allows IAM grants to the organization's own customer ID only. Google's load balancer service agent is outside that customer, so `terraform apply` fails on `google_storage_bucket_iam_member.lb_read` with "One or more users named in the policy do not belong to a permitted customer".
 
-On 2026-10-27 we used the workaround that Google documents for the legacy constraint. Turn the rule off for this project, grant the role, and turn the rule on again. Do the same if a later change must rewrite the bucket IAM policy.
+On 2026-10-27 and again on 2026-10-30 we used the workaround that Google documents for the legacy constraint. Turn the rule off for this project, grant the role, and turn the rule on again. Do the same if a later change must rewrite the bucket IAM policy.
 
 1. Give yourself `roles/orgpolicy.policyAdmin` on the organization. An organization admin can do this.
 2. Set a project policy with `allowAll: true` for `iam.allowedPolicyMemberDomains` on `pr-risk-prod`.
-3. Run `terraform apply`.
+3. Run `terraform apply`. The project policy can take some minutes to apply. If the grant fails with error 412, wait 1 minute and run the apply again. A role change destroys the old grant first, so the load balancer cannot read the bucket until the grant works.
 4. Delete the project policy. Add `--billing-project=<a project with the Org Policy API on>`, because `pr-risk-prod` does not enable that API.
 5. Check that the effective policy is the organization's customer ID again, then remove `roles/orgpolicy.policyAdmin`.
 
