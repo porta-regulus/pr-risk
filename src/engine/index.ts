@@ -16,6 +16,7 @@ export {
   shareAtLeastOne,
   sortedCopy,
   standardError,
+  subtree,
   tolerance,
   toleranceAt,
 } from './metrics';

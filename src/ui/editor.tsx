@@ -14,7 +14,7 @@ import { documentChanges, withChangeLog } from './edit';
 import { InvalidFields } from './fields';
 
 export type Update = (change: (doc: RiskDocument) => RiskDocument) => void;
-export type ScreenName = 'start' | 'context' | 'identify' | 'prioritize' | 'respond' | 'monitor';
+export type ScreenName = 'start' | 'context' | 'identify' | 'prioritize' | 'respond' | 'monitor' | 'enterprise';
 
 const SCREENS: readonly (readonly [Exclude<ScreenName, 'start'>, string])[] = [
   ['context', 'Context and strategy'],
@@ -22,6 +22,7 @@ const SCREENS: readonly (readonly [Exclude<ScreenName, 'start'>, string])[] = [
   ['prioritize', 'Prioritize'],
   ['respond', 'Respond and optimize'],
   ['monitor', 'Monitor and adjust'],
+  ['enterprise', 'Enterprise view'],
 ];
 
 const SAVE_DELAY_MS = 600;

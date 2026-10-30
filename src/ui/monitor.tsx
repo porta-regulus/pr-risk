@@ -2,7 +2,7 @@
 // KPIs and KRIs with their triggers, review triggers, acceptance records, the tolerance what-if
 // on the kept per-trial totals, and the forecast log with the Brier score.
 import type { ComponentChildren } from 'preact';
-import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { exceedance, lossGrid, type TolerancePoint } from '../engine/metrics';
 import { brierScores, withForecasts, withOutcome } from '../monitor/forecasts';
 import type { MonitorNumbers } from '../monitor/numbers';
@@ -13,7 +13,7 @@ import type { Risk, RiskDocument } from '../schema/types';
 import { AcceptanceEditor } from './acceptance';
 import { withSection } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
-import { InvalidFields, type InvalidReport, NumberField, SelectField, TextField } from './fields';
+import { InvalidFields, NumberField, SelectField, TextField, useInvalid } from './fields';
 import { useEngine } from './jobs';
 import { LecChart, money, percent, probability, sourceLine, StatusText } from './report';
 import { KIND_TEXT, metricsOf } from './table9';
@@ -37,22 +37,6 @@ export function monitorKey(doc: RiskDocument): string | undefined {
     simulation: doc.simulation,
     currency: doc.document.currency,
   });
-}
-
-// Number fields of a form that is not part of the document. Text that is not a number stops
-// the form, not the save of the document.
-function useInvalid(): readonly [InvalidReport, boolean] {
-  const [fields, setFields] = useState<ReadonlySet<string>>(new Set());
-  const report = useCallback((field: string, label: string | undefined) => {
-    setFields((current) => {
-      if ((label !== undefined) === current.has(field)) return current;
-      const next = new Set(current);
-      if (label === undefined) next.delete(field);
-      else next.add(field);
-      return next;
-    });
-  }, []);
-  return [report, fields.size > 0];
 }
 
 const OPERATOR_TEXT: Readonly<Record<string, string>> = { '>': 'above', '>=': 'at or above', '<': 'below', '<=': 'at or below', '==': 'equal to', '!=': 'not equal to' };

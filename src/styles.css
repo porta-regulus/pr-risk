@@ -612,6 +612,51 @@ table.err {
 table.err .line {
   display: block;
 }
+/* Screen S7 */
+.print-view {
+  display: grid;
+  min-width: 0;
+}
+table.erp,
+table.entries,
+table.summaries {
+  min-width: 56rem;
+}
+table.portfolio {
+  min-width: 40rem;
+}
+table.erp caption {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+.erp-kind {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+table.erp th[scope='row'],
+table.portfolio th[scope='row'] {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+  vertical-align: top;
+}
+table.erp td.assessed {
+  white-space: nowrap;
+}
+table.entries .line {
+  display: block;
+}
+table.entries td.note {
+  min-width: 9rem;
+}
+table.summaries .sources {
+  min-width: 14rem;
+}
+.escalate {
+  color: var(--warn-text);
+  font-weight: 600;
+}
 .register-status {
   margin: 0;
   padding-left: 1.1rem;
@@ -826,6 +871,13 @@ table.sign td {
     color: #566070;
   }
 }
+@page enterprise {
+  @bottom-left {
+    content: 'PortaRegulus Risk enterprise view';
+    font-size: 7.5pt;
+    color: #566070;
+  }
+}
 
 @media print {
   :root {
@@ -851,8 +903,31 @@ table.sign td {
     max-width: none;
     padding: 0;
   }
-  main.screen > :not(.record) {
+  main.screen > :not(.record):not(.print-view) {
     display: none !important;
+  }
+  /* Screen S7 prints the register, the profile and the portfolio without the form fields. */
+  .print-view .panel {
+    border: 0;
+    padding: 0;
+  }
+  .print-view .field,
+  .print-view .hint {
+    display: none;
+  }
+  .print-view .table-box {
+    overflow: visible;
+  }
+  .print-view table {
+    min-width: 0;
+  }
+  /* A row stays whole, and so does a risk of the profile (one tbody each). */
+  .print-view tr,
+  .print-view table.erp tbody {
+    break-inside: avoid;
+  }
+  .print-view {
+    page: enterprise;
   }
   .record {
     border: 0;

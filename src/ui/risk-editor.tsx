@@ -4,6 +4,7 @@ import { useEffect, useState } from 'preact/hooks';
 import type { Distribution, Risk, RiskDocument } from '../schema/types';
 import { CancelledError, runJob } from '../engine/client';
 import type { RiskNumbers } from '../engine/numbers';
+import { referencesTo, withoutRisk } from '../enterprise/normalize';
 import { feedbackBasics } from './analysis';
 import { DistributionField, formatNumber } from './distribution';
 import { DriverLinksTab } from './drivers';
@@ -56,7 +57,7 @@ export const SUBCODES: Readonly<Record<CategoryCode, readonly string[]>> = {
   safety: ['product', 'workplace', 'ot-process'],
   reputation: ['customer', 'public', 'regulator'],
 };
-const CODES: readonly (readonly [CategoryCode, string])[] = [
+export const CODES: readonly (readonly [CategoryCode, string])[] = [
   ['ict', 'ICT'],
   ['financial', 'Financial'],
   ['legal', 'Legal'],
@@ -459,11 +460,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
 
   const others = doc.risks.filter((item) => item.riskId !== risk.riskId);
   const links = risk.linkedRisks ?? [];
-  const referencedBy = [
-    ...doc.risks.filter((item) => (item.sourceRefs ?? []).some((ref) => ref.riskId === risk.riskId) || (item.linkedRisks ?? []).some((link) => link.riskId === risk.riskId)).map((item) => item.riskId),
-    ...(doc.responses ?? []).filter((option) => option.effects.some((effect) => effect.targetKind === 'risk' && effect.targetId === risk.riskId) || (option.introducesRisks ?? []).includes(risk.riskId)).map((option) => option.id),
-    ...(doc.forecasts ?? []).filter((forecast) => forecast.riskId === risk.riskId).map((forecast) => forecast.id),
-  ];
+  const referencedBy = referencesTo(doc, risk.riskId);
 
   const tabButton = (name: Tab, index: number) => (
     <button
@@ -700,7 +697,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
           disabled={referencedBy.length > 0}
           title={referencedBy.length > 0 ? `Used by ${referencedBy.join(', ')}` : undefined}
           onClick={() => {
-            update((current) => ({ ...current, risks: current.risks.filter((item) => item.riskId !== risk.riskId) }));
+            update((current) => withoutRisk(current, risk.riskId));
             onRemoved();
           }}
         >

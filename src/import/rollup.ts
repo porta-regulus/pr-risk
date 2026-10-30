@@ -61,6 +61,12 @@ function summary(sources: readonly Risk[], id: string, options: SummaryOptions, 
     rollUp: { method: 'nist-three-point', disparityLayout: options.layout, likelihood, impact },
   };
   if (options.priority !== undefined) risk.priority = options.priority;
+  // A number that a source takes from its labels stays marked as defaulted (rules D-Q1 and D-Q3).
+  const defaulted = (['/riskLikelihood', '/riskImpact'] as const).filter((field) => sources.some((source) => (source.defaultedFields ?? []).includes(field)));
+  if (defaulted.length > 0) risk.defaultedFields = [...defaulted, '/exposureRating'];
+  // The summary supports every objective of its sources (lint L-09).
+  const objectiveIds = [...new Set(sources.flatMap((source) => source.objectiveIds ?? []))];
+  if (objectiveIds.length > 0) risk.objectiveIds = objectiveIds;
   return risk;
 }
 
