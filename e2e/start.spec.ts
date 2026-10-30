@@ -101,6 +101,80 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   expect(problems, 'errors, warnings and CSP violations').toEqual([]);
 });
 
+// SPEC.md Sec. 9.7 through the screen. A parent register takes a newer file of its child registers
+// and keeps current, takes incoming or keeps both, one choice per changed risk.
+test('import into an open document shows the diff and takes one choice per risk', async ({ page }) => {
+  const problems: string[] = [];
+  page.on('pageerror', (error) => problems.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error' || message.type() === 'warning') problems.push(message.text());
+  });
+
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Table 10 imports (example 3)' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
+  const original = await page.evaluate(storedDocument);
+  const originalRisk = (id: string) => (original['risks'] as Risk[]).find((risk) => risk.riskId === id);
+
+  // A newer copy of the Table 10 file. A-1 has a new likelihood, B-1 a new impact, C-1 a new response type.
+  const table10 = readFileSync(fileURLToPath(new URL('../docs/schema/fixtures/table10-system-registers.csv', import.meta.url)), 'utf8');
+  const newer = table10.replace(',0.1,2000000,', ',0.15,2000000,').replace(',0.3,400000,', ',0.3,450000,').replace('Accept,General counsel', 'Mitigate,General counsel');
+  await page.setInputFiles('#import-file', { name: 'table10-newer.csv', mimeType: 'text/csv', buffer: Buffer.from(newer, 'utf8') });
+  await expect(page.getByText('Format csv. 3 risks, 0 new registers')).toBeVisible();
+  await expect(page.getByText('3 risks have other values in the file.')).toBeVisible();
+
+  // One group per changed risk, with field, current and incoming. Take incoming is the default.
+  const group = (id: string) => page.getByRole('group', { name: `Risk ${id}` });
+  const row = (id: string, field: string) => page.getByRole('region', { name: `Changed fields of Risk ${id}` }).getByRole('row', { name: field });
+  await expect(row('A-1', 'riskLikelihood').getByRole('cell')).toHaveText(['0.1', '0.15']);
+  await expect(row('B-1', 'riskImpact').getByRole('cell')).toHaveText(['400000', '450000']);
+  await expect(row('C-1', 'riskResponseType').getByRole('cell')).toHaveText(['Accept', 'Mitigate']);
+  await expect(row('A-1', 'notes').getByRole('cell').nth(1)).toHaveText('Not set');
+  for (const id of ['A-1', 'B-1', 'C-1']) await expect(group(id).getByRole('radio', { name: 'Take incoming' })).toBeChecked();
+  await expectAccessible(page, 'S1 with an import diff');
+
+  // Keep current for A-1 with the keyboard, keep both for C-1 with the mouse, B-1 stays on take incoming.
+  await group('A-1').getByRole('radio', { name: 'Take incoming' }).focus();
+  await page.keyboard.press('ArrowLeft');
+  await expect(group('A-1').getByRole('radio', { name: 'Keep current' })).toBeChecked();
+  await group('C-1').getByRole('radio', { name: 'Keep both' }).check();
+  await expect(group('B-1').getByRole('radio', { name: 'Take incoming' })).toBeChecked();
+
+  // No horizontal overflow at 375 px. The diff tables scroll inside their own regions.
+  await page.setViewportSize({ width: 375, height: 812 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+
+  await page.getByRole('button', { name: /^Add to / }).click();
+  await expect(page.getByText('2 risks from table10-newer.csv are saved. 1 risk keeps its current version.')).toBeVisible();
+
+  // The stored document has the result of each choice, and the change log records it.
+  const stored = await page.evaluate(storedDocument);
+  const risk = (id: string) => (stored['risks'] as Risk[]).find((item) => item.riskId === id);
+  expect(risk('A-1')).toEqual(originalRisk('A-1'));
+  expect(risk('B-1')?.riskImpact).toBe(450000);
+  expect(risk('C-1')).toEqual(originalRisk('C-1'));
+  expect(risk('C-1-2')?.riskResponseType).toEqual(['Mitigate']);
+  expect((stored['risks'] as Risk[]).length).toBe((original['risks'] as Risk[]).length + 1);
+  const log = stored['changeLog'] as { entityKind: string; entityId: string; before?: unknown; after?: unknown }[];
+  expect(log.map((entry) => [entry.entityKind, entry.entityId])).toEqual([
+    ['risk', 'B-1'],
+    ['risk', 'C-1-2'],
+  ]);
+  expect(log[0]?.before).toEqual(originalRisk('B-1'));
+  expect(log[0]?.after).toEqual(risk('B-1'));
+  expect(log[1]).not.toHaveProperty('before');
+  expect(log[1]?.after).toEqual(risk('C-1-2'));
+  expect((stored['provenance'] as { fileName: string }[]).at(-1)?.fileName).toBe('table10-newer.csv');
+
+  expect(problems, 'errors, warnings and CSP violations').toEqual([]);
+});
+
+interface Risk {
+  readonly riskId: string;
+  readonly riskImpact?: number;
+  readonly riskResponseType?: string[];
+}
+
 // What the browser still holds for this origin. Runs in the page.
 async function storedData(): Promise<Record<string, number>> {
   const db = await new Promise<IDBDatabase>((resolve, reject) => {
