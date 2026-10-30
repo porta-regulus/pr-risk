@@ -189,6 +189,94 @@ test('selecting another document closes the import preview', async ({ page }) =>
   await expect(page.getByRole('button', { name: /^Add to / })).toBeHidden();
 });
 
+// CRA Annex I Part I points 2(e) and 2(f) (docs/release/annex-i-self-check.md, gaps F1, F2 and F4).
+test('a damaged stored record is not opened or exported, and its last valid version comes back', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
+  await expect(page.getByText('The app does not encrypt the data in this browser.')).toBeVisible();
+  await expect(page.getByText('use a browser profile with no extensions')).toBeVisible();
+
+  // A change outside the app while an editor screen is open. The next screen checks the record.
+  await page.getByRole('button', { name: 'Context and strategy' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Context and strategy' })).toBeVisible();
+  await page.evaluate(damageStoredDocument, false);
+  await page.getByRole('navigation', { name: 'Screens' }).getByRole('button', { name: 'Identify and analyze' }).click();
+  await expect(page.getByRole('alert')).toContainText('The stored copy of this document is damaged, so this screen does not open it.');
+  await expectAccessible(page, 'editor with a damaged document');
+
+  await page.getByRole('button', { name: 'Back to start' }).click();
+  await expect(page.getByRole('alert')).toContainText('is damaged. Rule ');
+  await expect(page.getByText('The stored copy is damaged.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Context and strategy' })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'App file (JSON)' })).toBeHidden();
+  await expectAccessible(page, 'S1 with a damaged document');
+
+  await page.getByRole('button', { name: 'Restore the last valid version' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'Version 1 is restored.' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Context and strategy' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'App file (JSON)' })).toBeVisible();
+  expect((await page.evaluate(storedDocument))['risks']).toHaveLength(9);
+});
+
+// Codex review of pull request 17. With no valid kept version, a saved copy still restores the document.
+test('a saved copy restores a damaged document that has no valid kept version', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'App file (JSON)' }).click();
+  const copy = readFileSync(await (await downloadPromise).path());
+
+  await page.evaluate(damageStoredDocument, true);
+  await page.reload();
+  await page.getByRole('button', { name: 'Restore the last valid version' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: 'No kept version of this document is valid.' })).toBeVisible();
+
+  await page.setInputFiles('#import-file', { name: 'copy.json', mimeType: 'application/json', buffer: copy });
+  await expect(page.getByRole('heading', { name: 'Preview of copy.json' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Add to / })).toBeHidden();
+  await page.getByRole('button', { name: 'Save the file as a document' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'risks from copy.json are saved.' })).toBeVisible();
+  await expect(page.getByText('The stored copy is damaged.')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Context and strategy' })).toBeVisible();
+  expect((await page.evaluate(storedDocument))['risks']).toHaveLength(9);
+});
+
+// Breaks the risk list of the first stored document, as a change in the developer tools would. Runs in the page.
+// With versionsToo, the kept versions are broken as well, so no valid version is left.
+async function damageStoredDocument(versionsToo = false): Promise<void> {
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open('pr-risk');
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+    request.onerror = () => {
+      reject(request.error ?? new Error('open failed'));
+    };
+  });
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(['documents', 'versions'], 'readwrite');
+    for (const name of versionsToo ? ['documents', 'versions'] : ['documents']) {
+      const cursor = tx.objectStore(name).openCursor();
+      cursor.onsuccess = () => {
+        const found = cursor.result;
+        if (found === null) return;
+        const record = found.value as { doc: Record<string, unknown> };
+        found.update({ ...record, doc: { ...record.doc, risks: 'none' } });
+        found.continue();
+      };
+    }
+    tx.oncomplete = () => {
+      resolve();
+    };
+    tx.onerror = () => {
+      reject(tx.error ?? new Error('update failed'));
+    };
+  });
+  db.close();
+}
+
 interface Risk {
   readonly riskId: string;
   readonly riskImpact?: number;

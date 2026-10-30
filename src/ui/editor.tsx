@@ -6,7 +6,7 @@ import { type ComponentChildren, Fragment } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import { documentErrors } from '../schema/document';
 import type { Finding, RiskDocument } from '../schema/types';
-import { exportOverdue, loadDocument, openDb, saveDocument, type StoredDocument, undo } from '../storage/db';
+import { exportOverdue, loadDocument, openDb, saveDocument, storedProblem, type StoredDocument, undo } from '../storage/db';
 import { runJob } from '../engine/client';
 import type { RiskNumbers } from '../engine/numbers';
 import { simulationTargets, withNistNumbers, withNumbersFrom, withSimulationSettings } from './analysis';
@@ -57,6 +57,8 @@ export function DocumentScreen({
   const [draft, setDraft] = useState<RiskDocument>();
   const [errors, setErrors] = useState<readonly Finding[]>([]);
   const [failure, setFailure] = useState<string>();
+  // The stored record failed the check on open (storedProblem). The screen then edits nothing.
+  const [damaged, setDamaged] = useState<string>();
   const [note, setNote] = useState<string>();
   const [saving, setSaving] = useState(false);
   // Number fields whose text is not a number. The document still holds the old value, so
@@ -98,7 +100,10 @@ export function DocumentScreen({
       open = database;
       const loaded = await loadDocument(database, id);
       setDb(database);
-      if (loaded !== undefined) {
+      const problem = loaded === undefined ? undefined : storedProblem(loaded);
+      if (problem !== undefined) {
+        setDamaged(problem);
+      } else if (loaded !== undefined) {
         showStored(loaded);
         showDraft(loaded.doc);
       }
@@ -170,6 +175,22 @@ export function DocumentScreen({
       timer.current = undefined;
     };
   }, [stored, draft, dirty, blocked]);
+
+  if (damaged !== undefined) {
+    return (
+      <main class="screen">
+        <h1>{title}</h1>
+        <p class="message message-error" role="alert">
+          The stored copy of this document is damaged, so this screen does not open it. {damaged} Go back to the start screen to restore the last valid version.
+        </p>
+        <button type="button" onClick={() => {
+            onNavigate('start');
+          }}>
+          Back to start
+        </button>
+      </main>
+    );
+  }
 
   if (db === undefined || stored === undefined || draft === undefined) {
     return (

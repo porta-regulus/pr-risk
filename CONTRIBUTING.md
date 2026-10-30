@@ -11,6 +11,7 @@ Read [docs/HANDOFF.md](docs/HANDOFF.md) first. The requirements are in [docs/SPE
 5. Do not add regulation or framework mappings per risk (SPEC.md Sec. 3.2).
 6. Never invent a default frequency or loss for a risk.
 7. Do not edit `docs/schema/vendor/`.
+8. Add automated tests for new functionality in the same pull request. A unit test checks each new rule. A Playwright test checks each new screen flow.
 
 ## Checks
 
