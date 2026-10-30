@@ -102,13 +102,19 @@ export function withoutObjective(doc: RiskDocument, registerId?: string): Risk[]
   return profileRisks(doc, registerId).filter((risk) => !(risk.objectiveIds ?? []).some((id) => known.has(id)));
 }
 
-// One row of the portfolio view. The financial profile is the expected annual loss, which is
-// the sum of the exposure ratings, because an expected value adds up over risks. The curves of
-// the roll-up do not add up, and screen S4 shows them. The document keeps no reputation or
-// mission label of the previous period, so those profiles have the current period only.
+// One row of the portfolio view. The financial profile is the expected annual loss. The sum of
+// the exposure ratings gives it, because an expected value adds up over risks. With a
+// simulation, the screen shows the simulated value of the register with its standard error
+// instead, as screen S4 does, and the entries outside the simulation separately. The document
+// keeps no reputation or mission label of the previous period, so those profiles have the
+// current period only.
 export interface PortfolioRow {
   readonly entries: number;
   readonly current: number;
+  // Entries in the simulation: risks with an estimate, and summary entries whose sources all
+  // have one. The other entries add otherExposure.
+  readonly simulatedEntries: number;
+  readonly otherExposure: number;
   // Entries whose numbers are placeholders or come from their labels (defaultedFields).
   readonly defaulted: number;
   readonly previous: number;
@@ -137,9 +143,19 @@ function highest(doc: RiskDocument, labels: readonly (string | undefined)[]): st
   return best?.label;
 }
 
+function simulated(doc: RiskDocument, risk: Risk): boolean {
+  const sources = risk.sourceRefs ?? [];
+  if (sources.length === 0) return risk.estimate !== undefined;
+  return sources.every((ref) => {
+    const source = doc.risks.find((item) => item.registerId === ref.registerId && item.riskId === ref.riskId);
+    return source !== undefined && simulated(doc, source);
+  });
+}
+
 // Negative risks only. Gains of positive risks are on the screens Prioritize and Respond.
 export function portfolioRow(doc: RiskDocument, registerId?: string): PortfolioRow {
   const risks = profileRisks(doc, registerId).filter((risk) => risk.polarity === 'negative');
+  const others = risks.filter((risk) => !simulated(doc, risk));
   const previous = risks.map(previousExposure).filter((value): value is number => value !== undefined);
   const reputation = highest(
     doc,
@@ -152,6 +168,8 @@ export function portfolioRow(doc: RiskDocument, registerId?: string): PortfolioR
   return {
     entries: risks.length,
     current: risks.reduce((sum, risk) => sum + risk.exposureRating, 0),
+    simulatedEntries: risks.length - others.length,
+    otherExposure: others.reduce((sum, risk) => sum + risk.exposureRating, 0),
     defaulted: risks.filter((risk) => (risk.defaultedFields ?? []).some((field) => DEFAULTED.includes(field))).length,
     previous: previous.reduce((sum, value) => sum + value, 0),
     previousEntries: previous.length,

@@ -6,6 +6,7 @@
 import { useState } from 'preact/hooks';
 import { childEntries, type ChildEntry, mergeResult, parentRegisters, referencesTo, summaryEntries, withMerge, withoutRisk } from '../enterprise/normalize';
 import { type Assessed, type ErpBlock, erpBlocks, isPlaceholder, portfolioRow, withoutObjective } from '../enterprise/profile';
+import type { PriorityNumbers } from '../engine/prioritize';
 import type { DisparityLayout } from '../import/rollup';
 import { lint } from '../schema/rules';
 import type { Register, Risk, RiskDocument } from '../schema/types';
@@ -14,7 +15,9 @@ import { DocumentScreen, type ScreenName, type Update } from './editor';
 import { ErrView } from './err';
 import { InvalidFields, NumberField, SelectField, TextField, useInvalid } from './fields';
 import { registerTree } from './identify';
-import { money, probability } from './report';
+import { useEngine } from './jobs';
+import { simulationKey } from './prioritize';
+import { money, probability, sourceLine } from './report';
 import { CODES } from './risk-editor';
 
 const CODE_TEXT: ReadonlyMap<string, string> = new Map(CODES);
@@ -501,7 +504,14 @@ function NormalizePanel({ doc, update }: { readonly doc: RiskDocument; readonly 
   );
 }
 
-function PortfolioView({ doc }: { readonly doc: RiskDocument }) {
+interface Simulation {
+  readonly numbers?: PriorityNumbers;
+  readonly running: boolean;
+  readonly error?: string;
+}
+
+function PortfolioView({ doc, simulation }: { readonly doc: RiskDocument; readonly simulation: Simulation }) {
+  const { numbers } = simulation;
   const tree = registerTree(doc.registers);
   const roots = tree.filter((item) => item.depth === 0).length;
   const shift = roots > 1 ? 1 : 0;
@@ -514,9 +524,10 @@ function PortfolioView({ doc }: { readonly doc: RiskDocument }) {
     <section aria-labelledby="portfolio-title" class="panel">
       <h2 id="portfolio-title">Portfolio by register and period</h2>
       <p class="hint">
-        After SP 800-221r1 Table 7 (p. 44, line 1429), without its sub-columns. A register includes the registers below it. The financial profile is the expected annual loss, the sum of
-        the exposure ratings of the negative risks, because expected values add up. The loss exceedance curve of a register is on the screen Prioritize. The previous period comes from
-        the previous assessments. The document keeps no reputation or mission label of the previous period.
+        After SP 800-221r1 Table 7 (p. 44, line 1429), without its sub-columns. A register includes the registers below it. The financial profile is the expected annual loss of the
+        negative risks. With a simulation it is the simulated value with its standard error, as on the screen Prioritize, and the entries without an estimate show apart. Without a
+        simulation it is the sum of the exposure ratings, because expected values add up. The previous period comes from the previous assessments. The document keeps no reputation or
+        mission label of the previous period.
       </p>
       <div class="table-box" tabIndex={0} role="region" aria-labelledby="portfolio-caption">
         <table class="portfolio">
@@ -546,27 +557,47 @@ function PortfolioView({ doc }: { readonly doc: RiskDocument }) {
           </thead>
           <tbody>
             {rows.map((row) => {
-              const numbers = portfolioRow(doc, row.id);
+              const profile = portfolioRow(doc, row.id);
+              const curve = row.id === undefined ? numbers?.state : numbers?.registers.find((register) => register.registerId === row.id);
+              const run = curve === undefined || profile.simulatedEntries === 0 ? undefined : { eal: curve.eal, se: curve.ealSe };
+              const others = profile.entries - profile.simulatedEntries;
               return (
                 <tr key={row.id ?? ''} data-register={row.id ?? 'all'}>
                   <th scope="row" style={{ paddingLeft: `${String(row.depth * 1.25)}rem` }}>
                     {row.title}
                     <span class="sub">{row.level}</span>
                   </th>
-                  <td class="current">{money(numbers.current)}</td>
+                  <td class="current">
+                    {run === undefined ? (
+                      <>
+                        {money(profile.current)}
+                        {profile.simulatedEntries > 0 && simulation.running && <span class="sub">The simulation runs.</span>}
+                      </>
+                    ) : (
+                      <>
+                        {money(run.eal)}
+                        <span class="sub se">Simulated, standard error {money(run.se)}</span>
+                        {others > 0 && (
+                          <span class="sub">
+                            Not in the simulation: {others} {others === 1 ? 'entry' : 'entries'} with {money(profile.otherExposure)} by exposure rating
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </td>
                   <td class="previous">
-                    {numbers.previousEntries === 0 ? 'Not recorded' : money(numbers.previous)}
-                    {numbers.previousEntries > 0 && numbers.previousEntries < numbers.entries && (
+                    {profile.previousEntries === 0 ? 'Not recorded' : money(profile.previous)}
+                    {profile.previousEntries > 0 && profile.previousEntries < profile.entries && (
                       <span class="sub">
-                        {numbers.previousEntries} of {numbers.entries} entries
+                        {profile.previousEntries} of {profile.entries} entries
                       </span>
                     )}
                   </td>
-                  <td>{numbers.reputation ?? 'No label'}</td>
-                  <td>{numbers.mission ?? 'No label'}</td>
+                  <td>{profile.reputation ?? 'No label'}</td>
+                  <td>{profile.mission ?? 'No label'}</td>
                   <td class="entries">
-                    {numbers.entries}
-                    {numbers.defaulted > 0 && <span class="sub">{numbers.defaulted} with defaulted numbers</span>}
+                    {profile.entries}
+                    {profile.defaulted > 0 && <span class="sub">{profile.defaulted} with defaulted numbers</span>}
                   </td>
                 </tr>
               );
@@ -574,11 +605,26 @@ function PortfolioView({ doc }: { readonly doc: RiskDocument }) {
           </tbody>
         </table>
       </div>
+      {simulation.error !== undefined && <p class="save-error">The simulation failed. {simulation.error}</p>}
+      {numbers !== undefined && <p class="source">{sourceLine(numbers)}</p>}
     </section>
   );
 }
 
 function EnterpriseBody({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
+  // The run of screen S4, for the simulated expected annual loss of each register.
+  const key = simulationKey(doc);
+  const job = useEngine(
+    key,
+    () =>
+      ({
+        kind: 'prioritize',
+        doc,
+        trials: doc.simulation?.trials ?? 100_000,
+        seed: doc.simulation?.seed ?? 0,
+      }) as const,
+  );
+  const numbers = key !== undefined && job.resultKey === key ? job.result : undefined;
   return (
     <>
       <div class="print-view">
@@ -589,7 +635,7 @@ function EnterpriseBody({ doc, update }: { readonly doc: RiskDocument; readonly 
       </div>
       <NormalizePanel doc={doc} update={update} />
       <div class="print-view">
-        <PortfolioView doc={doc} />
+        <PortfolioView doc={doc} simulation={{ ...(numbers === undefined ? {} : { numbers }), running: job.running, ...(job.error === undefined ? {} : { error: job.error }) }} />
       </div>
       <div class="button-row">
         <button

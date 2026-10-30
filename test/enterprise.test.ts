@@ -274,16 +274,39 @@ describe('G5 the ERP view of example 1 in the layout of Fig. 11', () => {
 describe('Portfolio view by register and period (Sec. 6.13 item 3)', () => {
   it('sums the exposure ratings of the subtree for the current and the previous period', () => {
     const doc = example(EXAMPLE_2);
-    expect(portfolioRow(doc, 'CORP')).toEqual({ entries: 7, current: 229_648, defaulted: 0, previous: 111_000, previousEntries: 2 });
-    expect(portfolioRow(doc, 'PROD-A')).toEqual({ entries: 2, current: 64_850, defaulted: 0, previous: 15_000, previousEntries: 1 });
+    expect(portfolioRow(doc, 'CORP')).toEqual({ entries: 7, current: 229_648, simulatedEntries: 7, otherExposure: 0, defaulted: 0, previous: 111_000, previousEntries: 2 });
+    expect(portfolioRow(doc, 'PROD-A')).toEqual({ entries: 2, current: 64_850, simulatedEntries: 2, otherExposure: 0, defaulted: 0, previous: 15_000, previousEntries: 1 });
     expect(portfolioRow(doc)).toEqual(portfolioRow(doc, 'CORP'));
   });
 
   it('gives the highest reputation and mission labels on the impact scale, without closed and positive risks', () => {
     const doc = example(EXAMPLE_1);
-    expect(portfolioRow(doc, 'ERR')).toEqual({ entries: 8, current: 11_650_000, defaulted: 8, previous: 0, previousEntries: 0, reputation: 'High', mission: 'High' });
-    expect(portfolioRow(doc, 'ERP11')).toEqual({ entries: 3, current: 10_100_000, defaulted: 3, previous: 11_000_000, previousEntries: 3 });
+    expect(portfolioRow(doc, 'ERR')).toEqual({
+      entries: 8,
+      current: 11_650_000,
+      simulatedEntries: 0,
+      otherExposure: 11_650_000,
+      defaulted: 8,
+      previous: 0,
+      previousEntries: 0,
+      reputation: 'High',
+      mission: 'High',
+    });
+    expect(portfolioRow(doc, 'ERP11')).toEqual({ entries: 3, current: 10_100_000, simulatedEntries: 0, otherExposure: 10_100_000, defaulted: 3, previous: 11_000_000, previousEntries: 3 });
     expect(portfolioRow(doc).current).toBe(21_750_000);
+  });
+
+  it('splits the entries into those in the simulation and the others', () => {
+    const doc = example(EXAMPLE_2);
+    const result = mergeResult(doc, {
+      sources: [riskOf(doc, 'R-07'), riskOf(doc, 'R-08')],
+      options: { id: 'CORP-1', registerId: 'CORP', riskDescription: 'Product line A risks at the company level.', riskOwnerPointOfContact: 'IT lead', layout: 'one-row-all-responses' },
+    });
+    if (!('rows' in result)) throw new Error(result.problems.join(' '));
+    const { estimate, ...unestimated } = riskOf(doc, 'R-02');
+    const pending: Risk = { ...unestimated, riskId: 'R-10' };
+    const merged = withMerge({ ...doc, risks: [...doc.risks, pending] }, result.rows);
+    expect(portfolioRow(merged, 'CORP')).toMatchObject({ entries: 7, simulatedEntries: 6, otherExposure: pending.exposureRating });
   });
 
   it('counts a summary entry instead of its sources', () => {

@@ -100,6 +100,20 @@ test('G5. S7 shows the profile of example 1 by objective in the layout of Fig. 1
   expect(problems).toEqual([]);
 });
 
+test('S7 shows the simulated expected annual loss of example 2 with its standard error', async ({ page }) => {
+  const problems = watchProblems(page);
+  await open(page, 'SME with numbers (example 2)', 'Enterprise view');
+  const corp = page.locator('table.portfolio tr[data-register="CORP"] td.current');
+  await expect(corp.locator('.se')).toHaveText(/^Simulated, standard error [\d,]+$/, { timeout: 30_000 });
+  const eal = Number((await corp.evaluate((cell) => cell.firstChild?.textContent ?? '')).replaceAll(',', ''));
+  expect(Math.abs(eal - 229_648) / 229_648).toBeLessThan(0.05);
+  await expect(page.locator('table.portfolio tr[data-register="PROD-A"] td.current .se')).toBeVisible();
+  await expect(page.locator('table.entries tr[data-risk="R-07"] .note')).toHaveText('Escalate. At or above the escalation threshold.');
+  await expect(page.getByText(/^Simulation of document [0-9a-f]{12}, seed /)).toBeVisible();
+  await expectAccessible(page, 'S7 of example 2');
+  expect(problems).toEqual([]);
+});
+
 // Combined description quoted from SP 800-221r1 lines 1624 to 1625.
 const ORG_1 = 'External malicious party uses malicious code to exfiltrate sensitive business-related documents.';
 
