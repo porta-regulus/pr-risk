@@ -169,6 +169,26 @@ test('import into an open document shows the diff and takes one choice per risk'
   expect(problems, 'errors, warnings and CSP violations').toEqual([]);
 });
 
+// The diff of a preview is valid only for the document it was made against. Selecting another
+// document closes the preview, so no choice is committed against the wrong diff.
+test('selecting another document closes the import preview', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Table 10 imports (example 3)' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await expect(page.getByRole('row', { name: /Example Machinery/ }).getByRole('button', { name: 'Selected' })).toBeVisible();
+  await page.getByRole('row', { name: /Import adapters/ }).getByRole('button', { name: 'Select' }).click();
+
+  const table10 = readFileSync(fileURLToPath(new URL('../docs/schema/fixtures/table10-system-registers.csv', import.meta.url)), 'utf8');
+  await page.setInputFiles('#import-file', { name: 'table10-newer.csv', mimeType: 'text/csv', buffer: Buffer.from(table10.replace(',0.1,2000000,', ',0.15,2000000,'), 'utf8') });
+  await expect(page.getByRole('group', { name: 'Risk A-1' })).toBeVisible();
+
+  await page.getByRole('row', { name: /Example Machinery/ }).getByRole('button', { name: 'Select' }).click();
+  await expect(page.getByText('The selected document changed, so the preview is closed. Choose the file again.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Preview of table10-newer.csv' })).toBeHidden();
+  await expect(page.getByRole('button', { name: /^Add to / })).toBeHidden();
+});
+
 interface Risk {
   readonly riskId: string;
   readonly riskImpact?: number;

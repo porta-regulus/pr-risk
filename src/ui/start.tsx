@@ -40,6 +40,18 @@ interface Message {
   readonly text: string;
 }
 
+// An import preview and the stored document version that its diff and errors were made against.
+interface Pending {
+  readonly preview: ImportPreview;
+  readonly fileName: string;
+  readonly targetId: string | undefined;
+  readonly targetVersion: number | undefined;
+}
+
+// The diff is valid only for the document version it was made against (Sec. 9.7).
+const isStale = (pending: Pending, target: StoredDocument | undefined): boolean => pending.targetId !== target?.id || pending.targetVersion !== target?.version;
+const STALE_TEXT = 'The selected document changed, so the preview is closed. Choose the file again.';
+
 function ErrorList({ errors }: { readonly errors: readonly Finding[] }) {
   if (errors.length === 0) return null;
   return (
@@ -164,7 +176,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   const [currentId, setCurrentId] = useState<string | undefined>(selectedId);
   const [status, setStatus] = useState<StorageStatus>();
   const [message, setMessage] = useState<Message>();
-  const [preview, setPreview] = useState<{ preview: ImportPreview; fileName: string }>();
+  const [preview, setPreview] = useState<Pending>();
   // The merge choice per matched risk id (Sec. 9.7). An id that is not here takes incoming.
   const [choices, setChoices] = useState<Record<string, Choice>>({});
   const [busy, setBusy] = useState(false);
@@ -194,6 +206,14 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   const report = (kind: Message['kind'], text: string): void => {
     setMessage({ kind, text });
   };
+
+  // A preview made against another document, or another version of it, must not be committed.
+  useEffect(() => {
+    if (preview === undefined || !isStale(preview, current)) return;
+    setPreview(undefined);
+    setChoices({});
+    report('ok', STALE_TEXT);
+  }, [current?.id, current?.version, preview]);
 
   const store = async (doc: RiskDocument, text: string): Promise<void> => {
     if (db === undefined) return;
@@ -246,7 +266,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
       const base = current?.doc ?? newDocument(file.name.replace(/\.[^.]+$/, '') || 'Imported register', '', 'EUR');
       // A document always has at least one register. The first one takes rows without a register column.
       const result = await runImport({ doc: base, file: { fileName: file.name, bytes }, options: { register: base.registers[0] } });
-      setPreview({ preview: result, fileName: file.name });
+      setPreview({ preview: result, fileName: file.name, targetId: current?.id, targetVersion: current?.version });
       setChoices({});
       setMessage(undefined);
     } catch (error) {
@@ -259,6 +279,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   const commit = (mode: 'merge' | 'replace') =>
     guard(async () => {
       if (preview === undefined) return;
+      if (isStale(preview, current)) throw new Error(STALE_TEXT);
       // With no open document, a whole document is restored as it is.
       const replace = preview.preview.document !== undefined && (mode === 'replace' || current === undefined);
       const base = replace || current === undefined ? (preview.preview.document ?? newDocument(preview.fileName, '', 'EUR')) : current.doc;
