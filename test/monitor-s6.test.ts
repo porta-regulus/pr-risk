@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { measure, sortedCopy, statusOf, tolerance } from '../src/engine';
 import { brierScores, freezeForecasts, withForecasts, withOutcome } from '../src/monitor/forecasts';
 import { monitorNumbers } from '../src/monitor/numbers';
-import { acceptanceState, emergedOn, itemState, latestInGap, reviewTriggers, withObservation, withReviewNeeded } from '../src/monitor/review';
+import { acceptanceState, APP_ACTOR, automaticReviews, emergedOn, itemState, latestInGap, reasonKey, reviewTriggers, withAutomaticReview, withObservation } from '../src/monitor/review';
 import { checkCurve, curveProblems, samePoints, withPoints, withToleranceChange } from '../src/monitor/tolerance';
 import { documentErrors, type RiskDocument } from '../src/schema';
 import { documentChanges, withChangeLog } from '../src/ui/edit';
@@ -129,13 +129,6 @@ describe('review triggers (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
     expect(kinds(added('2026-10-29T10:00:00Z'), '2026-10-30')['R-06']).toBeUndefined();
   });
 
-  it('sets Review needed only on the risks it names, and the result is valid', () => {
-    const next = withReviewNeeded(doc, ['R-01', 'R-02']);
-    expect(next.risks.filter((risk) => risk.status === 'Review needed').map((risk) => risk.riskId)).toEqual(['R-01', 'R-02']);
-    expect(documentErrors(next)).toEqual([]);
-    expect(documentChanges(doc, next).map((change) => change.entityId)).toEqual(['R-01', 'R-02']);
-  });
-
   it('gives the acceptance state of each record', () => {
     const r05 = doc.risks.find((risk) => risk.riskId === 'R-05');
     if (r05?.acceptance === undefined) throw new Error('R-05');
@@ -144,6 +137,94 @@ describe('review triggers (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
     expect(acceptanceState({ ...r05, acceptance: open }, '2099-01-01')).toBe('open-ended');
     const { acceptance: _record, ...bare } = r05;
     expect(acceptanceState(bare, '2026-10-30')).toBeUndefined();
+  });
+});
+
+describe('automatic Review needed (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
+  const doc = example(EXAMPLE_2);
+  const ICT = ['R-01', 'R-02', 'R-03', 'R-04', 'R-07', 'R-08', 'R-09'];
+  const AT = '2026-10-30T09:00:00Z';
+  const reviewed = (d: RiskDocument, today = '2026-10-30'): RiskDocument => withAutomaticReview(d, automaticReviews(d, today), AT);
+  const appEntries = (d: RiskDocument) => (d.changeLog ?? []).filter((entry) => entry.actor?.startsWith(APP_ACTOR) === true);
+  const withStatus = (d: RiskDocument, ids: readonly string[], status: RiskDocument['risks'][number]['status']): RiskDocument => ({
+    ...d,
+    risks: d.risks.map((risk) => (ids.includes(risk.riskId) ? { ...risk, status } : risk)),
+  });
+
+  it('sets every risk with a reason to Review needed, with one change log entry that names the app and the reason', () => {
+    const reviews = automaticReviews(doc, '2026-10-30');
+    expect(reviews.map((review) => review.riskId)).toEqual(ICT);
+    expect(reviews[0]?.reasons.map((reason) => reason.text)).toEqual(['KRI-1 of appetite statement AP-1 fires on the observation of 2026-10-27.']);
+    const next = reviewed(doc);
+    expect(next.risks.filter((risk) => risk.status === 'Review needed').map((risk) => risk.riskId)).toEqual(ICT);
+    expect(documentErrors(next)).toEqual([]);
+    const entries = appEntries(next);
+    expect(entries.map((entry) => entry.entityId)).toEqual(ICT);
+    expect(entries[0]).toMatchObject({
+      at: AT,
+      actor: 'PortaRegulus Risk (automatic review). KRI-1 of appetite statement AP-1 fires on the observation of 2026-10-27.',
+      entityKind: 'risk',
+      entityId: 'R-01',
+      path: '',
+      before: { status: 'Open' },
+      after: { status: 'Review needed' },
+    });
+  });
+
+  it('writes nothing for a risk that has the status Review needed already', () => {
+    const next = reviewed(withStatus(doc, ['R-01'], 'Review needed'));
+    expect(appEntries(next).map((entry) => entry.entityId)).toEqual(ICT.slice(1));
+    // A second check writes nothing, because every risk with a reason has the status now.
+    expect(automaticReviews(next, '2026-10-30')).toEqual([]);
+    expect(reviewed(next)).toBe(next);
+  });
+
+  it('acts once per reason, so a person ends the review, and a new observation acts again', () => {
+    const closed = withStatus(reviewed(doc), ICT, 'Monitored');
+    expect(automaticReviews(closed, '2026-10-30')).toEqual([]);
+    // KRI-1 fires again on a later observation.
+    const statement = withObservation(statementOf(closed, 'AP-1'), { observedOn: '2026-11-15', values: { days_since_restore_test: 230 } });
+    const later: RiskDocument = { ...closed, appetite: { ...closed.appetite, statements: (closed.appetite?.statements ?? []).map((item) => (item.id === 'AP-1' ? statement : item)) } };
+    expect(automaticReviews(later, '2026-11-15').map((review) => review.reasons[0]?.text)).toEqual(ICT.map(() => 'KRI-1 of appetite statement AP-1 fires on the observation of 2026-11-15.'));
+  });
+
+  it('skips the reasons that acted in this visit, so undo keeps the change back', () => {
+    const done = new Set(automaticReviews(doc, '2026-10-30').flatMap((review) => review.reasons.map((reason) => reasonKey(review.riskId, reason))));
+    expect(automaticReviews(doc, '2026-10-30', done)).toEqual([]);
+  });
+
+  it('starts reviews for a passed review date and an expired acceptance, and each date is its own reason', () => {
+    const due: RiskDocument = { ...doc, risks: doc.risks.map((risk) => (risk.riskId === 'R-06' ? { ...risk, reviewDue: '2027-01-31' } : risk)) };
+    const first = reviewed(due, '2027-10-21');
+    const texts = Object.fromEntries(appEntries(first).map((entry) => [entry.entityId, entry.actor]));
+    expect(texts['R-05']).toBe('PortaRegulus Risk (automatic review). The acceptance expired on 2027-10-20.');
+    expect(texts['R-06']).toBe('PortaRegulus Risk (automatic review). The review was due on 2027-01-31.');
+    // After the review a person sets a new review date. When it passes, the app acts again.
+    const renewed = withStatus(first, ['R-06'], 'Open');
+    const moved: RiskDocument = { ...renewed, risks: renewed.risks.map((risk) => (risk.riskId === 'R-06' ? { ...risk, reviewDue: '2028-01-31' } : risk)) };
+    expect(automaticReviews(moved, '2027-10-21').map((review) => review.riskId)).not.toContain('R-06');
+    expect(automaticReviews(moved, '2028-02-01').find((review) => review.riskId === 'R-06')?.reasons.map((reason) => reason.kind)).toEqual(['review-due']);
+  });
+
+  it('the save keeps the entries of the app and writes no second entry for the risks they explain', () => {
+    const draft = reviewed(doc);
+    const saved = withChangeLog(doc, draft, '2026-10-30T09:00:05Z');
+    expect(saved.changeLog).toEqual(draft.changeLog);
+    // A change of a person in the same save gets its own entry, after the entries of the app.
+    const both: RiskDocument = { ...draft, risks: draft.risks.map((risk) => (risk.riskId === 'R-02' ? { ...risk, notes: 'Checked.' } : risk)) };
+    const log = withChangeLog(doc, both, '2026-10-30T09:00:05Z').changeLog ?? [];
+    expect(log.filter((entry) => entry.actor === undefined).map((entry) => entry.entityId)).toEqual(['R-02']);
+    expect(log.slice(-ICT.length).every((entry) => entry.actor?.startsWith(APP_ACTOR) === true)).toBe(true);
+  });
+
+  it('a draft log that is an older copy of the saved log adds no entry', () => {
+    const first = withChangeLog(doc, { ...doc, risks: doc.risks.map((risk) => (risk.riskId === 'R-01' ? { ...risk, notes: 'A.' } : risk)) }, '2026-10-30T09:00:00Z');
+    // The second save of the same risk within 10 minutes replaces the last entry.
+    const second = withChangeLog(first, { ...first, risks: first.risks.map((risk) => (risk.riskId === 'R-01' ? { ...risk, notes: 'B.' } : risk)) }, '2026-10-30T09:01:00Z');
+    // A draft that still holds the log of the first save.
+    const stale: RiskDocument = { ...second, changeLog: first.changeLog ?? [], risks: second.risks.map((risk) => (risk.riskId === 'R-02' ? { ...risk, notes: 'C.' } : risk)) };
+    const log = withChangeLog(second, stale, '2026-10-30T09:02:00Z').changeLog ?? [];
+    expect(log.map((entry) => entry.entityId)).toEqual(['R-01', 'R-02']);
   });
 });
 

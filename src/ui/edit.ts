@@ -113,10 +113,18 @@ const COALESCE_MS = 10 * 60 * 1000;
 
 // SPEC.md Sec. 6.18. One change log entry per change, built on the saved log. A second change
 // of the same entity and path by the same actor within 10 minutes updates that entry and keeps
-// its "before", so autosave does not add an entry per pause in typing.
+// its "before", so autosave does not add an entry per pause in typing. Entries that the draft
+// added after the saved log, such as the automatic reviews of screen S6, stay, and an entity
+// change that one of them explains gets no second entry. A draft log that does not start with
+// the saved log is an older copy of it and adds nothing.
 export function withChangeLog(saved: RiskDocument, draft: RiskDocument, at: string, actor?: string): RiskDocument {
   const log = [...(saved.changeLog ?? [])];
+  const draftLog = draft.changeLog ?? [];
+  const own = draftLog.length > log.length && log.every((entry, i) => draftLog[i] === entry) ? draftLog.slice(log.length) : [];
+  const explained = new Map(own.map((entry) => [`${entry.entityKind} ${entry.entityId}`, entry]));
   for (const change of documentChanges(saved, draft)) {
+    const by = explained.get(`${change.entityKind} ${change.entityId}`);
+    if (by !== undefined && 'after' in by && 'after' in change && canonicalize(by.after ?? null) === canonicalize(change.after ?? null)) continue;
     const last = log.at(-1);
     const recent =
       last !== undefined &&
@@ -133,5 +141,5 @@ export function withChangeLog(saved: RiskDocument, draft: RiskDocument, at: stri
       log.push({ at, entityKind: change.entityKind, entityId: change.entityId, path: change.path, ...(actor === undefined ? {} : { actor }), ...('before' in change ? { before: change.before } : {}), ...after });
     }
   }
-  return withValue(draft, 'changeLog', log);
+  return withValue(draft, 'changeLog', [...log, ...own]);
 }
