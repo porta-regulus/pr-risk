@@ -7,6 +7,14 @@ updates:
     groups:
       dev-tools:
         dependency-type: development
+    ignore:
+      # typescript-eslint 8.72 supports TypeScript below 6.1 only (DEPENDENCIES.md).
+      # Remove this rule when a typescript-eslint release supports the newer TypeScript.
+      - dependency-name: typescript
+        versions: ['>=6.1.0']
+      # The major of the Node types follows the Node runtime in .nvmrc, not the newest types.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:
