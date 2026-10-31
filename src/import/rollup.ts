@@ -22,6 +22,19 @@ export function threePoint(values: readonly number[], polarity: 'negative' | 'po
 }
 
 export type DisparityLayout = 'one-row-per-response' | 'one-row-all-responses';
+export type ResponseCostRule = 'total' | 'exposure-weighted-average';
+
+// SP 800-221r1 lines 1661 to 1664 and SPEC.md Sec. 6.15 item 4. The total is the default. The
+// weighted average weights each cost by the exposure rating of its source, so a source with a
+// larger expected loss or gain counts more. When every exposure rating is 0, it is the plain
+// mean. The result is rounded to whole currency units, as exposureRating is.
+export function responseCost(sources: readonly Risk[], rule: ResponseCostRule): number {
+  const total = sources.reduce((sum, source) => sum + source.riskResponseCost, 0);
+  if (rule === 'total' || sources.length === 0) return total;
+  const weights = sources.reduce((sum, source) => sum + source.exposureRating, 0);
+  if (weights === 0) return Math.round(total / sources.length);
+  return Math.round(sources.reduce((sum, source) => sum + source.riskResponseCost * source.exposureRating, 0) / weights);
+}
 
 export interface SummaryOptions {
   readonly id: string;
@@ -31,6 +44,7 @@ export interface SummaryOptions {
   readonly layout: DisparityLayout;
   readonly riskResponseDescription?: string;
   readonly priority?: number;
+  readonly costRule?: ResponseCostRule;
 }
 
 function summary(sources: readonly Risk[], id: string, options: SummaryOptions, types: Risk['riskResponseType']): Risk {
@@ -52,13 +66,21 @@ function summary(sources: readonly Risk[], id: string, options: SummaryOptions, 
     riskImpact: impact.mostLikely,
     exposureRating: Math.round(likelihood.mostLikely * impact.mostLikely),
     riskResponseType: types,
-    riskResponseCost: sources.reduce((sum, source) => sum + source.riskResponseCost, 0),
+    riskResponseCost: responseCost(sources, options.costRule ?? 'total'),
     riskResponseDescription: options.riskResponseDescription ?? `Responses of the sources ${sources.map((source) => source.riskId).join(', ')}.`,
     riskOwnerPointOfContact: options.riskOwnerPointOfContact,
     status: 'Open',
     responseDecision: 'decided',
     sourceRefs: sources.map((source) => ({ registerId: source.registerId, riskId: source.riskId, label: source.riskId })),
-    rollUp: { method: 'nist-three-point', disparityLayout: options.layout, likelihood, impact },
+    // Without responseCostRule the cost is the total, as in schema 1.0.0. So only the
+    // weighted average writes the field, and a summary with the total stays a 1.0.0 entry.
+    rollUp: {
+      method: 'nist-three-point',
+      disparityLayout: options.layout,
+      likelihood,
+      impact,
+      ...(options.costRule === 'exposure-weighted-average' ? { responseCostRule: options.costRule } : {}),
+    },
   };
   if (options.priority !== undefined) risk.priority = options.priority;
   // A number that a source takes from its labels stays marked as defaulted (rules D-Q1 and D-Q3).

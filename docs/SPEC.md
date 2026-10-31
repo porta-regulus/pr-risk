@@ -380,7 +380,7 @@ Sec. 5.1.1 gives a decision rule that the app shows as a suggestion. If exposure
 
 1. **ERR view (Fig. 10).** Columns ID, Pri., Risk Description, Risk Category, Financial Impact (OpEx, CapEx), Reputation Impact, Mission Impact, Likelihood, Exposure Rating, Risk Response, Risk Owner, Status. Golden test G1.
 2. **ERP view (Fig. 11).** One block per enterprise objective, headed "<KIND> OBJECTIVE" and the statement. Rows per risk with Impact and Likelihood, each with Last, Current and Residual. Then Current Risk Response (`detail.implementedResponseDescription`), Proposed Risk Response (`riskResponseDescription`) and Risk Owner. Last comes from `previousAssessment`, Residual from `detail.planned`. Golden test G5.
-3. **Portfolio view (Table 7, partial).** Rows are the registers of the tree (Enterprise, then each child). Columns are current and previous period, with EAL for the financial profile and the highest reputation and mission labels. The Table 7 sub-columns are out of scope (Sec. 3.2).
+3. **Portfolio view (Table 7, partial).** Rows are the registers of the tree (Enterprise, then each child). Columns are current and previous period, with EAL for the financial profile and the highest reputation and mission labels. The previous period comes from `previousAssessment`. "Close the period" on S7 copies the current assessment of each open risk in scope into it. It copies labels and the impact split, and numbers only when they are not in `defaultedFields`, because the previous assessment has no `defaultedFields` (hard rule 2). The Table 7 sub-columns are out of scope (Sec. 3.2).
 4. **Breakdown (Fig. 12).** The category tree (code, subcode, risk) is the risk breakdown structure.
 5. **Leadership decisions (Sec. 4.4).** The decision record (Sec. 4).
 
@@ -396,7 +396,7 @@ Sec. 5.1.1 gives a decision rule that the app shows as a suggestion. If exposure
 1. **Aggregation.** The parent view lists all child entries grouped by category, with source tags of the form register letter and number (for example A-1) as in line 1595.
 2. **Normalization actions (Table 10).** De-duplicate and combine (merge selected rows into one summary entry with `sourceRefs`). Reprioritize (`priorityOverride`). Resolve disparities (layout `one-row-per-response` or `one-row-all-responses`). Adjudicate key risks (escalation threshold).
 3. **Three-point roll-up** of the summary values (Sec. 8.15).
-4. **Integrating details (Sec. 5.2.3).** Raw child entries stay visible from the summary entry. Response cost roll-up is the total by default, or the weighted average if the user chooses it. The summary owner is an organization-level person. Status values are the common enum.
+4. **Integrating details (Sec. 5.2.3).** Raw child entries stay visible from the summary entry. Response cost roll-up is the total by default, or the weighted average if the user chooses it. The weight of each source cost is the exposure rating of the source, so a source with a larger expected loss or gain counts more. When every exposure rating is 0, the weighted average is the plain mean. The result is rounded to whole currency units. `rollUp.responseCostRule` records the weighted average. Without it the cost is the total. The summary owner is an organization-level person. Status values are the common enum.
 5. **Response consistency (Sec. 5.3).** Lint L-10 flags summary entries whose sources have different response types, so leaders can "clarify which treatment is the appropriate response".
 
 ### 6.16 Adjusting responses and priorities (Sec. 5.3, 5.3.1, 5.3.3, 5.4.4)
@@ -451,12 +451,12 @@ Sec. 5.1.1 gives a decision rule that the app shows as a suggestion. If exposure
 | `objectiveIds`, `assetIds`, `horizon`, `threatSourceType` | none | `assetsAffected`, `threatSourcesActors` text | props | 2.4.4, 3.3 |
 | `estimate` | none (N8) | in `currentRiskAnalysis` | props, group `estimate` | 3.4 |
 | `driverLinks`, `linkedRisks`, `onlyWithResponse` | none | in `dependencies` | props | 2.4.1, 3.3.2, 3.6 |
-| `previousAssessment` | none | none | props | 4.3 |
+| `previousAssessment` (with `impacts` since 1.1.0) | none | none | props | 4.3 |
 | `detail.*` | none | same names | `description`, `statement`, props | Fig. 15 |
 | `detail.planned` | none | `likelihoodAfterControlsWillBe`, `impactAfterControls`, `expectedExposureRating` | facets, state adjusted | Fig. 15, Fig. 11 Residual |
 | `detail.measured` | none | `actualResponseCost`, `likelihoodAfterControlsAreInPlaceWillBe`, `impactAfterControlsAreInPlace`, `finalExposureRating` | remediation props | Fig. 15 |
 | `detail.implementedResponseDescription`, `detail.residualResponseAsImplemented` | none (N17) | none | props | Fig. 11, Fig. 15 |
-| `sourceRefs`, `rollUp` | none | suffix of `riskIdNumbers` | props | 5.2.1, 5.2.2 |
+| `sourceRefs`, `rollUp` (with `responseCostRule` since 1.1.0) | none | suffix of `riskIdNumbers` | props | 5.2.1, 5.2.2, 5.2.3 |
 | `evidence` | none | `sourceOfRiskInformation` | props | 3.3.3 |
 | `reviewDue` | none | `followUpDate` default | `risk.deadline` | Fig. 15 |
 | `defaultedFields` | none | none | prop | |
@@ -549,7 +549,7 @@ Errors (V) block save or import. Warnings (L) show in the UI and in the record a
 | V-08 | In a quantitative register, every leaf risk has an `estimate`. |
 | V-09 | `responseDecision` pending implies response `["Accept"]` with cost 0. |
 | V-10 | Lognormal lower is below upper. PERT min, mode, max are in order. |
-| V-11 | Every label (current, previous, planned, measured, impacts) is on `strategy.scales`. |
+| V-11 | Every label (current, previous, planned, measured, impacts, previous impacts) is on `strategy.scales`. |
 | V-12 | Tolerance curve loss strictly ascending, probability strictly descending. |
 | V-13 | Frequency upper bound at most 100 per year. Trials 1 000 to 1 000 000. |
 | V-14 | Response effects target an existing risk or driver. Bundles list existing options. |
@@ -574,7 +574,7 @@ Errors (V) block save or import. Warnings (L) show in the UI and in the record a
 
 ### 7.7 Schema versioning
 
-1. `schemaVersion` is semantic. Release 1 is `1.0.0`. The `$id` contains the version.
+1. `schemaVersion` is semantic. The `$id` contains the version. Version `1.1.0` adds two optional fields, `previousAssessment.impacts` and `rollUp.responseCostRule`. A `1.0.0` document is also a valid `1.1.0` document, so the schema accepts both values and the app needs no migration. The app writes `1.1.0` when it saves. It refuses a newer minor version, for example `1.2.0`, because that can hold fields that the app does not know.
 2. A new optional field is a minor version. A changed meaning or a new required field is a major version.
 3. The app reads the current and the previous major version and migrates the previous one on import, with a provenance record.
 4. When NIST publishes the final SP 800-221r1 or new IR 8286 schemas, vendor the new files, keep the old ones, add a migration test, and update the concept id table (Sec. 3.1).

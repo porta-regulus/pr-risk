@@ -42,14 +42,16 @@ export function labelFields(risk: Risk): [string, ScaleName, string | undefined]
       [`detail.${part}.exposureRatingLabel`, 'exposure', block?.exposureRatingLabel],
     );
   }
-  const impacts = risk.impacts;
-  out.push(
-    ['impacts.financial.opex', 'impact', impacts?.financial?.opex?.label],
-    ['impacts.financial.capex', 'impact', impacts?.financial?.capex?.label],
-    ['impacts.reputation', 'impact', impacts?.reputation?.label],
-    ['impacts.mission', 'impact', impacts?.mission?.label],
-    ['impacts.safety', 'impact', impacts?.safety?.label],
-  );
+  // Schema 1.1.0 adds the impact split of the previous period.
+  for (const [prefix, impacts] of [['impacts', risk.impacts], ['previousAssessment.impacts', previous?.impacts]] as const) {
+    out.push(
+      [`${prefix}.financial.opex`, 'impact', impacts?.financial?.opex?.label],
+      [`${prefix}.financial.capex`, 'impact', impacts?.financial?.capex?.label],
+      [`${prefix}.reputation`, 'impact', impacts?.reputation?.label],
+      [`${prefix}.mission`, 'impact', impacts?.mission?.label],
+      [`${prefix}.safety`, 'impact', impacts?.safety?.label],
+    );
+  }
   return out;
 }
 

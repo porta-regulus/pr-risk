@@ -112,7 +112,7 @@ export type Risk = RiskRegister & {
    */
   onlyWithResponse?: string;
   /**
-   * Sec. 4.3 Fig. 11 Last column and Table 7 Previous Period.
+   * Sec. 4.3 Fig. 11 Last column and Table 7 Previous Period. impacts is since 1.1.0, for the reputation and mission profiles of the previous period.
    */
   previousAssessment?: {
     asOf?: Date;
@@ -122,6 +122,7 @@ export type Risk = RiskRegister & {
     riskLikelihoodLabel?: string;
     riskImpactLabel?: string;
     exposureRatingLabel?: string;
+    impacts?: Impacts;
   };
   /**
    * Sec. 5.3.1, 5.3.3 and 5.4.4. A priority set by leadership, with the reason.
@@ -197,7 +198,10 @@ export type ResponseEffect1 = {
  */
 export interface PortaRegulusRiskRegisterExchangeDocument {
   $schema?: string;
-  schemaVersion: "1.0.0";
+  /**
+   * Sec. 7.7. A 1.0.0 document is also a valid 1.1.0 document, because 1.1.0 adds optional fields only. The app writes 1.1.0.
+   */
+  schemaVersion: "1.0.0" | "1.1.0";
   document: DocumentInfo;
   context?: Context;
   governance?: Governance;
@@ -784,6 +788,10 @@ export interface RollUp {
   disparityLayout: "one-row-per-response" | "one-row-all-responses";
   likelihood?: ThreePointValue;
   impact?: ThreePointValue;
+  /**
+   * Since 1.1.0. SP 800-221r1 lines 1661 to 1664. total is the sum of the source costs. exposure-weighted-average weights each source cost by its exposure rating, and is the plain mean when every exposure rating is 0. Without this field the cost is the total.
+   */
+  responseCostRule?: "total" | "exposure-weighted-average";
 }
 /**
  * This interface was referenced by `PortaRegulusRiskRegisterExchangeDocument`'s JSON-Schema

@@ -11446,5 +11446,179 @@
    "threatVectors": "Physical Connectivity Disruption",
    "vulnerabilityPredisposingConditions": "Outdoor/Exposed Infrastructure"
   }
+ },
+ "labelFields": {
+  "fields": [
+   [
+    "riskLikelihoodLabel",
+    "likelihood",
+    "likelihood"
+   ],
+   [
+    "riskImpactLabel",
+    "impact",
+    "impact"
+   ],
+   [
+    "exposureRatingLabel",
+    "exposure",
+    "exposure"
+   ],
+   [
+    "previousAssessment.riskLikelihoodLabel",
+    "likelihood",
+    "prev likelihood"
+   ],
+   [
+    "previousAssessment.riskImpactLabel",
+    "impact",
+    "prev impact"
+   ],
+   [
+    "previousAssessment.exposureRatingLabel",
+    "exposure",
+    "prev exposure"
+   ],
+   [
+    "detail.planned.likelihoodLabel",
+    "likelihood",
+    "planned likelihood"
+   ],
+   [
+    "detail.planned.impactLabel",
+    "impact",
+    "planned impact"
+   ],
+   [
+    "detail.planned.exposureRatingLabel",
+    "exposure",
+    "planned exposure"
+   ],
+   [
+    "detail.measured.likelihoodLabel",
+    "likelihood",
+    "measured likelihood"
+   ],
+   [
+    "detail.measured.impactLabel",
+    "impact",
+    "measured impact"
+   ],
+   [
+    "detail.measured.exposureRatingLabel",
+    "exposure",
+    "measured exposure"
+   ],
+   [
+    "impacts.financial.opex",
+    "impact",
+    "opex"
+   ],
+   [
+    "impacts.financial.capex",
+    "impact",
+    "capex"
+   ],
+   [
+    "impacts.reputation",
+    "impact",
+    "reputation"
+   ],
+   [
+    "impacts.mission",
+    "impact",
+    "mission"
+   ],
+   [
+    "impacts.safety",
+    "impact",
+    "safety"
+   ],
+   [
+    "previousAssessment.impacts.financial.opex",
+    "impact",
+    "prev opex"
+   ],
+   [
+    "previousAssessment.impacts.financial.capex",
+    "impact",
+    "prev capex"
+   ],
+   [
+    "previousAssessment.impacts.reputation",
+    "impact",
+    "prev reputation"
+   ],
+   [
+    "previousAssessment.impacts.mission",
+    "impact",
+    "prev mission"
+   ],
+   [
+    "previousAssessment.impacts.safety",
+    "impact",
+    "prev safety"
+   ]
+  ],
+  "risk": {
+   "detail": {
+    "measured": {
+     "exposureRatingLabel": "measured exposure",
+     "impactLabel": "measured impact",
+     "likelihoodLabel": "measured likelihood"
+    },
+    "planned": {
+     "exposureRatingLabel": "planned exposure",
+     "impactLabel": "planned impact",
+     "likelihoodLabel": "planned likelihood"
+    }
+   },
+   "exposureRatingLabel": "exposure",
+   "impacts": {
+    "financial": {
+     "capex": {
+      "label": "capex"
+     },
+     "opex": {
+      "label": "opex"
+     }
+    },
+    "mission": {
+     "label": "mission"
+    },
+    "reputation": {
+     "label": "reputation"
+    },
+    "safety": {
+     "label": "safety"
+    }
+   },
+   "previousAssessment": {
+    "exposureRatingLabel": "prev exposure",
+    "impacts": {
+     "financial": {
+      "capex": {
+       "label": "prev capex"
+      },
+      "opex": {
+       "label": "prev opex"
+      }
+     },
+     "mission": {
+      "label": "prev mission"
+     },
+     "reputation": {
+      "label": "prev reputation"
+     },
+     "safety": {
+      "label": "prev safety"
+     }
+    },
+    "riskImpactLabel": "prev impact",
+    "riskLikelihoodLabel": "prev likelihood"
+   },
+   "riskImpactLabel": "impact",
+   "riskLikelihoodLabel": "likelihood"
+  }
  }
 }

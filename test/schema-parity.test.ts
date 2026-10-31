@@ -7,11 +7,13 @@ import {
   documentErrors,
   formatG,
   importRdr,
+  labelFields,
   nistExportErrors,
   nistRdrErrors,
   projectRdr,
   projectRegister,
   semanticErrors,
+  type Risk,
   type RiskDocument,
 } from '../src/schema';
 import { EXAMPLE_NAMES, example, nistRdrExample, readJson } from './schema-helpers';
@@ -20,6 +22,7 @@ interface Parity {
   examples: Record<string, { semanticErrors: string[]; risks: Record<string, { register: unknown; rdr: unknown }> }>;
   g4: { document: RiskDocument; rdr: Record<string, unknown> };
   formatG: [number, string][];
+  labelFields: { risk: Risk; fields: [string, string, string][] };
 }
 
 const parity = readJson('test/fixtures/python-parity.json') as Parity;
@@ -72,6 +75,13 @@ describe('G4 Fig. 15 RDR round trip (SPEC.md Sec. 12.2)', () => {
     for (const [key, value] of Object.entries(original)) expect(rdr[key], key).toEqual(value);
     expect(Object.keys(rdr).filter((key) => !(key in original))).toEqual(['currentRiskAnalysis']);
     expect(canonicalize(rdr)).toBe(canonicalize(parity.g4.rdr));
+  });
+});
+
+describe('Rule V-11 label fields (schema 1.1.0 adds previousAssessment.impacts)', () => {
+  it('lists the same labels in the same order as validate.py label_fields', () => {
+    expect(labelFields(parity.labelFields.risk)).toEqual(parity.labelFields.fields);
+    expect(parity.labelFields.fields.map(([field]) => field)).toContain('previousAssessment.impacts.reputation');
   });
 });
 

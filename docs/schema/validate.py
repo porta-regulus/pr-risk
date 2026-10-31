@@ -52,11 +52,12 @@ def label_fields(r: dict) -> list:
         blk = r.get("detail", {}).get(part, {})
         out += [(f"detail.{part}." + k, s, blk.get(k)) for k, s in
                 (("likelihoodLabel", "likelihood"), ("impactLabel", "impact"), ("exposureRatingLabel", "exposure"))]
-    imp = r.get("impacts", {})
-    for k in ("opex", "capex"):
-        out.append((f"impacts.financial.{k}", "impact", imp.get("financial", {}).get(k, {}).get("label")))
-    for k in ("reputation", "mission", "safety"):
-        out.append((f"impacts.{k}", "impact", imp.get(k, {}).get("label")))
+    # Schema 1.1.0 adds the impact split of the previous period.
+    for prefix, imp in (("impacts", r.get("impacts", {})), ("previousAssessment.impacts", prev.get("impacts", {}))):
+        for k in ("opex", "capex"):
+            out.append((f"{prefix}.financial.{k}", "impact", imp.get("financial", {}).get(k, {}).get("label")))
+        for k in ("reputation", "mission", "safety"):
+            out.append((f"{prefix}.{k}", "impact", imp.get(k, {}).get("label")))
     return out
 
 

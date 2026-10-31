@@ -1,6 +1,6 @@
 // IndexedDB storage (ADR-0004 decision 1, SPEC.md Sec. 10 item 3). The working copy of
 // every document stays in this browser. Autosave keeps 20 versions for undo.
-import { documentErrors } from '../schema/document';
+import { documentErrors, SCHEMA_VERSION } from '../schema/document';
 import type { RiskDocument } from '../schema/types';
 
 const DB_NAME = 'pr-risk';
@@ -67,8 +67,10 @@ export function openDb(): Promise<IDBDatabase> {
 const versionKey = (id: string, version: number): string => `${id}\u0000${String(version).padStart(10, '0')}`;
 
 // Saves a valid document as a new version and keeps the last 20 versions. A save after an
-// undo removes the versions after the current one, as in an editor.
-export async function saveDocument(db: IDBDatabase, doc: RiskDocument, now = new Date().toISOString()): Promise<StoredDocument> {
+// undo removes the versions after the current one, as in an editor. A save writes the
+// current schema version, because a 1.0.0 document is also a valid 1.1.0 document.
+export async function saveDocument(db: IDBDatabase, given: RiskDocument, now = new Date().toISOString()): Promise<StoredDocument> {
+  const doc: RiskDocument = given.schemaVersion === SCHEMA_VERSION ? given : { ...given, schemaVersion: SCHEMA_VERSION };
   const errors = documentErrors(doc);
   if (errors.length > 0) throw new Error(`The document is not valid: ${errors[0]?.message ?? ''}`);
   const tx = db.transaction(['documents', 'versions'], 'readwrite');
