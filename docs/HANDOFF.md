@@ -302,6 +302,8 @@ Open for the product owner.
 
 ### Task 12. Release 1 and AT-7 (SPEC.md Sec. 12.7)
 
+Status 2026-10-31. The repository is public since 2026-10-31. Private vulnerability reporting, Dependabot alerts and security updates, secret scanning with push protection, and immutable releases are on. Scorecard publishes 7.2 on https://api.scorecard.dev (run 41242967570, commit b64506e). The next step is the test tag (D3). AT-7 can pass on the day that the test tag passes.
+
 Status 2026-10-30. AT-7 cannot pass while the repository is private. The code is not the cause. The organization `porta-regulus` has the GitHub Team plan. On that plan, artifact attestations work only in public repositories, and code scanning in a private repository needs a Code Security licence. AT-7 can pass 1 to 3 working days after the repository becomes public. It does not have to wait for 2027-01-28.
 
 Pull request #14 added this section and fixed 5 workflow gaps. It was merged on 2026-10-30.
@@ -321,7 +323,7 @@ Scorecard scores (Scorecard 5.6.0). Pull request #14 has the score of each check
 |---|---|
 | Private, CLI run on 2026-10-30, before pull request #14 | 6.7 |
 | Measured. Private, pull request #14 and ruleset A, Scorecard workflow on `main` on 2026-10-30 (run 41122185865). CI-Tests -1. | 7.1 |
-| Plus `statuses: read`, private or public. CI-Tests 10. | 7.2 |
+| Plus `statuses: read`, private or public. CI-Tests 10. Measured on `main` on 2026-10-31, public and published (run 41242967570). | 7.2 |
 | Plus a first release with the `.intoto.jsonl` file | 7.4 |
 | Plus the Best Practices badge, level passing | 7.5 |
 | Plus CodeQL on all of the last 30 commits | 7.7 |
@@ -336,21 +338,21 @@ The Maintained clock started on 2026-10-30, the creation date. A change of visib
 
 Plan.
 1. Done 2026-10-30. Merge the workflow change (pull request #14).
-2. The product owner makes the repository public (D1). CI already scans every commit for secrets with gitleaks.
-3. Same day. The product owner sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
-4. Same day. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Expected 7.2.
+2. Done 2026-10-31. The product owner makes the repository public (D1). CI already scans every commit for secrets with gitleaks. A check of all 125 commits before the change found no secrets, personal paths or internal host names.
+3. Done 2026-10-31. The product owner sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
+4. Done 2026-10-31. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Measured 7.2.
 5. Same day, after approval (D3). Push the test tag `v0.1.0-rc.1`. Check that the prerelease has 6 files, and run the verify commands of the release notes. This meets task 1 done criterion 3. Expected Scorecard 7.4.
 6. Day 1 to 2. The product owner makes the entry on https://www.bestpractices.dev (D5). The answers with evidence URLs are in [`docs/release/best-practices-answers.md`](release/best-practices-answers.md) (draft 2026-10-30). Its section 1 lists 5 steps to do before the entry.
 7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are closed (S1 notices on storage encryption and browser extensions, a check of each stored record on read, `docs/self-host.md`, 3 statements in `SECURITY.md`). F5, F6 and F8 to F11 need the product owner.
 8. Tag release 1 when AT-5 and AT-6 pass (D7).
 
-Earliest date. If the repository becomes public on Monday 2026-11-02, AT-7 can pass on Wednesday 2026-11-04. Release 1 is on that date or on the date that AT-5 and AT-6 pass, whichever is later.
+Earliest date. The repository became public on Saturday 2026-10-31. AT-7 can pass on the day that the test tag passes (D3). Release 1 is on that date or on the date that AT-5 and AT-6 pass, whichever is later.
 
 Decisions for the product owner.
-1. D1. The date to make the repository public. AT-7 cannot pass before that date.
+1. D1. Done 2026-10-31. The date to make the repository public. AT-7 cannot pass before that date.
 2. D2. Done 2026-10-30. Ruleset A is active on `main` (ruleset ID 26223939, no bypass actor). It requires 5 checks from the GitHub Actions app. These are "Lint, type check and unit tests", "Build and Playwright", "OSCAL POA&M exports pass oscal-cli (AT-4)", "Schema and reference model checks" and "No secret in the git history (gitleaks)". The performance job and CodeQL are not required, because they run only while the repository is public and a slow runner must not block a merge. Change to ruleset B when a second maintainer exists.
 3. D3. Approval of the test tag `v0.1.0-rc.1`. The deploy job is skipped while the repository variables are empty. If you set the variables first, the test tag deploys to production.
-4. D4. Immutable releases. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number, for example `v0.1.0-rc.2`.
+4. D4. Done 2026-10-31, immutable releases are on. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number, for example `v0.1.0-rc.2`.
 5. D5. The Best Practices entry needs the GitHub account of a project member.
 6. D6. Who writes and who signs the Annex I self-check, and where it is published.
 7. D7. The version number of release 1. `package.json` has `0.1.0-rc.1`.
