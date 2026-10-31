@@ -2,6 +2,7 @@
 import { rankOf } from '../schema/rules';
 import type { Register, Risk, RiskDocument, ScaleBand } from '../schema/types';
 import { findHeaderRow, mapColumns, type Target } from './columns';
+import { valueAt } from './stated';
 import {
   guessCategory,
   guessLocale,
@@ -37,6 +38,8 @@ export interface TableResult {
   readonly registers: Register[];
   readonly warnings: string[];
   readonly columnMapping: Record<string, string>;
+  // Per riskId, the JSON Pointers of the fields that the row states (Sec. 9.7).
+  readonly stated: Record<string, readonly string[]>;
   readonly unmapped: readonly string[];
   readonly unmatchedLabels: { readonly likelihood: string[]; readonly impact: string[]; readonly exposure: string[] };
 }
@@ -54,6 +57,18 @@ const DEFAULTED_ORDER = [
   '/riskResponseDescription',
   '/riskOwnerPointOfContact',
   '/status',
+] as const;
+
+// Fields that a row holds only when the file states them.
+const OPTIONAL_STATED = [
+  '/priority',
+  '/impacts/financial/opex/label',
+  '/impacts/financial/capex/label',
+  '/impacts/reputation/label',
+  '/impacts/mission/label',
+  '/detail/implementedResponseDescription',
+  '/objectiveIds',
+  '/reviewDue',
 ] as const;
 
 function bandOf(bands: readonly ScaleBand[] | undefined, label: string | undefined): ScaleBand | undefined {
@@ -91,6 +106,7 @@ export function tableToRisks(doc: RiskDocument, rows: readonly (readonly string[
   const existingRegisters = new Set(doc.registers.map((register) => register.id));
   const newRegisters = new Map<string, Register>();
   const asOf = options.asOf ?? new Date().toISOString().slice(0, 10);
+  const statedRows: string[][] = [];
 
   const risks = body.map((row, index): Risk => {
     const defaulted = new Set<string>();
@@ -161,7 +177,8 @@ export function tableToRisks(doc: RiskDocument, rows: readonly (readonly string[
       impact = Math.round(exposure / likelihood);
       defaulted.add('/riskImpact');
     }
-    if (likelihood === undefined || impact === undefined || exposure === undefined) {
+    const placeholder = likelihood === undefined || impact === undefined || exposure === undefined;
+    if (placeholder) {
       // Rule D-Q2. Placeholders, listed as defaulted.
       for (const field of ['/riskLikelihood', '/riskImpact', '/exposureRating']) defaulted.add(field);
       likelihood ??= 0;
@@ -261,6 +278,27 @@ export function tableToRisks(doc: RiskDocument, rows: readonly (readonly string[
       else warnings.push(`Row ${riskId} has the review date "${review}", which is not a YYYY-MM-DD date. It is left out.`);
     }
     risk['defaultedFields'] = DEFAULTED_ORDER.filter((field) => defaulted.has(field));
+
+    // The fields that the row states. A take incoming changes only these (Sec. 9.7).
+    const stated: string[] = [];
+    if (cell(row, 'registerId') !== undefined) stated.push('/registerId');
+    if (cell(row, 'riskDescription') !== undefined) stated.push('/riskDescription');
+    // The numbers go together (rule V-07). Placeholders are not stated.
+    if (!placeholder) {
+      stated.push('/riskLikelihood', '/riskImpact', '/exposureRating');
+      for (const label of ['riskLikelihoodLabel', 'riskImpactLabel', 'exposureRatingLabel']) if (label in risk) stated.push(`/${label}`);
+    }
+    for (const field of ['/riskCategory', '/riskResponseDescription', '/riskOwnerPointOfContact']) if (!defaulted.has(field)) stated.push(field);
+    if (statusText !== undefined && status.known) stated.push('/status');
+    if (!defaulted.has('/riskResponseType')) {
+      // The polarity and the cost go with the response type (rules V-04 and V-09).
+      stated.push('/riskResponseType', '/responseDecision');
+      if (types.some((type) => type !== 'Accept')) stated.push('/polarity');
+      if (!defaulted.has('/riskResponseCost')) stated.push('/riskResponseCost');
+    }
+    if (options.polarity?.[riskId] !== undefined && !stated.includes('/polarity')) stated.push('/polarity');
+    for (const pointer of OPTIONAL_STATED) if (valueAt(risk, pointer) !== undefined) stated.push(pointer);
+    statedRows.push(stated);
     return risk as unknown as Risk;
   });
 
@@ -290,6 +328,7 @@ export function tableToRisks(doc: RiskDocument, rows: readonly (readonly string[
     registers: [...newRegisters.values()],
     warnings,
     columnMapping,
+    stated: Object.fromEntries(risks.map((risk, index) => [risk.riskId, statedRows[index] ?? []])),
     unmapped: mapping.unmapped,
     unmatchedLabels: { likelihood: [...unmatched.likelihood], impact: [...unmatched.impact], exposure: [...unmatched.exposure] },
   };

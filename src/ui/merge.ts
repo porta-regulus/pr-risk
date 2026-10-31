@@ -1,6 +1,6 @@
 // The merge choice of an import on screen S1 (SPEC.md Sec. 9.7). The diff rows per matched
 // entity, the choices that go to commitImport, and the text after the commit.
-import type { Choice, DiffEntry, ImportPreview } from '../import/pipeline';
+import type { Choice, DiffEntry, ImportChoices, ImportPreview, RegisterChoice } from '../import/pipeline';
 import { canonicalize } from '../schema/canonical';
 import type { RiskDocument } from '../schema/types';
 
@@ -62,42 +62,57 @@ export function mergeEntities(doc: RiskDocument, preview: ImportPreview): MergeE
   }));
 }
 
-// The choices for commitImport. A changed risk gets the choice of the user, else 'incoming' as
-// in commitImport. A matched risk without a change gets 'current', so it adds no entry with
-// equal before and after to the change log.
-export function importChoices(doc: RiskDocument, preview: ImportPreview, selected: Readonly<Record<string, Choice>>): Record<string, Choice> {
-  const existing = new Set(doc.risks.map((risk) => risk.riskId));
-  const changed = new Set(preview.diff.filter((entry) => entry.kind === 'risk').map((entry) => entry.id));
-  const choices: Record<string, Choice> = {};
-  for (const risk of preview.risks) {
-    if (!existing.has(risk.riskId)) continue;
-    choices[risk.riskId] = changed.has(risk.riskId) ? (selected[risk.riskId] ?? 'incoming') : 'current';
+const changedIds = (preview: ImportPreview, kind: DiffEntry['kind']): Set<string> => new Set(preview.diff.filter((entry) => entry.kind === kind).map((entry) => entry.id));
+
+// The choices for commitImport. A changed entity gets the choice of the user, else 'incoming'
+// as in commitImport. A matched entity without a change gets 'current'.
+export function importChoices(doc: RiskDocument, preview: ImportPreview, selected: ImportChoices): Required<ImportChoices> {
+  const risks: Record<string, Choice> = {};
+  const changedRisks = changedIds(preview, 'risk');
+  const existingRisks = new Set(doc.risks.map((risk) => risk.riskId));
+  for (const { riskId } of preview.risks) {
+    if (existingRisks.has(riskId)) risks[riskId] = changedRisks.has(riskId) ? (selected.risks?.[riskId] ?? 'incoming') : 'current';
   }
-  return choices;
+  const registers: Record<string, RegisterChoice> = {};
+  const changedRegisters = changedIds(preview, 'register');
+  const existingRegisters = new Set(doc.registers.map((register) => register.id));
+  for (const { id } of preview.registers) {
+    if (existingRegisters.has(id)) registers[id] = changedRegisters.has(id) ? (selected.registers?.[id] ?? 'incoming') : 'current';
+  }
+  return { risks, registers };
 }
 
 // Risks of the file with an id of the open document and no changed field.
 export function unchangedRisks(doc: RiskDocument, preview: ImportPreview): number {
-  return Object.values(importChoices(doc, preview, {})).filter((choice) => choice === 'current').length;
+  return Object.values(importChoices(doc, preview, {}).risks).filter((choice) => choice === 'current').length;
 }
 
 const count = (n: number, one: string, many: string): string => `${String(n)} ${n === 1 ? one : many}`;
 
-// The message after a merge. New risks and risks with 'incoming' or 'both' are saved.
-export function mergeResultText(fileName: string, preview: ImportPreview, choices: Readonly<Record<string, Choice>>): string {
-  const changed = new Set(preview.diff.filter((entry) => entry.kind === 'risk').map((entry) => entry.id));
+// The message after a merge. New risks and risks with 'incoming' or 'both' are saved. A
+// changed register with 'incoming' is updated.
+export function mergeResultText(fileName: string, preview: ImportPreview, choices: ImportChoices): string {
+  const changed = changedIds(preview, 'risk');
   let saved = 0;
   let kept = 0;
   let same = 0;
   for (const risk of preview.risks) {
-    const choice = choices[risk.riskId] ?? 'incoming';
+    const choice = choices.risks?.[risk.riskId] ?? 'incoming';
     if (choice !== 'current') saved += 1;
     else if (changed.has(risk.riskId)) kept += 1;
     else same += 1;
   }
+  const registers = [...changedIds(preview, 'register')];
+  const updated = registers.filter((id) => (choices.registers?.[id] ?? 'incoming') === 'incoming').length;
+  const keptRegisters = registers.length - updated;
   return [
     `${count(saved, 'risk', 'risks')} from ${fileName} ${saved === 1 ? 'is' : 'are'} saved.`,
     ...(kept === 0 ? [] : [`${count(kept, 'risk keeps its', 'risks keep their')} current version.`]),
     ...(same === 0 ? [] : [`${count(same, 'risk has', 'risks have')} no change.`]),
+    ...(updated === 0 ? [] : [`${count(updated, 'register is', 'registers are')} updated.`]),
+    ...(keptRegisters === 0 ? [] : [`${count(keptRegisters, 'register keeps its', 'registers keep their')} current version.`]),
   ].join(' ');
 }
+
+// The text of each choice that an entity of this kind has.
+export const choicesOf = (kind: DiffEntry['kind']): Choice[] => (kind === 'risk' ? ['current', 'incoming', 'both'] : ['current', 'incoming']);
