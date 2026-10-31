@@ -69,7 +69,7 @@ Ratings.
 | F7 | `SECURITY.md` does not say that a security fix comes as its own release, or what happens to a report about a third-party component. | II 2, II 6 | `SECURITY.md` has both statements, and says how users learn about a fix. | Build session | Closed 2026-10-30 |
 | F8 | While the repository is private, CodeQL does not run, and private vulnerability reporting, secret scanning and Dependabot alerts are off. | I 2(a), II 2, II 3, II 6 | Turn them on when the repository becomes public (HANDOFF.md task 12, plan step 3). | Product owner | Open |
 | F9 | The manual test of ADR-0004 D3 in Safari is not done. | I 2(h) | Do the test in task 9 and write the result in HANDOFF.md. | Product owner | Open |
-| F10 | No release exists, so no SBOM, attestation or release note exists yet. | I 2(a), II 1 | Check the files of the test tag `v0.1.0-rc.1` (D3). | Product owner | Open |
+| F10 | No release exists, so no SBOM, attestation or release note exists yet. | I 2(a), II 1 | Check the files of the test tag `v0.1.0-rc.2` (D3). The first test tag `v0.1.0-rc.1` failed before a release, see HANDOFF task 12. | Product owner | Open |
 | F11 | This check assumes that the mailbox `security@portaregulus.com` exists and that a person reads it. | II 6 | Confirm the mailbox and who reads it. | Product owner | Open |
 
 ## 5. Sign-off
