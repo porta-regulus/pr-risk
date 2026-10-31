@@ -356,10 +356,10 @@ Decisions for the product owner.
 1. D1. Done 2026-10-31. The date to make the repository public. AT-7 cannot pass before that date.
 2. D2. Done 2026-10-30. Ruleset A is active on `main` (ruleset ID 26223939, no bypass actor). It requires 5 checks from the GitHub Actions app. These are "Lint, type check and unit tests", "Build and Playwright", "OSCAL POA&M exports pass oscal-cli (AT-4)", "Schema and reference model checks" and "No secret in the git history (gitleaks)". The performance job and CodeQL are not required, because they run only while the repository is public and a slow runner must not block a merge. Change to ruleset B when a second maintainer exists.
 3. D3. Done 2026-10-31. Approval of the test tag. `v0.1.0-rc.1` failed before a release, and `v0.1.0-rc.2` passed. The deploy job is skipped while the repository variables are empty. If you set the variables first, the test tag deploys to production.
-4. D4. Done 2026-10-31, immutable releases are on. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number. The next free test tag is `v0.1.0-rc.3`.
+4. D4. Done 2026-10-31, immutable releases are on. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number. The next free test tag is `v1.0.0-rc.1` (D7).
 5. D5. The Best Practices entry needs the GitHub account of a project member.
 6. D6. Who writes and who signs the Annex I self-check, and where it is published.
-7. D7. The version number of release 1. `package.json` has `0.1.0-rc.2`.
+7. D7. Done 2026-10-31. Release 1 is `1.0.0`. Users read a `0.x` version as beta, and the file format has its own schema version, so the app version can show stability. The test tags before release 1 are `v1.0.0-rc.N`. `package.json` has `1.0.0-rc.1`.
 
 ## 6. Rules for the build session
 
