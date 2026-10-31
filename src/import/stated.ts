@@ -36,10 +36,16 @@ function setAt(root: Json, path: readonly string[], value: unknown): void {
   else root[key] = child;
 }
 
+// Each number with its label.
 const LABELS = [
-  ['riskLikelihood', 'riskLikelihoodLabel'],
-  ['riskImpact', 'riskImpactLabel'],
-  ['exposureRating', 'exposureRatingLabel'],
+  ['/riskLikelihood', '/riskLikelihoodLabel'],
+  ['/riskImpact', '/riskImpactLabel'],
+  ['/exposureRating', '/exposureRatingLabel'],
+  ...['planned', 'measured'].flatMap((block) => [
+    [`/detail/${block}/likelihood`, `/detail/${block}/likelihoodLabel`],
+    [`/detail/${block}/impact`, `/detail/${block}/impactLabel`],
+    [`/detail/${block}/exposureRating`, `/detail/${block}/exposureRatingLabel`],
+  ]),
 ] as const;
 
 export function statedVersion(current: Risk, incoming: Risk, stated: readonly string[]): Risk {
@@ -47,9 +53,8 @@ export function statedVersion(current: Risk, incoming: Risk, stated: readonly st
   for (const pointer of stated) setAt(result, pathOf(pointer), valueAt(incoming, pointer));
   const taken = new Set(stated);
   // A label that the file does not state stays only while its number stays.
-  const before = current as unknown as Json;
   for (const [number, label] of LABELS) {
-    if (!taken.has(`/${label}`) && result[number] !== before[number]) Reflect.deleteProperty(result, label);
+    if (!taken.has(label) && valueAt(result, number) !== valueAt(current, number)) setAt(result, pathOf(label), undefined);
   }
   // A field is defaulted when its value is an importer default. Stated fields take that mark
   // from the file, the other fields keep it.

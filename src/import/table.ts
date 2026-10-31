@@ -283,11 +283,9 @@ export function tableToRisks(doc: RiskDocument, rows: readonly (readonly string[
     const stated: string[] = [];
     if (cell(row, 'registerId') !== undefined) stated.push('/registerId');
     if (cell(row, 'riskDescription') !== undefined) stated.push('/riskDescription');
-    // The numbers go together (rule V-07). Placeholders are not stated.
-    if (!placeholder) {
-      stated.push('/riskLikelihood', '/riskImpact', '/exposureRating');
-      for (const label of ['riskLikelihoodLabel', 'riskImpactLabel', 'exposureRatingLabel']) if (label in risk) stated.push(`/${label}`);
-    }
+    // The numbers go together (rule V-07). Placeholders are not stated, but a label of the row is.
+    if (!placeholder) stated.push('/riskLikelihood', '/riskImpact', '/exposureRating');
+    for (const label of ['riskLikelihoodLabel', 'riskImpactLabel', 'exposureRatingLabel']) if (label in risk) stated.push(`/${label}`);
     for (const field of ['/riskCategory', '/riskResponseDescription', '/riskOwnerPointOfContact']) if (!defaulted.has(field)) stated.push(field);
     if (statusText !== undefined && status.known) stated.push('/status');
     if (!defaulted.has('/riskResponseType')) {

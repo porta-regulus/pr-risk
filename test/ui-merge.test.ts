@@ -95,6 +95,7 @@ describe('take incoming from a file with only some fields', () => {
       'SYS-A,1,Text,0.1,1000,Exploit,500,Open',
       'SYS-A,2,Text,0.1,1000,Accept,,Unknown word',
       'SYS-A,3,,,,,,',
+      'SYS-A,4,Text,High,High,,,',
     ].join('\n');
     const result = tableToRisks(doc3, parseCsv(csvText), { register: doc3.registers[0] });
     expect(result.stated['1']).toEqual([
@@ -111,8 +112,10 @@ describe('take incoming from a file with only some fields', () => {
     ]);
     // Accept does not fix the polarity. An empty cell and an unknown status are not stated.
     expect(result.stated['2']).toEqual(['/registerId', '/riskDescription', '/riskLikelihood', '/riskImpact', '/exposureRating', '/riskResponseType', '/responseDecision']);
-    // Placeholder numbers (rule D-Q2) are not stated.
+    // Placeholder numbers (rule D-Q2) are not stated. Example 3 has no scales, so the labels give
+    // no numbers, but the row states the labels.
     expect(result.stated['3']).toEqual(['/registerId']);
+    expect(result.stated['4']).toEqual(['/registerId', '/riskDescription', '/riskLikelihoodLabel', '/riskImpactLabel']);
   });
 
   it('keeps the fields that a NIST IR 8286 entry does not hold', () => {
@@ -142,6 +145,35 @@ describe('take incoming from a file with only some fields', () => {
     const merged = commitImport(doc3, nist);
     expect(riskOf(merged, 'A-1')?.notes).toBe(a1?.notes);
     expect(riskOf(merged, 'A-1')?.category).toEqual(a1?.category);
+  });
+
+  it('changes only the planned and measured values that an RDR states', () => {
+    const a1 = riskOf(doc3, 'A-1') as Risk;
+    const detail = { planned: { likelihood: 0.05, likelihoodLabel: 'Low', impact: 2000000, exposureRating: 100000 }, measured: { actualResponseCost: 1000 } };
+    const doc = { ...doc3, risks: doc3.risks.map((risk) => (risk.riskId === 'A-1' ? { ...risk, detail } : risk)) } as RiskDocument;
+    const rdr = { riskIdNumbers: 'A-1', comments: 'New comment', likelihoodAfterControlsWillBe: 0.02 };
+    const nist = prepareImport(doc, { fileName: 'rdr.json', bytes: new TextEncoder().encode(JSON.stringify([rdr])) }, { ir8286RegisterId: 'SYS-A', importedOn: IMPORTED_ON });
+    expect(nist.errors).toEqual([]);
+    const merged = riskOf(commitImport(doc, nist), 'A-1');
+    // The RDR has no other planned or measured value, so the others stay. The label of the changed number goes.
+    expect(merged?.detail).toEqual({ planned: { likelihood: 0.02, impact: 2000000, exposureRating: 100000 }, measured: { actualResponseCost: 1000 }, comments: 'New comment' });
+    expect(merged?.riskLikelihood).toBe(a1.riskLikelihood);
+  });
+
+  it('changes the cost only with a stated response type (rule V-09)', () => {
+    const doc = {
+      ...doc3,
+      risks: doc3.risks.map((risk) => (risk.riskId === 'A-1' ? { ...risk, responseDecision: 'pending', riskResponseType: ['Accept'], riskResponseCost: 0 } : risk)),
+    } as RiskDocument;
+    const files = [
+      [{ riskId: 'A-1', riskResponseCost: 5000 }],
+      [{ riskIdNumbers: 'A-1', plannedResponseCost: 5000 }],
+    ];
+    for (const items of files) {
+      const nist = prepareImport(doc, { fileName: 'cost.json', bytes: new TextEncoder().encode(JSON.stringify(items)) }, { ir8286RegisterId: 'SYS-A', importedOn: IMPORTED_ON });
+      expect(nist.errors).toEqual([]);
+      expect(riskOf(commitImport(doc, nist), 'A-1')).toMatchObject({ responseDecision: 'pending', riskResponseType: ['Accept'], riskResponseCost: 0 });
+    }
   });
 });
 
