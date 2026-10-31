@@ -300,6 +300,8 @@ Pull request #14 added this section and fixed 5 workflow gaps. It was merged on 
 
 A sixth fix gives the Scorecard job the permission `statuses: read`. Without it, CI-Tests on the private repository stops with HTTP 403 on the commit statuses API and gives -1, so the check is not counted. A public repository does not need this permission.
 
+On 2026-10-31, 2 new advisories for the dev dependencies glob and minimatch took Vulnerabilities to 8 and the score on `main` to 7.0. The fixed versions are new major versions that eslint 10 and cacache 19 do not accept yet. `osv-scanner.toml` ignores the 2 advisories until 2026-12-01, with the reasons. Before that date, remove the entries when Dependabot brings the fixed versions, or check them again. One more open advisory takes 7.0 to 6.9.
+
 Scorecard scores (Scorecard 5.6.0). Pull request #14 has the score of each check.
 
 | State | Score |
