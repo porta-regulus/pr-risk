@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { decrypt, encrypt, ITERATIONS, WrongPassphraseError } from '../src/export/encryption';
 import { exportCsv, exportIr8286, exportNative, guardCell, hasDefaultedNumbers } from '../src/export/export';
 import { decodeText, parseCsv } from '../src/import/csv';
-import { canonicalize, readDocument, REGISTER_FIELDS, type RiskDocument } from '../src/schema';
+import { canonicalize, readDocument, REGISTER_FIELDS } from '../src/schema';
 import { example, EXAMPLE_1, EXAMPLE_2 } from './schema-helpers';
 
 describe('native JSON', () => {
@@ -43,7 +43,7 @@ describe('IR 8286 JSON', () => {
 
   it('rule E-01 refuses a file that fails the NIST schema', () => {
     const doc = example(EXAMPLE_2);
-    const broken = { ...doc, risks: doc.risks.map((risk, i) => (i === 0 ? { ...risk, riskId: 7 as unknown as string } : risk)) } as RiskDocument;
+    const broken = { ...doc, risks: doc.risks.map((risk, i) => (i === 0 ? { ...risk, riskId: 7 as unknown as string } : risk)) };
     const result = exportIr8286(broken);
     expect(result.ok).toBe(false);
     expect('errors' in result && result.errors.length).toBeGreaterThan(0);

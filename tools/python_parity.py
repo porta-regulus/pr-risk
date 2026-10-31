@@ -44,6 +44,25 @@ def g4() -> dict:
     return {"document": doc, "rdr": validate.project_rdr(doc, risk)}
 
 
+def label_fields() -> dict:
+    """Rule V-11 checks the same labels in the same order as labelFields in rules.ts.
+
+    Each label is distinct, so a field in the wrong place shows. Schema 1.1.0 adds
+    previousAssessment.impacts.
+    """
+    def impacts(p: str) -> dict:
+        return {"financial": {"opex": {"label": p + "opex"}, "capex": {"label": p + "capex"}},
+                "reputation": {"label": p + "reputation"}, "mission": {"label": p + "mission"},
+                "safety": {"label": p + "safety"}}
+    risk = {"riskLikelihoodLabel": "likelihood", "riskImpactLabel": "impact", "exposureRatingLabel": "exposure",
+            "previousAssessment": {"riskLikelihoodLabel": "prev likelihood", "riskImpactLabel": "prev impact",
+                                   "exposureRatingLabel": "prev exposure", "impacts": impacts("prev ")},
+            "detail": {part: {"likelihoodLabel": part + " likelihood", "impactLabel": part + " impact",
+                              "exposureRatingLabel": part + " exposure"} for part in ("planned", "measured")},
+            "impacts": impacts("")}
+    return {"risk": risk, "fields": [list(item) for item in validate.label_fields(risk)]}
+
+
 def format_g_cases() -> list:
     rng = random.Random(20261207)
     values = [0.0, -0.0, 1.0, 0.1, 0.5, 2.5, 1e-5, 1.5e-5, 0.0001, 0.00012345678, 123456.0, 1234565.0,
@@ -61,5 +80,6 @@ def format_g_cases() -> list:
 
 
 if __name__ == "__main__":
-    json.dump({"examples": examples(), "g4": g4(), "formatG": format_g_cases()}, sys.stdout, indent=1, sort_keys=True)
+    json.dump({"examples": examples(), "g4": g4(), "formatG": format_g_cases(), "labelFields": label_fields()},
+              sys.stdout, indent=1, sort_keys=True)
     sys.stdout.write("\n")

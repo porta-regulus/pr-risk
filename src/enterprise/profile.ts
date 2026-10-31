@@ -105,9 +105,8 @@ export function withoutObjective(doc: RiskDocument, registerId?: string): Risk[]
 // One row of the portfolio view. The financial profile is the expected annual loss. The sum of
 // the exposure ratings gives it, because an expected value adds up over risks. With a
 // simulation, the screen shows the simulated value of the register with its standard error
-// instead, as screen S4 does, and the entries outside the simulation separately. The document
-// keeps no reputation or mission label of the previous period, so those profiles have the
-// current period only.
+// instead, as screen S4 does, and the entries outside the simulation separately. The reputation
+// and mission profiles of the previous period come from previousAssessment.impacts (schema 1.1.0).
 export interface PortfolioRow {
   readonly entries: number;
   readonly current: number;
@@ -122,6 +121,8 @@ export interface PortfolioRow {
   readonly previousEntries: number;
   readonly reputation?: string;
   readonly mission?: string;
+  readonly previousReputation?: string;
+  readonly previousMission?: string;
 }
 
 const DEFAULTED = ['/riskLikelihood', '/riskImpact', '/exposureRating'];
@@ -165,6 +166,14 @@ export function portfolioRow(doc: RiskDocument, registerId?: string): PortfolioR
     doc,
     risks.map((risk) => risk.impacts?.mission?.label),
   );
+  const previousReputation = highest(
+    doc,
+    risks.map((risk) => risk.previousAssessment?.impacts?.reputation?.label),
+  );
+  const previousMission = highest(
+    doc,
+    risks.map((risk) => risk.previousAssessment?.impacts?.mission?.label),
+  );
   return {
     entries: risks.length,
     current: risks.reduce((sum, risk) => sum + risk.exposureRating, 0),
@@ -175,5 +184,7 @@ export function portfolioRow(doc: RiskDocument, registerId?: string): PortfolioR
     previousEntries: previous.length,
     ...(reputation === undefined ? {} : { reputation }),
     ...(mission === undefined ? {} : { mission }),
+    ...(previousReputation === undefined ? {} : { previousReputation }),
+    ...(previousMission === undefined ? {} : { previousMission }),
   };
 }

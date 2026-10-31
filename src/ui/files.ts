@@ -1,4 +1,5 @@
 // File save and new-document helpers for the screens.
+import { SCHEMA_VERSION } from '../schema/document';
 import type { RiskDocument } from '../schema/types';
 
 // Saves text as a file through a temporary blob link. The app sends nothing over the network.
@@ -33,7 +34,7 @@ export function slug(text: string): string {
 export function newDocument(title: string, organization: string, currency: string, now = new Date()): RiskDocument {
   const iso = now.toISOString().replace(/\.\d{3}Z$/, 'Z');
   return {
-    schemaVersion: '1.0.0',
+    schemaVersion: SCHEMA_VERSION,
     document: {
       id: `doc-${crypto.randomUUID()}`,
       title,

@@ -117,12 +117,13 @@ test('S7 shows the simulated expected annual loss of example 2 with its standard
 // Combined description quoted from SP 800-221r1 lines 1624 to 1625.
 const ORG_1 = 'External malicious party uses malicious code to exfiltrate sensitive business-related documents.';
 
-async function merge(page: Page, layout: string, added: string): Promise<void> {
+async function merge(page: Page, layout: string, added: string, cost = 'Total of the sources'): Promise<void> {
   for (const id of ['A-1', 'B-1', 'C-1']) await page.getByRole('checkbox', { name: `Select ${id}` }).check();
   await expect(page.getByLabel('Id of the summary entry')).toHaveValue('ORG-1');
   await expect(page.getByLabel('Risk owner')).toHaveValue('Business unit risk manager');
   await page.getByLabel('Combined risk description').fill(ORG_1);
   await page.getByLabel('Different responses').selectOption({ label: layout });
+  await page.getByLabel('Response cost').selectOption({ label: cost });
   await page.getByRole('button', { name: 'Merge the 3 selected entries' }).click();
   await expect(page.getByRole('status').filter({ hasText: added })).toBeVisible();
   await expect(page.locator('section[aria-labelledby="normalize-title"] ul.errors')).toHaveCount(0);
@@ -166,13 +167,14 @@ test('G3. S7 merges A-1, B-1 and C-1 of example 3 with both layouts of Table 10'
   await expect(org1.locator('.types')).toHaveText('Mitigate, Accept');
   await expect(org1.locator('.likelihood')).toHaveText('0.1000, 0.2000, 0.3000');
   await expect(org1.locator('.impact')).toHaveText('400,000, 800,000, 2,000,000');
+  await expect(org1.locator('.cost .sub')).toHaveText('Total of the sources');
   await expect(warning).toBeVisible();
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
   await expectAccessible(page, 'S7 of example 3 with a summary entry');
 
   // (c) and (d). One row per response, with the n = 2 and n = 1 rules of Sec. 8.15.
   await org1.getByRole('button', { name: 'Remove ORG-1' }).click();
-  await merge(page, 'One row per response', 'ORG-1 and ORG-1.2 are added to Business unit risk register.');
+  await merge(page, 'One row per response', 'ORG-1 and ORG-1.2 are added to Business unit risk register.', 'Average weighted by exposure rating');
   const mitigate = page.locator('table.summaries tr[data-risk="ORG-1"]');
   const accept = page.locator('table.summaries tr[data-risk="ORG-1.2"]');
   await expect(mitigate.locator('.types')).toHaveText('Mitigate');
@@ -184,6 +186,7 @@ test('G3. S7 merges A-1, B-1 and C-1 of example 3 with both layouts of Table 10'
   expect(await sourcesOf(page, 'ORG-1.2').evaluateAll((items) => items.map((item) => item.getAttribute('data-source')))).toEqual(['C-1']);
   await expect(accept.locator('.likelihood')).toHaveText('0.2000, 0.2000, 0.2000');
   await expect(accept.locator('.impact')).toHaveText('800,000, 800,000, 800,000');
+  await expect(mitigate.locator('.cost .sub')).toHaveText('Average weighted by exposure rating');
   await expect(page.locator('.warnings').filter({ hasText: 'L-10' })).toHaveCount(0);
   await expect(page.locator('table.entries tr[data-risk="C-1"] .note')).toHaveText('In ORG-1.2');
   await expectNoOverflow(page);
@@ -195,5 +198,31 @@ test('G3. S7 merges A-1, B-1 and C-1 of example 3 with both layouts of Table 10'
   await page.getByRole('button', { name: 'Enterprise view' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Enterprise view' })).toBeFocused();
   await expect(page.locator('table.summaries tbody tr')).toHaveCount(2);
+  expect(problems).toEqual([]);
+});
+
+test('S7 closes the period of example 1, the portfolio shows the previous labels, and undo takes the close back', async ({ page }) => {
+  const problems = watchProblems(page);
+  await open(page, EXAMPLE_1, 'Enterprise view');
+  const err = page.locator('table.portfolio tr[data-register="ERR"]');
+  await expect(err.locator('td.reputation')).toHaveText('High');
+  await expect(err.locator('td.reputation-previous')).toHaveText('No label');
+  await expect(err.locator('td.mission-previous')).toHaveText('No label');
+
+  await page.getByLabel('Registers', { exact: true }).selectOption({ label: 'Notional Enterprise Risk Register' });
+  await page.getByLabel('End of the period').fill('2026-10-31');
+  await page.getByRole('button', { name: 'Close the period for 9 open risks' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'The current assessment of 9 risks is now the previous period, as of 2026-10-31.' })).toBeVisible();
+  await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
+  await expect(err.locator('td.reputation-previous')).toHaveText('High');
+  await expect(err.locator('td.mission-previous')).toHaveText('High');
+  // Numbers that come from labels are not copied, so the financial previous period stays empty.
+  await expect(err.locator('td.previous')).toHaveText('Not recorded');
+  await expectAccessible(page, 'S7 after the close of a period');
+  await expectNoOverflow(page);
+
+  await page.getByRole('button', { name: 'Undo last change' }).click();
+  await expect(page.getByRole('status').filter({ hasText: /Version \d+ is back\./ })).toBeVisible();
+  await expect(err.locator('td.reputation-previous')).toHaveText('No label');
   expect(problems).toEqual([]);
 });

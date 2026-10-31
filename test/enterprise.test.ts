@@ -4,9 +4,10 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { childEntries, mergeResult, parentRegisters, referencesTo, summaryEntries, withMerge, withoutRisk } from '../src/enterprise/normalize';
+import { closePeriod } from '../src/enterprise/period';
 import { erpBlocks, portfolioRow, profileRisks, withoutObjective } from '../src/enterprise/profile';
 import { decodeText, parseCsv } from '../src/import/csv';
-import type { SummaryOptions } from '../src/import/rollup';
+import { responseCost, type SummaryOptions } from '../src/import/rollup';
 import { documentErrors, lint, nistExportErrors, type Risk, type RiskDocument } from '../src/schema';
 import { assessedText } from '../src/ui/enterprise';
 import { ERR_COLUMNS, errCells } from '../src/ui/err';
@@ -313,5 +314,86 @@ describe('Portfolio view by register and period (Sec. 6.13 item 3)', () => {
     const doc = example(EXAMPLE_3);
     expect(portfolioRow(doc, 'ORG')).toMatchObject({ entries: 4, current: 160_000 + 150_000, defaulted: 2 });
     expect(portfolioRow(doc, 'SYS-A')).toMatchObject({ entries: 1, current: 200_000 });
+  });
+});
+
+describe('Response cost of a summary entry (Sec. 6.15 item 4, schema 1.1.0)', () => {
+  const base = riskOf(example(EXAMPLE_3), 'A-1');
+  const source = (riskId: string, riskResponseCost: number, exposureRating: number): Risk => ({ ...base, riskId, riskResponseCost, exposureRating });
+
+  it('is the total by default, and the weighted average weights each cost by the exposure rating of its source', () => {
+    const sources = [source('X-1', 10_000, 300_000), source('X-2', 40_000, 100_000)];
+    expect(responseCost(sources, 'total')).toBe(50_000);
+    // (10 000 x 300 000 + 40 000 x 100 000) / 400 000
+    expect(responseCost(sources, 'exposure-weighted-average')).toBe(17_500);
+  });
+
+  it('is the plain mean when every exposure rating is 0, rounded to whole currency units', () => {
+    expect(responseCost([source('X-1', 10_000, 0), source('X-2', 5_001, 0)], 'exposure-weighted-average')).toBe(7_501);
+  });
+
+  it('records the weighted average in rollUp, and the total writes no rule, as in schema 1.0.0', () => {
+    const doc = withoutRisk(example(EXAMPLE_3), 'ORG-1');
+    const sources = [source('A-1', 30_000, 200_000), source('B-1', 10_000, 120_000), source('C-1', 50_000, 160_000)].map((item) => ({ ...riskOf(doc, item.riskId), riskResponseCost: item.riskResponseCost }));
+    const costed = { ...doc, risks: doc.risks.map((risk) => sources.find((item) => item.riskId === risk.riskId) ?? risk) };
+    const options: SummaryOptions = { id: 'ORG-1', registerId: 'ORG', riskDescription: 'Combined.', riskOwnerPointOfContact: 'CISO', layout: 'one-row-all-responses' };
+    const weighted = mergeResult(costed, { sources, options: { ...options, costRule: 'exposure-weighted-average' } });
+    const total = mergeResult(costed, { sources, options });
+    if (!('rows' in weighted) || !('rows' in total)) throw new Error('The merge failed');
+    expect(weighted.rows[0]?.riskResponseCost).toBe(responseCost(sources, 'exposure-weighted-average'));
+    expect(weighted.rows[0]?.rollUp?.responseCostRule).toBe('exposure-weighted-average');
+    expect(total.rows[0]?.riskResponseCost).toBe(90_000);
+    expect(total.rows[0]?.rollUp && 'responseCostRule' in total.rows[0].rollUp).toBe(false);
+    expect(documentErrors(withMerge(costed, weighted.rows))).toEqual([]);
+  });
+});
+
+describe('Close the period (Sec. 6.13 item 3, schema 1.1.0)', () => {
+  it('copies the labels and the impact split of each open risk, but no number from a label (hard rule 2)', () => {
+    const doc = example(EXAMPLE_1);
+    const result = closePeriod(doc, 'ERR', '2026-10-31');
+    expect(result.closed).toBe(9);
+    const one = riskOf(result.doc, '1');
+    expect(one.previousAssessment).toEqual({
+      asOf: '2026-10-31',
+      exposureRatingLabel: riskOf(doc, '1').exposureRatingLabel,
+      ...(riskOf(doc, '1').riskLikelihoodLabel === undefined ? {} : { riskLikelihoodLabel: riskOf(doc, '1').riskLikelihoodLabel }),
+      impacts: riskOf(doc, '1').impacts,
+    });
+    expect(riskOf(result.doc, '8')).toBe(riskOf(doc, '8'));
+    expect(riskOf(result.doc, 'F11-1')).toBe(riskOf(doc, 'F11-1'));
+    expect(documentErrors(result.doc)).toEqual([]);
+    expect(portfolioRow(result.doc, 'ERR')).toMatchObject({ reputation: 'High', mission: 'High', previousReputation: 'High', previousMission: 'High', previousEntries: 0 });
+  });
+
+  it('copies estimated numbers, replaces the old previous assessment and keeps the scope to the subtree', () => {
+    const doc = example(EXAMPLE_2);
+    const result = closePeriod(doc, 'PROD-A', '2026-12-31');
+    expect(result.closed).toBe(2);
+    const r8 = riskOf(doc, 'R-08');
+    expect(riskOf(result.doc, 'R-08').previousAssessment).toEqual({ asOf: '2026-12-31', riskLikelihood: r8.riskLikelihood, riskImpact: r8.riskImpact, exposureRating: r8.exposureRating });
+    expect(riskOf(result.doc, 'R-01')).toBe(riskOf(doc, 'R-01'));
+    expect(portfolioRow(result.doc, 'PROD-A')).toMatchObject({ previous: portfolioRow(doc, 'PROD-A').current, previousEntries: 2 });
+    expect(closePeriod(doc, 'CORP', '2026-12-31').closed).toBe(8);
+    expect(documentErrors(result.doc)).toEqual([]);
+  });
+
+  it('removes the previous assessment of a risk whose current one has only placeholders', () => {
+    const doc = example(EXAMPLE_3);
+    const gw = riskOf(doc, 'GW-1');
+    const withOld = { ...doc, risks: doc.risks.map((risk) => (risk === gw ? { ...gw, previousAssessment: { asOf: '2025-12-31', exposureRating: 1_000 } } : risk)) };
+    const result = closePeriod(withOld, 'GW', '2026-12-31');
+    expect(riskOf(result.doc, 'GW-1').previousAssessment).toBeUndefined();
+    expect(documentErrors(result.doc)).toEqual([]);
+  });
+
+  it('gives the highest previous reputation and mission labels of the scope', () => {
+    const doc = example(EXAMPLE_1);
+    const lowered = {
+      ...doc,
+      risks: doc.risks.map((risk) => (risk.registerId === 'ERR' ? { ...risk, previousAssessment: { asOf: '2025-12-31', impacts: { reputation: { label: risk.riskId === '7' ? 'Mod' : 'Low' } } } } : risk)),
+    };
+    expect(portfolioRow(lowered, 'ERR')).toMatchObject({ previousReputation: 'Mod' });
+    expect(portfolioRow(lowered, 'ERR').previousMission).toBeUndefined();
   });
 });
