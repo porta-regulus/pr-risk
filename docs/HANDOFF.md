@@ -234,7 +234,7 @@ Automatic Review needed (`automaticReviews` and `withAutomaticReview` in `src/mo
 
 Answers of the product owner, 2026-10-31. The owner asked for a proposal on both open items and accepted it.
 1. A breached tolerance starts a review. A KRI only warns before the tolerance breaches, so a breach is the stronger reason. Without this rule, a statement with a tolerance and no KRI never starts a review, for example AP-2 of example 2. The rule covers the `breachWhen` of an appetite statement only. A breach of the tolerance curve is a result for the whole roll-up, and it would set every risk to "Review needed", so it stays on S4 and S5.
-2. The reasons go into the new optional field `reasons` of a change log entry. The field is in schema 1.1.0 and needs no 1.2.0, because 1.1.0 has no release yet (no tag, the repository is private). A 1.1.0 document without the field stays valid. After the first release, a new field needs a new minor version (Sec. 7.7 item 2).
+2. The reasons go into the new optional field `reasons` of a change log entry. The field is in schema 1.1.0 and needs no 1.2.0, because 1.1.0 has no release yet (no tag). A 1.1.0 document without the field stays valid. After the first release, a new field needs a new minor version (Sec. 7.7 item 2).
 
 ### Task 7. S7 Enterprise view
 
