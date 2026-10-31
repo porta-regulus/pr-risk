@@ -291,32 +291,36 @@ Open for the product owner.
 
 Status 2026-10-30. AT-7 cannot pass while the repository is private. The code is not the cause. The organization `porta-regulus` has the GitHub Team plan. On that plan, artifact attestations work only in public repositories, and code scanning in a private repository needs a Code Security licence. AT-7 can pass 1 to 3 working days after the repository becomes public. It does not have to wait for 2027-01-28.
 
-The pull request that adds this section fixes 5 workflow gaps.
+Pull request #14 added this section and fixed 5 workflow gaps. It was merged on 2026-10-30.
 1. `release.yml`. `SHA256SUMS` and the per-file list are now attestation subjects. Both Sigstore bundles are release files (`pr-risk-<tag>.intoto.jsonl` and `pr-risk-<tag>.sbom.intoto.jsonl`). Scorecard Signed-Releases reads release files only, not the attestation API. Without these files, the first release gives Signed-Releases 0, and the score falls below 7.0.
 2. `release.yml`. The release notes give the verify commands and add the GitHub generated notes, for the Best Practices criterion `release_notes`.
 3. `scorecard.yml`. Scorecard runs on the private repository too, without publishing, and stores a JSON result. This meets task 1 done criterion 4. The SARIF upload runs only while the repository is public.
 4. `scorecard.yml` and `codeql.yml`. A schedule event has no webhook payload, so `github.event.repository.private` is empty there, and the Monday runs would start on the private repository and fail. A first job now gets the visibility from the API.
 5. `osv-scanner.toml`. The OSV records for npm `xlsx` have no fixed version, so Scorecard Vulnerabilities flagged CVE-2023-30533 and CVE-2024-22363. SheetJS fixed them in 0.19.3 and 0.20.2, and the lockfile pins 0.20.3. The file ignores the 2 IDs with these reasons. Vulnerabilities goes from 8 to 10.
 
-Scorecard estimate (Scorecard 5.6.0). The pull request has the score of each check.
+A sixth fix gives the Scorecard job the permission `statuses: read`. Without it, CI-Tests on the private repository stops with HTTP 403 on the commit statuses API and gives -1, so the check is not counted. A public repository does not need this permission.
+
+Scorecard scores (Scorecard 5.6.0). Pull request #14 has the score of each check.
 
 | State | Score |
 |---|---|
-| Now, private, CLI run on 2026-10-30 | 6.7 |
-| This change merged, repository public, no ruleset, no release | 6.9 |
-| Plus ruleset A on `main` | 7.2 |
+| Private, CLI run on 2026-10-30, before pull request #14 | 6.7 |
+| Measured. Private, pull request #14 and ruleset A, Scorecard workflow on `main` on 2026-10-30 (run 41122185865). CI-Tests -1. | 7.1 |
+| Plus `statuses: read`, private or public. CI-Tests 10. | 7.2 |
 | Plus a first release with the `.intoto.jsonl` file | 7.4 |
 | Plus the Best Practices badge, level passing | 7.5 |
 | Plus CodeQL on all of the last 30 commits | 7.7 |
 | Ruleset B in place of A, with all of the above | 8.0 |
 | From 2027-01-28, when Maintained gives 10 | 8.4 with A, 8.7 with B |
 
+The measured 7.1 is above 7.0, but it is not sufficient for AT-7. A result on a private repository is not published on https://api.scorecard.dev and has no badge, and AT-7 also needs the attestations. Both need the public repository.
+
 Ruleset A blocks deletion and force push, and requires a pull request with 0 approvals and the CI checks on an up-to-date branch. It gives Branch-Protection 4. Do not set "require approval of the most recent push", because that needs a second person. Ruleset B adds 1 required approval and the last push approval, with the admin role as bypass actor. It gives 8, but each merge of your own change uses the bypass, so B stops other people only. Code-Review and Contributors stay 0 with one maintainer (SPEC.md Q5).
 
 The Maintained clock started on 2026-10-30, the creation date. A change of visibility keeps that date. A new repository starts the 90 days again, so do not make a new repository.
 
 Plan.
-1. Merge the workflow change.
+1. Done 2026-10-30. Merge the workflow change (pull request #14).
 2. The product owner makes the repository public (D1). CI already scans every commit for secrets with gitleaks.
 3. Same day. The product owner sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
 4. Same day. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Expected 7.2.
