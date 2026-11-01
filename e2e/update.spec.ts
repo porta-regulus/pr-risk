@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, normalize, sep } from 'node:path';
@@ -26,11 +26,15 @@ async function startServer() {
   const server = createServer((req, res) => {
     const pathname = new URL(req.url ?? '/', 'http://localhost').pathname;
     const file = normalize(join(DIST, pathname === '/' ? 'index.html' : pathname));
-    if (!file.startsWith(DIST + sep) || !existsSync(file) || !statSync(file).isFile()) {
+    let body: string;
+    try {
+      if (!file.startsWith(DIST + sep)) throw new Error('outside dist');
+      // One read with no check before it, so the file cannot change between a check and the read.
+      body = readFileSync(file, 'utf8');
+    } catch {
       res.writeHead(404).end();
       return;
     }
-    let body = readFileSync(file, 'utf8');
     if (deployed && file.endsWith('.js')) {
       body = body.split(version).join(NEXT).replace(/^const PR_RISK_VERSION = "/m, 'const PR_RISK_VERSION = "next-');
     }
@@ -73,17 +77,26 @@ test('a new deploy shows a ready notice, then activates on the next start with i
     server.next();
     await first.reload();
     const ready = first.getByRole('status').filter({ hasText: 'A new version of the app is ready.' });
-    await expect(ready).toBeVisible();
+    // The browser installs the new worker after the load. A slow runner can need some seconds.
+    await expect(ready).toBeVisible({ timeout: 15_000 });
     await expect(first.getByText(`Version ${version}, build`)).toBeVisible();
     await expectAccessible(first, 'S1 with the notice that a new version is ready');
     await ready.getByRole('button', { name: 'Close notice' }).click();
     await expect(ready).toHaveCount(0);
 
     // Close all tabs of the app and open it again. The new version is active.
+    // The waiting worker activates when no tab uses the old one. The browser can need a moment
+    // after the close, and a tab that opens before then still gets the old version, so try again.
     await first.close();
-    const second = await context.newPage();
-    await second.goto(`${server.origin}/`);
-    await expect(second.getByText(`Version ${NEXT}, build`)).toBeVisible();
+    let second = await context.newPage();
+    await expect(async () => {
+      if (second.url() !== 'about:blank') {
+        await second.close();
+        second = await context.newPage();
+      }
+      await second.goto(`${server.origin}/`);
+      await expect(second.getByText(`Version ${NEXT}, build`)).toBeVisible({ timeout: 1_000 });
+    }).toPass({ timeout: 15_000 });
     await expect(second.getByRole('status').filter({ hasText: `Version ${NEXT} is now active.` })).toBeVisible();
     await expect(second.getByRole('status').filter({ hasText: 'A new version of the app is ready.' })).toHaveCount(0);
     expect(problems, 'errors, warnings and CSP violations').toEqual([]);

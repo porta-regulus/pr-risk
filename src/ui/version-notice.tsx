@@ -4,7 +4,13 @@ import { noticeState, onNoticeState, recordVersion, releaseUrl, setNoticeState }
 
 export function VersionNotice() {
   const [state, setState] = useState(noticeState);
-  useEffect(() => onNoticeState(setState), []);
+  // The effect runs after the first render. Read the state again, because the service worker
+  // can report an update between the render and the subscription.
+  useEffect(() => {
+    const stop = onNoticeState(setState);
+    setState(noticeState());
+    return stop;
+  }, []);
   return (
     <>
       {state.changed && (
