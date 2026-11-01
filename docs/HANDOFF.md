@@ -268,12 +268,17 @@ Status 2026-10-30. Done. AT-4 passes.
 
 ### Task 9. Encrypted export, durability banners, remove-all
 
-Status 2026-10-30. Done, apart from the manual test of D3 in Safari.
+Status 2026-11-02. Done. The manual test of D3 in Safari passed on 2026-11-02.
 1. ADR-0004 I2. The encrypted copy uses AES-256-GCM with a key from PBKDF2-HMAC-SHA-256, 600 000 iterations, a 16-byte random salt and a 12-byte random IV, all through WebCrypto (`src/export/encryption.ts`). `test/export.test.ts` has the known-answer test against node:crypto and the wrong passphrase test. `e2e/start.spec.ts` saves an encrypted copy on S1 and restores it in an empty browser.
 2. ADR-0004 I5. "Remove all data from this browser" needs the typed word REMOVE. `e2e/start.spec.ts` checks that after it the browser holds no document, no version, no cache, no service worker and no local storage entry. A test run with the cache step removed from `removeAll` fails, so the check works.
 3. ADR-0004 D3. The app requests persistent storage on the first save. S1 and the editor screens show the last-export date, and a banner when there is no export or the last one is older than 7 days (`exportOverdue`, `test/browser/storage.test.ts`). S1 says whether the browser keeps the data.
 
-Open for the product owner. ADR-0004 D3 asks for a manual test in Safari. Open the hosted app in Safari, save a document and export it. Check that S1 shows the last-export date and says whether Safari keeps the data. Write the result here.
+Manual test of ADR-0004 D3 in Safari, 2026-11-02. Safari 26.6.2 on macOS 26.6.2 (build 25G83), https://risk.portaregulus.com at version 1.0.0-rc.1 (build c0448a5). The product owner opened example 2 and exported the App file (JSON).
+1. S1 shows the last-export date. Before the export the column said "never". After it, the column said 02/11/2026, 00:49:54. The exported file passes `validateDocument` and has 2 registers and 9 risks.
+2. S1 says whether Safari keeps the data. Safari did not give persistent storage to the site, so S1 says "The browser can delete this data when space is low or after 7 days without a visit (Safari)."
+3. The export reminder works. For a document with no export, S1 shows "You have not saved a copy of this document yet. Browsers can delete stored data. Export a copy now."
+
+Remaining risk. In a normal Safari tab, Safari can delete the data after 7 days without a visit. After that, only an exported file brings the data back. ADR-0004 states this cost under "Costs of this decision, stated plainly".
 
 ### Import merge choice on S1 (SPEC.md Sec. 9.7)
 
@@ -313,6 +318,8 @@ Status 2026-11-01. Built at the request of the product owner, so that a person w
 4. Tests. `test/ui-steps.test.ts`, `e2e/steps.spec.ts` (tick, focus on the section, closed state, print, axe) and `e2e/at5.spec.ts` (6 of 6 done before the run).
 
 ### Task 12. Release 1 and AT-7 (SPEC.md Sec. 12.7)
+
+Status 2026-11-02, Safari test. Gap F9 is closed. The manual test of ADR-0004 D3 in Safari 26.6.2 on macOS 26.6.2 (build 25G83) passed (task 9). Annex I row I 2(h) is Met. All 11 gaps of the Annex I self-check are closed. The open items before release 1 are the sign-off of the Annex I self-check (D6), AT-5 and AT-6.
 
 Status 2026-11-01, Best Practices badge. D5 is done. The GitHub account PortaRegulus made project 16174 on https://www.bestpractices.dev/projects/16174, and it has the passing level since 2026-11-01. It has 60 Met, 5 N/A and 2 Unmet SUGGESTED criteria (`test_most`, `dynamic_analysis_enable_assertions`). The README shows the badge. Scorecard reads the badge on its next run. The open items before release 1 are F9, the sign-off of the Annex I self-check (D6), AT-5 and AT-6.
 
@@ -365,7 +372,7 @@ Plan.
 4. Done 2026-10-31. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Measured 7.2.
 5. Done 2026-10-31 with `v0.1.0-rc.2`. After approval (D3), push the test tag. Check that the prerelease has 6 files, and run the verify commands of the release notes. This meets task 1 done criterion 3. Measured Scorecard 7.4.
 6. Done 2026-11-01. Project 16174 has the passing level (D5). The answers with evidence URLs are in [`docs/release/best-practices-answers.md`](release/best-practices-answers.md).
-7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are closed (S1 notices on storage encryption and browser extensions, a check of each stored record on read, `docs/self-host.md`, 3 statements in `SECURITY.md`). F8 and F10 are closed on 2026-10-31 (public repository with its security features, prerelease `v0.1.0-rc.2`). F6 is closed on 2026-10-31 by a decision of the product owner. F5 is closed on 2026-11-01 (notice of a new version). F11 is closed on 2026-11-01 (the security mailbox works). F9 needs the product owner.
+7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are closed (S1 notices on storage encryption and browser extensions, a check of each stored record on read, `docs/self-host.md`, 3 statements in `SECURITY.md`). F8 and F10 are closed on 2026-10-31 (public repository with its security features, prerelease `v0.1.0-rc.2`). F6 is closed on 2026-10-31 by a decision of the product owner. F5 is closed on 2026-11-01 (notice of a new version). F11 is closed on 2026-11-01 (the security mailbox works). F9 is closed on 2026-11-02 (the manual test in Safari passed).
 8. Tag release 1 when AT-5 and AT-6 pass (D7).
 
 Earliest date. AT-7 passed on Saturday 2026-10-31 for the test tag. Release 1 can be tagged when AT-5 and AT-6 pass. It must also pass AT-7, and the same workflow makes that automatic.
