@@ -39,7 +39,7 @@ export interface TableResult {
   readonly warnings: string[];
   readonly columnMapping: Record<string, string>;
   // Per riskId, the JSON Pointers of the fields that the row states (Sec. 9.7).
-  readonly stated: Record<string, readonly string[]>;
+  readonly stated: ReadonlyMap<string, readonly string[]>;
   readonly unmapped: readonly string[];
   readonly unmatchedLabels: { readonly likelihood: string[]; readonly impact: string[]; readonly exposure: string[] };
 }
@@ -326,7 +326,7 @@ export function tableToRisks(doc: RiskDocument, rows: readonly (readonly string[
     registers: [...newRegisters.values()],
     warnings,
     columnMapping,
-    stated: Object.fromEntries(risks.map((risk, index) => [risk.riskId, statedRows[index] ?? []])),
+    stated: new Map(risks.map((risk, index) => [risk.riskId, statedRows[index] ?? []])),
     unmapped: mapping.unmapped,
     unmatchedLabels: { likelihood: [...unmatched.likelihood], impact: [...unmatched.impact], exposure: [...unmatched.exposure] },
   };
