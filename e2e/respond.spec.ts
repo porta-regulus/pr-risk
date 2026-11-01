@@ -14,7 +14,7 @@ function watchProblems(page: Page): string[] {
 async function openExample2(page: Page): Promise<void> {
   await page.goto('/');
   await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
-  await expect(page.getByRole('button', { name: 'Respond and optimize' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Respond and optimize', exact: true })).toBeEnabled();
 }
 
 // Screen S4 under the production CSP. Example 2 simulates in the engine worker, and the
@@ -47,7 +47,7 @@ test('S4 shows the loss exceedance, the ranking and the display-only matrix of e
 test('S5 finds the best portfolio of example 2 and prints the decision record on 2 A4 pages', async ({ page }, testInfo) => {
   const problems = watchProblems(page);
   await openExample2(page);
-  await page.getByRole('button', { name: 'Respond and optimize' }).click();
+  await page.getByRole('button', { name: 'Respond and optimize', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Respond and optimize' })).toBeFocused();
   await page.locator('summary', { hasText: /^O-4 Cyber insurance/ }).click();
   await expect(page.locator('#option-O-4-oneoff')).toBeVisible();

@@ -12,6 +12,7 @@ import type { RiskNumbers } from '../engine/numbers';
 import { simulationTargets, withNistNumbers, withNumbersFrom, withSimulationSettings } from './analysis';
 import { documentChanges, withChangeLog } from './edit';
 import { InvalidFields } from './fields';
+import { completionSteps, type StepState } from './steps';
 
 export type Update = (change: (doc: RiskDocument) => RiskDocument) => void;
 export type ScreenName = 'start' | 'context' | 'identify' | 'prioritize' | 'respond' | 'monitor' | 'enterprise';
@@ -26,6 +27,76 @@ const SCREENS: readonly (readonly [Exclude<ScreenName, 'start'>, string])[] = [
 ];
 
 const SAVE_DELAY_MS = 600;
+
+const STEP_STATES: Readonly<Record<StepState, string>> = { done: 'Done', next: 'Next', todo: 'To do', optional: 'Optional', last: 'Last step' };
+
+// A closed steps panel stays closed on the other screens until the page loads again.
+let stepsClosed = false;
+// The section that a step opens after the screen changes.
+let pendingSection: string | undefined;
+
+// Scrolls to a section and moves the focus to its heading, so keyboard and screen reader
+// users start there too. The heading stops below the sticky save bar, which is higher when it
+// wraps or shows errors.
+function showSection(id: string): boolean {
+  const target = document.getElementById(id);
+  if (target === null) return false;
+  if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+  const bar = document.querySelector('.save-bar')?.getBoundingClientRect().height ?? 0;
+  window.scrollTo(0, target.getBoundingClientRect().top + window.scrollY - bar - 8);
+  target.focus({ preventScroll: true });
+  return true;
+}
+
+// SPEC.md Sec. 5. The steps of the AT-5 task in plain words, ticked from the saved document.
+// Colour is never the only signal, so each step also has its state as a word.
+function StepsPanel({ doc, screen, onGo }: { readonly doc: RiskDocument; readonly screen: Exclude<ScreenName, 'start'>; readonly onGo: (screen: Exclude<ScreenName, 'start'>, section: string) => void }) {
+  const [open, setOpen] = useState(!stepsClosed);
+  const { steps, done, required } = completionSteps(doc);
+  return (
+    <details
+      class="steps panel"
+      open={open}
+      onToggle={(event) => {
+        const next = event.currentTarget.open;
+        stepsClosed = !next;
+        setOpen(next);
+      }}
+    >
+      <summary>
+        Steps to complete: {done} of {required} done
+      </summary>
+      <p class="muted">Do the steps in this order. The app ticks a step when the saved document shows it.</p>
+      <ol>
+        {steps.map((step) => (
+          <li key={step.key} class={`step step-${step.state}`} aria-current={step.state === 'next' ? 'step' : undefined}>
+            <p>
+              <span class="step-state">{STEP_STATES[step.state]}</span> <strong>{step.title}</strong>
+            </p>
+            {step.state !== 'done' && (
+              <>
+                {step.state === 'next' ? (
+                  <p>{step.how}</p>
+                ) : (
+                  <details class="help">
+                    <summary>How to do this step</summary>
+                    <p>{step.how}</p>
+                  </details>
+                )}
+                {step.missing !== undefined && <p class="hint">{step.missing}</p>}
+                <button type="button" class="quiet" onClick={() => {
+                    onGo(step.screen, step.section);
+                  }}>
+                  {step.screen === screen ? 'Show me where' : `Go to ${SCREENS.find(([name]) => name === step.screen)?.[1] ?? step.screen}`}
+                </button>
+              </>
+            )}
+          </li>
+        ))}
+      </ol>
+    </details>
+  );
+}
 
 const isoSeconds = (date = new Date()): string => date.toISOString().replace(/\.\d{3}Z$/, 'Z');
 
@@ -113,10 +184,14 @@ export function DocumentScreen({
     };
   }, [id]);
 
-  // A new screen starts at the top, with focus on its title for screen reader users.
+  // A new screen starts at the top, with focus on its title for screen reader users. A step
+  // of the steps panel starts at its section.
   const ready = stored !== undefined;
   useEffect(() => {
     if (!ready) return;
+    const section = pendingSection;
+    pendingSection = undefined;
+    if (section !== undefined && showSection(section)) return;
     window.scrollTo(0, 0);
     document.getElementById('screen-title')?.focus();
   }, [ready]);
@@ -230,7 +305,7 @@ export function DocumentScreen({
 
   // Leaving saves a pending valid change first, and waits for a save that runs. A change
   // that cannot be saved stays, and the screen says so, because leaving would drop it.
-  const leave = (target: ScreenName): void => {
+  const leave = (target: ScreenName, section?: string): void => {
     if (blocked || (dirty && documentErrors(draft).length > 0)) {
       setNote('Correct the changes, or discard them, before you go to another screen.');
       return;
@@ -238,7 +313,9 @@ export function DocumentScreen({
     clearTimeout(timer.current);
     timer.current = undefined;
     void saveNow().then((ok) => {
-      if (ok) onNavigate(target);
+      if (!ok) return;
+      pendingSection = section;
+      onNavigate(target);
     });
   };
 
@@ -299,6 +376,11 @@ export function DocumentScreen({
           </ul>
         )}
       </div>
+
+      <StepsPanel doc={stored.doc} screen={screen} onGo={(target, section) => {
+          if (target === screen) showSection(section);
+          else leave(target, section);
+        }} />
 
       <InvalidFields.Provider value={reportInvalid}>
         <Fragment key={revision}>{children(draft, update, { blocked })}</Fragment>

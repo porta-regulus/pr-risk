@@ -195,6 +195,13 @@ The screens follow the six steps of the ICTRM life cycle (Sec. 2.2, Fig. 2), plu
 | S6 | Monitor and adjust | 6 Monitor, evaluate, adjust | 3.7, 3.7.1, 5.1.2, 5.4.2 | KPIs and KRIs with observations. Review triggers. Acceptance records. Tolerance what-if. Forecast freeze, outcome entry, Brier score. |
 | S7 | Enterprise view | Integration | 4.1 to 4.4, 5.2 | ERR (Fig. 10 layout). ERP by objective (Fig. 11 layout). Aggregation, merge and normalization. Portfolio view by register and period. |
 
+Steps to complete (S2 to S7). A panel under the save bar leads a first-time user through the AT-5 task (Sec. 12.5) in plain words. It is help text (Sec. 12.5, Help).
+1. The steps, in this order. 2 objectives with a statement. A tolerance curve with 3 or more points. 1 or more risks that are not Closed. An owner, an estimate and 1 or more objectives for each risk that is not Closed. A driver that 2 risks link to (optional). The first-year budget. 2 or more response options, 1 of them a candidate or selected. The run and the print of the decision record.
+2. The app ticks a step from the saved document. It cannot tick the run and the print, because they do not change the document. The first required step that is not done is "Next" and shows how to do it. The other steps show it on request. The state of each step is also a word, so colour is never the only signal.
+3. Each step has a button that saves, opens the screen of the step, and moves the focus to the heading of its section.
+4. A closed panel stays closed on the other screens until the page loads again. The panel does not print. It shows no number for an estimate (hard rule 2).
+5. S1 tells a new user to create a document and then open "Context and strategy".
+
 Estimate entry words (S3). From the calibration method of Hubbard and Seiersen, *How to Measure Anything in Cybersecurity Risk*, 2nd ed., Wiley 2023.
 1. "How many times per year does this happen, not counting events caused through the drivers below? Give a range you are 90% sure of." A toggle allows "once every N years". The app converts and swaps the bounds.
 2. "When it happens once, what is the loss? Give a range you are 90% sure of." For a positive risk the word is "gain".

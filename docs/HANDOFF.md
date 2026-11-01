@@ -302,6 +302,14 @@ Open for the product owner.
 1. Two other optional fields wait for a decision, the `reason` field of a change log entry (task 6, open item 2) and the record of a value that the user did not take on import (import merge choice, open item 2). Each is a new optional field, so both can go into version 1.2.0.
 2. The first previous period. "Close the period" fills it from now on. A register that has last year's assessment in another tool has no way to enter it, apart from an import of a native file that holds `previousAssessment`. A form for the previous assessment on S3 is possible if the pilot needs it.
 
+### Steps to complete (SPEC.md Sec. 5)
+
+Status 2026-11-01. Built at the request of the product owner, so that a person with no risk training can go from a new document to the printed decision record.
+1. Screens S2 to S7 show the panel "Steps to complete" under the save bar. `completionSteps` in `src/ui/steps.ts` reads the saved document. `StepsPanel` in `src/ui/editor.tsx` shows it, and its buttons open the section of a step.
+2. The steps follow the AT-5 task. The panel is in-app help text, which Sec. 12.5 allows, so AT-5 can use it.
+3. Playwright finds the nav button "Identify and analyze" and the panel button "Go to Identify and analyze" with the same name. The e2e tests now find the 3 nav buttons that a step can open with `exact: true`.
+4. Tests. `test/ui-steps.test.ts`, `e2e/steps.spec.ts` (tick, focus on the section, closed state, print, axe) and `e2e/at5.spec.ts` (6 of 6 done before the run).
+
 ### Task 12. Release 1 and AT-7 (SPEC.md Sec. 12.7)
 
 Status 2026-10-31, test tag. AT-7 passes for the prerelease `v0.1.0-rc.2` (commit e5ec955, release run 41244747547). The release is immutable and has 6 files. `sha256sum -c SHA256SUMS`, `gh attestation verify` for the provenance (with and without the attached bundle) and for the CycloneDX 1.6 SBOM, and `gh release verify` all pass. The provenance is in Rekor. Scorecard publishes 7.4 (run 41245028956), with Signed-Releases 10. The first test tag `v0.1.0-rc.1` (on dfedb67) stopped at the SBOM attestation, because `actions/attest` needs a CycloneDX `serialNumber` and `cyclonedx-npm --output-reproducible` leaves it out. No release was made for it. Its provenance attestation stays in Rekor. Pull request #25 adds a serial number from the bundle SHA-256 and sets the version to `0.1.0-rc.2`. The open items are D5, D6 and D7.

@@ -466,6 +466,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
       <div class="grid">
         <section aria-labelledby="create-title" class="panel">
           <h2 id="create-title">Create a document</h2>
+          <p class="hint">New here? Type a title and click Create. Then click "Context and strategy" under Your documents. Each screen shows the steps to complete, from the first objective to the printed decision record.</p>
           <label for="new-title">Title</label>
           <input id="new-title" value={newTitle} onInput={(event) => {
             setNewTitle(event.currentTarget.value);
