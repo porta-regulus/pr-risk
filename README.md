@@ -1,5 +1,7 @@
 # PortaRegulus Risk
 
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/16174/badge)](https://www.bestpractices.dev/projects/16174)
+
 A free, open-source risk register for the risk components of NIST SP 800-221r1. It helps the IT lead of a company with 50 to 249 staff decide which risk responses to fund, so that the annual loss exceedance curve stays below the risk tolerance curve.
 
 **Status.** All screens of release 1 work. Release 1 waits for the usability test, the expert review and the release checks (AT-5, AT-6 and AT-7). See [docs/HANDOFF.md](docs/HANDOFF.md).
@@ -47,8 +49,8 @@ To contribute code or text, read [CONTRIBUTING.md](CONTRIBUTING.md).
 | [docs/schema/](docs/schema/) | Exchange schema (JSON Schema 2020-12) and examples |
 | [infra/gcp/](infra/gcp/) | Hosting on GCP |
 | [SECURITY.md](SECURITY.md) | How to report a vulnerability |
-| [docs/release/](docs/release/) | CRA Annex I self-check and OpenSSF Best Practices answers (drafts) |
+| [docs/release/](docs/release/) | CRA Annex I self-check (draft) and the OpenSSF Best Practices answers of project 16174 |
 
 ## Licence
 
-Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+Apache-2.0 for the code and the JSON Schema. The Risklet catalogue in `src/catalogue/risklet.json` is CC BY 4.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
