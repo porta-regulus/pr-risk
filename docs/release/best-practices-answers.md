@@ -2,14 +2,16 @@
 
 | Item | Value |
 |---|---|
-| Status | Draft. The product owner makes the entry on https://www.bestpractices.dev with a GitHub account of a project member (HANDOFF.md task 12, D5). |
-| Date | 2026-10-30 |
-| Checked version | `main` at commit a02d31b |
+| Status | Entered on 2026-11-01 as project 16174 by the GitHub account PortaRegulus, https://www.bestpractices.dev/projects/16174. Level passing since 2026-11-01 (HANDOFF.md task 12, D5). |
+| Date | 2026-10-30. Checked again and entered on 2026-11-01. |
+| Checked version | `main` at commit a02d31b. Checked again at commit 1ca0214 on 2026-11-01. |
 | Criteria source | `criteria/criteria.yml` of `coreinfrastructure/best-practices-badge`, commit e035b3e. Level passing has 67 criteria. |
 
 The URLs work only after the repository is public. `R` below means https://github.com/porta-regulus/pr-risk.
 
 ## 1. Do these before the entry
+
+All 5 steps are done. The product owner confirmed step 5 on 2026-11-01.
 
 | # | Step | Criteria |
 |---|---|---|
@@ -45,14 +47,14 @@ MUST criteria must be Met or N/A. SHOULD and SUGGESTED criteria can be Unmet.
 
 | Criterion | Level | Answer | Justification and evidence |
 |---|---|---|---|
-| `repo_public` | MUST | Met after step 1 | `R` |
+| `repo_public` | MUST | Met | `R` |
 | `repo_track` | MUST | Met | Git records each change, its author and its date. |
 | `repo_interim` | MUST | Met | Every change goes through a pull request to `main`. `R/pulls?q=is%3Apr` |
 | `repo_distributed` | SUGGESTED | Met | Git |
 | `version_unique` | MUST | Met | Each release has a tag that must equal the version in `package.json`. The release workflow stops if they differ. `R/blob/main/.github/workflows/release.yml` |
-| `version_semver` | SUGGESTED | Met | SemVer, for example `0.1.0-rc.1`. |
+| `version_semver` | SUGGESTED | Met | SemVer, for example `1.0.0-rc.1`. |
 | `version_tags` | SUGGESTED | Met | Git tags `v*` start the release workflow. |
-| `release_notes` | MUST | Met after step 4 | Each GitHub release has notes with the merged pull requests and the verify commands. `R/releases`. Add a short paragraph on what changed for users, because a list of pull request titles is close to a version control log. |
+| `release_notes` | MUST | Met | Each GitHub release has notes with the merged pull requests and the verify commands. `R/releases`. Add a short paragraph on what changed for users, because a list of pull request titles is close to a version control log. |
 | `release_notes_vulns` | MUST | N/A | No publicly known vulnerability has been fixed. |
 
 ### Reporting
@@ -63,9 +65,9 @@ MUST criteria must be Met or N/A. SHOULD and SUGGESTED criteria can be Unmet.
 | `report_tracker` | SHOULD | Met | GitHub issues |
 | `report_responses` | MUST | Met | No bug report has been received yet. We answer each one. |
 | `enhancement_responses` | SHOULD | Met | No enhancement request has been received yet. |
-| `report_archive` | MUST | Met after step 1 | GitHub issues are public and searchable. `R/issues?q=` |
+| `report_archive` | MUST | Met | GitHub issues are public and searchable. `R/issues?q=` |
 | `vulnerability_report_process` | MUST | Met | `R/blob/main/SECURITY.md` |
-| `vulnerability_report_private` | MUST | Met after step 2 | GitHub private vulnerability reporting, or e-mail to security@portaregulus.com. `R/security/advisories/new` |
+| `vulnerability_report_private` | MUST | Met | GitHub private vulnerability reporting, or e-mail to security@portaregulus.com. `R/security/advisories/new` |
 | `vulnerability_report_response` | MUST | N/A | No vulnerability report in the last 6 months. SECURITY.md promises an answer in 5 working days. |
 
 ### Quality
@@ -90,8 +92,8 @@ MUST criteria must be Met or N/A. SHOULD and SUGGESTED criteria can be Unmet.
 
 | Criterion | Level | Answer | Justification and evidence |
 |---|---|---|---|
-| `know_secure_design` | MUST | Met after step 5 | The STRIDE threat model shows the design principles in use, for example fail-safe defaults (CSP `default-src 'none'`), least privilege (Permissions-Policy, no network) and economy of mechanism (no server). `R/blob/main/docs/adr/0004-local-first-data-and-threat-model.md` |
-| `know_common_errors` | MUST | Met after step 5 | ADR-0004 names the common web errors and their counter, for example XSS (text only, Trusted Types), prototype pollution, CSV injection and clickjacking. |
+| `know_secure_design` | MUST | Met | The STRIDE threat model shows the design principles in use, for example fail-safe defaults (CSP `default-src 'none'`), least privilege (Permissions-Policy, no network) and economy of mechanism (no server). `R/blob/main/docs/adr/0004-local-first-data-and-threat-model.md` |
+| `know_common_errors` | MUST | Met | ADR-0004 names the common web errors and their counter, for example XSS (text only, Trusted Types), prototype pollution, CSV injection and clickjacking. |
 | `crypto_published` | MUST | Met | AES-256-GCM, PBKDF2-HMAC-SHA-256 and SHA-256, all published and reviewed. |
 | `crypto_call` | SHOULD | Met | The app calls WebCrypto only. `R/blob/main/src/export/encryption.ts` |
 | `crypto_floss` | MUST | Met | WebCrypto in Chromium and Firefox is FLOSS. |
@@ -103,7 +105,7 @@ MUST criteria must be Met or N/A. SHOULD and SUGGESTED criteria can be Unmet.
 | `crypto_random` | MUST | Met | Salt and IV come from `crypto.getRandomValues`. |
 | `delivery_mitm` | MUST | Met | HTTPS with HSTS preload for the hosted app. GitHub releases over HTTPS with Sigstore attestations. |
 | `delivery_unsigned` | MUST | Met | `SHA256SUMS` is a subject of the build provenance attestation. The release notes give the commands that check the signature first. |
-| `vulnerabilities_fixed_60_days` | MUST | Met | `npm audit` finds 0 vulnerabilities on 2026-10-30. No open advisory. |
+| `vulnerabilities_fixed_60_days` | MUST | Met | No vulnerability of medium or higher severity has been publicly known for more than 60 days. On 2026-11-01 the one open advisory is GHSA-g3hv-75wg-m249 (minimatch, medium). It became public on 2026-10-30 and is in development tools only, not in the release bundle. |
 | `vulnerabilities_critical_fixed` | SHOULD | Met | SECURITY.md sets a shorter time for an exploited vulnerability. |
 | `no_leaked_credentials` | MUST | Met | CI runs gitleaks on the full history of every branch, including archives found by content. `R/blob/main/scripts/secret-scan.sh` |
 
@@ -111,9 +113,9 @@ MUST criteria must be Met or N/A. SHOULD and SUGGESTED criteria can be Unmet.
 
 | Criterion | Level | Answer | Justification and evidence |
 |---|---|---|---|
-| `static_analysis` | MUST | Met after step 3 | CodeQL on each push to `main`, each pull request and each week. ESLint with type-aware rules on each pull request. `R/actions/workflows/codeql.yml` |
+| `static_analysis` | MUST | Met | CodeQL on each push to `main`, each pull request and each week. ESLint with type-aware rules on each pull request. `R/actions/workflows/codeql.yml` |
 | `static_analysis_common_vulnerabilities` | SUGGESTED | Met | CodeQL security queries for JavaScript and TypeScript. |
-| `static_analysis_fixed` | MUST | Met after step 3 | No open alert. |
+| `static_analysis_fixed` | MUST | Met | CodeQL has 0 open alerts on 2026-11-01. The other open code scanning alerts come from OpenSSF Scorecard and are about repository settings, not code. |
 | `static_analysis_often` | SUGGESTED | Met | Each commit on `main` and each pull request. |
 | `dynamic_analysis` | SUGGESTED | Met | fast-check property tests of the importer and the engine, and Playwright tests of the production build under the production CSP. |
 | `dynamic_analysis_unsafe` | SUGGESTED | N/A | TypeScript only, a memory-safe language. |
@@ -122,4 +124,4 @@ MUST criteria must be Met or N/A. SHOULD and SUGGESTED criteria can be Unmet.
 
 ## 3. Summary
 
-After steps 1 to 5, all MUST criteria are Met or N/A. 2 SUGGESTED criteria stay Unmet, `test_most` and `dynamic_analysis_enable_assertions`. They do not block the passing level. The user paragraph in the release notes is not required, but it makes `release_notes` safe from the "raw output of a version control log" rule.
+All MUST criteria are Met or N/A. The entry has 60 Met, 5 N/A and 2 Unmet. 2 SUGGESTED criteria stay Unmet, `test_most` and `dynamic_analysis_enable_assertions`. They do not block the passing level. The user paragraph in the release notes is not required, but it makes `release_notes` safe from the "raw output of a version control log" rule.

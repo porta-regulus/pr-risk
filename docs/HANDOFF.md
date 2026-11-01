@@ -306,6 +306,8 @@ Open for the product owner.
 
 ### Task 12. Release 1 and AT-7 (SPEC.md Sec. 12.7)
 
+Status 2026-11-01, Best Practices badge. D5 is done. The GitHub account PortaRegulus made project 16174 on https://www.bestpractices.dev/projects/16174, and it has the passing level since 2026-11-01. It has 60 Met, 5 N/A and 2 Unmet SUGGESTED criteria (`test_most`, `dynamic_analysis_enable_assertions`). The README shows the badge. Scorecard reads the badge on its next run. The open items before release 1 are F9, the sign-off of the Annex I self-check (D6), AT-5 and AT-6.
+
 Status 2026-11-01, security mailbox. Gap F11 is closed. The product owner sent a test e-mail to `security@portaregulus.com`, and it arrived. The product owner reads the mailbox. Annex I row II 6 is Met. The open gap is F9. The open items before release 1 are D5, F9, the sign-off of the Annex I self-check (D6), AT-5 and AT-6.
 
 Status 2026-11-01. Gap F5 is closed. S1 and the editor frame show a notice when a new version is ready and when a new version is active, with a link to its release notes. The notice makes no request. `e2e/update.spec.ts` deploys a new build to a real service worker under the production CSP, which is the update test of ADR-0004 T3. Annex I row I 2(c) is Met. The open gaps are F9 and F11. The open items before release 1 are D5, F9, F11, the sign-off of the Annex I self-check (D6), AT-5 and AT-6.
@@ -354,7 +356,7 @@ Plan.
 3. Done 2026-10-31. The product owner sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
 4. Done 2026-10-31. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Measured 7.2.
 5. Done 2026-10-31 with `v0.1.0-rc.2`. After approval (D3), push the test tag. Check that the prerelease has 6 files, and run the verify commands of the release notes. This meets task 1 done criterion 3. Measured Scorecard 7.4.
-6. Day 1 to 2. The product owner makes the entry on https://www.bestpractices.dev (D5). The answers with evidence URLs are in [`docs/release/best-practices-answers.md`](release/best-practices-answers.md) (draft 2026-10-30). Its section 1 lists 5 steps to do before the entry.
+6. Done 2026-11-01. Project 16174 has the passing level (D5). The answers with evidence URLs are in [`docs/release/best-practices-answers.md`](release/best-practices-answers.md).
 7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are closed (S1 notices on storage encryption and browser extensions, a check of each stored record on read, `docs/self-host.md`, 3 statements in `SECURITY.md`). F8 and F10 are closed on 2026-10-31 (public repository with its security features, prerelease `v0.1.0-rc.2`). F6 is closed on 2026-10-31 by a decision of the product owner. F5 is closed on 2026-11-01 (notice of a new version). F11 is closed on 2026-11-01 (the security mailbox works). F9 needs the product owner.
 8. Tag release 1 when AT-5 and AT-6 pass (D7).
 
@@ -365,7 +367,7 @@ Decisions for the product owner.
 2. D2. Done 2026-10-30. Ruleset A is active on `main` (ruleset ID 26223939, no bypass actor). It requires 5 checks from the GitHub Actions app. These are "Lint, type check and unit tests", "Build and Playwright", "OSCAL POA&M exports pass oscal-cli (AT-4)", "Schema and reference model checks" and "No secret in the git history (gitleaks)". The performance job and CodeQL are not required, because they run only while the repository is public and a slow runner must not block a merge. Change to ruleset B when a second maintainer exists.
 3. D3. Done 2026-10-31. Approval of the test tag. `v0.1.0-rc.1` failed before a release, and `v0.1.0-rc.2` passed. The deploy job is skipped while the repository variables are empty. If you set the variables first, the test tag deploys to production.
 4. D4. Done 2026-10-31, immutable releases are on. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number. The next free test tag is `v1.0.0-rc.1` (D7).
-5. D5. The Best Practices entry needs the GitHub account of a project member.
+5. D5. Done 2026-11-01. The GitHub account PortaRegulus made the Best Practices entry, project 16174.
 6. D6. Who writes and who signs the Annex I self-check, and where it is published.
 7. D7. Done 2026-10-31. Release 1 is `1.0.0`. Users read a `0.x` version as beta, and the file format has its own schema version, so the app version can show stability. The test tags before release 1 are `v1.0.0-rc.N`. `package.json` has `1.0.0-rc.1`.
 
