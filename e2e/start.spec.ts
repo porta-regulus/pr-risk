@@ -241,6 +241,25 @@ test('selecting another document closes the import preview', async ({ page }) =>
   await expect(page.getByRole('button', { name: /^Add to / })).toBeHidden();
 });
 
+// The Safari test of ADR-0004 D3 on 2026-11-02 showed "The file is saved to your downloads." above
+// the banner "You have not saved a copy of this document yet." after a select. A message tells the
+// result of the last action, so selecting another document removes it.
+test('selecting another document removes the message of the last action', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Table 10 imports (example 3)' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await expect(page.getByRole('row', { name: /Example Machinery/ }).getByRole('button', { name: 'Selected' })).toBeVisible();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'App file (JSON)' }).click();
+  await downloadPromise;
+  await expect(page.getByText('The file is saved to your downloads.')).toBeVisible();
+
+  await page.getByRole('row', { name: /Import adapters/ }).getByRole('button', { name: 'Select' }).click();
+  await expect(page.getByText('You have not saved a copy of this document yet.')).toBeVisible();
+  await expect(page.getByText('The file is saved to your downloads.')).toBeHidden();
+});
+
 // CRA Annex I Part I points 2(e) and 2(f) (docs/release/annex-i-self-check.md, gaps F1, F2 and F4).
 test('a damaged stored record is not opened or exported, and its last valid version comes back', async ({ page }) => {
   await page.goto('/');

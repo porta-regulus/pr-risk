@@ -395,6 +395,8 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                     <td>{dateText(item.lastExportOn)}</td>
                     <td class="actions">
                       <button type="button" onClick={() => {
+                        // The message tells the result of the last action, so it does not apply to the next document.
+                        setMessage(undefined);
                         setCurrentId(item.id);
                       }} disabled={item.id === current?.id}>
                         {item.id === current?.id ? 'Selected' : 'Select'}
