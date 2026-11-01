@@ -41,7 +41,7 @@ export interface Ir8286Result {
   readonly warnings: string[];
   readonly recordCount: number;
   // Per riskId, the JSON Pointers of the fields that the file states (Sec. 9.7).
-  readonly stated: Record<string, readonly string[]>;
+  readonly stated: ReadonlyMap<string, readonly string[]>;
 }
 
 // The NIST keys of a register entry or an RDR for the risk fields.
@@ -117,7 +117,7 @@ export function importIr8286(json: unknown, registerId: string): Ir8286Result {
   const rdrs = new Map(items.filter((item) => 'riskIdNumbers' in item).map((item) => [str(item['riskIdNumbers']), item]));
   const warnings: string[] = [];
   const risks: Risk[] = [];
-  const stated: Record<string, readonly string[]> = {};
+  const stated = new Map<string, readonly string[]>();
 
   for (const entry of entries) {
     const id = str(entry['riskId']);
@@ -169,13 +169,13 @@ export function importIr8286(json: unknown, registerId: string): Ir8286Result {
       risk['detail'] = detail;
     }
     const fields = statedOf(entry, ENTRY_KEYS, types, rdr, risk['detail'] as object | undefined);
-    stated[id] = status.known && 'status' in entry ? [...fields, '/status'] : fields;
+    stated.set(id, status.known && 'status' in entry ? [...fields, '/status'] : fields);
     risks.push(risk as unknown as Risk);
   }
   for (const rdr of rdrs.values()) {
     if (!('currentRiskAnalysis' in rdr)) warnings.push(`RDR ${str(rdr['riskIdNumbers'])} has no currentRiskAnalysis, which the NIST RDR schema requires.`);
     const risk = importRdr(rdr, registerId);
-    stated[risk.riskId] = statedOf(rdr, RDR_KEYS, risk.riskResponseType, rdr, risk.detail);
+    stated.set(risk.riskId, statedOf(rdr, RDR_KEYS, risk.riskResponseType, rdr, risk.detail));
     risks.push(risk);
   }
   if (rdrs.size > 0) warnings.push('Status, polarity and category are not in an RDR and are defaulted.');

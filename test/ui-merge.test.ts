@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { commitImport, prepareImport, type ImportFile } from '../src/import/pipeline';
 import { parseCsv } from '../src/import/csv';
+import { importIr8286 } from '../src/import/ir8286';
 import { statedVersion } from '../src/import/stated';
 import { tableToRisks } from '../src/import/table';
 import { documentErrors, type Risk, type RiskDocument } from '../src/schema';
@@ -98,7 +99,7 @@ describe('take incoming from a file with only some fields', () => {
       'SYS-A,4,Text,High,High,,,',
     ].join('\n');
     const result = tableToRisks(doc3, parseCsv(csvText), { register: doc3.registers[0] });
-    expect(result.stated['1']).toEqual([
+    expect(result.stated.get('1')).toEqual([
       '/registerId',
       '/riskDescription',
       '/riskLikelihood',
@@ -111,11 +112,11 @@ describe('take incoming from a file with only some fields', () => {
       '/riskResponseCost',
     ]);
     // Accept does not fix the polarity. An empty cell and an unknown status are not stated.
-    expect(result.stated['2']).toEqual(['/registerId', '/riskDescription', '/riskLikelihood', '/riskImpact', '/exposureRating', '/riskResponseType', '/responseDecision']);
+    expect(result.stated.get('2')).toEqual(['/registerId', '/riskDescription', '/riskLikelihood', '/riskImpact', '/exposureRating', '/riskResponseType', '/responseDecision']);
     // Placeholder numbers (rule D-Q2) are not stated. Example 3 has no scales, so the labels give
     // no numbers, but the row states the labels.
-    expect(result.stated['3']).toEqual(['/registerId']);
-    expect(result.stated['4']).toEqual(['/registerId', '/riskDescription', '/riskLikelihoodLabel', '/riskImpactLabel']);
+    expect(result.stated.get('3')).toEqual(['/registerId']);
+    expect(result.stated.get('4')).toEqual(['/registerId', '/riskDescription', '/riskLikelihoodLabel', '/riskImpactLabel']);
   });
 
   it('keeps the fields that a NIST IR 8286 entry does not hold', () => {
@@ -174,6 +175,16 @@ describe('take incoming from a file with only some fields', () => {
       expect(nist.errors).toEqual([]);
       expect(riskOf(commitImport(doc, nist), 'A-1')).toMatchObject({ responseDecision: 'pending', riskResponseType: ['Accept'], riskResponseCost: 0 });
     }
+  });
+
+  it('keeps the stated fields of a risk id that is an object property name', () => {
+    const ids = ['__proto__', 'constructor', 'toString'];
+    const entries = ids.map((riskId) => ({ riskId, riskDescription: `Risk ${riskId}` }));
+    const rdr = { riskIdNumbers: 'hasOwnProperty', comments: 'From an RDR' };
+    const result = importIr8286([...entries, rdr], 'SYS-A');
+    for (const id of ids) expect(result.stated.get(id)).toEqual(['/riskDescription']);
+    expect(result.stated.get('hasOwnProperty')).toEqual(['/detail/comments']);
+    expect(result.stated.size).toBe(4);
   });
 });
 
