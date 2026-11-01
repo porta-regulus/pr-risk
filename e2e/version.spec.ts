@@ -39,7 +39,7 @@ test('shows the notice of a new version on S1 and in the editor frame until the 
 
   // The editor frame shows the same notice. Closing it there closes it on S1 too.
   await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
-  await page.getByRole('button', { name: 'Identify and analyze' }).click();
+  await page.getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Identify and analyze' })).toBeFocused();
   await expect(notice).toBeVisible();
   await notice.getByRole('button', { name: 'Close notice' }).click();

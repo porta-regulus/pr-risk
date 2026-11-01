@@ -250,23 +250,23 @@ test('a damaged stored record is not opened or exported, and its last valid vers
   await expect(page.getByText('use a browser profile with no extensions')).toBeVisible();
 
   // A change outside the app while an editor screen is open. The next screen checks the record.
-  await page.getByRole('button', { name: 'Context and strategy' }).click();
+  await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Context and strategy' })).toBeVisible();
   await page.evaluate(damageStoredDocument, false);
-  await page.getByRole('navigation', { name: 'Screens' }).getByRole('button', { name: 'Identify and analyze' }).click();
+  await page.getByRole('navigation', { name: 'Screens' }).getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('The stored copy of this document is damaged, so this screen does not open it.');
   await expectAccessible(page, 'editor with a damaged document');
 
   await page.getByRole('button', { name: 'Back to start' }).click();
   await expect(page.getByRole('alert')).toContainText('is damaged. Rule ');
   await expect(page.getByText('The stored copy is damaged.')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Context and strategy' })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Context and strategy', exact: true })).toBeHidden();
   await expect(page.getByRole('button', { name: 'App file (JSON)' })).toBeHidden();
   await expectAccessible(page, 'S1 with a damaged document');
 
   await page.getByRole('button', { name: 'Restore the last valid version' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Version 1 is restored.' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Context and strategy' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Context and strategy', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'App file (JSON)' })).toBeVisible();
   expect((await page.evaluate(storedDocument))['risks']).toHaveLength(9);
 });
@@ -291,7 +291,7 @@ test('a saved copy restores a damaged document that has no valid kept version', 
   await page.getByRole('button', { name: 'Save the file as a document' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'risks from copy.json are saved.' })).toBeVisible();
   await expect(page.getByText('The stored copy is damaged.')).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Context and strategy' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Context and strategy', exact: true })).toBeVisible();
   expect((await page.evaluate(storedDocument))['risks']).toHaveLength(9);
 });
 

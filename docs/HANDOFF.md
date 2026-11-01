@@ -304,6 +304,14 @@ Open for the product owner.
 1. The record of a value that the user did not take on import waits for a decision (import merge choice, open item 2). The `reasons` field of a change log entry went into 1.1.0 on 2026-10-31 (task 6). The import field can go into 1.1.0 too while 1.1.0 has no release. After the first release it needs 1.2.0.
 2. The first previous period. "Close the period" fills it from now on. A register that has last year's assessment in another tool has no way to enter it, apart from an import of a native file that holds `previousAssessment`. A form for the previous assessment on S3 is possible if the pilot needs it.
 
+### Steps to complete (SPEC.md Sec. 5)
+
+Status 2026-11-01. Built at the request of the product owner, so that a person with no risk training can go from a new document to the printed decision record.
+1. Screens S2 to S7 show the panel "Steps to complete" under the save bar. `completionSteps` in `src/ui/steps.ts` reads the saved document. `StepsPanel` in `src/ui/editor.tsx` shows it, and its buttons open the section of a step.
+2. The steps follow the AT-5 task. The panel is in-app help text, which Sec. 12.5 allows, so AT-5 can use it.
+3. Playwright finds the nav button "Identify and analyze" and the panel button "Go to Identify and analyze" with the same name. The e2e tests now find the 3 nav buttons that a step can open with `exact: true`.
+4. Tests. `test/ui-steps.test.ts`, `e2e/steps.spec.ts` (tick, focus on the section, closed state, print, axe) and `e2e/at5.spec.ts` (6 of 6 done before the run).
+
 ### Task 12. Release 1 and AT-7 (SPEC.md Sec. 12.7)
 
 Status 2026-11-01, Best Practices badge. D5 is done. The GitHub account PortaRegulus made project 16174 on https://www.bestpractices.dev/projects/16174, and it has the passing level since 2026-11-01. It has 60 Met, 5 N/A and 2 Unmet SUGGESTED criteria (`test_most`, `dynamic_analysis_enable_assertions`). The README shows the badge. Scorecard reads the badge on its next run. The open items before release 1 are F9, the sign-off of the Annex I self-check (D6), AT-5 and AT-6.

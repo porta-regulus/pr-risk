@@ -47,7 +47,7 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
   await page.goto('/');
   await page.getByRole('button', { name: 'NIST Fig. 10 and Table 9 (example 1)' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
-  await page.getByRole('button', { name: 'Context and strategy' }).click();
+  await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Context and strategy' })).toBeFocused();
   await expect(page.getByText('Saved as version 1.')).toBeVisible();
   await expectAccessible(page, 'S2');
@@ -121,7 +121,7 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
 
   // The edits survive a reload.
   await page.reload();
-  await page.getByRole('button', { name: 'Context and strategy' }).click();
+  await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
   await expect(page.getByLabel('Mission', { exact: true })).toHaveValue('Keep the plant safe.');
   await expect(page.getByLabel('Capacity (USD)')).toHaveValue('1000000');
 
@@ -141,7 +141,7 @@ test('S2 adds a statement from a Table 2 template', async ({ page }) => {
   await page.getByLabel('Title', { exact: true }).fill('Template check');
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is created.' })).toBeVisible();
-  await page.getByRole('button', { name: 'Context and strategy' }).click();
+  await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
   await page.getByText('Examples from SP 800-221r1 Table 2').click();
   await expectAccessible(page, 'S2 with the Table 2 examples open');
   await page.getByRole('button', { name: 'Use the Government Agency example as a new statement' }).click();

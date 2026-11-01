@@ -193,7 +193,7 @@ test('G3. S7 merges A-1, B-1 and C-1 of example 3 with both layouts of Table 10'
 
   // The saved merge is there after the editor navigation goes to another screen and back.
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
-  await page.getByRole('button', { name: 'Identify and analyze' }).click();
+  await page.getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Identify and analyze' })).toBeFocused();
   await page.getByRole('button', { name: 'Enterprise view' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Enterprise view' })).toBeFocused();

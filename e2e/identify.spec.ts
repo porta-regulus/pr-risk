@@ -16,7 +16,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
   await page.getByLabel('Organization').fill('Pilot GmbH');
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: '"Pilot register" is created.' })).toBeVisible();
-  await page.getByRole('button', { name: 'Identify and analyze' }).click();
+  await page.getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Identify and analyze' })).toBeFocused();
 
   // The register becomes quantitative, and an asset joins the inventory.
@@ -91,9 +91,9 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
 
   // The work survives a reload, and the other screen opens from the navigation.
   await page.reload();
-  await page.getByRole('button', { name: 'Identify and analyze' }).click();
+  await page.getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await expect(page.getByRole('row').filter({ hasText: 'If the web shop is down for a day' })).toContainText(exposure ?? '');
-  await page.getByRole('button', { name: 'Context and strategy' }).click();
+  await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Context and strategy' })).toBeVisible();
   expect(problems, 'errors, warnings and CSP violations').toEqual([]);
 });
@@ -102,7 +102,7 @@ test('S3 shows the exposures that come from labels in example 1', async ({ page 
   await page.goto('/');
   await page.getByRole('button', { name: 'NIST Fig. 10 and Table 9 (example 1)' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
-  await page.getByRole('button', { name: 'Identify and analyze' }).click();
+  await page.getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await page.getByRole('button', { name: 'Notional Enterprise Risk Register', exact: true }).click();
   const row = page.getByRole('row').filter({ has: page.getByRole('cell', { name: '1', exact: true }) });
   await expect(row).toContainText('500,000');

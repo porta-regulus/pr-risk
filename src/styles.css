@@ -534,6 +534,44 @@ details.help {
   padding-left: 0.75rem;
 }
 
+/* The steps panel of screens S2 to S7 */
+.steps ol {
+  margin: 0;
+  padding-left: 1.4rem;
+  display: grid;
+  gap: 0.6rem;
+}
+.step > * {
+  margin: 0.25rem 0 0;
+}
+.step-state {
+  display: inline-block;
+  min-width: 5.5em;
+  padding: 0 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-align: center;
+}
+.step-done .step-state {
+  background: var(--ok-bg);
+  color: var(--ok-text);
+}
+.step-done strong {
+  font-weight: 400;
+  color: var(--muted);
+}
+.step-next {
+  border-left: 3px solid var(--accent);
+  padding-left: 0.6rem;
+}
+.step-next .step-state {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
 /* Screens S4 and S5, and the decision record */
 .status {
   display: inline-flex;

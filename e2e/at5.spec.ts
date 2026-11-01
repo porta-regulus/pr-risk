@@ -125,7 +125,7 @@ test('AT-5 task from an empty browser to the printed decision record in under 10
   await expect(page.getByRole('status').filter({ hasText: 'is created.' })).toBeVisible();
 
   // Context with 2 objectives, and a tolerance curve with 4 points.
-  await page.getByRole('button', { name: 'Context and strategy' }).click();
+  await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
   await page.getByRole('button', { name: 'Add an objective' }).click();
   await page.getByLabel('Objective 1 kind').selectOption('operations');
   await page.getByLabel('Objective 1 statement').fill('Deliver every order on time.');
@@ -139,7 +139,7 @@ test('AT-5 task from an empty browser to the printed decision record in under 10
   await saved(page);
 
   // 5 risks with frequency range, impact range, owner and objective, 1 of them positive.
-  await page.getByRole('button', { name: 'Identify and analyze' }).click();
+  await page.getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await page.getByLabel('Method').selectOption('quantitative');
   await saved(page);
   for (const [i, risk] of RISKS.entries()) await addRisk(page, i + 1, risk);
@@ -162,10 +162,13 @@ test('AT-5 task from an empty browser to the printed decision record in under 10
   await expect(page.getByText('D-1 Cloud hosting outage, linked to 2 risks')).toBeVisible();
 
   // 2 response options, then the optimization.
-  await page.getByRole('button', { name: 'Respond and optimize' }).click();
+  await page.getByRole('button', { name: 'Respond and optimize', exact: true }).click();
   await page.locator('#budget-cash').fill('40000');
   await addOption(page, 1, 'Offline backups with restore tests', 'risk|R-1', [12_000, 4_000, 3], [10_000, 150_000]);
   await addOption(page, 2, 'Call-back check for bank account changes', 'risk|R-3', [1_000, 2_000, 3], [1_000, 20_000]);
+  // The steps panel sees every step of the task, so the run and the print are next.
+  await expect(page.locator('details.steps > summary')).toHaveText('Steps to complete: 6 of 6 done');
+  await expect(page.locator('details.steps li[aria-current="step"]')).toContainText('Find the best portfolio and print the decision record');
   await page.getByRole('button', { name: 'Find the best portfolio' }).click();
   const record = page.locator('article.record');
   await expect(record.getByRole('heading', { level: 3, name: '04 Funded portfolio' })).toBeVisible({ timeout: 60_000 });
