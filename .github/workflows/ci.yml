@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # The merge queue on main needs the required checks on each merge group.
+  merge_group:
   workflow_dispatch:
 
 permissions: read-all
