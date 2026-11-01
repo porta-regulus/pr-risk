@@ -932,9 +932,23 @@ export interface ProvenanceRecord {
 export interface ChangeLogEntry {
   at: DateTime;
   actor?: string;
+  /**
+   * Since 1.1.0. Sec. 6.11 item 2 and Sec. 6.14 item 1. Why the app made the change itself. key is a fixed name of the reason, so a reason acts once also when its text changes. text is for people. A change of a person has no reasons.
+   *
+   * @minItems 1
+   */
+  reasons?: [ChangeReason, ...ChangeReason[]];
   entityKind: "context" | "strategy" | "asset" | "register" | "risk" | "driver" | "response" | "appetite" | "forecast";
   entityId: string;
   path: string;
   before?: unknown;
   after?: unknown;
+}
+/**
+ * This interface was referenced by `PortaRegulusRiskRegisterExchangeDocument`'s JSON-Schema
+ * via the `definition` "changeReason".
+ */
+export interface ChangeReason {
+  key: string;
+  text: string;
 }
