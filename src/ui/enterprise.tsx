@@ -5,9 +5,10 @@
 // labels, so the screen runs no simulation.
 import { useState } from 'preact/hooks';
 import { childEntries, type ChildEntry, mergeResult, parentRegisters, referencesTo, summaryEntries, withMerge, withoutRisk } from '../enterprise/normalize';
+import { closePeriod, periodRisks } from '../enterprise/period';
 import { type Assessed, type ErpBlock, erpBlocks, isPlaceholder, portfolioRow, withoutObjective } from '../enterprise/profile';
 import type { PriorityNumbers } from '../engine/prioritize';
-import type { DisparityLayout } from '../import/rollup';
+import type { DisparityLayout, ResponseCostRule } from '../import/rollup';
 import { lint } from '../schema/rules';
 import type { Register, Risk, RiskDocument } from '../schema/types';
 import { nextId, withValue } from './edit';
@@ -25,6 +26,11 @@ const CODE_TEXT: ReadonlyMap<string, string> = new Map(CODES);
 const LAYOUTS: readonly (readonly [DisparityLayout, string])[] = [
   ['one-row-all-responses', 'One row with all responses'],
   ['one-row-per-response', 'One row per response'],
+];
+
+const COST_RULES: readonly (readonly [ResponseCostRule, string])[] = [
+  ['total', 'Total of the sources'],
+  ['exposure-weighted-average', 'Average weighted by exposure rating'],
 ];
 
 export function assessedText(value: Assessed | undefined, factor: 'impact' | 'likelihood'): string {
@@ -225,6 +231,7 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
   const [description, setDescription] = useState('');
   const [owner, setOwner] = useState<string>();
   const [layout, setLayout] = useState<DisparityLayout>('one-row-all-responses');
+  const [costRule, setCostRule] = useState<ResponseCostRule>('total');
   const [response, setResponse] = useState('');
   const [priority, setPriority] = useState<number>();
   const [problems, setProblems] = useState<readonly string[]>([]);
@@ -243,6 +250,7 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
         riskDescription: description.trim(),
         riskOwnerPointOfContact: (owner ?? parent.owner ?? '').trim(),
         layout,
+        costRule,
         ...(response.trim() === '' ? {} : { riskResponseDescription: response.trim() }),
         ...(priority === undefined ? {} : { priority }),
       },
@@ -294,8 +302,8 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
       )}
       <h3>De-duplicate and combine</h3>
       <p class="hint">
-        Merge the selected entries into one summary entry of {parent.title}. Likelihood and impact take the three-point roll-up of SP 800-221r1 lines 1637 to 1641, and the response cost
-        is the total of the sources. Summary entries never enter the simulation, so no risk counts twice.
+        Merge the selected entries into one summary entry of {parent.title}. Likelihood and impact take the three-point roll-up of SP 800-221r1 lines 1637 to 1641. The response cost
+        is the total of the sources, or their average weighted by exposure rating (lines 1661 to 1664). Summary entries never enter the simulation, so no risk counts twice.
       </p>
       <InvalidFields.Provider value={report}>
         <div class="field-row">
@@ -320,6 +328,18 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
               options={LAYOUTS}
               onChange={(value) => {
                 setLayout(value ?? 'one-row-all-responses');
+              }}
+            />
+          </div>
+          <div class="field">
+            <SelectField
+              id="merge-cost"
+              label="Response cost"
+              hint="The weighted average counts a source with a larger exposure rating more. When every exposure rating is 0, it is the plain mean."
+              value={costRule}
+              options={COST_RULES}
+              onChange={(value) => {
+                setCostRule(value ?? 'total');
               }}
             />
           </div>
@@ -388,6 +408,7 @@ function SummaryTable({ doc, parent, update }: { readonly doc: RiskDocument; rea
                 <th scope="col">Likelihood</th>
                 <th scope="col">Impact</th>
                 <th scope="col">Exposure</th>
+                <th scope="col">Response cost</th>
                 <th scope="col">Priority</th>
                 <th scope="col">Risk Owner</th>
                 <th scope="col">Sources</th>
@@ -405,6 +426,10 @@ function SummaryTable({ doc, parent, update }: { readonly doc: RiskDocument; rea
                     <td class="likelihood">{threeText(risk.rollUp?.likelihood, risk.riskLikelihood, probability)}</td>
                     <td class="impact">{threeText(risk.rollUp?.impact, risk.riskImpact, money)}</td>
                     <td>{money(risk.exposureRating)}</td>
+                    <td class="cost">
+                      {money(risk.riskResponseCost)}
+                      <span class="sub">{risk.rollUp?.responseCostRule === 'exposure-weighted-average' ? 'Average weighted by exposure rating' : 'Total of the sources'}</span>
+                    </td>
                     <td>
                       <NumberField
                         id={`summary-priority-${risk.riskId}`}
@@ -504,6 +529,71 @@ function NormalizePanel({ doc, update }: { readonly doc: RiskDocument; readonly 
   );
 }
 
+// The scope value for every register. No register id can hold "*".
+const ALL = '*';
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+const localDate = (now = new Date()): string => new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+
+// SPEC.md Sec. 6.13 item 3. The previous period of the ERP and the portfolio comes from here.
+function PeriodPanel({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
+  const [scope, setScope] = useState(ALL);
+  const [asOf, setAsOf] = useState(localDate);
+  const [note, setNote] = useState<string>();
+  const tree = registerTree(doc.registers);
+  const registerId = tree.some(({ register }) => register.id === scope) ? scope : undefined;
+  const count = periodRisks(doc, registerId).length;
+  const close = (): void => {
+    update((current) => closePeriod(current, registerId, asOf).doc);
+    setNote(`The current assessment of ${String(count)} ${count === 1 ? 'risk' : 'risks'} is now the previous period, as of ${asOf}.`);
+  };
+  return (
+    <section aria-labelledby="period-title" class="panel">
+      <h2 id="period-title">Close the period</h2>
+      <p class="hint">
+        At the end of a period, the current assessment of each open risk becomes its previous assessment. It replaces the previous assessment that the risk has. The column Last of the
+        profile and the previous period of the portfolio then show it. Labels and the impact split are copied. Numbers that are placeholders or that come from labels are not copied,
+        because a copy would read as an estimate. Undo last change takes the close back.
+      </p>
+      <div class="field-row">
+        <div class="field">
+          <SelectField
+            id="period-scope"
+            label="Registers"
+            hint="A register includes the registers below it."
+            value={scope}
+            options={[[ALL, 'All registers'] as const, ...tree.map(({ register, depth }) => [register.id, `${'. '.repeat(depth)}${register.title}`] as const)]}
+            onChange={(value) => {
+              setScope(value ?? ALL);
+              setNote(undefined);
+            }}
+          />
+        </div>
+        <div class="field">
+          <TextField
+            id="period-as-of"
+            label="End of the period"
+            type="date"
+            value={asOf}
+            onChange={(value) => {
+              setAsOf(value);
+              setNote(undefined);
+            }}
+          />
+        </div>
+      </div>
+      <div class="button-row">
+        <button type="button" disabled={count === 0 || !DATE.test(asOf)} onClick={close}>
+          Close the period for {count} open {count === 1 ? 'risk' : 'risks'}
+        </button>
+      </div>
+      <p role="status" class="muted">
+        {note}
+      </p>
+    </section>
+  );
+}
+
 interface Simulation {
   readonly numbers?: PriorityNumbers;
   readonly running: boolean;
@@ -526,8 +616,8 @@ function PortfolioView({ doc, simulation }: { readonly doc: RiskDocument; readon
       <p class="hint">
         After SP 800-221r1 Table 7 (p. 44, line 1429), without its sub-columns. A register includes the registers below it. The financial profile is the expected annual loss of the
         negative risks. With a simulation it is the simulated value with its standard error, as on the screen Prioritize, and the entries without an estimate show apart. Without a
-        simulation it is the sum of the exposure ratings, because expected values add up. The previous period comes from the previous assessments. The document keeps no reputation or
-        mission label of the previous period.
+        simulation it is the sum of the exposure ratings, because expected values add up. The previous period comes from the previous assessments. The reputation and mission
+        profiles give the highest label on the impact scale.
       </p>
       <div class="table-box" tabIndex={0} role="region" aria-labelledby="portfolio-caption">
         <table class="portfolio">
@@ -540,19 +630,25 @@ function PortfolioView({ doc, simulation }: { readonly doc: RiskDocument; readon
               <th scope="colgroup" colSpan={2}>
                 Financial risk profile
               </th>
-              <th scope="col" rowSpan={2}>
-                Reputation risk profile, current period
+              <th scope="colgroup" colSpan={2}>
+                Reputation risk profile
               </th>
-              <th scope="col" rowSpan={2}>
-                Mission risk profile, current period
+              <th scope="colgroup" colSpan={2}>
+                Mission risk profile
               </th>
               <th scope="col" rowSpan={2}>
                 Entries
               </th>
             </tr>
             <tr>
-              <th scope="col">Current period</th>
-              <th scope="col">Previous period</th>
+              {[0, 1, 2].flatMap((profile) => [
+                <th scope="col" key={`${String(profile)}-current`}>
+                  Current period
+                </th>,
+                <th scope="col" key={`${String(profile)}-previous`}>
+                  Previous period
+                </th>,
+              ])}
             </tr>
           </thead>
           <tbody>
@@ -593,8 +689,10 @@ function PortfolioView({ doc, simulation }: { readonly doc: RiskDocument; readon
                       </span>
                     )}
                   </td>
-                  <td>{profile.reputation ?? 'No label'}</td>
-                  <td>{profile.mission ?? 'No label'}</td>
+                  <td class="reputation">{profile.reputation ?? 'No label'}</td>
+                  <td class="reputation-previous">{profile.previousReputation ?? 'No label'}</td>
+                  <td class="mission">{profile.mission ?? 'No label'}</td>
+                  <td class="mission-previous">{profile.previousMission ?? 'No label'}</td>
                   <td class="entries">
                     {profile.entries}
                     {profile.defaulted > 0 && <span class="sub">{profile.defaulted} with defaulted numbers</span>}
@@ -637,6 +735,7 @@ function EnterpriseBody({ doc, update }: { readonly doc: RiskDocument; readonly 
       <div class="print-view">
         <PortfolioView doc={doc} simulation={{ ...(numbers === undefined ? {} : { numbers }), running: job.running, ...(job.error === undefined ? {} : { error: job.error }) }} />
       </div>
+      <PeriodPanel doc={doc} update={update} />
       <div class="button-row">
         <button
           type="button"

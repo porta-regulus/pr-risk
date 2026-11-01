@@ -6,7 +6,9 @@ import { projectRdr, projectRegister } from './project';
 import { semanticErrors } from './rules';
 import type { Finding, RiskDocument } from './types';
 
-export const SCHEMA_VERSION = '1.0.0';
+// The version that the app writes. 1.1.0 adds optional fields only, so a 1.0.0 document
+// is also a valid 1.1.0 document and needs no migration (Sec. 7.7 item 2).
+export const SCHEMA_VERSION = '1.1.0';
 // ADR-0004 D1.
 export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
 export const MAX_JSON_DEPTH = 32;
@@ -49,8 +51,14 @@ export function migrate(value: unknown): { doc: unknown; migratedFrom?: string }
     return { error: { rule: 'SCHEMA', message: 'The file is not a JSON object' } };
   }
   const version = (value as Record<string, unknown>)['schemaVersion'];
-  if (typeof version !== 'string' || version.split('.')[0] !== SCHEMA_VERSION.split('.')[0]) {
-    return { error: { rule: 'SCHEMA', message: `Schema version ${String(version)} is not supported. This app reads ${SCHEMA_VERSION}.` } };
+  const [major, minor] = typeof version === 'string' ? version.split('.') : [];
+  const [ownMajor, ownMinor] = SCHEMA_VERSION.split('.');
+  if (major !== ownMajor) {
+    return { error: { rule: 'SCHEMA', message: `Schema version ${String(version)} is not supported. This app reads ${ownMajor ?? ''}.0.0 to ${SCHEMA_VERSION}.` } };
+  }
+  // A newer minor version can hold fields that this app does not know.
+  if (Number(minor) > Number(ownMinor)) {
+    return { error: { rule: 'SCHEMA', message: `Schema version ${String(version)} is newer than this app. This app reads ${ownMajor ?? ''}.0.0 to ${SCHEMA_VERSION}. Use a newer version of the app.` } };
   }
   return { doc: value };
 }

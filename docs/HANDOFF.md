@@ -64,6 +64,8 @@ Status 2026-10-29. Merged to `main` with pull request 1 of `porta-regulus/pr-ris
 
 Status 2026-10-30. The repository was created private on 2026-10-30. CodeQL is skipped while it is private. Done criterion 4 is met after the AT-7 workflow change (task 12), because Scorecard then runs on the private repository and stores a JSON result. Done criterion 3 cannot pass while the repository is private. See task 12.
 
+Status 2026-10-31. The repository is public. CodeQL runs. Done criterion 3 passes with the test tag `v0.1.0-rc.2` (task 12).
+
 Steps.
 1. Create the public repository now, because the Scorecard Maintained check scores 0 for the first 90 days. Ask the product owner before you create or push it.
 2. Add `LICENSE` (Apache-2.0), `NOTICE`, `SECURITY.md` with the CVD policy (SPEC.md Sec. 11 item 7), `DEPENDENCIES.md`, `CONTRIBUTING.md`.
@@ -251,8 +253,8 @@ What the screen does.
 5. Print. The print button prints the ERR, the ERP and the portfolio without the form fields (SPEC.md Sec. 9.8).
 
 Answers of the product owner, 2026-10-30, and what follows from them.
-1. Weighted average of the response costs (Sec. 6.15 item 4, SP 800-221r1 lines 1661 to 1664). The owner asked for a proposal. Proposal. Weight the cost of each source by its exposure rating, so that a source with a larger expected loss counts more, and use the plain mean when every exposure rating is 0. The total stays the default. The summary must record which rule gave its cost, which needs a new optional field in `rollUp`. Not built. It goes with item 2.
-2. Previous reputation and mission labels. The owner wants them if this is possible. It is possible, but it is a minor schema version (Sec. 7.7 item 2). `schemaVersion` and `$id` go to 1.1.0, documents of 1.0.0 must still open, `validate.py` and rule V-11 check the new labels, and the generated files and pinned fixtures change. No screen edits `previousAssessment` yet, so the task also needs a way to fill the previous period. Not built. Proposed as a separate task.
+1. Weighted average of the response costs (Sec. 6.15 item 4, SP 800-221r1 lines 1661 to 1664). The owner asked for a proposal. Proposal. Weight the cost of each source by its exposure rating, so that a source with a larger expected loss counts more, and use the plain mean when every exposure rating is 0. The total stays the default. The summary must record which rule gave its cost, which needs a new optional field in `rollUp`. Built 2026-10-31, see "Schema 1.1.0" after task 9.
+2. Previous reputation and mission labels. The owner wants them if this is possible. It is possible, but it is a minor schema version (Sec. 7.7 item 2). `schemaVersion` and `$id` go to 1.1.0, documents of 1.0.0 must still open, `validate.py` and rule V-11 check the new labels, and the generated files and pinned fixtures change. No screen edits `previousAssessment` yet, so the task also needs a way to fill the previous period. Built 2026-10-31, see "Schema 1.1.0" after task 9.
 3. Simulated value in the portfolio. The owner prefers it. Done, see item 4 of the list above.
 4. The per-entity choice of the import merge (Sec. 9.7). The owner does not know which task owns it. `src/import/pipeline.ts` (task 4) has the choice (keep current, take incoming, keep both), but S1 shows only the number of changed fields. Proposal. Build the control on S1 before the usability test of task 10, because a parent register takes its child registers as files (Sec. 6.1 item 4), and the import of a newer child file needs the choice. Built 2026-10-30, see "Import merge choice on S1" after task 9.
 
@@ -289,54 +291,79 @@ Decisions of the product owner, 2026-10-31. SPEC.md Sec. 9.7 has the rules.
 
 Tests for the decisions. `test/ui-merge.test.ts` checks the diff of a newer Table 10 CSV, the stated fields of CSV rows, an IR 8286 entry, labels, nested fields, defaulted marks and the register choice. `e2e/start.spec.ts` checks that notes and category stay after take incoming and keep both. A third test imports a native copy of example 3 with 2 changed registers. It keeps current for SYS-A and takes incoming for SYS-B, then checks the stored registers, their order, the change log and axe-core.
 
+### Schema 1.1.0 (SPEC.md Sec. 7.7)
+
+Status 2026-10-31. Done. This is items 1 and 2 of the answers in task 7.
+1. Version. `schemaVersion` accepts `1.0.0` and `1.1.0`, and the `$id` has `1.1.0`. Version 1.1.0 adds optional fields only, so a 1.0.0 document is also a valid 1.1.0 document. The app needs no migration, and the documents and the 20 kept versions in a browser stay valid. `saveDocument` writes `1.1.0`. `migrate` refuses a newer minor version with "Use a newer version of the app". The 3 examples stay 1.0.0, so the tests show that a 1.0.0 file still opens.
+2. Previous reputation and mission labels. `previousAssessment.impacts` uses the same definition as `impacts`. Rule V-11 checks its labels in `rules.ts` and in `validate.py`. A new parity case in `tools/python_parity.py` checks that both list the same 22 label fields in the same order. The portfolio of S7 has current and previous columns for the financial, reputation and mission profiles.
+3. Close the period. A panel on S7 copies the current assessment of each open risk in a register, with the registers below it, or in all registers, into `previousAssessment`, with the end date of the period. It replaces the old previous assessment. It copies labels and the impact split. It copies a number only when the number is not in `defaultedFields`, because the previous assessment has no `defaultedFields`, and a placeholder or a number from a label would then read as an estimate (hard rule 2). A risk with nothing to copy loses its old previous assessment. Undo takes the close back. Closed risks and risks that only a response causes are not changed.
+4. Response cost of a summary entry. The merge form on S7 has the choice "Total of the sources" (default) or "Average weighted by exposure rating". The weight is the exposure rating of each source, the plain mean applies when every exposure rating is 0, and the result is rounded to whole currency units (`responseCost` in `src/import/rollup.ts`). Only the weighted average writes `rollUp.responseCostRule`. Without the field the cost is the total, as in 1.0.0, so golden test G3 still gives ORG-1 of example 3 exactly. The table of summary entries shows the cost and its rule.
+5. Tests. `test/enterprise.test.ts` (cost rule, close of a period, previous labels), `test/schema-rules.test.ts` (both versions, newer minor version, V-11 and schema cases), `test/schema-parity.test.ts` (label fields) and `e2e/enterprise.spec.ts` (cost rule in the merge, close of a period with axe, 375 px and undo).
+
+Open for the product owner.
+1. Two other optional fields wait for a decision, the `reason` field of a change log entry (task 6, open item 2) and the record of a value that the user did not take on import (import merge choice, open item 2). Each is a new optional field, so both can go into version 1.2.0.
+2. The first previous period. "Close the period" fills it from now on. A register that has last year's assessment in another tool has no way to enter it, apart from an import of a native file that holds `previousAssessment`. A form for the previous assessment on S3 is possible if the pilot needs it.
+
 ### Task 12. Release 1 and AT-7 (SPEC.md Sec. 12.7)
+
+Status 2026-10-31, first deploy. The test tag `v1.0.0-rc.1` (commit c0448a5, release run 41248630337) passed the release and the first deploy to https://risk.portaregulus.com. The 5 repository variables come from the Terraform output `github_variables`. The release is immutable and has 6 files, and all verify commands and `gh release verify` pass. The SBOM attestation now comes from `actions/attest` v4.2.2. The 11 live files are equal to the files of the release, and the live headers are the headers of ADR-0004. The `production` environment has the tag rule `v*` but no required reviewer, so each `v*` tag deploys at once. `infra/gcp/README.md` step 6 asks for a required reviewer. The product owner decides if a single maintainer needs this approval step. The open items before release 1 are D5, F5, F9, F11, the sign-off of the Annex I self-check (D6), AT-5 and AT-6.
+
+Status 2026-10-31, test tag. AT-7 passes for the prerelease `v0.1.0-rc.2` (commit e5ec955, release run 41244747547). The release is immutable and has 6 files. `sha256sum -c SHA256SUMS`, `gh attestation verify` for the provenance (with and without the attached bundle) and for the CycloneDX 1.6 SBOM, and `gh release verify` all pass. The provenance is in Rekor. Scorecard publishes 7.4 (run 41245028956), with Signed-Releases 10. The first test tag `v0.1.0-rc.1` (on dfedb67) stopped at the SBOM attestation, because `actions/attest` needs a CycloneDX `serialNumber` and `cyclonedx-npm --output-reproducible` leaves it out. No release was made for it. Its provenance attestation stays in Rekor. Pull request #25 adds a serial number from the bundle SHA-256 and sets the version to `0.1.0-rc.2`. The open items are D5, D6 and D7.
+
+Status 2026-10-31. The repository is public since 2026-10-31. Private vulnerability reporting, Dependabot alerts and security updates, secret scanning with push protection, and immutable releases are on. Scorecard publishes 7.2 on https://api.scorecard.dev (run 41242967570, commit b64506e). The next step is the test tag (D3). AT-7 can pass on the day that the test tag passes.
 
 Status 2026-10-30. AT-7 cannot pass while the repository is private. The code is not the cause. The organization `porta-regulus` has the GitHub Team plan. On that plan, artifact attestations work only in public repositories, and code scanning in a private repository needs a Code Security licence. AT-7 can pass 1 to 3 working days after the repository becomes public. It does not have to wait for 2027-01-28.
 
-The pull request that adds this section fixes 5 workflow gaps.
+Pull request #14 added this section and fixed 5 workflow gaps. It was merged on 2026-10-30.
 1. `release.yml`. `SHA256SUMS` and the per-file list are now attestation subjects. Both Sigstore bundles are release files (`pr-risk-<tag>.intoto.jsonl` and `pr-risk-<tag>.sbom.intoto.jsonl`). Scorecard Signed-Releases reads release files only, not the attestation API. Without these files, the first release gives Signed-Releases 0, and the score falls below 7.0.
 2. `release.yml`. The release notes give the verify commands and add the GitHub generated notes, for the Best Practices criterion `release_notes`.
 3. `scorecard.yml`. Scorecard runs on the private repository too, without publishing, and stores a JSON result. This meets task 1 done criterion 4. The SARIF upload runs only while the repository is public.
 4. `scorecard.yml` and `codeql.yml`. A schedule event has no webhook payload, so `github.event.repository.private` is empty there, and the Monday runs would start on the private repository and fail. A first job now gets the visibility from the API.
 5. `osv-scanner.toml`. The OSV records for npm `xlsx` have no fixed version, so Scorecard Vulnerabilities flagged CVE-2023-30533 and CVE-2024-22363. SheetJS fixed them in 0.19.3 and 0.20.2, and the lockfile pins 0.20.3. The file ignores the 2 IDs with these reasons. Vulnerabilities goes from 8 to 10.
 
-Scorecard estimate (Scorecard 5.6.0). The pull request has the score of each check.
+A sixth fix gives the Scorecard job the permission `statuses: read`. Without it, CI-Tests on the private repository stops with HTTP 403 on the commit statuses API and gives -1, so the check is not counted. A public repository does not need this permission.
+
+On 2026-10-31, 2 new advisories for the dev dependencies glob and minimatch took Vulnerabilities to 8 and the score on `main` to 7.0. The fixed versions are new major versions that eslint 10 and cacache 19 do not accept yet. `osv-scanner.toml` ignores the 2 advisories until 2026-12-01, with the reasons. Before that date, remove the entries when Dependabot brings the fixed versions, or check them again. One more open advisory takes 7.0 to 6.9.
+
+Scorecard scores (Scorecard 5.6.0). Pull request #14 has the score of each check.
 
 | State | Score |
 |---|---|
-| Now, private, CLI run on 2026-10-30 | 6.7 |
-| This change merged, repository public, no ruleset, no release | 6.9 |
-| Plus ruleset A on `main` | 7.2 |
-| Plus a first release with the `.intoto.jsonl` file | 7.4 |
+| Private, CLI run on 2026-10-30, before pull request #14 | 6.7 |
+| Measured. Private, pull request #14 and ruleset A, Scorecard workflow on `main` on 2026-10-30 (run 41122185865). CI-Tests -1. | 7.1 |
+| Plus `statuses: read`, private or public. CI-Tests 10. Measured on `main` on 2026-10-31, public and published (run 41242967570). | 7.2 |
+| Plus a first release with the `.intoto.jsonl` file. Measured on 2026-10-31 after `v0.1.0-rc.2` (run 41245028956). | 7.4 |
 | Plus the Best Practices badge, level passing | 7.5 |
 | Plus CodeQL on all of the last 30 commits | 7.7 |
 | Ruleset B in place of A, with all of the above | 8.0 |
 | From 2027-01-28, when Maintained gives 10 | 8.4 with A, 8.7 with B |
+
+The measured 7.1 is above 7.0, but it is not sufficient for AT-7. A result on a private repository is not published on https://api.scorecard.dev and has no badge, and AT-7 also needs the attestations. Both need the public repository.
 
 Ruleset A blocks deletion and force push, and requires a pull request with 0 approvals and the CI checks on an up-to-date branch. It gives Branch-Protection 4. Do not set "require approval of the most recent push", because that needs a second person. Ruleset B adds 1 required approval and the last push approval, with the admin role as bypass actor. It gives 8, but each merge of your own change uses the bypass, so B stops other people only. Code-Review and Contributors stay 0 with one maintainer (SPEC.md Q5).
 
 The Maintained clock started on 2026-10-30, the creation date. A change of visibility keeps that date. A new repository starts the 90 days again, so do not make a new repository.
 
 Plan.
-1. Merge the workflow change.
-2. The product owner makes the repository public (D1). CI already scans every commit for secrets with gitleaks.
-3. Same day. The product owner sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
-4. Same day. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Expected 7.2.
-5. Same day, after approval (D3). Push the test tag `v0.1.0-rc.1`. Check that the prerelease has 6 files, and run the verify commands of the release notes. This meets task 1 done criterion 3. Expected Scorecard 7.4.
+1. Done 2026-10-30. Merge the workflow change (pull request #14).
+2. Done 2026-10-31. The product owner makes the repository public (D1). CI already scans every commit for secrets with gitleaks. A check of all 125 commits before the change found no secrets, personal paths or internal host names.
+3. Done 2026-10-31. The product owner sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
+4. Done 2026-10-31. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Measured 7.2.
+5. Done 2026-10-31 with `v0.1.0-rc.2`. After approval (D3), push the test tag. Check that the prerelease has 6 files, and run the verify commands of the release notes. This meets task 1 done criterion 3. Measured Scorecard 7.4.
 6. Day 1 to 2. The product owner makes the entry on https://www.bestpractices.dev (D5). The answers with evidence URLs are in [`docs/release/best-practices-answers.md`](release/best-practices-answers.md) (draft 2026-10-30). Its section 1 lists 5 steps to do before the entry.
-7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are closed (S1 notices on storage encryption and browser extensions, a check of each stored record on read, `docs/self-host.md`, 3 statements in `SECURITY.md`). F5, F6 and F8 to F11 need the product owner.
+7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are closed (S1 notices on storage encryption and browser extensions, a check of each stored record on read, `docs/self-host.md`, 3 statements in `SECURITY.md`). F8 and F10 are closed on 2026-10-31 (public repository with its security features, prerelease `v0.1.0-rc.2`). F5, F6, F9 and F11 need the product owner.
 8. Tag release 1 when AT-5 and AT-6 pass (D7).
 
-Earliest date. If the repository becomes public on Monday 2026-11-02, AT-7 can pass on Wednesday 2026-11-04. Release 1 is on that date or on the date that AT-5 and AT-6 pass, whichever is later.
+Earliest date. AT-7 passed on Saturday 2026-10-31 for the test tag. Release 1 can be tagged when AT-5 and AT-6 pass. It must also pass AT-7, and the same workflow makes that automatic.
 
 Decisions for the product owner.
-1. D1. The date to make the repository public. AT-7 cannot pass before that date.
+1. D1. Done 2026-10-31. The date to make the repository public. AT-7 cannot pass before that date.
 2. D2. Done 2026-10-30. Ruleset A is active on `main` (ruleset ID 26223939, no bypass actor). It requires 5 checks from the GitHub Actions app. These are "Lint, type check and unit tests", "Build and Playwright", "OSCAL POA&M exports pass oscal-cli (AT-4)", "Schema and reference model checks" and "No secret in the git history (gitleaks)". The performance job and CodeQL are not required, because they run only while the repository is public and a slow runner must not block a merge. Change to ruleset B when a second maintainer exists.
-3. D3. Approval of the test tag `v0.1.0-rc.1`. The deploy job is skipped while the repository variables are empty. If you set the variables first, the test tag deploys to production.
-4. D4. Immutable releases. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number, for example `v0.1.0-rc.2`.
+3. D3. Done 2026-10-31. Approval of the test tag. `v0.1.0-rc.1` failed before a release, and `v0.1.0-rc.2` passed. The deploy job is skipped while the repository variables are empty. If you set the variables first, the test tag deploys to production.
+4. D4. Done 2026-10-31, immutable releases are on. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number. The next free test tag is `v1.0.0-rc.1` (D7).
 5. D5. The Best Practices entry needs the GitHub account of a project member.
 6. D6. Who writes and who signs the Annex I self-check, and where it is published.
-7. D7. The version number of release 1. `package.json` has `0.1.0-rc.1`.
+7. D7. Done 2026-10-31. Release 1 is `1.0.0`. Users read a `0.x` version as beta, and the file format has its own schema version, so the app version can show stability. The test tags before release 1 are `v1.0.0-rc.N`. `package.json` has `1.0.0-rc.1`.
 
 ## 6. Rules for the build session
 

@@ -16,7 +16,7 @@ The URLs work only after the repository is public. `R` below means https://githu
 | 1 | Make the repository public (D1). | `repo_public`, `report_archive`, `discussion` |
 | 2 | Turn on private vulnerability reporting. | `vulnerability_report_private` |
 | 3 | Wait for the first CodeQL run on `main`, and check that it has no open alert. | `static_analysis`, `static_analysis_fixed` |
-| 4 | Push the test tag `v0.1.0-rc.1` (D3), so that one release with release notes exists. | `release_notes`, `version_tags` |
+| 4 | Push the test tag `v0.1.0-rc.2` (D3), so that one release with release notes exists. | `release_notes`, `version_tags` |
 | 5 | Confirm that a primary developer meets the 2 knowledge criteria. | `know_secure_design`, `know_common_errors` |
 
 ## 2. Answers

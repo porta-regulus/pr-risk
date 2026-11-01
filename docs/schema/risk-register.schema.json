@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://www.portaregulus.com/schema/risk-register/1.0.0/risk-register.schema.json",
+  "$id": "https://www.portaregulus.com/schema/risk-register/1.1.0/risk-register.schema.json",
   "title": "PortaRegulus risk register exchange document",
   "description": "One file holds the risk components of NIST SP 800-221r1 ipd for one enterprise: context, governance roles, strategy, appetite, assets, registers, drivers, risks, responses and the forecast log. Each risk entry is a valid NIST IR 8286 Rev. 1 risk register entry (allOf). The risk detail uses NIST IR 8286 Rev. 1 risk detail record property definitions. Amounts are in the document currency. Probabilities are fractions from 0 to 1. Section numbers in descriptions refer to SP 800-221r1 ipd.",
   "type": "object",
@@ -16,7 +16,11 @@
       "type": "string"
     },
     "schemaVersion": {
-      "const": "1.0.0"
+      "description": "Sec. 7.7. A 1.0.0 document is also a valid 1.1.0 document, because 1.1.0 adds optional fields only. The app writes 1.1.0.",
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ]
     },
     "document": {
       "$ref": "#/$defs/documentInfo"
@@ -707,6 +711,13 @@
         },
         "impact": {
           "$ref": "#/$defs/threePointValue"
+        },
+        "responseCostRule": {
+          "description": "Since 1.1.0. SP 800-221r1 lines 1661 to 1664. total is the sum of the source costs. exposure-weighted-average weights each source cost by its exposure rating, and is the plain mean when every exposure rating is 0. Without this field the cost is the total.",
+          "enum": [
+            "total",
+            "exposure-weighted-average"
+          ]
         }
       }
     },
@@ -1148,7 +1159,7 @@
           "$ref": "#/$defs/identifier"
         },
         "previousAssessment": {
-          "description": "Sec. 4.3 Fig. 11 Last column and Table 7 Previous Period.",
+          "description": "Sec. 4.3 Fig. 11 Last column and Table 7 Previous Period. impacts is since 1.1.0, for the reputation and mission profiles of the previous period.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
@@ -1172,6 +1183,9 @@
             },
             "exposureRatingLabel": {
               "type": "string"
+            },
+            "impacts": {
+              "$ref": "#/$defs/impacts"
             }
           }
         },

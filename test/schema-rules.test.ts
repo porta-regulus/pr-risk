@@ -78,6 +78,14 @@ const CASES: [string, string, Mutation, string][] = [
     risk.riskResponseType = ['Mitigate'];
   }, 'V-09'],
   ['label not on the strategy scale', EXAMPLE_1, (doc) => { riskOf(doc, '1').exposureRatingLabel = 'Extreme'; }, 'V-11'],
+  ['previous reputation label not on the strategy scale (1.1.0)', EXAMPLE_1, (doc) => {
+    riskOf(doc, '1').previousAssessment = { asOf: '2026-01-01', impacts: { reputation: { label: 'Extreme' } } };
+  }, 'V-11'],
+  ['unknown field in the previous impact split (1.1.0)', EXAMPLE_1, (doc) => {
+    riskOf(doc, '1').previousAssessment = { asOf: '2026-01-01', impacts: { reputation: { label: 'High' } } };
+    mutable(riskOf(doc, '1').previousAssessment?.impacts)['brand'] = { label: 'High' };
+  }, 'SCHEMA'],
+  ['unknown response cost rule (1.1.0)', EXAMPLE_3, (doc) => { mutable(riskOf(doc, 'ORG-1').rollUp)['responseCostRule'] = 'median'; }, 'SCHEMA'],
   ['tolerance curve not descending', EXAMPLE_2, (doc) => {
     const points = doc.appetite?.toleranceCurve?.points;
     const [first, second] = points ?? [];
@@ -145,6 +153,23 @@ describe('lint', () => {
 describe('readDocument', () => {
   it('reads every example', () => {
     for (const file of [EXAMPLE_1, EXAMPLE_2, EXAMPLE_3]) expect(readDocument(JSON.stringify(example(file))).ok).toBe(true);
+  });
+
+  it('reads a 1.0.0 document and a 1.1.0 document with the new optional fields (SPEC.md Sec. 7.7)', () => {
+    const old = example(EXAMPLE_1);
+    expect(old.schemaVersion).toBe('1.0.0');
+    expect(readDocument(JSON.stringify(old)).ok).toBe(true);
+    const doc = example(EXAMPLE_1);
+    doc.schemaVersion = '1.1.0';
+    riskOf(doc, '1').previousAssessment = { asOf: '2026-01-01', riskImpactLabel: 'High', impacts: { reputation: { label: 'Medium' }, mission: { label: 'High' } } };
+    const read = readDocument(JSON.stringify(doc));
+    expect(read.ok && read.doc.risks.find((risk) => risk.riskId === '1')?.previousAssessment?.impacts?.mission?.label).toBe('High');
+  });
+
+  it('rejects a newer minor version, because it can hold fields that this app does not know', () => {
+    const read = readDocument(JSON.stringify({ ...example(EXAMPLE_2), schemaVersion: '1.2.0' }));
+    expect(read.ok).toBe(false);
+    expect(!read.ok && read.errors[0]?.message).toBe('Schema version 1.2.0 is newer than this app. This app reads 1.0.0 to 1.1.0. Use a newer version of the app.');
   });
 
   it('rejects broken JSON, deep nesting, other major versions and __proto__ keys', () => {
