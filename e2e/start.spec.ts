@@ -131,7 +131,9 @@ test('import into an open document shows the diff and takes one choice per risk'
   await expect(row('A-1', 'riskLikelihood').getByRole('cell')).toHaveText(['0.1', '0.15']);
   await expect(row('B-1', 'riskImpact').getByRole('cell')).toHaveText(['400000', '450000']);
   await expect(row('C-1', 'riskResponseType').getByRole('cell')).toHaveText(['Accept', 'Mitigate']);
-  await expect(row('A-1', 'notes').getByRole('cell').nth(1)).toHaveText('Not set');
+  // The CSV holds only some fields. Fields that it does not hold, such as notes, are not in the diff.
+  await expect(page.getByText('The file holds only some fields of a risk.')).toBeVisible();
+  await expect(row('A-1', 'notes')).toHaveCount(0);
   for (const id of ['A-1', 'B-1', 'C-1']) await expect(group(id).getByRole('radio', { name: 'Take incoming' })).toBeChecked();
   await expectAccessible(page, 'S1 with an import diff');
 
@@ -153,9 +155,10 @@ test('import into an open document shows the diff and takes one choice per risk'
   const stored = await page.evaluate(storedDocument);
   const risk = (id: string) => (stored['risks'] as Risk[]).find((item) => item.riskId === id);
   expect(risk('A-1')).toEqual(originalRisk('A-1'));
-  expect(risk('B-1')?.riskImpact).toBe(450000);
+  // Take incoming and keep both change only the fields that the CSV holds. Notes and category stay.
+  expect(risk('B-1')).toEqual({ ...originalRisk('B-1'), riskImpact: 450000, exposureRating: 135000 });
   expect(risk('C-1')).toEqual(originalRisk('C-1'));
-  expect(risk('C-1-2')?.riskResponseType).toEqual(['Mitigate']);
+  expect(risk('C-1-2')).toEqual({ ...originalRisk('C-1'), riskId: 'C-1-2', riskResponseType: ['Mitigate'] });
   expect((stored['risks'] as Risk[]).length).toBe((original['risks'] as Risk[]).length + 1);
   const log = stored['changeLog'] as { entityKind: string; entityId: string; before?: unknown; after?: unknown }[];
   expect(log.map((entry) => [entry.entityKind, entry.entityId])).toEqual([
@@ -169,6 +172,53 @@ test('import into an open document shows the diff and takes one choice per risk'
   expect((stored['provenance'] as { fileName: string }[]).at(-1)?.fileName).toBe('table10-newer.csv');
 
   expect(problems, 'errors, warnings and CSP violations').toEqual([]);
+});
+
+// SPEC.md Sec. 9.7 for registers. A native file with changed registers gives each one the choice
+// keep current or take incoming. A register has no keep both.
+test('import of a native file takes one choice per changed register', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Table 10 imports (example 3)' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
+  const original = await page.evaluate(storedDocument);
+  const registers = original['registers'] as Register[];
+  const originalRegister = (id: string) => registers.find((register) => register.id === id);
+  const newer = {
+    ...original,
+    registers: registers.map((register) =>
+      register.id === 'SYS-A' ? { ...register, title: 'Merger file share, new' } : register.id === 'SYS-B' ? { ...register, asOf: '2026-12-31' } : register,
+    ),
+  };
+  await page.setInputFiles('#import-file', { name: 'example-3-newer.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(newer), 'utf8') });
+  await expect(page.getByText('2 registers have other values in the file.')).toBeVisible();
+
+  const group = (id: string) => page.getByRole('group', { name: `Register ${id}` });
+  await expect(page.getByRole('region', { name: 'Changed fields of Register SYS-A' }).getByRole('row', { name: 'title' }).getByRole('cell')).toHaveText([
+    'Merger project file share',
+    'Merger file share, new',
+  ]);
+  await expect(page.getByRole('region', { name: 'Changed fields of Register SYS-B' }).getByRole('row', { name: 'asOf' }).getByRole('cell')).toHaveText(['2026-10-27', '2026-12-31']);
+  for (const id of ['SYS-A', 'SYS-B']) {
+    await expect(group(id).getByRole('radio', { name: 'Take incoming' })).toBeChecked();
+    await expect(group(id).getByRole('radio', { name: 'Keep both' })).toHaveCount(0);
+  }
+  await expectAccessible(page, 'S1 with a register diff');
+
+  await group('SYS-A').getByRole('radio', { name: 'Keep current' }).check();
+  await page.getByRole('button', { name: /^Add to / }).click();
+  const riskCount = (original['risks'] as Risk[]).length;
+  await expect(page.getByText(`0 risks from example-3-newer.json are saved. ${String(riskCount)} risks have no change. 1 register is updated. 1 register keeps its current version.`)).toBeVisible();
+
+  const stored = await page.evaluate(storedDocument);
+  const storedRegisters = stored['registers'] as Register[];
+  expect(storedRegisters.find((register) => register.id === 'SYS-A')).toEqual(originalRegister('SYS-A'));
+  expect(storedRegisters.find((register) => register.id === 'SYS-B')).toEqual({ ...originalRegister('SYS-B'), asOf: '2026-12-31' });
+  expect(storedRegisters.map((register) => register.id)).toEqual(registers.map((register) => register.id));
+  expect(stored['risks']).toEqual(original['risks']);
+  const log = stored['changeLog'] as { entityKind: string; entityId: string; before?: unknown; after?: unknown }[];
+  expect(log.map((entry) => [entry.entityKind, entry.entityId])).toEqual([['register', 'SYS-B']]);
+  expect(log[0]?.before).toEqual(originalRegister('SYS-B'));
+  expect(log[0]?.after).toEqual({ ...originalRegister('SYS-B'), asOf: '2026-12-31' });
 });
 
 // The diff of a preview is valid only for the document it was made against. Selecting another
@@ -283,6 +333,12 @@ interface Risk {
   readonly riskId: string;
   readonly riskImpact?: number;
   readonly riskResponseType?: string[];
+}
+
+interface Register {
+  readonly id: string;
+  readonly title?: string;
+  readonly asOf?: string;
 }
 
 // What the browser still holds for this origin. Runs in the page.

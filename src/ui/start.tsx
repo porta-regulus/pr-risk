@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import { decrypt, encrypt, isEncryptedFile } from '../export/encryption';
 import { exportCsv, exportIr8286, exportNative } from '../export/export';
 import { runImport } from '../import/client';
-import { commitImport, type Choice, type ImportPreview } from '../import/pipeline';
+import { commitImport, type Choice, type DiffEntry, type ImportChoices, type ImportPreview } from '../import/pipeline';
 import { exportPoam } from '../oscal/poam';
 import { lint } from '../schema/rules';
 import type { Finding, RiskDocument } from '../schema/types';
@@ -26,7 +26,7 @@ import {
 } from '../storage/db';
 import type { ScreenName } from './editor';
 import { downloadText, newDocument, slug } from './files';
-import { CHOICE_TEXT, fieldParts, importChoices, mergeEntities, mergeResultText, unchangedRisks, type MergeEntity } from './merge';
+import { CHOICE_TEXT, choicesOf, fieldParts, importChoices, mergeEntities, mergeResultText, unchangedRisks, type MergeEntity } from './merge';
 
 const EXAMPLES = {
   'example-2': { label: 'SME with numbers (example 2)', load: () => import('../../docs/schema/examples/example-2-sme-quantitative.json') },
@@ -68,19 +68,22 @@ function ErrorList({ errors }: { readonly errors: readonly Finding[] }) {
 }
 
 // Sec. 9.7. One block per entity of the open document that the file changes, with the
-// fields side by side. A risk gets the choice of keep current, take incoming or keep both.
+// fields side by side. A risk gets the choice of keep current, take incoming or keep both. A
+// register gets keep current or take incoming.
 function MergeChoices({
   title,
   entities,
   same,
+  partial,
   choices,
   onChoose,
 }: {
   readonly title: string;
   readonly entities: readonly MergeEntity[];
   readonly same: number;
-  readonly choices: Readonly<Record<string, Choice>>;
-  readonly onChoose: (id: string, choice: Choice) => void;
+  readonly partial: boolean;
+  readonly choices: ImportChoices;
+  readonly onChoose: (kind: DiffEntry['kind'], id: string, choice: Choice) => void;
 }) {
   const risks = entities.filter((entity) => entity.kind === 'risk');
   const registers = entities.filter((entity) => entity.kind === 'register');
@@ -98,8 +101,13 @@ function MergeChoices({
           {same} {same === 1 ? 'risk is' : 'risks are'} the same in the file and stay as they are.
         </p>
       )}
+      {partial && risks.length > 0 && (
+        <p class="hint">The file holds only some fields of a risk. Take incoming and keep both change only the fields that the file holds. All other fields keep their current values.</p>
+      )}
       {registers.length > 0 && (
-        <p class="hint">The import keeps the registers of the open document. To change a register, use the screen Identify and analyze.</p>
+        <p class="hint">
+          {registers.length} {registers.length === 1 ? 'register has' : 'registers have'} other values in the file. A register has no keep both, because its risks use its id.
+        </p>
       )}
       {entities.map((entity) => {
         const label = `${entity.kind === 'risk' ? 'Risk' : 'Register'} ${entity.id}`;
@@ -132,33 +140,22 @@ function MergeChoices({
             </table>
           </div>
         );
-        if (entity.kind === 'register') {
-          return (
-            <div class="merge-entity" key={`register ${entity.id}`}>
-              <p>
-                <strong>{label}</strong>
-                <span class="sub">{entity.title}</span>
-              </p>
-              {table}
-            </div>
-          );
-        }
-        const choice = choices[entity.id] ?? 'incoming';
+        const choice = (entity.kind === 'risk' ? choices.risks?.[entity.id] : choices.registers?.[entity.id]) ?? 'incoming';
         return (
-          <fieldset class="merge-entity" key={`risk ${entity.id}`}>
+          <fieldset class="merge-entity" key={`${entity.kind} ${entity.id}`}>
             <legend>{label}</legend>
             <p class="sub">{entity.title}</p>
             {table}
             <div class="merge-options">
-              {(Object.keys(CHOICE_TEXT) as Choice[]).map((option) => (
+              {choicesOf(entity.kind).map((option) => (
                 <label key={option} class="check">
                   <input
                     type="radio"
-                    name={`merge-${entity.id}`}
+                    name={`merge-${entity.kind}-${entity.id}`}
                     value={option}
                     checked={choice === option}
                     onChange={() => {
-                      onChoose(entity.id, option);
+                      onChoose(entity.kind, entity.id, option);
                     }}
                   />
                   {CHOICE_TEXT[option]}
@@ -179,8 +176,8 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   const [status, setStatus] = useState<StorageStatus>();
   const [message, setMessage] = useState<Message>();
   const [preview, setPreview] = useState<Pending>();
-  // The merge choice per matched risk id (Sec. 9.7). An id that is not here takes incoming.
-  const [choices, setChoices] = useState<Record<string, Choice>>({});
+  // The merge choice per matched risk and register (Sec. 9.7). An id that is not here takes incoming.
+  const [choices, setChoices] = useState<ImportChoices>({});
   const [busy, setBusy] = useState(false);
   const [passphrase, setPassphrase] = useState('');
   const [openPassphrase, setOpenPassphrase] = useState('');
@@ -529,9 +526,12 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                   title={current.title}
                   entities={entities}
                   same={same}
+                  partial={preview.preview.partial === true}
                   choices={choices}
-                  onChoose={(id, choice) => {
-                    setChoices((old) => ({ ...old, [id]: choice }));
+                  onChoose={(kind, id, choice) => {
+                    setChoices((old) =>
+                      kind === 'risk' ? { ...old, risks: { ...old.risks, [id]: choice } } : { ...old, registers: { ...old.registers, [id]: choice === 'both' ? 'incoming' : choice } },
+                    );
                   }}
                 />
               )}

@@ -64,6 +64,8 @@ Status 2026-10-29. Merged to `main` with pull request 1 of `porta-regulus/pr-ris
 
 Status 2026-10-30. The repository was created private on 2026-10-30. CodeQL is skipped while it is private. Done criterion 4 is met after the AT-7 workflow change (task 12), because Scorecard then runs on the private repository and stores a JSON result. Done criterion 3 cannot pass while the repository is private. See task 12.
 
+Status 2026-10-31. The repository is public. CodeQL runs. Done criterion 3 passes with the test tag `v0.1.0-rc.2` (task 12).
+
 Steps.
 1. Create the public repository now, because the Scorecard Maintained check scores 0 for the first 90 days. Ask the product owner before you create or push it.
 2. Add `LICENSE` (Apache-2.0), `NOTICE`, `SECURITY.md` with the CVD policy (SPEC.md Sec. 11 item 7), `DEPENDENCIES.md`, `CONTRIBUTING.md`.
@@ -276,16 +278,18 @@ Open for the product owner. ADR-0004 D3 asks for a manual test in Safari. Open t
 ### Import merge choice on S1 (SPEC.md Sec. 9.7)
 
 Status 2026-10-30. Done. This is item 4 of the answers in task 7.
-1. When the user imports a file into an open document, S1 shows one block for each risk that has an id of the open document and other values. The block has a table with field, current and incoming, and the choice keep current, take incoming or keep both. Take incoming is the default, as in `commitImport`. A new risk gets no choice. The helpers are in `src/ui/merge.ts`. The diff is valid only for the document version that it was made against. When the user selects another document, or the selected document gets a new version, S1 closes the preview and asks for the file again.
+1. When the user imports a file into an open document, S1 shows one block for each risk or register that has an id of the open document and other values. The block has a table with field, current and incoming. A risk has the choice keep current, take incoming or keep both. A register has the choice keep current or take incoming (2026-10-31). Take incoming is the default, as in `commitImport`. A new risk or register gets no choice. The helpers are in `src/ui/merge.ts`. The diff is valid only for the document version that it was made against. When the user selects another document, or the selected document gets a new version, S1 closes the preview and asks for the file again.
 2. Each table is a scroll region that the keyboard can focus, as in `src/ui/record.tsx`. It scrolls to the side only. A height limit would hide changed fields under a second scroll bar. The screen has no horizontal overflow at 375 px.
-3. A risk with an id of the open document and no changed field gets keep current. It stays as it is and gets no change log entry. Before this change, it got an entry with equal before and after.
-4. The change log records the result. Take incoming gives an entry with before and after. Keep both gives an entry for the new id (for example C-1-2) with after only. Keep current gives no entry, because nothing changes. The provenance record lists the file for each choice.
+3. A risk or register with an id of the open document and no changed field stays as it is and gets no change log entry. `commitImport` skips it too when it gets no choice. Before this change, it got an entry with equal before and after.
+4. The change log records the result. Take incoming gives an entry with before and after, for a risk and for a register. Keep both gives an entry for the new id (for example C-1-2) with after only. Keep current gives no entry, because nothing changes. The provenance record lists the file for each choice.
 5. Tests. `test/ui-merge.test.ts` checks the diff rows, the choice mapping, the stored document and the change log for each choice. `e2e/start.spec.ts` opens example 3 and imports a newer Table 10 CSV. It chooses keep current for A-1 with the keyboard, take incoming for B-1 and keep both for C-1. Then it checks the stored document, the change log, axe-core and the 375 px width. A second test selects another document and checks that the preview closes. No child register of example 3 has 3 risks, so the test uses the Table 10 file, which holds the child registers SYS-A, SYS-B and SYS-C.
 
-Open for the product owner.
-1. Registers. The diff also shows a register with changed fields, but S1 gives it no choice. `commitImport` keeps the register of the open document and adds only new registers. The user changes a register on S3. Must a newer child file also update its register, for example the as-of date? That needs a register choice in `commitImport`. Keep both is not clear for a register, because its risks point to its id.
-2. Keep current in the change log. Schema 1.0.0 has no field for a value that the user did not take. If an auditor must see the incoming values that the user did not take, that needs a new optional field (schema 1.1.0, Sec. 7.7).
-3. Take incoming replaces the whole risk. A CSV row has fewer fields than a risk in the app, so in the test take incoming removes the notes and the category subcode of B-1. The diff shows this before the commit. A choice for each field is a possible change after the usability test of task 10.
+Decisions of the product owner, 2026-10-31. SPEC.md Sec. 9.7 has the rules.
+1. Registers. Built. A changed register gets keep current or take incoming, with take incoming as the default. A register has no keep both, because its risks refer to its id. A taken register stays in its place in the list. Only a native JSON or OSCAL file can change a register, because a CSV, XLSX or IR 8286 import adds only new registers.
+2. Keep current in the change log. No schema change. Keep current changes nothing, and Sec. 6.18 logs changes. The provenance record has the file name, format, `sha256` and column mapping, so the source file proves the values that the user did not take. Add a schema 1.1.0 field only if an auditor must see these values without the file.
+3. Take incoming from a CSV, XLSX or NIST IR 8286 file. Built. It changes only the fields that the file states (`src/import/stated.ts`). Before, it replaced the whole risk, so a newer Table 10 CSV removed the notes and the category subcode of each risk. The diff showed notes and category for each risk, so the source CSV of example 3 showed 3 changed risks. Now it shows no change. `tableToRisks` and `importIr8286` list the stated fields of each row as JSON Pointers. A choice per field waits for the usability test of task 10.
+
+Tests for the decisions. `test/ui-merge.test.ts` checks the diff of a newer Table 10 CSV, the stated fields of CSV rows, an IR 8286 entry, labels, nested fields, defaulted marks and the register choice. `e2e/start.spec.ts` checks that notes and category stay after take incoming and keep both. A third test imports a native copy of example 3 with 2 changed registers. It keeps current for SYS-A and takes incoming for SYS-B, then checks the stored registers, their order, the change log and axe-core.
 
 ### Schema 1.1.0 (SPEC.md Sec. 7.7)
 
@@ -301,6 +305,12 @@ Open for the product owner.
 2. The first previous period. "Close the period" fills it from now on. A register that has last year's assessment in another tool has no way to enter it, apart from an import of a native file that holds `previousAssessment`. A form for the previous assessment on S3 is possible if the pilot needs it.
 
 ### Task 12. Release 1 and AT-7 (SPEC.md Sec. 12.7)
+
+Status 2026-10-31, first deploy. The test tag `v1.0.0-rc.1` (commit c0448a5, release run 41248630337) passed the release and the first deploy to https://risk.portaregulus.com. The 5 repository variables come from the Terraform output `github_variables`. The release is immutable and has 6 files, and all verify commands and `gh release verify` pass. The SBOM attestation now comes from `actions/attest` v4.2.2. The 11 live files are equal to the files of the release, and the live headers are the headers of ADR-0004. The `production` environment has the tag rule `v*` but no required reviewer, so each `v*` tag deploys at once. `infra/gcp/README.md` step 6 asks for a required reviewer. The product owner decides if a single maintainer needs this approval step. The open items before release 1 are D5, F5, F9, F11, the sign-off of the Annex I self-check (D6), AT-5 and AT-6.
+
+Status 2026-10-31, test tag. AT-7 passes for the prerelease `v0.1.0-rc.2` (commit e5ec955, release run 41244747547). The release is immutable and has 6 files. `sha256sum -c SHA256SUMS`, `gh attestation verify` for the provenance (with and without the attached bundle) and for the CycloneDX 1.6 SBOM, and `gh release verify` all pass. The provenance is in Rekor. Scorecard publishes 7.4 (run 41245028956), with Signed-Releases 10. The first test tag `v0.1.0-rc.1` (on dfedb67) stopped at the SBOM attestation, because `actions/attest` needs a CycloneDX `serialNumber` and `cyclonedx-npm --output-reproducible` leaves it out. No release was made for it. Its provenance attestation stays in Rekor. Pull request #25 adds a serial number from the bundle SHA-256 and sets the version to `0.1.0-rc.2`. The open items are D5, D6 and D7.
+
+Status 2026-10-31. The repository is public since 2026-10-31. Private vulnerability reporting, Dependabot alerts and security updates, secret scanning with push protection, and immutable releases are on. Scorecard publishes 7.2 on https://api.scorecard.dev (run 41242967570, commit b64506e). The next step is the test tag (D3). AT-7 can pass on the day that the test tag passes.
 
 Status 2026-10-30. AT-7 cannot pass while the repository is private. The code is not the cause. The organization `porta-regulus` has the GitHub Team plan. On that plan, artifact attestations work only in public repositories, and code scanning in a private repository needs a Code Security licence. AT-7 can pass 1 to 3 working days after the repository becomes public. It does not have to wait for 2027-01-28.
 
@@ -321,8 +331,8 @@ Scorecard scores (Scorecard 5.6.0). Pull request #14 has the score of each check
 |---|---|
 | Private, CLI run on 2026-10-30, before pull request #14 | 6.7 |
 | Measured. Private, pull request #14 and ruleset A, Scorecard workflow on `main` on 2026-10-30 (run 41122185865). CI-Tests -1. | 7.1 |
-| Plus `statuses: read`, private or public. CI-Tests 10. | 7.2 |
-| Plus a first release with the `.intoto.jsonl` file | 7.4 |
+| Plus `statuses: read`, private or public. CI-Tests 10. Measured on `main` on 2026-10-31, public and published (run 41242967570). | 7.2 |
+| Plus a first release with the `.intoto.jsonl` file. Measured on 2026-10-31 after `v0.1.0-rc.2` (run 41245028956). | 7.4 |
 | Plus the Best Practices badge, level passing | 7.5 |
 | Plus CodeQL on all of the last 30 commits | 7.7 |
 | Ruleset B in place of A, with all of the above | 8.0 |
@@ -336,24 +346,24 @@ The Maintained clock started on 2026-10-30, the creation date. A change of visib
 
 Plan.
 1. Done 2026-10-30. Merge the workflow change (pull request #14).
-2. The product owner makes the repository public (D1). CI already scans every commit for secrets with gitleaks.
-3. Same day. The product owner sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
-4. Same day. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Expected 7.2.
-5. Same day, after approval (D3). Push the test tag `v0.1.0-rc.1`. Check that the prerelease has 6 files, and run the verify commands of the release notes. This meets task 1 done criterion 3. Expected Scorecard 7.4.
+2. Done 2026-10-31. The product owner makes the repository public (D1). CI already scans every commit for secrets with gitleaks. A check of all 125 commits before the change found no secrets, personal paths or internal host names.
+3. Done 2026-10-31. The product owner sets immutable releases (D4), and enables private vulnerability reporting, Dependabot alerts and secret scanning. `SECURITY.md` already points to private vulnerability reporting.
+4. Done 2026-10-31. The push to `main` runs Scorecard. Read the score on https://api.scorecard.dev or in the run artifact. Measured 7.2.
+5. Done 2026-10-31 with `v0.1.0-rc.2`. After approval (D3), push the test tag. Check that the prerelease has 6 files, and run the verify commands of the release notes. This meets task 1 done criterion 3. Measured Scorecard 7.4.
 6. Day 1 to 2. The product owner makes the entry on https://www.bestpractices.dev (D5). The answers with evidence URLs are in [`docs/release/best-practices-answers.md`](release/best-practices-answers.md) (draft 2026-10-30). Its section 1 lists 5 steps to do before the entry.
-7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are closed (S1 notices on storage encryption and browser extensions, a check of each stored record on read, `docs/self-host.md`, 3 statements in `SECURITY.md`). F5, F6 and F8 to F11 need the product owner.
+7. Day 1 to 3. The product owner reviews and publishes the CRA Annex I self-check (D6). The draft is [`docs/release/annex-i-self-check.md`](release/annex-i-self-check.md) (2026-10-30). It found 11 gaps, F1 to F11. F1 to F4 and F7 are closed (S1 notices on storage encryption and browser extensions, a check of each stored record on read, `docs/self-host.md`, 3 statements in `SECURITY.md`). F8 and F10 are closed on 2026-10-31 (public repository with its security features, prerelease `v0.1.0-rc.2`). F5, F6, F9 and F11 need the product owner.
 8. Tag release 1 when AT-5 and AT-6 pass (D7).
 
-Earliest date. If the repository becomes public on Monday 2026-11-02, AT-7 can pass on Wednesday 2026-11-04. Release 1 is on that date or on the date that AT-5 and AT-6 pass, whichever is later.
+Earliest date. AT-7 passed on Saturday 2026-10-31 for the test tag. Release 1 can be tagged when AT-5 and AT-6 pass. It must also pass AT-7, and the same workflow makes that automatic.
 
 Decisions for the product owner.
-1. D1. The date to make the repository public. AT-7 cannot pass before that date.
+1. D1. Done 2026-10-31. The date to make the repository public. AT-7 cannot pass before that date.
 2. D2. Done 2026-10-30. Ruleset A is active on `main` (ruleset ID 26223939, no bypass actor). It requires 5 checks from the GitHub Actions app. These are "Lint, type check and unit tests", "Build and Playwright", "OSCAL POA&M exports pass oscal-cli (AT-4)", "Schema and reference model checks" and "No secret in the git history (gitleaks)". The performance job and CodeQL are not required, because they run only while the repository is public and a slow runner must not block a merge. Change to ruleset B when a second maintainer exists.
-3. D3. Approval of the test tag `v0.1.0-rc.1`. The deploy job is skipped while the repository variables are empty. If you set the variables first, the test tag deploys to production.
-4. D4. Immutable releases. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number, for example `v0.1.0-rc.2`.
+3. D3. Done 2026-10-31. Approval of the test tag. `v0.1.0-rc.1` failed before a release, and `v0.1.0-rc.2` passed. The deploy job is skipped while the repository variables are empty. If you set the variables first, the test tag deploys to production.
+4. D4. Done 2026-10-31, immutable releases are on. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number. The next free test tag is `v1.0.0-rc.1` (D7).
 5. D5. The Best Practices entry needs the GitHub account of a project member.
 6. D6. Who writes and who signs the Annex I self-check, and where it is published.
-7. D7. The version number of release 1. `package.json` has `0.1.0-rc.1`.
+7. D7. Done 2026-10-31. Release 1 is `1.0.0`. Users read a `0.x` version as beta, and the file format has its own schema version, so the app version can show stability. The test tags before release 1 are `v1.0.0-rc.N`. `package.json` has `1.0.0-rc.1`.
 
 ## 6. Rules for the build session
 
