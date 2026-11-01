@@ -961,7 +961,15 @@ Export and import per Sec. 7.5. CI validates exports with NIST oscal-cli `poam v
 
 ### 9.7 Merge and diff
 
-Imports into an open document show a diff (field, current, incoming) per entity matched by id. Per entity the user can keep current, take incoming, or keep both (incoming gets a new id). The change log records the result.
+Imports into an open document show a diff (field, current, incoming) per entity matched by id. Per risk the user can keep current, take incoming, or keep both (incoming gets a new id). Per register the user can keep current or take incoming. A register has no keep both, because its risks refer to its id. The change log records the result. A matched entity without a changed field adds no change log entry.
+
+A CSV, XLSX or NIST IR 8286 file holds only some fields of a risk. For a matched risk, the incoming version is the current risk with the fields that the file states. Take incoming and keep both use this version, and the diff shows only these fields.
+1. An empty cell, a missing column and an importer default do not replace a current value. To clear a field, edit the risk. An RDR changes only the planned and measured values that it holds.
+2. The likelihood, impact and exposure numbers change together (rule V-07). Placeholder numbers (rule D-Q2) do not change them.
+3. The polarity changes with a stated response type other than Accept (rule V-04). The cost changes only with a stated response type (rule V-09).
+4. A label that the file states changes, also when its numbers are placeholders. A label that the file does not state stays only while its number stays.
+5. A stated field takes its defaulted mark from the file. All other fields keep their mark.
+6. The category is a guess from the category text, so it never replaces a current category.
 
 ### 9.8 Exports
 

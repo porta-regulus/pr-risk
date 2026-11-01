@@ -102,11 +102,11 @@ describe('merge and diff (Sec. 9.7)', () => {
     const text = new TextDecoder().decode(fig10.bytes).replace('Retiring staff lead to personnel shortages', 'Retiring staff lead to shortages');
     const preview = prepareImport(first, file('fig10.csv', text), { register: err, importedOn: IMPORTED_ON });
     expect(preview.diff.map((entry) => [entry.id, entry.field])).toEqual([['1', 'riskDescription']]);
-    const keep = commitImport(first, preview, { '1': 'current' });
+    const keep = commitImport(first, preview, { risks: { '1': 'current' } });
     expect(keep.risks.find((risk) => risk.riskId === '1')?.riskDescription).toBe('Retiring staff lead to personnel shortages');
-    const take = commitImport(first, preview, { '1': 'incoming' });
+    const take = commitImport(first, preview, { risks: { '1': 'incoming' } });
     expect(take.risks.find((risk) => risk.riskId === '1')?.riskDescription).toBe('Retiring staff lead to shortages');
-    const both = commitImport(first, preview, { '1': 'both' });
+    const both = commitImport(first, preview, { risks: { '1': 'both' } });
     expect(both.risks.find((risk) => risk.riskId === '1-2')?.riskDescription).toBe('Retiring staff lead to shortages');
     expect(both.risks.find((risk) => risk.riskId === '1')?.riskDescription).toBe('Retiring staff lead to personnel shortages');
   });

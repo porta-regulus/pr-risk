@@ -7,6 +7,7 @@ import type { Finding, Register, Risk, RiskDocument } from '../schema/types';
 import { decodeText, parseCsv } from './csv';
 import { importCvdPortal, isCvdPortalExport, type CvdOptions } from './cvd';
 import { importIr8286, isIr8286 } from './ir8286';
+import { statedVersion } from './stated';
 import { tableToRisks, type TableOptions } from './table';
 import { xlsxRows } from './xlsx';
 import { importPoam } from '../oscal/poam';
@@ -45,6 +46,9 @@ export interface ImportPreview {
   // Errors of the merge into the open document.
   readonly errors: Finding[];
   readonly diff: DiffEntry[];
+  // True when the file states only some fields of a risk (CSV, XLSX, NIST IR 8286). For a
+  // matched risk, the risks above then hold the current risk with the stated fields of the file.
+  readonly partial?: boolean;
   readonly provenance: ProvenanceRecord;
   // The whole document, when the file restores one without loss (native JSON, OSCAL payload).
   readonly document?: RiskDocument;
@@ -97,14 +101,20 @@ function diffOf(kind: DiffEntry['kind'], current: object | undefined, incoming: 
     .map((field) => ({ kind, id, field, current: a[field], incoming: b[field] }));
 }
 
-// The document as it would be after a commit that takes every incoming entity.
+// The list with each incoming item in the place of the item with its id, and new items at the end.
+function replaced<T>(items: readonly T[], incoming: readonly T[], id: (item: T) => string): T[] {
+  const byId = new Map(incoming.map((item) => [id(item), item]));
+  const result = items.map((item) => byId.get(id(item)) ?? item);
+  const existing = new Set(items.map(id));
+  return [...result, ...incoming.filter((item) => !existing.has(id(item)))];
+}
+
+// The document after a commit of these registers and risks.
 function merged(doc: RiskDocument, registers: readonly Register[], risks: readonly Risk[]): RiskDocument {
-  const registerIds = new Set(registers.map((register) => register.id));
-  const riskIds = new Set(risks.map((risk) => risk.riskId));
   return {
     ...doc,
-    registers: [...doc.registers.filter((register) => !registerIds.has(register.id)), ...registers] as RiskDocument['registers'],
-    risks: [...doc.risks.filter((risk) => !riskIds.has(risk.riskId)), ...risks],
+    registers: replaced(doc.registers, registers, (register) => register.id) as RiskDocument['registers'],
+    risks: replaced(doc.risks, risks, (risk) => risk.riskId),
   };
 }
 
@@ -133,13 +143,14 @@ export function prepareImport(doc: RiskDocument, file: ImportFile, options: Impo
   let warnings: string[] = [];
   let recordCount: number;
   let columnMapping: Record<string, string> | undefined;
+  let stated: Readonly<Record<string, readonly string[]>> | undefined;
   let document: RiskDocument | undefined;
   try {
     if (format === 'csv' || format === 'xlsx') {
       const rows = format === 'csv' ? parseCsv(text) : xlsxRows(file.bytes, MAX_ROWS + 22);
       if (rows.length > MAX_ROWS + 1) return blocked(format, file, importedOn, `The file has more than ${String(MAX_ROWS)} rows.`, 'LIMIT');
       const result = tableToRisks(doc, rows, options);
-      ({ registers, risks, warnings, columnMapping } = result);
+      ({ registers, risks, warnings, columnMapping, stated } = result);
       recordCount = risks.length;
     } else {
       const value = JSON.parse(text) as unknown;
@@ -168,12 +179,21 @@ export function prepareImport(doc: RiskDocument, file: ImportFile, options: Impo
         const registerId = options.ir8286RegisterId ?? options.register?.id;
         if (registerId === undefined) return blocked(format, file, importedOn, 'Choose a target register for the NIST entries.');
         const result = importIr8286(value, registerId);
-        ({ risks, warnings, recordCount } = result);
+        ({ risks, warnings, recordCount, stated } = result);
         if (options.register !== undefined && !doc.registers.some((register) => register.id === registerId)) registers = [options.register];
       }
     }
   } catch (error) {
     return blocked(format, file, importedOn, error instanceof Error ? error.message : String(error));
+  }
+  if (stated !== undefined) {
+    // Sec. 9.7. The file changes only the fields that it states of a matched risk.
+    const fields = stated;
+    risks = risks.map((risk) => {
+      const current = doc.risks.find((item) => item.riskId === risk.riskId);
+      const pointers = fields[risk.riskId];
+      return current === undefined || pointers === undefined ? risk : statedVersion(current, risk, pointers);
+    });
   }
 
   const provenance: ProvenanceRecord = {
@@ -198,12 +218,21 @@ export function prepareImport(doc: RiskDocument, file: ImportFile, options: Impo
     warnings,
     errors,
     diff,
+    ...(stated === undefined ? {} : { partial: true }),
     provenance,
     ...(document === undefined ? {} : { document, documentErrors: documentErrors(replacement(document, provenance)) }),
   };
 }
 
 export type Choice = 'current' | 'incoming' | 'both';
+// A register has no keep both, because its risks point to its id.
+export type RegisterChoice = Exclude<Choice, 'both'>;
+
+// The choice per matched risk id and per matched register id. The default is 'incoming'.
+export interface ImportChoices {
+  readonly risks?: Readonly<Record<string, Choice>>;
+  readonly registers?: Readonly<Record<string, RegisterChoice>>;
+}
 
 // Provenance ids must stay unique (rule V-01) after the record joins a document.
 function withUniqueId(record: ProvenanceRecord, existing: readonly ProvenanceRecord[]): ProvenanceRecord {
@@ -224,11 +253,12 @@ function replacement(document: RiskDocument, provenance: ProvenanceRecord, actor
 }
 
 // Sec. 9.7. Per matched entity the user keeps current, takes incoming, or keeps both
-// (incoming gets a new id). The change log records the result.
+// (incoming gets a new id). The change log records the result. A matched entity without a
+// changed field adds nothing.
 export function commitImport(
   doc: RiskDocument,
   preview: ImportPreview,
-  choices: Readonly<Record<string, Choice>> = {},
+  choices: ImportChoices = {},
   actor?: string,
   mode: 'merge' | 'replace' = 'merge',
 ): RiskDocument {
@@ -242,13 +272,15 @@ export function commitImport(
   }
   if (preview.errors.length > 0) throw new Error('The import has errors and cannot be committed');
   const at = preview.provenance.importedOn;
+  const by = actor === undefined ? {} : { actor };
+  const changed = new Set(preview.diff.map((entry) => `${entry.kind} ${entry.id}`));
   const taken = new Set(doc.risks.map((risk) => risk.riskId));
   const incoming: Risk[] = [];
   const log: NonNullable<RiskDocument['changeLog']> = [];
   for (const risk of preview.risks) {
     const exists = taken.has(risk.riskId);
-    const choice = exists ? (choices[risk.riskId] ?? 'incoming') : 'incoming';
-    if (choice === 'current') continue;
+    const choice = exists ? (choices.risks?.[risk.riskId] ?? 'incoming') : 'incoming';
+    if (choice === 'current' || (exists && choice === 'incoming' && !changed.has(`risk ${risk.riskId}`))) continue;
     let id = risk.riskId;
     if (choice === 'both') {
       let n = 2;
@@ -258,11 +290,17 @@ export function commitImport(
     }
     const before = choice === 'incoming' ? doc.risks.find((item) => item.riskId === id) : undefined;
     incoming.push({ ...risk, riskId: id });
-    log.push({ at, entityKind: 'risk', entityId: id, path: '', ...(actor === undefined ? {} : { actor }), ...(before === undefined ? {} : { before }), after: { ...risk, riskId: id } });
+    log.push({ at, entityKind: 'risk', entityId: id, path: '', ...by, ...(before === undefined ? {} : { before }), after: { ...risk, riskId: id } });
   }
-  const newRegisters = preview.registers.filter((register) => !doc.registers.some((item) => item.id === register.id));
-  for (const register of newRegisters) log.push({ at, entityKind: 'register', entityId: register.id, path: '', after: register });
-  const result = merged(doc, newRegisters, incoming);
+  const registers: Register[] = [];
+  for (const register of preview.registers) {
+    const before = doc.registers.find((item) => item.id === register.id);
+    const choice = before === undefined ? 'incoming' : (choices.registers?.[register.id] ?? 'incoming');
+    if (choice === 'current' || (before !== undefined && !changed.has(`register ${register.id}`))) continue;
+    registers.push(register);
+    log.push({ at, entityKind: 'register', entityId: register.id, path: '', ...by, ...(before === undefined ? {} : { before }), after: register });
+  }
+  const result = merged(doc, registers, incoming);
   const committed: RiskDocument = {
     ...result,
     provenance: [...(doc.provenance ?? []), withUniqueId(preview.provenance, doc.provenance ?? [])],
