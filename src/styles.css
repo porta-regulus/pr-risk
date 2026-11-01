@@ -255,6 +255,29 @@ h1:focus-visible {
   color: var(--ok-text);
 }
 
+/* The notice of a new version (src/ui/version-notice.tsx). */
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.notice p {
+  margin: 0;
+}
+
+.notice a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.notice a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .message-error,
 .errors {
   background: var(--error-bg);
