@@ -145,13 +145,14 @@ describe('automatic Review needed (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
   const ICT = ['R-01', 'R-02', 'R-03', 'R-04', 'R-07', 'R-08', 'R-09'];
   const AT = '2026-10-30T09:00:00Z';
   const reviewed = (d: RiskDocument, today = '2026-10-30'): RiskDocument => withAutomaticReview(d, automaticReviews(d, today), AT);
-  const appEntries = (d: RiskDocument) => (d.changeLog ?? []).filter((entry) => entry.actor?.startsWith(APP_ACTOR) === true);
+  const appEntries = (d: RiskDocument) => (d.changeLog ?? []).filter((entry) => entry.actor === APP_ACTOR);
+  const put = (d: RiskDocument, statement: Statement): RiskDocument => ({ ...d, appetite: { ...d.appetite, statements: (d.appetite?.statements ?? []).map((item) => (item.id === statement.id ? statement : item)) } });
   const withStatus = (d: RiskDocument, ids: readonly string[], status: RiskDocument['risks'][number]['status']): RiskDocument => ({
     ...d,
     risks: d.risks.map((risk) => (ids.includes(risk.riskId) ? { ...risk, status } : risk)),
   });
 
-  it('sets every risk with a reason to Review needed, with one change log entry that names the app and the reason', () => {
+  it('sets every risk with a reason to Review needed, with one change log entry that has the app as actor and lists the reasons', () => {
     const reviews = automaticReviews(doc, '2026-10-30');
     expect(reviews.map((review) => review.riskId)).toEqual(ICT);
     expect(reviews[0]?.reasons.map((reason) => reason.text)).toEqual(['KRI-1 of appetite statement AP-1 fires on the observation of 2026-10-27.']);
@@ -162,7 +163,8 @@ describe('automatic Review needed (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
     expect(entries.map((entry) => entry.entityId)).toEqual(ICT);
     expect(entries[0]).toMatchObject({
       at: AT,
-      actor: 'PortaRegulus Risk (automatic review). KRI-1 of appetite statement AP-1 fires on the observation of 2026-10-27.',
+      actor: 'PortaRegulus Risk (automatic review)',
+      reasons: [{ key: 'kri/AP-1/KRI-1/2026-10-27/1', text: 'KRI-1 of appetite statement AP-1 fires on the observation of 2026-10-27.' }],
       entityKind: 'risk',
       entityId: 'R-01',
       path: '',
@@ -192,7 +194,50 @@ describe('automatic Review needed (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
     const closed = withStatus(reviewed(doc), ICT, 'Monitored');
     const statement = withObservation(statementOf(closed, 'AP-1'), { observedOn: '2026-10-27', values: { days_since_restore_test: 215 } });
     const again: RiskDocument = { ...closed, appetite: { ...closed.appetite, statements: (closed.appetite?.statements ?? []).map((item) => (item.id === 'AP-1' ? statement : item)) } };
-    expect(automaticReviews(again, '2026-10-30')[0]?.reasons.map((reason) => reason.text)).toEqual(['KRI-1 of appetite statement AP-1 fires on observation 2 of 2026-10-27.']);
+    expect(automaticReviews(again, '2026-10-30')[0]?.reasons).toEqual([
+      { kind: 'kri', key: 'kri/AP-1/KRI-1/2026-10-27/2', text: 'KRI-1 of appetite statement AP-1 fires on observation 2 of 2026-10-27.' },
+    ]);
+  });
+
+  it('a breached tolerance starts a review, also in a statement without a KRI', () => {
+    const closed = withStatus(reviewed(doc), ICT, 'Monitored');
+    // AP-2 has only the tolerance TOL-2. It covers ict and reputation.
+    const ap2 = withObservation(statementOf(closed, 'AP-2'), { observedOn: '2026-10-29', values: { malicious_signed_releases: 1 } });
+    const breached = put(closed, ap2);
+    expect(itemState(statementOf(breached, 'AP-2').tolerances?.[0] ?? { id: '', text: '' }).state).toBe('fired');
+    const reviews = automaticReviews(breached, '2026-10-30');
+    expect(reviews.map((review) => review.riskId)).toEqual(ICT);
+    expect(reviews[0]?.reasons).toEqual([
+      { kind: 'tolerance', key: 'tolerance/AP-2/TOL-2/2026-10-29/1', text: 'The observation of 2026-10-29 breaches TOL-2 of appetite statement AP-2.' },
+    ]);
+    const next = withAutomaticReview(breached, reviews, AT);
+    expect(documentErrors(next)).toEqual([]);
+    expect(appEntries(next).at(-1)?.reasons?.map((reason) => reason.key)).toEqual(['tolerance/AP-2/TOL-2/2026-10-29/1']);
+    // In AP-1 the tolerance comes before the KRI, in the order of Table 9.
+    const ap1 = withObservation(statementOf(doc, 'AP-1'), { observedOn: '2026-10-28', values: { erp_outage_hours: 20 } });
+    expect(reviewTriggers(put(doc, ap1), '2026-10-30')[0]?.reasons.map((reason) => reason.key)).toEqual(['tolerance/AP-1/TOL-1/2026-10-28/1', 'kri/AP-1/KRI-1/2026-10-27/1']);
+  });
+
+  it('finds a reason by its key, so a changed text does not act again', () => {
+    const first = reviewed(doc);
+    // A later version of the app has other words for the same reason.
+    const reworded: RiskDocument = {
+      ...withStatus(first, ICT, 'Monitored'),
+      changeLog: (first.changeLog ?? []).map((entry) => (entry.reasons === undefined ? entry : { ...entry, reasons: [{ key: entry.reasons[0].key, text: 'Old words.' }] })),
+    };
+    expect(automaticReviews(reworded, '2026-10-30')).toEqual([]);
+    // The key and the actor both count. An entry of a person with the same key is not an act of the app.
+    const byPerson: RiskDocument = { ...reworded, changeLog: (reworded.changeLog ?? []).map((entry) => ({ ...entry, actor: 'A. Person' })) };
+    expect(automaticReviews(byPerson, '2026-10-30').map((review) => review.riskId)).toEqual(ICT);
+  });
+
+  it('the schema refuses an empty list of reasons and a reason without a key', () => {
+    const entry = appEntries(reviewed(doc))[0];
+    if (entry === undefined) throw new Error('entry');
+    const withLog = (changeLog: unknown): RiskDocument => ({ ...doc, changeLog: [{ ...entry, ...(changeLog as object) }] });
+    expect(documentErrors(withLog({ reasons: [] })).length).toBeGreaterThan(0);
+    expect(documentErrors(withLog({ reasons: [{ text: 'No key.' }] })).length).toBeGreaterThan(0);
+    expect(documentErrors(withLog({}))).toEqual([]);
   });
 
   it('each KRI is its own reason, so a KRI without a new observation does not reopen a review', () => {
@@ -200,7 +245,6 @@ describe('automatic Review needed (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
     const kri2: NonNullable<Statement['indicators']>[number] = { id: 'KRI-2', kind: 'lagging-kri', text: 'Open audit findings.', firesWhen: { combine: 'all', conditions: [{ metric: 'open_findings', operator: '>', threshold: 3 }] } };
     const ap1 = statementOf(doc, 'AP-1');
     const two = withObservation({ ...ap1, indicators: [...(ap1.indicators ?? []), kri2] }, { observedOn: '2026-10-28', values: { days_since_restore_test: 220, open_findings: 5 } });
-    const put = (d: RiskDocument, statement: Statement): RiskDocument => ({ ...d, appetite: { ...d.appetite, statements: (d.appetite?.statements ?? []).map((item) => (item.id === 'AP-1' ? statement : item)) } });
     const first = reviewed(put(doc, two));
     expect(documentErrors(first)).toEqual([]);
     expect(automaticReviews(put(doc, two), '2026-10-30')[0]?.reasons.map((reason) => reason.text)).toEqual([
@@ -222,9 +266,9 @@ describe('automatic Review needed (Sec. 6.11 item 2, Sec. 6.14 item 1)', () => {
   it('starts reviews for a passed review date and an expired acceptance, and each date is its own reason', () => {
     const due: RiskDocument = { ...doc, risks: doc.risks.map((risk) => (risk.riskId === 'R-06' ? { ...risk, reviewDue: '2027-01-31' } : risk)) };
     const first = reviewed(due, '2027-10-21');
-    const texts = Object.fromEntries(appEntries(first).map((entry) => [entry.entityId, entry.actor]));
-    expect(texts['R-05']).toBe('PortaRegulus Risk (automatic review). The acceptance expired on 2027-10-20.');
-    expect(texts['R-06']).toBe('PortaRegulus Risk (automatic review). The review was due on 2027-01-31.');
+    const reasons = Object.fromEntries(appEntries(first).map((entry) => [entry.entityId, entry.reasons]));
+    expect(reasons['R-05']).toEqual([{ key: 'acceptance-expired/2027-10-20', text: 'The acceptance expired on 2027-10-20.' }]);
+    expect(reasons['R-06']).toEqual([{ key: 'review-due/2027-01-31', text: 'The review was due on 2027-01-31.' }]);
     // After the review a person sets a new review date. When it passes, the app acts again.
     const renewed = withStatus(first, ['R-06'], 'Open');
     const moved: RiskDocument = { ...renewed, risks: renewed.risks.map((risk) => (risk.riskId === 'R-06' ? { ...risk, reviewDue: '2028-01-31' } : risk)) };

@@ -206,7 +206,7 @@ function IndicatorsPanel({ doc, update }: { readonly doc: RiskDocument; readonly
 // The risks that the app set to "Review needed" since this screen opened. Undo removes the
 // entries, so the list follows it.
 function automaticSince(doc: RiskDocument, since: string): string[] {
-  return (doc.changeLog ?? []).filter((entry) => entry.entityKind === 'risk' && entry.actor?.startsWith(APP_ACTOR) === true && entry.at >= since).map((entry) => entry.entityId);
+  return (doc.changeLog ?? []).filter((entry) => entry.entityKind === 'risk' && entry.actor === APP_ACTOR && entry.at >= since).map((entry) => entry.entityId);
 }
 
 function ReviewPanel({ doc, openedAt }: { readonly doc: RiskDocument; readonly openedAt: string }) {
@@ -217,10 +217,10 @@ function ReviewPanel({ doc, openedAt }: { readonly doc: RiskDocument; readonly o
     <section aria-labelledby="review-title" class="panel">
       <h2 id="review-title">Review triggers</h2>
       <p class="hint">
-        A risk needs a review when a KRI of its appetite statement fires, when its review date passes, when its acceptance expires, or when a new emerging or horizon risk appears in its
-        category after the as-of date of its register (Sec. 3.7.1 and 5.1.2). The app then sets the status "Review needed" itself. It checks when this screen opens and after each saved
-        change on it. The change log entry names the app and the reasons. Each reason acts once, so a person ends the review with another status. New evidence sets "Review needed" when
-        it comes in.
+        A risk needs a review when a tolerance of its appetite statement breaches or a KRI fires, when its review date passes, when its acceptance expires, or when a new emerging or
+        horizon risk appears in its category after the as-of date of its register (Sec. 3.7.1 and 5.1.2). The app then sets the status "Review needed" itself. It checks when this screen
+        opens and after each saved change on it. The change log entry has the app as actor and lists the reasons. Each reason acts once, so a person ends the review with another status.
+        New evidence sets "Review needed" when it comes in.
       </p>
       {set.length > 0 && (
         <p role="status">
@@ -249,7 +249,7 @@ function ReviewPanel({ doc, openedAt }: { readonly doc: RiskDocument; readonly o
                   <td>
                     <ul class="cell-list">
                       {item.reasons.map((reason) => (
-                        <li key={reason.text}>{reason.text}</li>
+                        <li key={reason.key}>{reason.text}</li>
                       ))}
                     </ul>
                   </td>

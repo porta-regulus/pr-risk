@@ -1974,6 +1974,14 @@
         "actor": {
           "type": "string"
         },
+        "reasons": {
+          "description": "Since 1.1.0. Sec. 6.11 item 2 and Sec. 6.14 item 1. Why the app made the change itself. key is a fixed name of the reason, so a reason acts once also when its text changes. text is for people. A change of a person has no reasons.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/changeReason"
+          }
+        },
         "entityKind": {
           "enum": [
             "context",
@@ -1995,6 +2003,24 @@
         },
         "before": {},
         "after": {}
+      }
+    },
+    "changeReason": {
+      "type": "object",
+      "required": [
+        "key",
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "context": {

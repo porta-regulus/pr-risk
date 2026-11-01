@@ -27,7 +27,14 @@ async function expectStates(page: Page, statement: string, states: Readonly<Reco
   for (const [item, text] of Object.entries(states)) await expect(state(page, statement, item), item).toHaveText(text);
 }
 
-// The change log entries that the app wrote itself, from the stored documents.
+interface Entry {
+  readonly actor?: string;
+  readonly entityId: string;
+  readonly reasons?: readonly { readonly key: string; readonly text: string }[];
+}
+
+// The change log entries that the app wrote itself, from the stored documents, as the risk id
+// and the reason keys.
 async function appEntries(page: Page): Promise<string[]> {
   return page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
@@ -39,17 +46,19 @@ async function appEntries(page: Page): Promise<string[]> {
         reject(new Error(String(open.error)));
       };
     });
-    const stored = await new Promise<{ doc: { changeLog?: { actor?: string; entityId: string }[] } }[]>((resolve, reject) => {
+    const stored = await new Promise<{ doc: { changeLog?: Entry[] } }[]>((resolve, reject) => {
       const all = db.transaction('documents').objectStore('documents').getAll();
       all.onsuccess = () => {
-        resolve(all.result as { doc: { changeLog?: { actor?: string; entityId: string }[] } }[]);
+        resolve(all.result as { doc: { changeLog?: Entry[] } }[]);
       };
       all.onerror = () => {
         reject(new Error(String(all.error)));
       };
     });
     db.close();
-    return stored.flatMap((item) => (item.doc.changeLog ?? []).filter((entry) => entry.actor?.startsWith('PortaRegulus Risk (automatic review)') === true).map((entry) => `${entry.entityId} ${entry.actor ?? ''}`));
+    return stored.flatMap((item) =>
+      (item.doc.changeLog ?? []).filter((entry) => entry.actor === 'PortaRegulus Risk (automatic review)').map((entry) => [entry.entityId, ...(entry.reasons ?? []).map((reason) => reason.key)].join(' ')),
+    );
   });
 }
 
@@ -88,7 +97,7 @@ test('S6 evaluates the Table 9 triggers on recorded observations (G2 b) and star
   await expect(review.locator('tbody th')).toHaveText(operational);
   await expect(statuses).toHaveText(operational.map(() => 'Review needed'));
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
-  expect(await appEntries(page)).toEqual(operational.map((id) => `${id} PortaRegulus Risk (automatic review). T9-EX3-LKRI1 of appetite statement T9-EX3 fires on the observation of 2026-10-30.`));
+  expect(await appEntries(page)).toEqual(operational.map((id) => `${id} kri/T9-EX3/T9-EX3-LKRI1/2026-10-30/1`));
 
   // Undo takes the change back, and the same reason does not act again in this visit.
   await page.getByRole('button', { name: 'Undo last change' }).click();
@@ -105,11 +114,12 @@ test('S6 evaluates the Table 9 triggers on recorded observations (G2 b) and star
   await expectStates(page, 'T9-EX3', { ...none, 'T9-EX3-LKRI2': 'Fires' });
   await expect(statuses).toHaveText(operational.map(() => 'Review needed'));
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
-  expect(await appEntries(page)).toHaveLength(operational.length);
-  // The status is Review needed already, so the next reason writes nothing.
+  expect(await appEntries(page)).toEqual(operational.map((id) => `${id} kri/T9-EX3/T9-EX3-LKRI2/2026-10-30/2`));
+  // The status is Review needed already, so the next reasons write nothing.
   await record(page, 'T9-EX3', { outage_hours: 2.5, customers_affected_percent: 6 });
   await expectStates(page, 'T9-EX3', { ...none, 'T9-EX3-LKRI1': 'Fires', 'T9-EX3-GKRI': 'Fires', 'T9-EX3-TOL': 'Breached' });
-  // Each KRI is its own reason, named by its own observation. This is the third of the day.
+  // Each tolerance and KRI is its own reason, named by its own observation. This is the third of the day.
+  await expect(review.locator('tbody tr').first()).toContainText('Observation 3 of 2026-10-30 breaches T9-EX3-TOL of appetite statement T9-EX3.');
   await expect(review.locator('tbody tr').first()).toContainText('T9-EX3-LKRI1 of appetite statement T9-EX3 fires on observation 3 of 2026-10-30.');
   await expect(review.locator('tbody tr').first()).toContainText('T9-EX3-GKRI of appetite statement T9-EX3 fires on observation 3 of 2026-10-30.');
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
