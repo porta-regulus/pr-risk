@@ -62,9 +62,9 @@ terraform -chdir=infra/gcp output -json github_variables
 | Load balancer IP | `136.82.106.15` (also `terraform output ip_address`) |
 | Budget alert | EUR 50 on the billing account of the bootstrap step |
 | Domain | `risk.portaregulus.com`, A record DNS only, managed certificate `ACTIVE` |
-| Main page | Applied on 2026-10-30. "/" serves `index.html`, and returns 404 until the first deploy |
+| Main page | Applied on 2026-10-30. "/" serves `index.html`. First deploy on 2026-10-31 with the test tag `v1.0.0-rc.1` |
 | Load balancer read | Applied on 2026-10-30. The load balancer has `roles/storage.legacyObjectReader`, so it cannot list the bucket |
-| GitHub | On 2026-10-30 the environment `production` and the repository variables do not exist. Do step 6 before the first tag |
+| GitHub | The environment `production` has the deployment tag rule `v*`, but no required reviewer. The 5 repository variables of step 6 are set since 2026-10-31 |
 | Plan files | Do not commit `terraform plan -out` files. `.gitignore` excludes them |
 
 ## Domain-restricted sharing
