@@ -143,7 +143,7 @@ export function prepareImport(doc: RiskDocument, file: ImportFile, options: Impo
   let warnings: string[] = [];
   let recordCount: number;
   let columnMapping: Record<string, string> | undefined;
-  let stated: Readonly<Record<string, readonly string[]>> | undefined;
+  let stated: ReadonlyMap<string, readonly string[]> | undefined;
   let document: RiskDocument | undefined;
   try {
     if (format === 'csv' || format === 'xlsx') {
@@ -191,7 +191,7 @@ export function prepareImport(doc: RiskDocument, file: ImportFile, options: Impo
     const fields = stated;
     risks = risks.map((risk) => {
       const current = doc.risks.find((item) => item.riskId === risk.riskId);
-      const pointers = fields[risk.riskId];
+      const pointers = fields.get(risk.riskId);
       return current === undefined || pointers === undefined ? risk : statedVersion(current, risk, pointers);
     });
   }
