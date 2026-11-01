@@ -13,6 +13,7 @@ import { simulationTargets, withNistNumbers, withNumbersFrom, withSimulationSett
 import { documentChanges, withChangeLog } from './edit';
 import { InvalidFields } from './fields';
 import { completionSteps, type StepState } from './steps';
+import { VersionNotice } from './version-notice';
 
 export type Update = (change: (doc: RiskDocument) => RiskDocument) => void;
 export type ScreenName = 'start' | 'context' | 'identify' | 'prioritize' | 'respond' | 'monitor' | 'enterprise';
@@ -352,6 +353,7 @@ export function DocumentScreen({
         </p>
       </header>
 
+      <VersionNotice />
       {exportOverdue(stored) && (
         <p class="banner" role="status">
           {stored.lastExportOn === undefined ? 'You have not saved a copy of this document yet.' : 'Your last copy is more than 7 days old.'} Browsers can delete stored data. Export a copy on the start screen.

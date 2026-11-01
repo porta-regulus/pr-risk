@@ -129,6 +129,6 @@ The first one must have `connect-src 'none'`, and the second one `connect-src 's
 
 ## Updates
 
-Your copy does not change until you install a new bundle. Watch the releases of https://github.com/porta-regulus/pr-risk to learn about security fixes (SECURITY.md). To update, check and extract the new bundle into an empty folder, then point the web server at it. The service worker loads the new version when users next start the app.
+Your copy does not change until you install a new bundle. Watch the releases of https://github.com/porta-regulus/pr-risk to learn about security fixes (SECURITY.md). To update, check and extract the new bundle into an empty folder, then point the web server at it. The service worker loads the new version when users next start the app. The app then shows a notice with the new version and a link to its release notes.
 
-The hosted app at https://risk.portaregulus.com updates itself on the next start after each release. To opt out of automatic updates, or to postpone an update, self-host the release that you choose. Your copy stays on that release until you install a newer bundle (CRA Annex I Part I 2(c)).
+The hosted app at https://risk.portaregulus.com updates itself on the next start after each release. While the app is open, a notice says that a new version is ready. The new version becomes active when you close all tabs of the app. To opt out of automatic updates, or to postpone an update, self-host the release that you choose. Your copy stays on that release until you install a newer bundle (CRA Annex I Part I 2(c)).

@@ -369,7 +369,7 @@ Sec. 5.1.1 gives a decision rule that the app shows as a suggestion. If exposure
 ### 6.11 Monitor, evaluate and adjust (Sec. 3.7, 3.7.1, 5.1.2)
 
 1. **KPIs and KRIs.** Each appetite statement holds tolerances, controls, KPIs, leading KRIs and lagging KRIs (Table 9). A tolerance has `breachWhen`, an indicator has `firesWhen`. Both are triggers with conditions (metric, operator, threshold, unit) combined by all or any. The user enters observations. The app evaluates the triggers on the latest observation and shows fired, not fired or no data.
-2. **Review triggers (Sec. 3.7.1).** A risk goes to status "Review needed" when new evidence is imported for it, when a KRI linked to its appetite statement fires, when its `reviewDue` date passes, or when a new emerging or horizon risk appears in its category.
+2. **Review triggers (Sec. 3.7.1).** A risk goes to status "Review needed" when new evidence is imported for it, when a KRI linked to its appetite statement fires or a tolerance of that statement breaches, when its `reviewDue` date passes, or when a new emerging or horizon risk appears in its category. A breach of the tolerance curve is a result of the roll-up, not of one risk, so it starts no review. When the app sets the status itself, the change log entry has the app as actor and lists the reasons in `reasons` (Sec. 6.18).
 3. **Risk reserves (Sec. 3.7.1).** The record shows each reserve with its probability of use and the expected amount released at year end.
 4. **Capacity.** P(loss above capacity) on every result screen (Sec. 3.7).
 5. **Forecasts.** The forecast and outcome log tests whether the analysis was right (Sec. 8.14).
@@ -422,7 +422,7 @@ Sec. 5.1.1 gives a decision rule that the app shows as a suggestion. If exposure
 ### 6.18 RDR and change log (Appendix B, Appendix D)
 
 1. The RDR is the Detail tab of the risk editor and the RDR export (Sec. 7.4). The print view lists the 36 Fig. 15 rows in Fig. 15 order.
-2. `changeLog[]` records every change (time, actor, entity, JSON Pointer path, before, after). Schema versions follow Sec. 7.7. Concept ids follow Sec. 3.1.
+2. `changeLog[]` records every change (time, actor, entity, JSON Pointer path, before, after). A change that the app makes itself also has `reasons`, each with a fixed `key` and a `text` for people. Schema versions follow Sec. 7.7. Concept ids follow Sec. 3.1.
 
 ## 7. Data exchange schema
 
@@ -581,7 +581,7 @@ Errors (V) block save or import. Warnings (L) show in the UI and in the record a
 
 ### 7.7 Schema versioning
 
-1. `schemaVersion` is semantic. The `$id` contains the version. Version `1.1.0` adds two optional fields, `previousAssessment.impacts` and `rollUp.responseCostRule`. A `1.0.0` document is also a valid `1.1.0` document, so the schema accepts both values and the app needs no migration. The app writes `1.1.0` when it saves. It refuses a newer minor version, for example `1.2.0`, because that can hold fields that the app does not know.
+1. `schemaVersion` is semantic. The `$id` contains the version. Version `1.1.0` adds three optional fields, `previousAssessment.impacts`, `rollUp.responseCostRule` and `changeLog[].reasons`. A `1.0.0` document is also a valid `1.1.0` document, so the schema accepts both values and the app needs no migration. The app writes `1.1.0` when it saves. It refuses a newer minor version, for example `1.2.0`, because that can hold fields that the app does not know.
 2. A new optional field is a minor version. A changed meaning or a new required field is a major version.
 3. The app reads the current and the previous major version and migrates the previous one on import, with a provenance record.
 4. When NIST publishes the final SP 800-221r1 or new IR 8286 schemas, vendor the new files, keep the old ones, add a migration test, and update the concept id table (Sec. 3.1).
@@ -968,7 +968,15 @@ Export and import per Sec. 7.5. CI validates exports with NIST oscal-cli `poam v
 
 ### 9.7 Merge and diff
 
-Imports into an open document show a diff (field, current, incoming) per entity matched by id. Per entity the user can keep current, take incoming, or keep both (incoming gets a new id). The change log records the result.
+Imports into an open document show a diff (field, current, incoming) per entity matched by id. Per risk the user can keep current, take incoming, or keep both (incoming gets a new id). Per register the user can keep current or take incoming. A register has no keep both, because its risks refer to its id. The change log records the result. A matched entity without a changed field adds no change log entry.
+
+A CSV, XLSX or NIST IR 8286 file holds only some fields of a risk. For a matched risk, the incoming version is the current risk with the fields that the file states. Take incoming and keep both use this version, and the diff shows only these fields.
+1. An empty cell, a missing column and an importer default do not replace a current value. To clear a field, edit the risk. An RDR changes only the planned and measured values that it holds.
+2. The likelihood, impact and exposure numbers change together (rule V-07). Placeholder numbers (rule D-Q2) do not change them.
+3. The polarity changes with a stated response type other than Accept (rule V-04). The cost changes only with a stated response type (rule V-09).
+4. A label that the file states changes, also when its numbers are placeholders. A label that the file does not state stays only while its number stays.
+5. A stated field takes its defaulted mark from the file. All other fields keep their mark.
+6. The category is a guess from the category text, so it never replaces a current category.
 
 ### 9.8 Exports
 
