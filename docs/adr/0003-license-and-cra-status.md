@@ -4,12 +4,13 @@
 |---|---|
 | Status | Accepted |
 | Date | 2026-10-27 |
+| Changed | 2026-11-02 by the product owner. The help text is Apache-2.0, not CC BY 4.0 (Decision item 1). |
 | Legal sources | Regulation (EU) 2024/2847 (CRA), consolidated text 02024R2847-20241120, https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2847. Commission guidance C(2026) 5252 of 27.7.2026 (non-binding). Commission CRA FAQ v1.4 of 4.9.2026. |
 | Not legal advice | Have counsel confirm before launch. The CJEU has the final word on interpretation. |
 
 ## Decision
 
-1. **Licence.** Apache-2.0 for code and for the JSON Schema. CC BY 4.0 for the risk catalogue content and the help text. No contributor licence agreement. No dual licence and no paid edition, ever.
+1. **Licence.** Apache-2.0 for code, for the JSON Schema and for the help text. CC BY 4.0 for the risk catalogue content. No contributor licence agreement. No dual licence and no paid edition, ever. The help text is in the UI source files, so it has the licence of the code. A person who copies the code cannot easily follow 2 licences in 1 file. Apache-2.0 also lets people use the text again with attribution.
 2. **CRA position.** PortaRegulus publishes the app so that it is not "placed on the market" under the CRA. The six conditions below keep it outside. PortaRegulus still applies the open-source steward measures of Art. 24 on a voluntary basis, because they cost little and the acceptance tests need them anyway (SBOM, signed builds, security policy).
 3. **Sign-up and leads.** The app asks for no e-mail and has no lead form. Lead capture stays on separate marketing pages of www.portaregulus.com.
 

@@ -33,7 +33,7 @@ MUST criteria must be Met or N/A. SHOULD and SUGGESTED criteria can be Unmet.
 | `interact` | MUST | Met | The README tells users how to get the app (Run it), how to report a problem and how to contribute. `R#readme` |
 | `contribution` | MUST | Met | Contributions come as pull requests. CONTRIBUTING.md gives the checks and the DCO sign-off. `R/blob/main/CONTRIBUTING.md` |
 | `contribution_requirements` | SHOULD | Met | CONTRIBUTING.md lists the rules (writing standard, no network request, tests, dependencies). `R/blob/main/CONTRIBUTING.md` |
-| `floss_license` | MUST | Met | Apache-2.0 for code and schema, CC BY 4.0 for catalogue content and help text. |
+| `floss_license` | MUST | Met | Apache-2.0 for code, schema and help text, CC BY 4.0 for the catalogue content. |
 | `floss_license_osi` | SUGGESTED | Met | Apache-2.0 is OSI approved. |
 | `license_location` | MUST | Met | `R/blob/main/LICENSE` |
 | `documentation_basics` | MUST | Met | README, SPEC.md and the ADRs. `R/tree/main/docs` |
