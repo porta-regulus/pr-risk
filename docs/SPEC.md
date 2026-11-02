@@ -4,7 +4,7 @@
 |---|---|
 | Working name | PortaRegulus Risk (code name `pr-risk`). Final name is open question Q1. Do not use "Risklet" (ADR-0003 C5). |
 | Version | 1.1, 2026-10-27. Restructured on the table of contents of NIST SP 800-221r1 ipd. Scope confirmed by the product owner in [ADR-0005](adr/0005-release-1-scope-by-toc.md). |
-| Licence | Apache-2.0 for code and schema. CC BY 4.0 for catalogue and help text (ADR-0003). |
+| Licence | Apache-2.0 for code, schema and help text. CC BY 4.0 for the catalogue (ADR-0003). |
 | Publisher | PortaRegulus, listed on www.portaregulus.com. Separate from CVD Portal. |
 | Decisions | [ADR-0001](adr/0001-primary-user-and-decision.md) user and decision. [ADR-0002](adr/0002-gap-against-free-alternatives.md) gap. [ADR-0003](adr/0003-license-and-cra-status.md) licence and CRA. [ADR-0004](adr/0004-local-first-data-and-threat-model.md) data location and threat model. |
 | Schema | [schema/risk-register.schema.json](schema/risk-register.schema.json), JSON Schema 2020-12, with 3 examples, fixtures, NIST vendor copies and [schema/validate.py](schema/validate.py) |
