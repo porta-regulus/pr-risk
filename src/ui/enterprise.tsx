@@ -197,7 +197,7 @@ function EntryTable({
                   }}
                 />
               </td>
-              <td>{risk.riskId}</td>
+              <td class="id">{risk.riskId}</td>
               <td>{risk.registerId}</td>
               <td>{risk.riskDescription}</td>
               <td>{entryText(doc, risk, 'riskLikelihood')}</td>
@@ -420,7 +420,7 @@ function SummaryTable({ doc, parent, update }: { readonly doc: RiskDocument; rea
                 const used = referencesTo(doc, risk.riskId);
                 return (
                   <tr key={risk.riskId} data-risk={risk.riskId}>
-                    <td>{risk.riskId}</td>
+                    <td class="id">{risk.riskId}</td>
                     <td class="description">{risk.riskDescription}</td>
                     <td class="types">{risk.riskResponseType.join(', ')}</td>
                     <td class="likelihood">{threeText(risk.rollUp?.likelihood, risk.riskLikelihood, probability)}</td>

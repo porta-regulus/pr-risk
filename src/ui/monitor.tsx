@@ -667,7 +667,7 @@ function ForecastPanel({ doc, update, numbers, simulated }: { readonly doc: Risk
               {forecasts.map((forecast) => (
                 <tr key={forecast.id}>
                   <th scope="row" class="id">{forecast.id}</th>
-                  <td>{forecast.riskId}</td>
+                  <td class="id">{forecast.riskId}</td>
                   <td>
                     {forecast.windowStart} to {forecast.windowEnd}
                   </td>
