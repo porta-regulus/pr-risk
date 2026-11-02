@@ -1,77 +1,134 @@
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Furrow (deal 1/3, seed free-local-first-risk-register-b84f·37c613e7·2026-11-02·r0) · redesign: restyle
+ * nav: kept (a row of screen keys, the current one filled) · signature: the steps panel, a ticked stepper on paper · states: kept (empty, error and full as the screens draw them)
+ * axes: light/grotesk-sans/warm · posture: committed · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P3 H3 E3 S3 R4 V3 · weakest: E, the six screen keys were all primary, so only "Context and strategy" stays filled */
+/* Hallmark · waive 7b · --text is oklch(18% 0.006 60) on screen and #000 only in the print block · the printed record uses toner black */
+/* Hallmark · waive 37 · Helvetica and the mono stack apply only in print and to the record hash · the record must print on 2 A4 pages with the widths of Helvetica */
+
+/* Furrow tokens, mapped onto the names the screens already use. Fonts are bundled (ADR-0004, no network). */
 :root {
-  --text: #14181f;
-  --muted: #566070;
-  --background: #f7f8fa;
-  --surface: #ffffff;
-  --border: #d6dbe3;
-  --accent: #2a62d1;
-  --accent-text: #ffffff;
-  --warn-bg: #fbf1d8;
-  --warn-text: #5e4300;
-  --error-bg: #fde8e3;
-  --error-text: #8a2410;
-  --ok-bg: #e5f4ec;
-  --ok-text: #155a3a;
-  --danger: #c23b17;
-  --within: #1b7a4b;
-  --breach: #a86500;
-  --clear: #c23b17;
+  --paper: oklch(96% 0.011 85);
+  --paper-3: oklch(92% 0.016 85);
+  --sheet: oklch(99.3% 0.004 85);
+  --text: oklch(18% 0.006 60);
+  --ink-2: oklch(28% 0.008 60);
+  --muted: oklch(44% 0.012 60);
+  --background: var(--paper);
+  --surface: oklch(99.5% 0.005 85);
+  --border: oklch(88% 0.013 85);
+  --field-border: oklch(58% 0.012 60);
+  --accent: oklch(70% 0.19 40);
+  --accent-text: oklch(18% 0.006 60);
+  --accent-edge: color-mix(in oklab, var(--accent) 78%, var(--text));
+  --accent-soft: oklch(94.5% 0.035 55);
+  --focus: oklch(60% 0.19 40);
+  --green: oklch(48% 0.11 150);
+  --green-text: oklch(99.5% 0.005 85);
+  --warn-bg: oklch(94% 0.05 85);
+  --warn-text: oklch(38% 0.08 70);
+  --error-bg: oklch(93% 0.04 35);
+  --error-text: oklch(40% 0.14 32);
+  --ok-bg: oklch(92% 0.04 150);
+  --ok-text: oklch(36% 0.09 150);
+  --danger: oklch(50% 0.17 30);
+  --danger-text: oklch(99.5% 0.005 85);
+  --within: oklch(48% 0.11 150);
+  --breach: oklch(58% 0.13 70);
+  --clear: oklch(50% 0.17 30);
   --line-1: #2a62d1;
   --line-2: #b0461a;
   --line-3: #6a4bb8;
   --line-4: #1b7a4b;
   --line-5: #7a6a00;
-  --tolerance: #14181f;
+  --tolerance: var(--text);
   --level-vl-bg: #e3f2e8;
   --level-l-bg: #c9e8d2;
   --level-m-bg: #fbecb5;
   --level-h-bg: #f8c9a8;
   --level-vh-bg: #f2a59a;
-  --level-text: #14181f;
+  --level-text: var(--text);
+  --print-ink: #000000;
+  --print-muted: #3c4450;
+  --print-paper: #ffffff;
+  --print-rule: #b8c0cc;
+  --print-foot: #566070;
+  --font-body: 'Red Hat Text Variable', 'Red Hat Text', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Red Hat Display Variable', 'Red Hat Display', var(--font-body);
+  --font-mono: ui-monospace, Menlo, Consolas, monospace;
+  --font-print: Helvetica, Arial, 'Liberation Sans', 'Nimbus Sans', sans-serif;
+  --font-print-mono: Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --radius-card: 10px;
+  --radius-key: 6px;
+  --radius-sheet: 3px;
+  --key-lit: inset 0 1px 0 color-mix(in oklab, var(--sheet) 45%, transparent), inset 0 -1px 0 color-mix(in oklab, var(--text) 10%, transparent);
+  --key-plain: inset 0 1px 0 var(--sheet), 0 1px 1px var(--border);
+  --shadow-sheet: 0 1px 1px oklch(18% 0.006 60 / 0.1), 0 2px 4px -1px oklch(18% 0.006 60 / 0.1), 0 24px 44px -20px oklch(18% 0.006 60 / 0.32);
+  --dur-micro: 120ms;
   color-scheme: light;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.5;
 }
 
+/* Furrow has no dark page. This is the same material at night: warm graphite, pale ink, the same tangerine. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #e9edf2;
-    --muted: #a4adbb;
-    --background: #111419;
-    --surface: #181c22;
-    --border: #2c333d;
-    --accent: #7aa3f4;
-    --accent-text: #0b1220;
-    --warn-bg: #2b2414;
-    --warn-text: #f1d189;
-    --error-bg: #3a1a12;
-    --error-text: #ffb4a0;
-    --ok-bg: #12291e;
-    --ok-text: #8fe0b5;
-    --danger: #f07a52;
-    --within: #6fd29f;
-    --breach: #f1c35a;
-    --clear: #ff8f70;
+    --paper: oklch(19% 0.008 60);
+    --paper-3: oklch(27% 0.01 60);
+    --sheet: oklch(23% 0.009 60);
+    --text: oklch(94% 0.01 85);
+    --ink-2: oklch(86% 0.012 85);
+    --muted: oklch(74% 0.014 80);
+    --surface: oklch(23% 0.009 60);
+    --border: oklch(34% 0.01 60);
+    --field-border: oklch(55% 0.012 70);
+    --accent: oklch(74% 0.17 45);
+    --accent-soft: oklch(32% 0.06 50);
+    --focus: oklch(76% 0.16 45);
+    --green: oklch(75% 0.13 150);
+    --green-text: oklch(18% 0.006 60);
+    --warn-bg: oklch(28% 0.04 80);
+    --warn-text: oklch(87% 0.1 85);
+    --error-bg: oklch(28% 0.05 35);
+    --error-text: oklch(84% 0.09 35);
+    --ok-bg: oklch(30% 0.05 150);
+    --ok-text: oklch(88% 0.08 150);
+    --danger: oklch(68% 0.16 35);
+    --danger-text: oklch(18% 0.006 60);
+    --within: oklch(75% 0.13 150);
+    --breach: oklch(82% 0.13 85);
+    --clear: oklch(72% 0.15 35);
     --line-1: #7aa3f4;
     --line-2: #f39a72;
     --line-3: #b9a2f2;
     --line-4: #6fd29f;
     --line-5: #e2d36b;
-    --tolerance: #e9edf2;
     --level-vl-bg: #1d3326;
     --level-l-bg: #24442f;
     --level-m-bg: #4a3e12;
     --level-h-bg: #5a3015;
     --level-vh-bg: #632218;
-    --level-text: #e9edf2;
+    --shadow-sheet: 0 1px 2px oklch(0% 0 0 / 0.4), 0 20px 40px -20px oklch(0% 0 0 / 0.6);
     color-scheme: dark;
   }
+}
+
+html,
+body {
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
   color: var(--text);
   background: var(--background);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 28%, transparent);
+  color: var(--text);
 }
 
 main {
@@ -86,24 +143,41 @@ h1,
 h2,
 h3 {
   margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-synthesis: none;
+  overflow-wrap: break-word;
+  min-width: 0;
   text-wrap: balance;
 }
 
 h1 {
-  font-size: 1.9rem;
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 h2 {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
 }
 
 h3 {
-  font-size: 1rem;
+  font-size: 1.08rem;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
   margin-top: 0.5rem;
 }
 
 p {
   margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
 }
 
 .lede {
@@ -135,7 +209,7 @@ p {
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-card);
   padding: 1.1rem 1.25rem;
   display: grid;
   gap: 0.6rem;
@@ -155,14 +229,17 @@ table {
   font-size: 0.95rem;
 }
 
+/* A 1px ink rule over a list, hairlines between its rows. */
 th {
   text-align: left;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--muted);
   padding: 0.5rem 0.75rem 0.5rem 0;
   border-bottom: 1px solid var(--border);
+}
+thead th {
+  border-bottom-color: var(--text);
 }
 
 td {
@@ -171,8 +248,10 @@ td {
   vertical-align: top;
 }
 
+tr[aria-current='true'] td {
+  background: var(--accent-soft);
+}
 tr[aria-current='true'] td:first-child {
-  box-shadow: inset 3px 0 0 var(--accent);
   padding-left: 0.6rem;
 }
 
@@ -193,56 +272,123 @@ select,
 textarea {
   font: inherit;
   color: var(--text);
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.45rem 0.6rem;
+  background: var(--surface);
+  border: 1px solid var(--field-border);
+  border-radius: var(--radius-key);
+  padding: 0.5rem 0.65rem;
   min-width: 0;
 }
+input:not([type='checkbox']):not([type='radio']):not([type='file']),
+select {
+  min-height: 2.5rem;
+}
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--ink-2);
+}
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--green);
+  width: 1.1rem;
+  height: 1.1rem;
+}
 
+/* Moulded keys: the primary is a tangerine fill with ink on it, the quiet one is paper. */
 button {
   font: inherit;
   font-weight: 600;
-  border-radius: 8px;
-  padding: 0.45rem 0.9rem;
-  border: 1px solid var(--accent);
+  line-height: 1.25;
+  min-height: 2.5rem;
+  border-radius: var(--radius-key);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--accent-edge);
   background: var(--accent);
   color: var(--accent-text);
+  box-shadow: var(--key-lit);
   cursor: pointer;
   justify-self: start;
+  transition: transform var(--dur-micro) ease-out;
+}
+
+button:hover {
+  background: color-mix(in oklab, var(--accent) 88%, var(--text));
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 button.quiet {
-  background: transparent;
-  color: var(--accent);
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--field-border);
+  box-shadow: var(--key-plain);
+}
+
+button.quiet:hover {
+  background: var(--paper-3);
 }
 
 button.danger {
   background: var(--danger);
   border-color: var(--danger);
-  color: #fff;
+  color: var(--danger-text);
 }
 
-button:disabled {
-  opacity: 0.5;
+button.danger:hover {
+  background: color-mix(in oklab, var(--danger) 88%, var(--text));
+}
+
+button:disabled,
+button.quiet:disabled,
+button.danger:disabled {
+  background: var(--paper-3);
+  border-color: var(--border);
+  color: var(--muted);
+  box-shadow: none;
+  transform: none;
   cursor: not-allowed;
 }
 
+/* The current screen in the row of screen keys is the selected key, filled. */
+nav button[aria-current='page'],
+nav button[aria-current='page']:disabled {
+  background: var(--accent);
+  border-color: var(--accent-edge);
+  color: var(--accent-text);
+  box-shadow: none;
+  cursor: default;
+}
+
+:focus-visible,
 button:focus-visible,
 .table-box:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible,
-h1:focus-visible {
-  outline: 2px solid var(--accent);
+h1:focus-visible,
+h2:focus-visible {
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+  button:active {
+    transform: none;
+  }
 }
 
 .banner,
 .message {
-  border-radius: 10px;
+  border-radius: var(--radius-card);
   padding: 0.75rem 1rem;
+  border: 1px solid color-mix(in oklab, currentColor 18%, transparent);
 }
 
 .banner {
@@ -274,7 +420,7 @@ h1:focus-visible {
 }
 
 .notice a:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 
@@ -295,7 +441,7 @@ h1:focus-visible {
 .warnings {
   margin: 0;
   padding: 0.5rem 0.75rem 0.5rem 1.75rem;
-  border-radius: 8px;
+  border-radius: var(--radius-key);
   font-size: 0.9rem;
 }
 
@@ -370,7 +516,7 @@ td select {
 }
 fieldset.checks {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-key);
   padding: 0.5rem 0.75rem;
   margin: 0;
   display: flex;
@@ -415,8 +561,10 @@ fieldset.checks legend {
   padding-top: 0.75rem;
 }
 .sub-editor {
-  border-left: 3px solid var(--border);
-  padding-left: 0.75rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-key);
+  padding: 0.75rem;
 }
 details.editor {
   display: grid;
@@ -431,7 +579,15 @@ details.editor > * + * {
 summary {
   cursor: pointer;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--text);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+summary:hover {
+  text-decoration-line: underline;
+}
+summary::marker {
+  color: var(--muted);
 }
 .check-box,
 .check-result {
@@ -470,12 +626,19 @@ summary {
 }
 .tree-item {
   background: transparent;
-  color: var(--accent);
+  color: var(--text);
   border-color: transparent;
-  padding: 0.2rem 0.4rem;
+  box-shadow: none;
+  min-height: 2rem;
+  padding: 0.2rem 0.5rem;
+  text-align: left;
+}
+.tree-item:hover {
+  background: var(--paper-3);
 }
 .tree-item.active {
-  border-color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-edge);
 }
 .tabs {
   display: flex;
@@ -483,18 +646,22 @@ summary {
   gap: 0.25rem;
   border-bottom: 1px solid var(--border);
 }
+.tabs {
+  padding-bottom: 0.4rem;
+}
 .tab {
   background: transparent;
-  color: var(--accent);
+  color: var(--ink-2);
   border: 1px solid transparent;
-  border-radius: 8px 8px 0 0;
+  box-shadow: none;
+}
+.tab:hover {
+  background: var(--paper-3);
 }
 .tab.active {
-  border-color: var(--border);
-  border-bottom-color: var(--surface);
-  color: var(--text);
-  margin-bottom: -1px;
-  background: var(--surface);
+  background: var(--accent);
+  border-color: var(--accent-edge);
+  color: var(--accent-text);
 }
 .tab-body {
   display: grid;
@@ -507,7 +674,7 @@ summary {
 fieldset.distribution,
 fieldset.scenario {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-key);
   padding: 0.6rem 0.85rem;
   margin: 0;
   display: grid;
@@ -522,78 +689,161 @@ fieldset.scenario legend {
 .feedback {
   background: var(--ok-bg);
   color: var(--ok-text);
-  border-radius: 8px;
+  border-radius: var(--radius-key);
   padding: 0.6rem 0.9rem;
 }
 .feedback ul {
   margin: 0.25rem 0 0;
   padding-left: 1.1rem;
 }
-details.help {
-  border-left: 3px solid var(--border);
-  padding-left: 0.75rem;
+details.help > summary {
+  font-weight: 500;
+}
+details.help > p {
+  margin-top: 0.3rem;
+  color: var(--ink-2);
 }
 
-/* The steps panel of screens S2 to S7 */
+/* The steps panel of screens S2 to S7: a stepper. A green key with a tick is done, the tangerine
+   key is next, a ring is still to do and a dashed ring is optional. */
+.steps > summary {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+}
+/* The button of the next step is the one action the panel asks for. */
+.step-next button.quiet {
+  background: var(--accent);
+  border-color: var(--accent-edge);
+  color: var(--accent-text);
+  box-shadow: var(--key-lit);
+}
+.step-next button.quiet:hover {
+  background: color-mix(in oklab, var(--accent) 88%, var(--text));
+}
 .steps ol {
-  margin: 0;
-  padding-left: 1.4rem;
-  display: grid;
-  gap: 0.6rem;
-}
-.step > * {
+  list-style: none;
   margin: 0.25rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
 }
-.step-state {
-  display: inline-block;
-  min-width: 5.5em;
-  padding: 0 0.4rem;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  font-size: 0.85em;
+.step {
+  position: relative;
+  padding: 0.15rem 0 0.9rem 2.75rem;
+  min-height: 2rem;
+}
+.step > * + * {
+  margin: 0.35rem 0 0;
+}
+/* The line that joins a step to the next one. */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(1rem - 1px);
+  top: 2.15rem;
+  bottom: 0.15rem;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--border);
+}
+.step-done:not(:last-child)::after {
+  background: var(--green);
+}
+.step-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2rem;
+  height: 2rem;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--field-border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.9rem;
   font-weight: 600;
-  text-align: center;
+  line-height: 1;
 }
-.step-done .step-state {
-  background: var(--ok-bg);
-  color: var(--ok-text);
+.step-done .step-mark {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--green-text);
+  font-size: 1rem;
+}
+.step-next .step-mark {
+  background: var(--accent);
+  border-color: var(--accent-edge);
+  color: var(--accent-text);
+}
+.step-optional .step-mark {
+  border-style: dashed;
+}
+.step strong {
+  font-weight: 600;
 }
 .step-done strong {
   font-weight: 400;
   color: var(--muted);
 }
-.step-next {
-  border-left: 3px solid var(--accent);
-  padding-left: 0.6rem;
+.step-next strong {
+  font-size: 1.08rem;
+}
+.step-state {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0 0.45rem;
+  border-radius: 4px;
+  background: var(--paper-3);
+  color: var(--ink-2);
+  font-size: 0.8rem;
+  font-weight: 600;
+  vertical-align: 0.1em;
 }
 .step-next .step-state {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+/* The mark already shows done and to do, so the word is for screen readers only. */
+.step-done .step-state,
+.step-todo .step-state {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* Screens S4 and S5, and the decision record */
+/* A status is a chip with its word on it. The colour repeats the word, it never replaces it. */
 .status {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
+  display: inline;
+  padding: 0.05rem 0.45rem;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  line-height: 1.7;
+  border-radius: 4px;
+  background: var(--paper-3);
+  color: var(--ink-2);
   font-weight: 600;
 }
 .status .dot {
-  width: 0.7em;
-  height: 0.7em;
-  border-radius: 50%;
-  background: var(--muted);
-  flex: none;
+  display: none;
 }
-.status-within .dot {
-  background: var(--within);
+.status-within {
+  background: var(--ok-bg);
+  color: var(--ok-text);
 }
-.status-breach .dot {
-  background: var(--breach);
+.status-breach {
+  background: var(--warn-bg);
+  color: var(--warn-text);
 }
-.status-clear .dot {
-  background: var(--clear);
+.status-clear {
+  background: var(--error-bg);
+  color: var(--error-text);
 }
 figure.chart {
   margin: 0;
@@ -768,10 +1018,12 @@ fieldset.override {
   border: 0;
   margin: 0;
 }
+/* The decision record on screen is the sheet it prints on. */
 .record {
-  background: var(--surface);
+  background: var(--sheet);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--shadow-sheet);
   padding: 1.25rem 1.5rem;
   display: grid;
   gap: 0.9rem;
@@ -788,9 +1040,8 @@ fieldset.override {
   padding-bottom: 0.15rem;
 }
 .record .kicker {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--muted);
 }
 .record-meta {
@@ -809,7 +1060,7 @@ fieldset.override {
   overflow-wrap: anywhere;
 }
 .record-meta .hash dd {
-  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
 }
 .record-meta .hash {
@@ -819,7 +1070,7 @@ fieldset.override {
   margin-top: 0.4rem;
   background: var(--warn-bg);
   color: var(--warn-text);
-  border-radius: 8px;
+  border-radius: var(--radius-key);
   padding: 0.4rem 0.7rem;
   font-weight: 600;
 }
@@ -847,8 +1098,8 @@ fieldset.override {
 }
 .action-box {
   border: 1px solid var(--border);
-  border-left: 4px solid var(--accent);
-  border-radius: 6px;
+  border-top: 2px solid var(--text);
+  border-radius: var(--radius-sheet);
   padding: 0.4rem 0.6rem;
   font-size: 0.85rem;
 }
@@ -942,20 +1193,21 @@ table.sign td {
 
 @media print {
   :root {
-    --text: #000000;
-    --muted: #3c4450;
-    --background: #ffffff;
-    --surface: #ffffff;
-    --border: #b8c0cc;
-    --tolerance: #000000;
-    --level-text: #000000;
+    --text: var(--print-ink);
+    --muted: var(--print-muted);
+    --background: var(--print-paper);
+    --surface: var(--print-paper);
+    --sheet: var(--print-paper);
+    --border: var(--print-rule);
+    --tolerance: var(--print-ink);
+    --level-text: var(--print-ink);
     color-scheme: light;
   }
   /* Fonts with the widths of Helvetica on every system (Arial on Windows, Liberation Sans on
      Linux), so the record prints on the same number of pages everywhere. */
   body {
-    background: #ffffff;
-    font-family: Helvetica, Arial, 'Liberation Sans', 'Nimbus Sans', sans-serif;
+    background: var(--print-paper);
+    font-family: var(--font-print);
     font-size: 7.6pt;
     line-height: 1.3;
   }
@@ -993,8 +1245,20 @@ table.sign td {
   .record {
     border: 0;
     border-radius: 0;
+    box-shadow: none;
     padding: 0;
     gap: 0.45rem;
+  }
+  .status {
+    padding: 0;
+    background: none;
+    color: inherit;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-print);
+    letter-spacing: 0;
   }
   .record > section {
     gap: 0.2rem;
@@ -1047,7 +1311,7 @@ table.sign td {
     font-size: 6.6pt;
   }
   .record-meta .hash dd {
-    font-family: Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-family: var(--font-print-mono);
     font-size: 6.6pt;
   }
   .record-meta {
@@ -1091,7 +1355,7 @@ table.sign td {
 /* A fieldset is min-content wide by default, which can widen the page. */
 .merge-entity {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-key);
   padding: 0.5rem 0.75rem;
   margin: 0;
   display: grid;
