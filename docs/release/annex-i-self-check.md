@@ -2,8 +2,8 @@
 
 | Item | Value |
 |---|---|
-| Status | Draft. The product owner answered the questions of section 5 on 2026-11-03 with the help of an AI assistant, not counsel. Counsel confirms the answers. Then the product owner signs and publishes it (HANDOFF.md task 12, D6). |
-| Date | 2026-10-30. Gaps F8 and F10 closed on 2026-10-31. Gaps F5 and F11 closed on 2026-11-01. Gap F9 closed on 2026-11-02. Review fixes, gaps F12, F13 and F14, the answers of section 5, the live test of the nginx example and the checks of `v1.0.0-rc.2` on 2026-11-03. |
+| Status | Draft. Counsel answers the questions of section 5. Then the product owner signs and publishes it (HANDOFF.md task 12, D6). |
+| Date | 2026-10-30. Gaps F8 and F10 closed on 2026-10-31. Gaps F5 and F11 closed on 2026-11-01. Gap F9 closed on 2026-11-02. Review fixes, gaps F12, F13 and F14, the live test of the nginx example and the checks of `v1.0.0-rc.2` on 2026-11-03. |
 | Checked version | The prerelease `v1.0.0-rc.2` (commit a4af75f). It has every fix of section 4, and it is live on https://risk.portaregulus.com since 2026-11-02. On 2026-11-03, `sha256sum -c SHA256SUMS`, the 3 `gh attestation verify` commands of its release notes and `gh release verify` pass. One check ran on the earlier prerelease `v1.0.0-rc.1` (commit c0448a5). This is the Safari test of F9 on 2026-11-02. Between the two tags, no change touches the storage, the export or the export reminder (`git diff v1.0.0-rc.1 v1.0.0-rc.2`). Before the sign-off, make sure that the release is still `v1.0.0-rc.2`, or do the checks again on the newer tag. |
 | Legal source | Regulation (EU) 2024/2847 (CRA), Annex I, https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2847 |
 | Not legal advice | Have counsel confirm before you publish it. |
@@ -80,16 +80,11 @@ Point (2) starts with "On the basis of the cybersecurity risk assessment referre
 
 ## 5. Questions for counsel
 
-The product owner answered each question on 2026-11-03 with the help of an AI assistant. These answers are not legal advice. Counsel confirms or changes each answer before the sign-off.
+Counsel answers each question before the sign-off. Only the conclusions of counsel go into this document.
 
-1. Point I 2(c). Does a permanent opt-out for one user apply to the hosted app, read with the words "where applicable" in 2(c)?
-   - Answer of the product owner. No. Self-hosting needs a web server, TLS and the security headers, so it is not "easy-to-use" for a browser user, and it is not the opt-out. The hosted app has one public origin with no account, and the origin serves the current release to every new session. A permanent opt-out for one user of that origin does not apply. The temporary postpone stays, because the open tabs keep their version. Self-hosting is a separate deployment option for teams that need a fixed version.
-   - Facts for counsel. The app does use automatic updates, and 2(c) names the opt-out in the same clause. An origin can also serve each release under its own path, so a version pin on the hosted origin is technically possible. It needs a change of the hosting (ADR-0006), and all versions on the origin share one IndexedDB.
-2. Point I 2(l). Can 2(l) be Met when read access and the opt-out do not apply (F6)?
-   - Answer of the product owner. Yes, under the words "where applicable" of point (2) and the risk assessment of ADR-0004. In a single-user app with no account and no server, a log of read access detects nothing, and it adds personal data against 2(g). The opt-out of 2(l) is for activity monitoring. The change log is the integrity record of the document (ADR-0004 R1), and it stays in the browser and in the files of the user. F6 stays closed. The missing author of F14 is a separate gap, and 2(l) is Partial until F14 closes.
-3. Section 1 item 1 and Art. 24. Confirm against Recital 15 and Art. 3(22) that PortaRegulus does not supply the app "in the course of a commercial activity".
-   - Answer of the product owner. There is a real risk that a regulator finds a commercial activity. PortaRegulus sells CVD Portal under the same brand, and the app imports a CVD Portal export (SPEC.md Sec. 9.5). Recital 15 names an intention to monetise, for example "a software platform through which the manufacturer monetises other services". This document does not claim the status of an open-source software steward.
-   - Facts for counsel. A company hosts the free app on its own domain, https://risk.portaregulus.com. ADR-0003 conditions C1 to C6 keep the app free of a price, an account, telemetry, a paid feature and an in-app sales link to CVD Portal. On 2026-11-03 the source code of the app has no link to CVD Portal, and the source code of CVD Portal has no link to the app. If counsel finds a commercial activity, PortaRegulus is the manufacturer and Art. 24 does not apply. Then Art. 14 applies already, since 11 September 2026, and the rest of the CRA applies from 11 December 2027 (Art. 71(2)). Recital 19 counts entities that develop and publish free and open-source software in a business context as possible stewards, so the steward status is possible only if counsel finds no commercial activity.
+1. Point I 2(c). Does a permanent opt-out for one user apply to the hosted app, read with the words "where applicable" in 2(c)? The hosted app has one public origin with no account, and the origin serves the current release to every new session. The open tabs keep their version until the user closes them all. Self-hosting is a separate deployment option for teams that need a fixed version.
+2. Point I 2(l). Can 2(l) be Met when read access and the opt-out do not apply (F6)? The missing author of F14 is a separate gap.
+3. Section 1 item 1 and Art. 24. Confirm against Recital 15 and Art. 3(22) that PortaRegulus does not supply the app "in the course of a commercial activity". A company hosts the free app on its own domain, https://risk.portaregulus.com. ADR-0003 conditions C1 to C6 keep the app free of a price, an account, telemetry, a paid feature and an in-app sales link to CVD Portal. PortaRegulus also sells CVD Portal, and the app imports a CVD Portal export (SPEC.md Sec. 9.5).
 
 ## 6. Sign-off
 
