@@ -16,6 +16,7 @@ const TYPES: Readonly<Record<string, string>> = {
   '.css': 'text/css',
   '.svg': 'image/svg+xml',
   '.webmanifest': 'application/manifest+json',
+  '.woff2': 'font/woff2',
 };
 
 // Serves dist/ with the headers of deploy/headers.json, as vite preview does. After next() it
@@ -26,17 +27,18 @@ async function startServer() {
   const server = createServer((req, res) => {
     const pathname = new URL(req.url ?? '/', 'http://localhost').pathname;
     const file = normalize(join(DIST, pathname === '/' ? 'index.html' : pathname));
-    let body: string;
+    let body: Buffer | string;
     try {
       if (!file.startsWith(DIST + sep)) throw new Error('outside dist');
       // One read with no check before it, so the file cannot change between a check and the read.
-      body = readFileSync(file, 'utf8');
+      // Bytes, not text, so a font file arrives as it is in dist/.
+      body = readFileSync(file);
     } catch {
       res.writeHead(404).end();
       return;
     }
     if (deployed && file.endsWith('.js')) {
-      body = body.split(version).join(NEXT).replace(/^const PR_RISK_VERSION = "/m, 'const PR_RISK_VERSION = "next-');
+      body = body.toString('utf8').split(version).join(NEXT).replace(/^const PR_RISK_VERSION = "/m, 'const PR_RISK_VERSION = "next-');
     }
     res.writeHead(200, { ...headersFor(config, pathname), 'Content-Type': TYPES[extname(file)] ?? 'application/octet-stream', 'Cache-Control': 'no-store' });
     res.end(body);

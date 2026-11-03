@@ -434,27 +434,27 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                 }} disabled={busy}>
                 Context and strategy
               </button>
-              <button type="button" onClick={() => {
+              <button type="button" class="quiet" onClick={() => {
                   onOpen(current.id, 'identify');
                 }} disabled={busy}>
                 Identify and analyze
               </button>
-              <button type="button" onClick={() => {
+              <button type="button" class="quiet" onClick={() => {
                   onOpen(current.id, 'prioritize');
                 }} disabled={busy}>
                 Prioritize
               </button>
-              <button type="button" onClick={() => {
+              <button type="button" class="quiet" onClick={() => {
                   onOpen(current.id, 'respond');
                 }} disabled={busy}>
                 Respond and optimize
               </button>
-              <button type="button" onClick={() => {
+              <button type="button" class="quiet" onClick={() => {
                   onOpen(current.id, 'monitor');
                 }} disabled={busy}>
                 Monitor and adjust
               </button>
-              <button type="button" onClick={() => {
+              <button type="button" class="quiet" onClick={() => {
                   onOpen(current.id, 'enterprise');
                 }} disabled={busy}>
                 Enterprise view

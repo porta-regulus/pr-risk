@@ -307,7 +307,7 @@ function RiskTable({
                 const source = numbersSource(doc, risk);
                 return (
                   <tr key={risk.riskId} aria-current={risk.riskId === selected ? 'true' : undefined}>
-                    <td>{risk.riskId}</td>
+                    <td class="id">{risk.riskId}</td>
                     <td>
                       {risk.riskDescription}
                       {risk.polarity === 'positive' && <span class="sub">Opportunity</span>}

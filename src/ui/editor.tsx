@@ -68,9 +68,10 @@ function StepsPanel({ doc, screen, onGo }: { readonly doc: RiskDocument; readonl
         Steps to complete: {done} of {required} done
       </summary>
       <p class="muted">Do the steps in this order. The app ticks a step when the saved document shows it.</p>
-      <ol>
-        {steps.map((step) => (
+      <ol role="list">
+        {steps.map((step, index) => (
           <li key={step.key} class={`step step-${step.state}`} aria-current={step.state === 'next' ? 'step' : undefined}>
+            <span class="step-mark" aria-hidden="true">{step.state === 'done' ? '✓' : index + 1}</span>
             <p>
               <span class="step-state">{STEP_STATES[step.state]}</span> <strong>{step.title}</strong>
             </p>

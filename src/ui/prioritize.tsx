@@ -312,7 +312,7 @@ function RiskTables({ doc, update, numbers }: { readonly doc: RiskDocument; read
                       {risk.priorityOverride?.priority ?? risk.priority ?? <span class="muted">None</span>}
                       {risk.priorityOverride !== undefined && <span class="sub">Override</span>}
                     </td>
-                    <td>{risk.riskId}</td>
+                    <td class="id">{risk.riskId}</td>
                     <td>
                       {risk.riskDescription}
                       {below && <span class="sub">Below threshold</span>}
@@ -357,7 +357,7 @@ function RiskTables({ doc, update, numbers }: { readonly doc: RiskDocument; read
                   const row = stats.get(risk.riskId);
                   return (
                     <tr key={risk.riskId}>
-                      <td>{risk.riskId}</td>
+                      <td class="id">{risk.riskId}</td>
                       <td>{risk.riskDescription}</td>
                       <td>{row === undefined ? <span class="muted">Not estimated</span> : `${money(row.expectedAnnual)} ± ${money(row.expectedAnnualSe)}`}</td>
                       <td>{row === undefined ? '' : probability(row.probability)}</td>
