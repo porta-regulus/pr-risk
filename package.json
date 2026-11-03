@@ -1,6 +1,6 @@
 {
   "name": "pr-risk",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "private": true,
   "description": "Free, open-source, local-first risk register for the risk components of NIST SP 800-221r1.",
   "license": "Apache-2.0",
