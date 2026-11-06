@@ -14,6 +14,10 @@ Not in scope.
 2. Denial of service with high traffic against the hosted origin.
 3. Findings that need a browser extension with "read all sites" rights, or physical access to an unlocked computer.
 
+## CRA Annex I self-check
+
+The self-check of each release against Annex I of the CRA is [docs/release/annex-i-self-check.md](docs/release/annex-i-self-check.md). The release notes of a release link to the signed version at its tag.
+
 ## How to report
 
 Use GitHub private vulnerability reporting at https://github.com/porta-regulus/pr-risk/security/advisories/new.

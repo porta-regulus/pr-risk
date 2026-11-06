@@ -387,7 +387,7 @@ Decisions for the product owner.
 3. D3. Done 2026-10-31. Approval of the test tag. `v0.1.0-rc.1` failed before a release, and `v0.1.0-rc.2` passed. The deploy job is skipped while the repository variables are empty. If you set the variables first, the test tag deploys to production.
 4. D4. Done 2026-10-31, immutable releases are on. Recommendation yes. Tags and release files then cannot change, and GitHub adds a release attestation. A tag name then cannot be used again, so a failed test tag needs the next number. The next free test tag is `v1.0.0-rc.3` (D7), on 2026-11-02.
 5. D5. Done 2026-11-01. The GitHub account PortaRegulus made the Best Practices entry, project 16174.
-6. D6. Who writes and who signs the Annex I self-check, and where it is published.
+6. D6. Done 2026-11-06. The product owner signs the Annex I self-check. No independent person reviews it for release 1 (gap F13). It stays in `docs/release/`. The release notes of `v1.0.0` and `SECURITY.md` link to the file at the tag, so the signed text cannot change.
 7. D7. Done 2026-10-31. Release 1 is `1.0.0`. Users read a `0.x` version as beta, and the file format has its own schema version, so the app version can show stability. The test tags before release 1 are `v1.0.0-rc.N`. `package.json` has `1.0.0-rc.2` since 2026-11-02. A tag must be `v` plus the `package.json` version, or the release workflow stops. Thus each new tag, also `v1.0.0`, needs a pull request that changes the version first.
 
 ## 6. Rules for the build session
