@@ -11,6 +11,7 @@ These are the only packages that reach the user's browser.
 | preact | 11.1.0 | MIT | UI rendering. Chosen over React by bundle size (build task 1). The empty app is 5.1 kB gzip in total. React and React DOM alone are about 45 kB gzip. | None |
 | xlsx (SheetJS Community Edition) | 0.20.3 | Apache-2.0 | XLSX import, in the import worker only. Installed from https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz, pinned by the sha512 in `package-lock.json`. Not the npm `xlsx@0.18.5`, which has CVE-2023-30533 and CVE-2024-22363. The ZIP directory is checked before SheetJS reads a file. | None |
 | ajv | 8.20.0 | MIT | Only two small runtime helpers (`ajv/dist/runtime/ucs2length`, `ajv/dist/runtime/equal`) reach the bundle. They are imported by the standalone validators that `scripts/gen-schema.mjs` generates at build time. The app never compiles a schema at run time (ADR-0004 E1). The generated validators are 47 kB gzip. | None |
+| @fontsource-variable/public-sans | 5.3.0 | OFL-1.1 | The font of all text on screen (pull request #42, the choice of the product owner). The package has no code. `src/main.tsx` imports its CSS, and Vite bundles 3 woff2 files (latin, latin-ext and vietnamese, about 53 kB) next to the app. They load from `'self'`, so the CSP `font-src 'self'` and ADR-0004 do not change. The browser loads a file only when the page uses its characters. Added after the package entered `package.json`, which broke rule 5 for pull request #42. | None |
 
 ## Build and test only
 
