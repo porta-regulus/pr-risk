@@ -55,10 +55,12 @@ export function VersionNotice({ startScreen = false }: { readonly startScreen?: 
               <button type="button" disabled={busy} onClick={() => {
                   setBusy(true);
                   setResult(undefined);
+                  setNoticeState({ activating: true });
                   void activateNewVersion().then((outcome) => {
                     if (outcome !== 'activated') {
                       setBusy(false);
                       setResult(RESULT_TEXT[outcome]);
+                      setNoticeState({ activating: false });
                     }
                   });
                 }}>

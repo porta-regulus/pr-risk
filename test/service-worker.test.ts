@@ -160,3 +160,18 @@ describe('requestActivation order', () => {
     expect(reloads).toBe(1);
   });
 });
+
+describe('requestActivation switch timeout', () => {
+  it('gives up when control does not change after a yes, and never reloads later', async () => {
+    const container = new EventTarget();
+    let reloads = 0;
+    const waiting = {
+      postMessage(_message: unknown, transfer: Transferable[]): void {
+        (transfer[0] as MessagePort).postMessage({ ok: true });
+      },
+    };
+    await expect(requestActivation(container, waiting, () => (reloads += 1), 1000, 30)).resolves.toBe('no-update');
+    container.dispatchEvent(new Event('controllerchange'));
+    expect(reloads).toBe(0);
+  });
+});

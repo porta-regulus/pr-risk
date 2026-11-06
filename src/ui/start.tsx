@@ -27,6 +27,7 @@ import {
 import type { ScreenName } from './editor';
 import { downloadText, newDocument, slug } from './files';
 import { CHOICE_TEXT, choicesOf, fieldParts, importChoices, mergeEntities, mergeResultText, unchangedRisks, type MergeEntity } from './merge';
+import { noticeState, onNoticeState } from './version';
 import { VersionNotice } from './version-notice';
 
 const EXAMPLES = {
@@ -171,6 +172,14 @@ function MergeChoices({
 }
 
 export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: string | undefined; readonly onOpen: (id: string, screen: Exclude<ScreenName, 'start'>) => void }) {
+  const [activating, setActivating] = useState(noticeState().activating === true);
+  useEffect(
+    () =>
+      onNoticeState((next) => {
+        setActivating(next.activating === true);
+      }),
+    [],
+  );
   const [db, setDb] = useState<IDBDatabase>();
   const [documents, setDocuments] = useState<StoredDocument[]>([]);
   const [currentId, setCurrentId] = useState<string | undefined>(selectedId);
@@ -356,6 +365,12 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
       </header>
 
       <VersionNotice startScreen />
+      {activating ? (
+        <p class="message" role="status">
+          The new version starts. The page reloads in a moment.
+        </p>
+      ) : (
+        <>
       {current !== undefined && exportOverdue(current) && (
         <p class="banner" role="status">
           {current.lastExportOn === undefined ? 'You have not saved a copy of this document yet.' : 'Your last copy is more than 7 days old.'} Browsers can delete stored data. Export a copy now.
@@ -616,6 +631,8 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
           Version {__APP_VERSION__}, build {__GIT_SHA__.slice(0, 12)}. Apache-2.0.
         </p>
       </footer>
+        </>
+      )}
     </main>
   );
 }

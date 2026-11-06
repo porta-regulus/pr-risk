@@ -45,29 +45,41 @@ interface WaitingLike {
 
 // ADR-0004 T3. Asks the waiting version to take over now. The caller must have no unsaved work,
 // because the page reloads.
-export function requestActivation(container: Pick<ContainerLike, 'addEventListener'>, waiting: WaitingLike | null, reload: () => void, timeoutMs = 3000): Promise<ActivateResult> {
+// An answer must come in timeoutMs, and the change of control in switchMs after a yes. Else the
+// result is no-update, and the page never reloads later under the user's work.
+export function requestActivation(
+  container: Pick<ContainerLike, 'addEventListener' | 'removeEventListener'>,
+  waiting: WaitingLike | null,
+  reload: () => void,
+  timeoutMs = 3000,
+  switchMs = 10_000,
+): Promise<ActivateResult> {
   if (waiting === null) return Promise.resolve('no-update');
   return new Promise((resolve) => {
     const channel = new MessageChannel();
     // The new version can take control before its answer arrives, so listen before the request.
     let changed = false;
     let accepted = false;
+    let done = false;
     const finish = (): void => {
+      if (done) return;
+      done = true;
       resolve('activated');
       reload();
     };
-    container.addEventListener(
-      'controllerchange',
-      () => {
-        changed = true;
-        if (accepted) finish();
-      },
-      { once: true },
-    );
-    const timer = setTimeout(() => {
+    const onChange = (): void => {
+      changed = true;
+      if (accepted) finish();
+    };
+    const giveUp = (): void => {
+      if (done) return;
+      done = true;
+      container.removeEventListener('controllerchange', onChange);
       channel.port1.close();
       resolve('no-update');
-    }, timeoutMs);
+    };
+    container.addEventListener('controllerchange', onChange, { once: true });
+    const timer = setTimeout(giveUp, timeoutMs);
     channel.port1.onmessage = (event: MessageEvent) => {
       clearTimeout(timer);
       channel.port1.close();
@@ -77,6 +89,7 @@ export function requestActivation(container: Pick<ContainerLike, 'addEventListen
       }
       accepted = true;
       if (changed) finish();
+      else setTimeout(giveUp, switchMs);
     };
     waiting.postMessage({ type: 'activate-now' }, [channel.port2]);
   });

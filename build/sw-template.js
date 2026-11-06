@@ -30,7 +30,8 @@ self.addEventListener('activate', (event) => {
 // under another open tab. The reply goes back on the port of the request.
 self.addEventListener('message', (event) => {
   const port = event.ports[0];
-  if (event.data?.type !== 'activate-now' || port === undefined) return;
+  // Only a window of this origin may ask.
+  if (event.origin !== self.location.origin || event.data?.type !== 'activate-now' || port === undefined) return;
   event.waitUntil(
     (async () => {
       const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
