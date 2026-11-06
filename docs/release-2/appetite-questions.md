@@ -2,8 +2,9 @@
 
 | Item | Value |
 |---|---|
-| Status | Planned for release 2 |
+| Status | In build for release 2. The code merges to `main` only after the release 1 tag. |
 | Date | 2026-11-06 |
+| Schema | 1.2.0 adds the optional object `appetite.elicitation` (Sec. 8) |
 | Decided by | PortaRegulus (product owner) |
 | ToC | `ictrm.3.2.1`, `ictrm.5.4.2` |
 | Screen | S2 Context and strategy |
@@ -38,13 +39,16 @@ Stage 1 is a slider because it is one amount and only its order of size matters.
 1. Each question names a loss, a chance and a year. No question asks for a word such as "low" or "high". Every board says "low" for cyber risk, and the word gives no number.
 2. Chances are natural frequencies ("1 in 20"), not percentages (Gigerenzer and Hoffrage 1995).
 3. All amounts come from the capacity of stage 1. The app never proposes an amount of its own. This follows the intent of hard rule 2.
-4. The search for a point. Each point has an upper limit. The upper limit is the last point that is set. If no point is set yet, the upper limit is 2 times capacity. The search starts with the range from 1/30 of the upper limit to the upper limit. For the first point (1 in 100) that is capacity / 15 to 2 times capacity. Each answer halves the range on a log scale. After 3 answers, the point is the geometric mean of the last range. Two possible results next to each other are then about 1.5 times apart.
+4. The search for a point. Each point has an upper limit. The upper limit is the last point that is set. If no point is set yet, the upper limit is 2 times capacity. The search starts with the range from 1/30 of the upper limit to the upper limit. For the first point (1 in 100) that is capacity / 15 to 2 times capacity. Each answer halves the range on a log scale. After 3 answers, the point is the geometric mean of the last range. Two possible results next to each other are then about 1.5 times apart. The app rounds each amount to 2 significant digits, so the board reads a plain number such as 120 000. The rounded amount is the limit of the next range.
 5. The order is 1 in 100, 1 in 20, 1 in 5, 1 in 2. Each new point is below the last point that is set. So the points that are set meet V-12 (loss ascending, probability strictly descending) by construction, and the app never asks a question again.
-6. Every question has "Do not know". The app leaves that point empty and never fills it. The search continues with the next point. Its upper limit comes from rule 4, so an empty point is never used as a value. The answers to the other points stay valid. With fewer than 3 points the curve is not valid. The app then opens the curve editor with the points that are set and no default points.
+6. Every question has "Do not know". The app leaves that point empty and never fills it. The search continues with the next point. Its upper limit comes from rule 4, so an empty point is never used as a value. The answers to the other points stay valid. With fewer than 3 points the curve is not complete, because the step "Draw your tolerance curve" needs 3 points. The app then moves to the curve editor with the points that are set and no default points. With 1 point the app writes no curve, because the schema needs 2 points. The result shows that point, so the user can type it in the editor.
 7. A first number anchors the answer. The search starts in the middle of a wide range, not at a typical value, so the first amount on the screen does not suggest an answer.
 8. Accessibility. All answers except capacity are native buttons. The capacity slider moves with the arrow keys, shows its value as text (`aria-valuetext`), and has a number field next to it. This meets WCAG 2.2 criteria 2.1.1 and 2.5.7.
 9. The flow records the date of the session and a free-text note of who took part. The app has no accounts (ADR-0004), so the note is text only. The result stays "Draft" until the "Approved by and on" fields are filled.
-10. After the flow, the curve editor of S2 lets the user drag a point to fine-tune it. That is an edit of the result, not an answer. A change after approval goes into `appetite.history` as in SPEC.md Sec. 6.17 item 2.
+10. After the flow, the curve editor of S2 lets the user change a point to fine-tune it. That is an edit of the result, not an answer. A change after approval goes into `appetite.history` as in SPEC.md Sec. 6.17 item 2.
+11. Stages 3 and 4 need the capacity (rule 3). After "Do not know yet" in stage 1, the app skips them and says why. Stage 2 still runs.
+12. Each answer is saved at once, so a closed tab loses nothing. A new capacity in stage 1 clears the stage 3 and 4 answers, because their amounts come from the old capacity.
+13. The flow changes the tolerance curve and the statements only when the user clicks "Use these answers" in stage 5. That step needs the note of who took part (rule 9). An existing curve goes into `appetite.history` with the date of the session, the note of who took part as "changed by", and the reason "Guided questions". The new curve has no approval. A "Not acceptable" answer makes one draft statement only once, also when the user clicks the button again.
 
 ## 5. Why buttons and not sliders
 
@@ -57,21 +61,38 @@ The ranges of answer options can signal what is "normal" (Schwarz, Hippler, Deut
 
 ## 6. Out of scope of this feature
 
-1. Revealed appetite from past decisions of the management body. See open question O5.
+1. Revealed appetite from past decisions of the management body. See decision O5.
 2. Tolerance curves for gains (SPEC.md Sec. 3.2).
 3. Weights between criteria. Criteria that the user cannot put in money stay appetite statements with triggers. They do not enter the tolerance curve.
 
-## 7. Open questions before the build
+## 7. Decisions on the open questions
 
-| # | Question | Default if no answer |
+The product owner decided O1 to O5 on 2026-11-06. Each decision is the default that this document proposed.
+
+| # | Question | Decision |
 |---|---|---|
-| O1 | The search range (1/30 of the upper limit to the upper limit, and 2 times capacity when no point is set) and 3 questions for each point are choices of the first mockup. They come from no source. | Test them in the pilot (`docs/pilot/`) with 3 or more management bodies. Keep them if the boards accept the points they get. |
-| O2 | The stage 4 flag at "More than 2E" comes from no source. | Show the flag as a question to the board, never as an error. Test it in the pilot. |
-| O3 | Where do the stage 2 answers, the stage 4 flags and the session note go in the document? | A new optional object `appetite.elicitation`. This changes `docs/schema/`, so it needs `npm run gen:schema` and an updated `test/fixtures/python-parity.json`. |
-| O4 | Stage 2 can say that an event is "Not acceptable" while the curve accepts the loss of that event. The conflict is only visible after S3 has estimates and S4 has a run. How does the app show it? | Help text on S4 that points to the stage 2 answers and to the tolerance what-if of S6 (SPEC.md Sec. 6.17 item 2). |
+| O1 | The search range (1/30 of the upper limit to the upper limit, and 2 times capacity when no point is set) and 3 questions for each point are choices of the first mockup. They come from no source. | Keep 3 questions for each point and the range of rule 4. Test them in the pilot (`docs/pilot/`) with 3 or more management bodies. Keep them if the boards accept the points they get. |
+| O2 | The stage 4 flag at "More than 2E" comes from no source. | Flag at "More than 2E". The flag is a question to the board, never an error. Test it in the pilot. |
+| O3 | Where do the stage 2 answers, the stage 4 flags and the session note go in the document? | A new optional object `appetite.elicitation` in schema 1.2.0 (Sec. 8). |
+| O4 | Stage 2 can say that an event is "Not acceptable" while the curve accepts the loss of that event. The conflict is only visible after S3 has estimates and S4 has a run. How does the app show it? | Help text on S4 that lists the "Not acceptable" events and points to the tolerance what-if of S6 (SPEC.md Sec. 6.17 item 2). The app makes no automatic check, because an event has no link to a risk. |
 | O5 | Use the past decisions of the management body (accept, treat, fund) as a second cross-check? | No. Many companies with 50 to 249 staff have no record of such decisions. |
 
-## 8. Sources
+## 8. Record in the document
+
+Schema 1.2.0 adds the optional object `appetite.elicitation`. It is a new optional field, so it is a minor version (SPEC.md Sec. 7.7 item 2). A 1.0.0 or 1.1.0 document is also a valid 1.2.0 document. The app writes 1.2.0. Release 1 refuses a 1.2.0 document with "Use a newer version of the app".
+
+| Field | Content |
+|---|---|
+| `heldOn` | The date of the session. Required. |
+| `participants` | Free text. Who took part (rule 9). |
+| `capacity` | The capacity that stage 3 and 4 used. The amounts of the questions come from it, so the record shows the same questions also after a later change of `appetite.capacity`. |
+| `criteria[]` | Stage 2. `objectiveId`, the `event` text, the `answer` (`acceptable`, `painful`, `not-acceptable` or `unknown`) and the `statementId` of the draft statement that stage 5 made. |
+| `points[]` | Stage 3. `oneIn` (100, 20, 5 or 2) and the `answers` in order (`accept`, `not-accept` or `unknown`), at most 3. The app computes each amount again from `capacity` and the answers, so the record has no amount that can disagree with the answers. |
+| `crossCheck` | Stage 4. `oneIn` of the point and the `answer` (`below-half`, `half-to-double`, `above-double` or `unknown`). `above-double` is the flag. |
+
+The result of the flow is in the existing fields `appetite.capacity`, `appetite.toleranceCurve` and `appetite.statements`. The record holds only the answers.
+
+## 9. Sources
 
 1. Couper, M. P., Tourangeau, R., Conrad, F. G. and Singer, E. (2006). Evaluating the effectiveness of visual analog scales. A web experiment. Social Science Computer Review 24(2), 227 to 245.
 2. Funke, F., Reips, U.-D. and Thomas, R. K. (2011). Sliders for the smart. Type of rating scale on the web interacts with educational level. Social Science Computer Review 29(2), 221 to 231.

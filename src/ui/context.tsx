@@ -5,6 +5,7 @@ import { AppetiteSection } from './appetite';
 import { nextId, withSection, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
 import { Checkboxes, LinesField, SelectField, TextField } from './fields';
+import { GuidedQuestions } from './guided-questions';
 import { StrategySection } from './strategy';
 
 type Context = NonNullable<RiskDocument['context']>;
@@ -295,6 +296,7 @@ export function ContextScreen({ id, onNavigate }: { readonly id: string; readonl
         <>
           <ContextSection doc={draft} update={update} />
           <GovernanceSection doc={draft} update={update} />
+          <GuidedQuestions doc={draft} update={update} />
           <AppetiteSection doc={draft} update={update} />
           <StrategySection doc={draft} update={update} />
         </>

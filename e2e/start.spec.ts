@@ -27,8 +27,8 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   await page.getByRole('button', { name: 'App file (JSON)' }).click();
   const download = await downloadPromise;
   const exported = JSON.parse(readFileSync(await download.path(), 'utf8')) as { schemaVersion: string; risks: unknown[] };
-  // The example file is 1.0.0. The app writes 1.1.0 when it saves (SPEC.md Sec. 7.7).
-  expect(exported.schemaVersion).toBe('1.1.0');
+  // The example file is 1.0.0. The app writes 1.2.0 when it saves (SPEC.md Sec. 7.7).
+  expect(exported.schemaVersion).toBe('1.2.0');
   expect(exported.risks).toHaveLength(9);
   await expect(page.getByText('You have not saved a copy of this document yet.')).toBeHidden();
 
@@ -85,8 +85,8 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   await expect(page.getByText('9 risks from example-2.oscal-poam.json are saved.')).toBeVisible();
   // Lossless means the whole document, not only the risks: the native path restores the risks too.
   const original = JSON.parse(readFileSync(fileURLToPath(new URL('../docs/schema/examples/example-2-sme-quantitative.json', import.meta.url)), 'utf8')) as Record<string, unknown>;
-  // The app writes schema 1.1.0 (SPEC.md Sec. 7.7). Every other field is restored as it was.
-  expect(withoutLogs(await page.evaluate(storedDocument))).toEqual(withoutLogs({ ...original, schemaVersion: '1.1.0' }));
+  // The app writes schema 1.2.0 (SPEC.md Sec. 7.7). Every other field is restored as it was.
+  expect(withoutLogs(await page.evaluate(storedDocument))).toEqual(withoutLogs({ ...original, schemaVersion: '1.2.0' }));
   await page.getByLabel(/Type REMOVE/).fill('REMOVE');
   await remove.click();
   await expect(page.getByText('All data is removed from this browser.')).toBeVisible();

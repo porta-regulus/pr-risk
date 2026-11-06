@@ -68,7 +68,7 @@ const versionKey = (id: string, version: number): string => `${id}\u0000${String
 
 // Saves a valid document as a new version and keeps the last 20 versions. A save after an
 // undo removes the versions after the current one, as in an editor. A save writes the
-// current schema version, because a 1.0.0 document is also a valid 1.1.0 document.
+// current schema version, because a 1.0.0 or 1.1.0 document is also a valid 1.2.0 document.
 export async function saveDocument(db: IDBDatabase, given: RiskDocument, now = new Date().toISOString()): Promise<StoredDocument> {
   const doc: RiskDocument = given.schemaVersion === SCHEMA_VERSION ? given : { ...given, schemaVersion: SCHEMA_VERSION };
   const errors = documentErrors(doc);

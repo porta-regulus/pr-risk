@@ -474,6 +474,7 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
               </ul>
             )}
             {numbers.clippedShare > 0.05 && <p class="banner">{percent(numbers.clippedShare)} of the trials have a clipped rate (lint L-08). Check the widest frequency ranges.</p>}
+            <NotAcceptableEvents doc={doc} />
           </section>
           <RiskTables doc={doc} update={update} numbers={numbers} />
           <section aria-labelledby="matrix-title" class="panel">
@@ -497,6 +498,29 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
       )}
       <ErrView doc={doc} number={4} />
     </>
+  );
+}
+
+// Decision O4 of docs/release-2/appetite-questions.md. An event that the management body does
+// not accept can have a loss that the curve accepts. An event has no link to a risk, so the app
+// cannot check this. It lists the events and points to the tolerance what-if of S6.
+function NotAcceptableEvents({ doc }: { readonly doc: RiskDocument }) {
+  const elicitation = doc.appetite?.elicitation;
+  const events = (elicitation?.criteria ?? []).filter((item) => item.answer === 'not-acceptable');
+  if (elicitation === undefined || events.length === 0) return null;
+  return (
+    <details class="help">
+      <summary>Events that the management body does not accept</summary>
+      <p class="hint">
+        The management body marked these events "Not acceptable" in the guided questions of {elicitation.heldOn}. The tolerance curve can still accept the loss of such an event. Find the annual
+        loss of each event on the chart. If the curve accepts that loss, change the curve with the tolerance what-if on the screen Monitor and adjust.
+      </p>
+      <ul class="cell-list">
+        {events.map((item, i) => (
+          <li key={i}>{item.event}</li>
+        ))}
+      </ul>
+    </details>
   );
 }
 
