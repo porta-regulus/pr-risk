@@ -73,6 +73,37 @@ const riskArbitrary = (index: number, registerIds: readonly string[], quantitati
       return risk as unknown as Risk;
     });
 
+// Schema 1.2.0. The answers of the guided questions (SPEC.md Sec. 6.5 item 6).
+const ONE_IN = [100, 20, 5, 2] as const;
+const elicitationArbitrary = fc.record(
+  {
+    heldOn: fc.constant('2026-11-06'),
+    participants: nonEmpty,
+    capacity: positive(1e8),
+    criteria: fc.array(
+      fc.record(
+        {
+          objectiveId: fc.constantFrom('OBJ-1', 'OBJ-2'),
+          event: nonEmpty,
+          answer: fc.constantFrom('acceptable' as const, 'painful' as const, 'not-acceptable' as const, 'unknown' as const),
+          statementId: fc.constantFrom('AS-1', 'AS-2'),
+        },
+        { requiredKeys: ['event', 'answer'] },
+      ),
+      { maxLength: 3 },
+    ),
+    points: fc.uniqueArray(
+      fc.record({
+        oneIn: fc.constantFrom(...ONE_IN),
+        answers: fc.array(fc.constantFrom('accept' as const, 'not-accept' as const, 'unknown' as const), { minLength: 1, maxLength: 3 }),
+      }),
+      { selector: (point) => point.oneIn, maxLength: 4 },
+    ),
+    crossCheck: fc.record({ oneIn: fc.constantFrom(...ONE_IN), answer: fc.constantFrom('below-half' as const, 'half-to-double' as const, 'above-double' as const, 'unknown' as const) }),
+  },
+  { requiredKeys: ['heldOn'] },
+);
+
 export const documentArbitrary: fc.Arbitrary<RiskDocument> = fc
   .record({
     methods: fc.array(fc.constantFrom(...METHODS), { minLength: 1, maxLength: 3 }),
@@ -81,6 +112,7 @@ export const documentArbitrary: fc.Arbitrary<RiskDocument> = fc
     organization: fc.option(text, { nil: undefined }),
     timeframe: fc.integer({ min: 1, max: 60 }),
     simulation: fc.option(fc.record({ seed: fc.nat(), trials: fc.integer({ min: 1000, max: 1_000_000 }) }), { nil: undefined }),
+    elicitation: fc.option(elicitationArbitrary, { nil: undefined }),
   })
   .chain((base) => {
     const registers = base.methods.map((method, index) => ({
@@ -101,6 +133,7 @@ export const documentArbitrary: fc.Arbitrary<RiskDocument> = fc
         risks,
       };
       if (base.simulation !== undefined) doc['simulation'] = { ...base.simulation, engineVersion: '0.0.0' };
+      if (base.elicitation !== undefined) doc['appetite'] = { elicitation: base.elicitation };
       return doc as unknown as RiskDocument;
     });
   });

@@ -130,7 +130,7 @@ From the ToC.
 5. Sec. 5.1 Table 8 as a workflow, and Sec. 5.1.2 calendars, reminders and notifications.
 6. Sec. 5.3.2 forced ranking optimization with weighted business drivers.
 7. Appendix C federal content. The target users are in the EU.
-8. Sec. 3.2.1 guided questions that set capacity, appetite statements and tolerance points from the answers of the management body. Planned for release 2 (`docs/release-2/appetite-questions.md`).
+8. Moved into release 1 on 2026-11-06. The guided questions of Sec. 3.2.1 are now in scope (Sec. 6.5 item 6 and `docs/release-2/appetite-questions.md`).
 
 Not in the ToC, so out.
 1. Regulation and framework mappings per risk (NIS2, CRA Annex I, CSF 2.0 subcategories). Responses can still name informative references (Sec. 3.6).
@@ -201,7 +201,14 @@ Steps to complete (S2 to S7). A panel under the save bar leads a first-time user
 2. The app ticks a step from the saved document. It cannot tick the run and the print, because they do not change the document. The first required step that is not done is "Next" and shows how to do it. The other steps show it on request. The state of each step is also a word, so colour is never the only signal.
 3. Each step has a button that saves, opens the screen of the step, and moves the focus to the heading of its section.
 4. A closed panel stays closed on the other screens until the page loads again. The panel does not print. It shows no number for an estimate (hard rule 2).
-5. S1 tells a new user to create a document and then open "Context and strategy".
+5. S1 tells a new user to create a document and then open "Guided mode".
+
+Guided mode (docs/ux/redesign-plan.md Sec. 3). The same document in 9 steps, one task on each page, in the order of the AT-5 task. Your company, Your goals, Loss you can take (the guided questions of Sec. 6.5 item 6), Your risks, Size each risk, Shared causes (optional), What you can do, Budget and best plan, Decision record.
+1. A numbered step list on the left shows each step, the current step and "Done" for each step that the document shows. At a width of 760 px or less it becomes a menu button.
+2. Each page has one main button, "Next", and a line that says what is still missing, in plain words.
+3. The steps use the edit functions of S2 to S5, so the guided mode and the full editor (S2 to S7) never differ. "Open the full editor" and "Guided mode" switch between them with a save first.
+4. The NIST references are in the help text "Why we ask this" of each step, not in the titles.
+5. Step 9 prints only the decision record, as S5 does.
 
 Estimate entry words (S3). From the calibration method of Hubbard and Seiersen, *How to Measure Anything in Cybersecurity Risk*, 2nd ed., Wiley 2023.
 1. "How many times per year does this happen, not counting events caused through the drivers below? Give a range you are 90% sure of." A toggle allows "once every N years". The app converts and swaps the bounds.
@@ -253,6 +260,7 @@ The six steps order the screens (Sec. 5). The register row shows which steps are
 3. `appetite.statements[]`, one per appetite statement. Each holds tolerances, controls and indicators in the shape of Table 9 (Sec. 6.11). A tolerance can have a machine-readable `breachWhen` trigger.
 4. Table 2 gives five example pairs. The help text shows them as templates.
 5. Identifying an emerging or horizon risk is a trigger to review appetite and tolerance (Sec. 3.3, lines 726 to 735). The app shows a review banner when a risk with `horizon` emerging or horizon is added.
+6. Guided questions on S2 and in step 3 of the guided mode (Sec. 5) let the management body set capacity, draft statements and tolerance points by answers of one click. The answers go into `appetite.elicitation` (schema 1.2.0). The full rules are in `docs/release-2/appetite-questions.md`.
 
 ### 6.6 Risk management strategy (Sec. 3.2.2)
 
@@ -582,7 +590,7 @@ Errors (V) block save or import. Warnings (L) show in the UI and in the record a
 
 ### 7.7 Schema versioning
 
-1. `schemaVersion` is semantic. The `$id` contains the version. Version `1.1.0` adds three optional fields, `previousAssessment.impacts`, `rollUp.responseCostRule` and `changeLog[].reasons`. A `1.0.0` document is also a valid `1.1.0` document, so the schema accepts both values and the app needs no migration. The app writes `1.1.0` when it saves. It refuses a newer minor version, for example `1.2.0`, because that can hold fields that the app does not know.
+1. `schemaVersion` is semantic. The `$id` contains the version. Version `1.1.0` adds three optional fields, `previousAssessment.impacts`, `rollUp.responseCostRule` and `changeLog[].reasons`. Version `1.2.0` (release 1) adds the optional object `appetite.elicitation` (Sec. 6.5 item 6). A `1.0.0` or `1.1.0` document is also a valid `1.2.0` document, so the schema accepts all three values and the app needs no migration. The app writes `1.2.0` when it saves. It refuses a newer minor version, for example `1.3.0`, because that can hold fields that the app does not know.
 2. A new optional field is a minor version. A changed meaning or a new required field is a major version.
 3. The app reads the current and the previous major version and migrates the previous one on import, with a provenance record.
 4. When NIST publishes the final SP 800-221r1 or new IR 8286 schemas, vendor the new files, keep the old ones, add a migration test, and update the concept id table (Sec. 3.1).
@@ -753,7 +761,7 @@ Three measures.
 2. **Clear breach.** LEC(x) minus 2 standard errors is above T(x) at some grid point. The optimization ranks with this test, because the point estimate flips for borderline portfolios.
 3. **Excess area.** Sum over the grid of max(0, LEC(x) - T(x)) times the grid step in log10 loss. It ranks portfolios that all breach.
 
-Default points for a new document, shown as a starting point and not as advice. (2% of capacity, 0.5), (10%, 0.2), (33%, 0.05), (100%, 0.01). Release 2 adds guided questions that replace these points with the answers of the management body (`docs/release-2/appetite-questions.md`).
+Default points for a new document, shown as a starting point and not as advice. (2% of capacity, 0.5), (10%, 0.2), (33%, 0.05), (100%, 0.01). The guided questions (Sec. 6.5 item 6) replace these points with the answers of the management body.
 
 ### 8.10 Responses
 
@@ -1063,6 +1071,7 @@ Cross-check (not a pass condition). The TypeScript engine and `reference/sim_ref
 |---|---|
 | Users | 5 people who match ADR-0001. Not PortaRegulus staff or customers of its paid products. |
 | Task | Create a first register. Context with at least 2 objectives. At least 5 risks (at least 1 from the catalogue, 1 own, 1 positive), each with frequency range, impact range, owner and objective. At least 1 driver with 2 links. A tolerance curve with 3 or more points. At least 2 response options. Run the optimization. Print the decision record. |
+| Mode | The users start in the guided mode (Sec. 5). They may open the full editor. |
 | Help | None. Any moderator intervention fails the session. In-app help text is allowed. |
 | Measure | Time from app open to printed record. Screen recording. Think-aloud. |
 | Pass | All 5 finish in under 30 minutes without help. |

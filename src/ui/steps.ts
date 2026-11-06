@@ -59,7 +59,7 @@ const DEFINITIONS: readonly Definition[] = [
   {
     key: 'tolerance',
     title: 'Draw your tolerance curve',
-    how: 'The curve shows how much loss per year your company can accept. Each point is an amount of loss and the highest chance per year that you accept for a loss above that amount. Click "Add a point" and type the 2 values. Add 3 points or more. If you know your capacity, type it and click "Use the starting points from capacity". Then check the points.',
+    how: 'The curve shows how much loss per year your company can accept. Each point is an amount of loss and the highest chance per year that you accept for a loss above that amount. Click "Add a point" and type the 2 values. Add 3 points or more. If you know your capacity, type it and click "Use the starting points from capacity". Then check the points. You can also click "Start the guided questions" and answer them with your management body. The answers set the points.',
     screen: 'context',
     section: 'appetite-title',
     kind: 'required',

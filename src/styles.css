@@ -1,39 +1,40 @@
-/* Hallmark · shape: app screen · genre: modern-minimal · theme: Furrow (deal 1/3, seed free-local-first-risk-register-b84f·37c613e7·2026-11-02·r0) · redesign: restyle
+/* Restyled to direction B (docs/ux/redesign-plan.md Sec. 4.1) in redesign phase 3. The Hallmark notes below describe the earlier Furrow theme.
+ * Hallmark · shape: app screen · genre: modern-minimal · theme: Furrow (deal 1/3, seed free-local-first-risk-register-b84f·37c613e7·2026-11-02·r0) · redesign: restyle
  * nav: kept (a row of screen keys, the current one filled) · signature: the steps panel, a ticked stepper on paper · states: kept (empty, error and full as the screens draw them)
  * axes: light/grotesk-sans/warm · posture: committed · contrast: pass · face: Public Sans, the owner's pick over Furrow's Red Hat · v2.0.0 */
 /* Hallmark · pre-emit critique: P3 H3 E3 S3 R4 V3 · weakest: E, the six screen keys were all primary, so only "Context and strategy" stays filled */
 /* Hallmark · waive 7b · --text is oklch(18% 0.006 60) on screen and #000 only in the print block · the printed record uses toner black */
 /* Hallmark · waive 37 · Helvetica and the mono stack apply only in print and to the record hash · the record must print on 2 A4 pages with the widths of Helvetica */
 
-/* Furrow tokens, mapped onto the names the screens already use. Fonts are bundled (ADR-0004, no network). */
+/* Direction B of docs/ux/redesign-plan.md Sec. 4.1, mapped onto the names the screens already use. Ink on white, one signal color, rules not boxes. Fonts are bundled (ADR-0004, no network). */
 :root {
-  --paper: oklch(96% 0.011 85);
-  --paper-3: oklch(92% 0.016 85);
-  --sheet: oklch(99.3% 0.004 85);
-  --text: oklch(18% 0.006 60);
-  --ink-2: oklch(28% 0.008 60);
-  --muted: oklch(44% 0.012 60);
+  --paper: #ffffff;
+  --paper-3: #f4f4f3;
+  --sheet: #ffffff;
+  --text: #111111;
+  --ink-2: #2b2b2b;
+  --muted: #595959;
   --background: var(--paper);
-  --surface: oklch(99.5% 0.005 85);
-  --border: oklch(88% 0.013 85);
-  --field-border: oklch(58% 0.012 60);
-  --accent: oklch(70% 0.19 40);
-  --accent-text: oklch(18% 0.006 60);
+  --surface: #ffffff;
+  --border: #e3e3e3;
+  --field-border: #111111;
+  --accent: #111111;
+  --accent-text: #ffffff;
   --accent-edge: color-mix(in oklab, var(--accent) 78%, var(--text));
-  --accent-soft: oklch(94.5% 0.035 55);
-  --focus: oklch(60% 0.19 40);
+  --accent-soft: #f4f4f3;
+  --focus: #b93c0a;
   --green: oklch(48% 0.11 150);
   --green-text: oklch(99.5% 0.005 85);
   --warn-bg: oklch(94% 0.05 85);
   --warn-text: oklch(38% 0.08 70);
-  --error-bg: oklch(93% 0.04 35);
-  --error-text: oklch(40% 0.14 32);
+  --error-bg: #fbeee8;
+  --error-text: #9a3209;
   --ok-bg: oklch(92% 0.04 150);
   --ok-text: oklch(36% 0.09 150);
   --warn-mark: oklch(80% 0.14 80);
   --mark-ink: oklch(18% 0.006 60);
-  --danger: oklch(50% 0.17 30);
-  --danger-text: oklch(99.5% 0.005 85);
+  --danger: #b93c0a;
+  --danger-text: #ffffff;
   --within: oklch(48% 0.11 150);
   --breach: oklch(58% 0.13 70);
   --clear: oklch(50% 0.17 30);
@@ -54,46 +55,46 @@
   --print-paper: #ffffff;
   --print-rule: #b8c0cc;
   --print-foot: #566070;
-  --font-body: 'Public Sans Variable', 'Public Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans Variable', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-body);
   --font-mono: ui-monospace, Menlo, Consolas, monospace;
   --font-print: Helvetica, Arial, 'Liberation Sans', 'Nimbus Sans', sans-serif;
   --font-print-mono: Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  --radius-card: 10px;
-  --radius-key: 6px;
-  --radius-sheet: 3px;
-  --key-lit: inset 0 1px 0 color-mix(in oklab, var(--sheet) 45%, transparent), inset 0 -1px 0 color-mix(in oklab, var(--text) 10%, transparent);
-  --key-plain: inset 0 1px 0 var(--sheet), 0 1px 1px var(--border);
-  --shadow-sheet: 0 1px 1px oklch(18% 0.006 60 / 0.1), 0 2px 4px -1px oklch(18% 0.006 60 / 0.1), 0 24px 44px -20px oklch(18% 0.006 60 / 0.32);
+  --radius-card: 2px;
+  --radius-key: 2px;
+  --radius-sheet: 2px;
+  --key-lit: none;
+  --key-plain: none;
+  --shadow-sheet: none;
   --dur-micro: 120ms;
   color-scheme: light;
 }
 
-/* Furrow has no dark page. This is the same material at night: warm graphite, pale ink, the same tangerine. */
+/* Direction B at night: pale ink on near black, the same rules, a lighter signal color. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --paper: oklch(19% 0.008 60);
-    --paper-3: oklch(27% 0.01 60);
-    --sheet: oklch(23% 0.009 60);
-    --text: oklch(94% 0.01 85);
-    --ink-2: oklch(86% 0.012 85);
-    --muted: oklch(74% 0.014 80);
-    --surface: oklch(23% 0.009 60);
-    --border: oklch(34% 0.01 60);
-    --field-border: oklch(55% 0.012 70);
-    --accent: oklch(74% 0.17 45);
-    --accent-soft: oklch(32% 0.06 50);
-    --focus: oklch(76% 0.16 45);
+    --paper: #131313;
+    --paper-3: #1d1d1d;
+    --sheet: #131313;
+    --text: #f1f1ef;
+    --ink-2: #dcdcd9;
+    --muted: #adadad;
+    --surface: #131313;
+    --border: #343434;
+    --field-border: #f1f1ef;
+    --accent: #f1f1ef;
+    --accent-soft: #1d1d1d;
+    --focus: #ff8a4c;
     --green: oklch(75% 0.13 150);
     --green-text: oklch(18% 0.006 60);
     --warn-bg: oklch(28% 0.04 80);
     --warn-text: oklch(87% 0.1 85);
-    --error-bg: oklch(28% 0.05 35);
-    --error-text: oklch(84% 0.09 35);
+    --error-bg: #2b1a12;
+    --error-text: #ffb08a;
     --ok-bg: oklch(30% 0.05 150);
     --ok-text: oklch(88% 0.08 150);
-    --danger: oklch(68% 0.16 35);
-    --danger-text: oklch(18% 0.006 60);
+    --danger: #ff8a4c;
+    --danger-text: #131313;
     --within: oklch(75% 0.13 150);
     --breach: oklch(82% 0.13 85);
     --clear: oklch(72% 0.15 35);
@@ -107,7 +108,8 @@
     --level-m-bg: #4a3e12;
     --level-h-bg: #5a3015;
     --level-vh-bg: #632218;
-    --shadow-sheet: 0 1px 2px oklch(0% 0 0 / 0.4), 0 20px 40px -20px oklch(0% 0 0 / 0.6);
+    --shadow-sheet: none;
+    --accent-text: #131313;
     color-scheme: dark;
   }
 }
@@ -1221,6 +1223,225 @@ td.id {
   }
 }
 
+/* Guided mode (docs/ux/redesign-plan.md Sec. 3.2 and 4.1). A numbered step list on the left,
+   one task on the page, one main button at the bottom. Rules, not boxes. */
+main.screen-guided {
+  max-width: 76rem;
+}
+.guided-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+}
+.guided {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: 3rem;
+  align-items: start;
+}
+.guided-menu {
+  display: none;
+}
+.guided-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: sticky;
+  top: 1rem;
+}
+.guided-steps li {
+  border-top: 1px solid var(--border);
+}
+.guided-steps li:last-child {
+  border-bottom: 1px solid var(--border);
+}
+.guided-step,
+.guided-step:hover:not(:disabled) {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+  text-align: left;
+  font-weight: 400;
+}
+.guided-step.is-done,
+.guided-step.is-now {
+  color: var(--text);
+}
+.guided-num {
+  width: 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.guided-step.is-now .guided-num {
+  color: var(--focus);
+}
+.guided-step.is-now .guided-name {
+  font-weight: 600;
+}
+.guided-state {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.guided-page {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 46rem;
+  min-width: 0;
+}
+.guided-eyebrow {
+  color: var(--focus);
+  font-weight: 600;
+}
+.guided-head h1 {
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+.guided-head .lede {
+  margin-top: 0.5rem;
+  font-size: 1.15rem;
+}
+.guided-fields {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+.guided-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: flex-end;
+}
+.guided-row > .field {
+  min-width: 12rem;
+}
+.guided-row > .field.wide {
+  flex: 1 1 18rem;
+}
+.guided-choices {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+}
+.guided-choices > legend {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.guided-choice,
+.guided-link {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+  min-height: 52px;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--border);
+}
+.guided-choice:last-child,
+.guided-link:last-child {
+  border-bottom: 1px solid var(--border);
+}
+.guided-choice input,
+.guided-link input[type='checkbox'] {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--text);
+}
+.guided-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+}
+.guided-tab,
+.guided-tab:hover:not(:disabled) {
+  min-height: 44px;
+  padding: 0 0.85rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+  font-weight: 400;
+}
+.guided-tab[aria-pressed='true'] {
+  border-bottom-color: var(--focus);
+  color: var(--text);
+  font-weight: 600;
+}
+.guided-flag {
+  color: var(--focus);
+  font-weight: 700;
+}
+.guided-subtitle {
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+.guided-more {
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+.guided-more > summary,
+.guided-why > summary {
+  min-height: 32px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.guided-why {
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+.guided-why p {
+  margin-top: 0.5rem;
+  color: var(--muted);
+}
+.guided-missing {
+  color: var(--error-text);
+  font-weight: 500;
+}
+.guided-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  border-top: 2px solid var(--text);
+  padding-top: 1rem;
+}
+.guided-spacer {
+  flex-grow: 1;
+}
+@media (max-width: 760px) {
+  .guided {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+  .guided-menu {
+    display: inline-flex;
+  }
+  .guided-steps {
+    display: none;
+    position: static;
+  }
+  .guided-steps.open {
+    display: block;
+  }
+}
+
 @media print {
   :root {
     --text: var(--print-ink);
@@ -1246,8 +1467,20 @@ td.id {
     max-width: none;
     padding: 0;
   }
-  main.screen > :not(.record):not(.print-view) {
+  main.screen > :not(.record):not(.print-view):not(.guided) {
     display: none !important;
+  }
+  /* The guided mode prints only its decision record. */
+  main.screen > .guided {
+    display: block !important;
+  }
+  .guided-nav,
+  .guided-page > :not(.record) {
+    display: none !important;
+  }
+  .guided-page {
+    display: block;
+    max-width: none;
   }
   /* Screen S7 prints the register, the profile and the portfolio without the form fields. */
   .print-view .panel {
@@ -1419,4 +1652,31 @@ td.id {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 1rem;
+}
+
+/* Guided questions on S2 (release 2). One question at a time, the answers are keys. */
+.question {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+}
+.answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.answers button[aria-pressed='true'],
+.answers button[aria-pressed='true']:hover {
+  background: var(--accent);
+  border-color: var(--accent-edge);
+  color: var(--accent-text);
+  box-shadow: none;
+}
+input[type='range'] {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--accent);
 }

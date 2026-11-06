@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://www.portaregulus.com/schema/risk-register/1.1.0/risk-register.schema.json",
+  "$id": "https://www.portaregulus.com/schema/risk-register/1.2.0/risk-register.schema.json",
   "title": "PortaRegulus risk register exchange document",
   "description": "One file holds the risk components of NIST SP 800-221r1 ipd for one enterprise: context, governance roles, strategy, appetite, assets, registers, drivers, risks, responses and the forecast log. Each risk entry is a valid NIST IR 8286 Rev. 1 risk register entry (allOf). The risk detail uses NIST IR 8286 Rev. 1 risk detail record property definitions. Amounts are in the document currency. Probabilities are fractions from 0 to 1. Section numbers in descriptions refer to SP 800-221r1 ipd.",
   "type": "object",
@@ -16,10 +16,11 @@
       "type": "string"
     },
     "schemaVersion": {
-      "description": "Sec. 7.7. A 1.0.0 document is also a valid 1.1.0 document, because 1.1.0 adds optional fields only. The app writes 1.1.0.",
+      "description": "Sec. 7.7. A 1.0.0 or 1.1.0 document is also a valid 1.2.0 document, because 1.1.0 and 1.2.0 add optional fields only. The app writes 1.2.0.",
       "enum": [
         "1.0.0",
-        "1.1.0"
+        "1.1.0",
+        "1.2.0"
       ]
     },
     "document": {
@@ -1777,8 +1778,135 @@
               }
             }
           }
+        },
+        "elicitation": {
+          "$ref": "#/$defs/elicitation"
         }
       }
+    },
+    "elicitation": {
+      "description": "Since 1.2.0. Sec. 6.5 item 6. The answers of the management body to the guided questions of docs/release-2/appetite-questions.md. The result is in capacity, toleranceCurve and statements. This record holds only the answers.",
+      "type": "object",
+      "required": [
+        "heldOn"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "heldOn": {
+          "description": "The date of the session.",
+          "$ref": "#/$defs/date"
+        },
+        "participants": {
+          "description": "Who took part. Free text, because the app has no accounts (ADR-0004).",
+          "type": "string",
+          "minLength": 1
+        },
+        "capacity": {
+          "description": "The capacity that the tolerance questions used. Each amount of a question comes from it and from the answers.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "criteria": {
+          "description": "Stage 2. One event for an objective and the answer of the management body.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "event",
+              "answer"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "objectiveId": {
+                "$ref": "#/$defs/identifier"
+              },
+              "event": {
+                "type": "string",
+                "minLength": 1
+              },
+              "answer": {
+                "enum": [
+                  "acceptable",
+                  "painful",
+                  "not-acceptable",
+                  "unknown"
+                ]
+              },
+              "statementId": {
+                "description": "The draft appetite statement that a not-acceptable answer made.",
+                "$ref": "#/$defs/identifier"
+              }
+            }
+          }
+        },
+        "points": {
+          "description": "Stage 3. The answers of the halving search for each tolerance point, one entry for each point at most.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/elicitationPoint"
+          }
+        },
+        "crossCheck": {
+          "description": "Stage 4. What the management body pays per year to remove the chance of one point. above-double is the flag.",
+          "type": "object",
+          "required": [
+            "oneIn",
+            "answer"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "oneIn": {
+              "description": "The chance per year is 1 in this number.",
+              "enum": [
+                100,
+                20,
+                5,
+                2
+              ]
+            },
+            "answer": {
+              "enum": [
+                "below-half",
+                "half-to-double",
+                "above-double",
+                "unknown"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "elicitationPoint": {
+      "type": "object",
+      "required": [
+        "oneIn",
+        "answers"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "oneIn": {
+          "description": "The chance per year is 1 in this number.",
+          "enum": [
+            100,
+            20,
+            5,
+            2
+          ]
+        },
+        "answers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "enum": [
+              "accept",
+              "not-accept",
+              "unknown"
+            ]
+          }
+        }
+      },
+      "description": "One tolerance point of stage 3. The app computes its amount from the capacity of the record and the answers."
     },
     "forecast": {
       "description": "A frozen prediction and its later outcome, for the Brier score.",
