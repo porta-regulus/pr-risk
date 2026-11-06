@@ -10,19 +10,3 @@ reason = "CVE-2023-30533, prototype pollution. SheetJS fixed it in 0.19.3. The l
 [[IgnoredVulns]]
 id = "GHSA-5pgg-2g8v-p4x9"
 reason = "CVE-2024-22363, ReDoS. SheetJS fixed it in 0.20.2. The lockfile pins xlsx 0.20.3 from cdn.sheetjs.com."
-
-# The next 2 entries are dev dependencies only. They are not in the bundle or in the
-# release SBOM (--omit dev), and their glob patterns come from the repository config.
-# The fixed versions are new major versions that the parent packages do not accept yet
-# (eslint 10 needs minimatch ^10, cacache 19 needs glob ^10, glob 14 is ESM only).
-# The entries expire on 2026-12-01. Remove them when Dependabot brings the fixed versions.
-
-[[IgnoredVulns]]
-id = "GHSA-3g3m-2fjr-6pw4"
-ignoreUntil = 2026-12-01
-reason = "CVE-2026-118773, glob AbortSignal bypass, fixed in 14.0.2. Dev only, glob 10.5.0 through cyclonedx-npm, node-gyp and cacache. npm ci runs with --ignore-scripts, so node-gyp does not run."
-
-[[IgnoredVulns]]
-id = "GHSA-g3hv-75wg-m249"
-ignoreUntil = 2026-12-01
-reason = "CVE-2026-118764, minimatch DoS, fixed in 11.0.1. Dev only, minimatch 10.2.6 and 9.0.9 through eslint, typescript-eslint and glob. The patterns come from the repository config."
