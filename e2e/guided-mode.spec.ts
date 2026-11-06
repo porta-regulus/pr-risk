@@ -192,6 +192,16 @@ test('guided mode takes the AT-5 task from an empty browser to the printed decis
   await narrow(page);
   // Steps 1 to 8 are done, the optional step 6 too.
   for (const i of [0, 1, 2, 3, 4, 5, 6]) await expect(page.locator('.guided-step').nth(i)).toContainText('Done');
+  // Step 8 has no record on the page, so it offers no print.
+  await expect(page.getByRole('button', { name: 'Print the decision record' })).toHaveCount(0);
+  // A number field with text that is not a number keeps the step open.
+  const budget = page.getByLabel('Cash you can spend in the first year (EUR)');
+  await budget.fill('40k');
+  await next('decision record').click();
+  await expect(page.getByRole('alert')).toContainText('Correct the number fields');
+  await expect(page.locator('.guided-eyebrow')).toHaveText('Step 8 of 9');
+  await budget.fill('40000');
+  await saved(page);
   await next('decision record').click();
 
   // Step 9. The record and the print.

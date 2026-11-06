@@ -2,6 +2,7 @@
 // order of the AT-5 task. It edits the same document with the same edit functions as the full
 // editor, so both modes stay equal. Saving, undo and the change log come from editor.tsx.
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { referencesTo } from '../enterprise/normalize';
 import type { Risk, RiskDocument } from '../schema/types';
 import { AppetiteSection } from './appetite';
 import { CATALOGUE, CATALOGUE_GROUPS, fromCatalogue, RISKLET_ATTRIBUTION } from './catalogue';
@@ -39,7 +40,8 @@ const openStep = new Map<string, number>();
 const printedDocs = new Set<string>();
 
 const usedObjective = (doc: RiskDocument, id: string): boolean => doc.risks.some((risk) => (risk.objectiveIds ?? []).includes(id));
-const usedRisk = (doc: RiskDocument, id: string): boolean => (doc.responses ?? []).some((option) => option.effects.some((effect) => effect.targetKind === 'risk' && effect.targetId === id));
+// Other risks, responses and forecasts can refer to a risk. Its removal would break rules V-06, V-18, V-19 or V-21.
+const usedRisk = (doc: RiskDocument, id: string): boolean => referencesTo(doc, id).length > 0;
 
 function CompanyStep({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
   const setInfo = (key: 'title' | 'organization', value: string): void => {
@@ -280,7 +282,7 @@ function RisksStep({ doc, update }: { readonly doc: RiskDocument; readonly updat
                   <td>{risk.catalogueRef === undefined ? 'Your own' : 'Catalogue'}</td>
                   <td>{risk.polarity === 'positive' ? 'Opportunity' : 'Risk'}</td>
                   <td>
-                    <button type="button" class="quiet" aria-label={`Remove ${risk.riskId}`} disabled={usedRisk(doc, risk.riskId)} onClick={() => {
+                    <button type="button" class="quiet" aria-label={`Remove ${risk.riskId}`} disabled={usedRisk(doc, risk.riskId)} title={usedRisk(doc, risk.riskId) ? 'Other parts of the document refer to this risk.' : undefined} onClick={() => {
                         update((current) => ({ ...current, risks: current.risks.filter((item) => item.riskId !== risk.riskId) }));
                       }}>
                       Remove
@@ -513,7 +515,8 @@ function PlanStep({ doc, update, run }: { readonly doc: RiskDocument; readonly u
             }} />
         </div>
       </div>
-      <RunButtons run={run} />
+      <RunButtons run={run} print={false} />
+      {run.record !== undefined && !run.stale && <p class="hint">Step 9 shows the decision record and prints it.</p>}
       {run.record !== undefined && <RankedPortfolios record={run.record} currency={currency} />}
       {run.record !== undefined && <ResidualAcceptance doc={doc} record={run.record} update={update} />}
     </div>
@@ -546,6 +549,7 @@ function GuidedBody({ doc, update, blocked }: { readonly doc: RiskDocument; read
   const [step, setStep] = useState(openStep.get(key) ?? 0);
   const [menu, setMenu] = useState(false);
   const [printed, setPrinted] = useState(printedDocs.has(key));
+  const [refused, setRefused] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
   const run = usePortfolioRun(doc, blocked);
@@ -557,7 +561,14 @@ function GuidedBody({ doc, update, blocked }: { readonly doc: RiskDocument; read
     window.scrollTo(0, 0);
     heading.current?.focus();
   }, [key, step]);
+  // A number field with text that is not a number keeps its text only while its step is open.
+  // So the step stays until the text is a number again or the change is discarded.
   const go = (next: number): void => {
+    if (blocked) {
+      setRefused(true);
+      return;
+    }
+    setRefused(false);
     moved.current = true;
     setMenu(false);
     setStep(next);
@@ -619,6 +630,11 @@ function GuidedBody({ doc, update, blocked }: { readonly doc: RiskDocument; read
               setPrinted(true);
             }}
           />
+        )}
+        {refused && blocked && (
+          <p class="guided-missing" role="alert">
+            Correct the number fields, or discard the unsaved changes, before you go to another step.
+          </p>
         )}
         {missing !== undefined && (
           <p class="guided-missing" role="status">

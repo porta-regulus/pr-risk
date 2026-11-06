@@ -537,7 +537,8 @@ export function newResponseOption(doc: RiskDocument): ResponseOption | undefined
   } as unknown as ResponseOption;
 }
 
-export function RunButtons({ run }: { readonly run: PortfolioRun }) {
+// print is false where the decision record is not on the page, so a print would be empty.
+export function RunButtons({ run, print = true }: { readonly run: PortfolioRun; readonly print?: boolean }) {
   const { job, record, stale, ready, canRun } = run;
   return (
     <>
@@ -550,7 +551,7 @@ export function RunButtons({ run }: { readonly run: PortfolioRun }) {
             Cancel the run
           </button>
         )}
-        {record !== undefined && !job.running && (
+        {print && record !== undefined && !job.running && (
           <button
             type="button"
             disabled={stale || !ready}
