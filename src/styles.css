@@ -1420,3 +1420,30 @@ td.id {
   flex-wrap: wrap;
   gap: 0.25rem 1rem;
 }
+
+/* Guided questions on S2 (release 2). One question at a time, the answers are keys. */
+.question {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+}
+.answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.answers button[aria-pressed='true'],
+.answers button[aria-pressed='true']:hover {
+  background: var(--accent);
+  border-color: var(--accent-edge);
+  color: var(--accent-text);
+  box-shadow: none;
+}
+input[type='range'] {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--accent);
+}

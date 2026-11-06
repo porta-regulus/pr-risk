@@ -130,7 +130,7 @@ From the ToC.
 5. Sec. 5.1 Table 8 as a workflow, and Sec. 5.1.2 calendars, reminders and notifications.
 6. Sec. 5.3.2 forced ranking optimization with weighted business drivers.
 7. Appendix C federal content. The target users are in the EU.
-8. Sec. 3.2.1 guided questions that set capacity, appetite statements and tolerance points from the answers of the management body. Planned for release 2 (`docs/release-2/appetite-questions.md`).
+8. Sec. 3.2.1 guided questions that set capacity, appetite statements and tolerance points from the answers of the management body. Release 2 (Sec. 6.5 item 6 and `docs/release-2/appetite-questions.md`).
 
 Not in the ToC, so out.
 1. Regulation and framework mappings per risk (NIS2, CRA Annex I, CSF 2.0 subcategories). Responses can still name informative references (Sec. 3.6).
@@ -253,6 +253,7 @@ The six steps order the screens (Sec. 5). The register row shows which steps are
 3. `appetite.statements[]`, one per appetite statement. Each holds tolerances, controls and indicators in the shape of Table 9 (Sec. 6.11). A tolerance can have a machine-readable `breachWhen` trigger.
 4. Table 2 gives five example pairs. The help text shows them as templates.
 5. Identifying an emerging or horizon risk is a trigger to review appetite and tolerance (Sec. 3.3, lines 726 to 735). The app shows a review banner when a risk with `horizon` emerging or horizon is added.
+6. Release 2. Guided questions on S2 let the management body set capacity, draft statements and tolerance points by answers of one click. The answers go into `appetite.elicitation` (schema 1.2.0). The full rules are in `docs/release-2/appetite-questions.md`.
 
 ### 6.6 Risk management strategy (Sec. 3.2.2)
 
@@ -582,7 +583,7 @@ Errors (V) block save or import. Warnings (L) show in the UI and in the record a
 
 ### 7.7 Schema versioning
 
-1. `schemaVersion` is semantic. The `$id` contains the version. Version `1.1.0` adds three optional fields, `previousAssessment.impacts`, `rollUp.responseCostRule` and `changeLog[].reasons`. A `1.0.0` document is also a valid `1.1.0` document, so the schema accepts both values and the app needs no migration. The app writes `1.1.0` when it saves. It refuses a newer minor version, for example `1.2.0`, because that can hold fields that the app does not know.
+1. `schemaVersion` is semantic. The `$id` contains the version. Version `1.1.0` adds three optional fields, `previousAssessment.impacts`, `rollUp.responseCostRule` and `changeLog[].reasons`. Version `1.2.0` (release 2) adds the optional object `appetite.elicitation` (Sec. 6.5 item 6). A `1.0.0` or `1.1.0` document is also a valid `1.2.0` document, so the schema accepts all three values and the app needs no migration. The app writes `1.2.0` when it saves. It refuses a newer minor version, for example `1.3.0`, because that can hold fields that the app does not know.
 2. A new optional field is a minor version. A changed meaning or a new required field is a major version.
 3. The app reads the current and the previous major version and migrates the previous one on import, with a provenance record.
 4. When NIST publishes the final SP 800-221r1 or new IR 8286 schemas, vendor the new files, keep the old ones, add a migration test, and update the concept id table (Sec. 3.1).

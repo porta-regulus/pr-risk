@@ -199,9 +199,9 @@ export type ResponseEffect1 = {
 export interface PortaRegulusRiskRegisterExchangeDocument {
   $schema?: string;
   /**
-   * Sec. 7.7. A 1.0.0 document is also a valid 1.1.0 document, because 1.1.0 adds optional fields only. The app writes 1.1.0.
+   * Sec. 7.7. A 1.0.0 or 1.1.0 document is also a valid 1.2.0 document, because 1.1.0 and 1.2.0 add optional fields only. The app writes 1.2.0.
    */
-  schemaVersion: "1.0.0" | "1.1.0";
+  schemaVersion: "1.0.0" | "1.1.0" | "1.2.0";
   document: DocumentInfo;
   context?: Context;
   governance?: Governance;
@@ -411,6 +411,7 @@ export interface Appetite {
      */
     points: [ToleranceCurvePoint, ToleranceCurvePoint, ...ToleranceCurvePoint[]];
   }[];
+  elicitation?: Elicitation;
 }
 /**
  * This interface was referenced by `PortaRegulusRiskRegisterExchangeDocument`'s JSON-Schema
@@ -493,6 +494,72 @@ export interface Indicator {
   text: string;
   firesWhen?: Trigger;
   observations?: Observation[];
+}
+/**
+ * Since 1.2.0. Sec. 6.5 item 6. The answers of the management body to the guided questions of docs/release-2/appetite-questions.md. The result is in capacity, toleranceCurve and statements. This record holds only the answers.
+ *
+ * This interface was referenced by `PortaRegulusRiskRegisterExchangeDocument`'s JSON-Schema
+ * via the `definition` "elicitation".
+ */
+export interface Elicitation {
+  /**
+   * The date of the session.
+   */
+  heldOn: string;
+  /**
+   * Who took part. Free text, because the app has no accounts (ADR-0004).
+   */
+  participants?: string;
+  /**
+   * The capacity that the tolerance questions used. Each amount of a question comes from it and from the answers.
+   */
+  capacity?: number;
+  /**
+   * Stage 2. One event for an objective and the answer of the management body.
+   */
+  criteria?: {
+    objectiveId?: Identifier;
+    event: string;
+    answer: "acceptable" | "painful" | "not-acceptable" | "unknown";
+    /**
+     * Stable local identifier. Unique per kind in one document.
+     */
+    statementId?: string;
+  }[];
+  /**
+   * Stage 3. The answers of the halving search for each tolerance point, one entry for each point at most.
+   */
+  points?: ElicitationPoint[];
+  /**
+   * Stage 4. What the management body pays per year to remove the chance of one point. above-double is the flag.
+   */
+  crossCheck?: {
+    /**
+     * The chance per year is 1 in this number.
+     */
+    oneIn: 100 | 20 | 5 | 2;
+    answer: "below-half" | "half-to-double" | "above-double" | "unknown";
+  };
+}
+/**
+ * One tolerance point of stage 3. The app computes its amount from the capacity of the record and the answers.
+ *
+ * This interface was referenced by `PortaRegulusRiskRegisterExchangeDocument`'s JSON-Schema
+ * via the `definition` "elicitationPoint".
+ */
+export interface ElicitationPoint {
+  /**
+   * The chance per year is 1 in this number.
+   */
+  oneIn: 100 | 20 | 5 | 2;
+  /**
+   * @minItems 1
+   * @maxItems 3
+   */
+  answers:
+    | ["accept" | "not-accept" | "unknown"]
+    | ["accept" | "not-accept" | "unknown", "accept" | "not-accept" | "unknown"]
+    | ["accept" | "not-accept" | "unknown", "accept" | "not-accept" | "unknown", "accept" | "not-accept" | "unknown"];
 }
 /**
  * Sec. 3.3.1. Mission-supporting asset with valuation. External assets are allowed.

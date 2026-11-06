@@ -166,10 +166,18 @@ describe('readDocument', () => {
     expect(read.ok && read.doc.risks.find((risk) => risk.riskId === '1')?.previousAssessment?.impacts?.mission?.label).toBe('High');
   });
 
+  it('reads a 1.2.0 document with the answers of the guided questions (release 2)', () => {
+    const doc = example(EXAMPLE_2);
+    doc.schemaVersion = '1.2.0';
+    doc.appetite = { ...doc.appetite, elicitation: { heldOn: '2026-11-06', capacity: 3_000_000, points: [{ oneIn: 100, answers: ['accept', 'unknown'] }] } };
+    const read = readDocument(JSON.stringify(doc));
+    expect(read.ok && read.doc.appetite?.elicitation?.points?.[0]?.answers).toEqual(['accept', 'unknown']);
+  });
+
   it('rejects a newer minor version, because it can hold fields that this app does not know', () => {
-    const read = readDocument(JSON.stringify({ ...example(EXAMPLE_2), schemaVersion: '1.2.0' }));
+    const read = readDocument(JSON.stringify({ ...example(EXAMPLE_2), schemaVersion: '1.3.0' }));
     expect(read.ok).toBe(false);
-    expect(!read.ok && read.errors[0]?.message).toBe('Schema version 1.2.0 is newer than this app. This app reads 1.0.0 to 1.1.0. Use a newer version of the app.');
+    expect(!read.ok && read.errors[0]?.message).toBe('Schema version 1.3.0 is newer than this app. This app reads 1.0.0 to 1.2.0. Use a newer version of the app.');
   });
 
   it('rejects broken JSON, deep nesting, other major versions and __proto__ keys', () => {

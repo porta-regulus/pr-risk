@@ -6,9 +6,9 @@ import { projectRdr, projectRegister } from './project';
 import { semanticErrors } from './rules';
 import type { Finding, RiskDocument } from './types';
 
-// The version that the app writes. 1.1.0 adds optional fields only, so a 1.0.0 document
-// is also a valid 1.1.0 document and needs no migration (Sec. 7.7 item 2).
-export const SCHEMA_VERSION = '1.1.0';
+// The version that the app writes. 1.1.0 and 1.2.0 add optional fields only, so a 1.0.0
+// or 1.1.0 document is also a valid 1.2.0 document and needs no migration (Sec. 7.7 item 2).
+export const SCHEMA_VERSION = '1.2.0';
 // ADR-0004 D1.
 export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
 export const MAX_JSON_DEPTH = 32;

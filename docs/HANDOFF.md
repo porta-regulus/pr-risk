@@ -390,6 +390,14 @@ Decisions for the product owner.
 6. D6. Who writes and who signs the Annex I self-check, and where it is published.
 7. D7. Done 2026-10-31. Release 1 is `1.0.0`. Users read a `0.x` version as beta, and the file format has its own schema version, so the app version can show stability. The test tags before release 1 are `v1.0.0-rc.N`. `package.json` has `1.0.0-rc.2` since 2026-11-02. A tag must be `v` plus the `package.json` version, or the release workflow stops. Thus each new tag, also `v1.0.0`, needs a pull request that changes the version first.
 
+### Release 2. Guided questions on S2 (SPEC.md Sec. 6.5 item 6)
+
+Status 2026-11-06. Built on a branch. It merges to `main` only after the release 1 tag, because it changes S2 and the schema version. The rules are in `docs/release-2/appetite-questions.md`. The product owner decided O1 to O5 on 2026-11-06.
+1. Schema 1.2.0 adds the optional object `appetite.elicitation` with the answers only. The app writes `1.2.0` and refuses `1.3.0`. A 1.0.0 or 1.1.0 document needs no migration. The examples stay 1.0.0 and `test/fixtures/python-parity.json` does not change.
+2. `src/ui/guided.ts` holds the halving search, the cross-check and the result as pure functions. `src/ui/guided-questions.tsx` is the panel on S2, above "Capacity, appetite and tolerance". S4 lists the "Not acceptable" events (decision O4).
+3. Tests. `test/ui-guided.test.ts` (the search, V-12 by construction for any capacity and answers, "Do not know", the flag, the result and the history), `test/schema-rules.test.ts` (1.2.0 and 1.3.0) and `e2e/guided.spec.ts` (the full flow by keyboard and click, axe-core, 375 px, S4).
+4. Open. The pilot must test the search range, 3 questions for each point and the 2E flag (decisions O1 and O2). No management body has used the flow yet.
+
 ## 6. Rules for the build session
 
 1. Write all prose (UI text, docs, commit messages) in ASD-STE100 Simplified Technical English. No em dashes, semicolons or colons in prose.
