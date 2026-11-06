@@ -2,7 +2,7 @@
 
 | Item | Value |
 |---|---|
-| Status | Plan for the product owner. No code is changed yet. |
+| Status | Phase 0 is done (pull request 52). Phase 1 is done. The product owner picked direction B with a sans font on 2026-11-06 (Sec. 4.1). The product owner passed the phase 2 prototype on 2026-11-06. Phase 3 is built (Sec. 5.2) and waits for review. |
 | Date | 2026-11-06 |
 | Decided by the product owner | Guided mode plus the full editor. The redesign ships before release 1, so release 1 and AT-5 wait. Claude proposes 2 or 3 visual directions as mockups first. |
 | Changes | HANDOFF task 12 (the order before the tag), SPEC.md Sec. 5 (screens), Sec. 10 (UI) and Sec. 12.5 (AT-5 uses the new GUI) |
@@ -83,18 +83,55 @@ Claude makes 3 clickable mockups of guided steps 1 to 3 and of one full editor s
 
 The look must not copy CVD Portal (ADR-0003 C5 and C7).
 
+### 4.1 Decision. Direction B with a sans font
+
+On 2026-11-06 the product owner looked at the 3 mockups and picked direction B, with a sans font in place of the serif. The mockups are on a private claude.ai canvas of the product owner. The rules below are the reference for phases 2 to 5.
+
+| Item | Rule |
+|---|---|
+| Font | IBM Plex Sans (SIL Open Font License 1.1) for all text. No serif and no monospace face. Phase 3 puts the WOFF2 files in the app, because the app makes no network request (ADR-0004). |
+| Titles | 52 px, weight 300, letter spacing -0.03em. The step label above the title uses the signal color. |
+| Colors, light | Ground and paper #FFFFFF, text and ink #111111, muted text #595959, hairline rule #E3E3E3, signal #B93C0A |
+| Colors, dark | Ground #131313, text and ink #F1F1EF, muted text #ADADAD, hairline rule #343434, signal #FF8A4C |
+| Signal color | Only for the current step, an item that needs action (for example "Missing") and the focus ring. Never for decoration. |
+| Structure | Rules, not boxes. A 2 px ink rule opens a table or closes a page. Hairlines divide rows. No cards, no shadows, no gradients. |
+| Fields | A text field has a 2 px ink line below it and a visible label above it. Phase 6 checks with the pilot user that the fields are easy to see. |
+| Buttons | The main action is a solid ink block with 2 px corners. A second action is an ink outline. A third action is underlined text. |
+| Steps | A numbered list of the 9 steps on the left (01 to 09), the current step in the signal color, done steps marked "Done". On a narrow screen the list becomes a menu button. |
+| Touch and focus | Each control is at least 44 by 44 px. Focus is a 2 px ring in the signal color with a 3 px gap. |
+
 ## 5. Phases
 
 | Phase | Work | Done when |
 |---|---|---|
 | 0 | Fix the stuck update (Sec. 6 decision 1) | A browser on an old version shows the new version after one restart of the app, with a test that proves it |
-| 1 | 3 visual mockups (Sec. 4) | The product owner picks one |
-| 2 | Clickable prototype of the guided mode, steps 1 to 9, with the chosen style, on example data | The product owner can go from step 1 to the record without help |
-| 3 | Merge `ed/appetite-questions-r2` (Sec. 6 decision 2). Build the guided mode in the app, with the guided questions as step 3 | All 9 steps work on real documents. The e2e tests, axe-core and 375 px pass. The AT-5 script runs through the guided mode |
+| 1 | 3 visual mockups (Sec. 4) | The product owner picks one. Done 2026-11-06, direction B with a sans font (Sec. 4.1) |
+| 2 | Clickable prototype of the guided mode, steps 1 to 9, with the chosen style, on example data | The product owner can go from step 1 to the record without help. Passed 2026-11-06 (Sec. 5.1) |
+| 3 | Merge `ed/appetite-questions-r2` (Sec. 6 decision 2). Build the guided mode in the app, with the guided questions as step 3 | All 9 steps work on real documents. The e2e tests, axe-core and 375 px pass. The AT-5 script runs through the guided mode. Built 2026-11-06 (Sec. 5.2) |
 | 4 | Clean up the full editor (Sec. 3.3) with the new style | Every field of today is still reachable. All tests pass |
 | 5 | Plain words (Sec. 2 item 3) on all screens | No NIST section number in a title or in the main text |
 | 6 | Pilot with 1 target user, fix the blockers | No open blocker |
 | 7 | AT-5 with 5 users, then AT-6, then the tag | HANDOFF task 12 |
+
+### 5.1 Phase 2 prototype
+
+The prototype is the board "Phase 2. Guided mode prototype" on the private mockup canvas of the product owner. It has all 9 steps in the style of Sec. 4.1, a phone layout below 760 px and a dark mode. It saves nothing.
+
+1. Each step has "Fill with example answers". The answers come from `docs/schema/examples/example-2-sme-quantitative.json`. The catalogue gives names only, never numbers (hard rule 2).
+2. Step 3 uses the tolerance search of `ed/appetite-questions-r2`.
+3. Step 5 has the calibration help of SPEC.md assumption A1, with one worked example.
+4. Step 8 runs a simplified Monte Carlo in the browser. It uses 10 000 years for each mix of options in the budget, lognormal 90% ranges, Poisson counts, and shared causes with a trigger chance. It picks the mix that keeps the most tolerance points, then the lowest expected loss plus annual cost. Phase 3 uses the real engine of SPEC.md Sec. 6 instead.
+5. Step 9 shows the decision record and prints it.
+
+Known limits. A gain counts as a negative loss, so the expected loss can be below zero. One-off costs of a new option are spread over 3 years. These are prototype rules, not app rules.
+
+### 5.2 Phase 3 build
+
+1. The branch `ed/appetite-questions-r2` is merged. Its docs now say release 1 (decision 2 of Sec. 6).
+2. `src/ui/guided-mode.tsx` is the guided mode, with the 9 steps of Sec. 3.2. `src/ui/guided-steps.ts` holds the titles and the done rules. The steps call the same edit functions as the full editor. S5 gave its run, its ranked table and its residual risks to `respond.tsx` exports, so that step 8 and S5 share them.
+3. S1 has "Guided mode" as the main button of a selected document. The full editor has "Guided mode" in its row of screens.
+4. The whole app has the colors and the font of Sec. 4.1. Phase 4 cleans up the layout of the full editor.
+5. Tests. `e2e/guided-mode.spec.ts` runs the AT-5 task through the guided mode, with axe-core and 375 px on the steps, the print of the record on 2 pages or fewer, and the step menu at 375 px. `test/ui-guided-steps.test.ts` tests the done rules. All earlier e2e tests pass with the new style.
 
 Phases 2 and 3 are the largest part. The product owner sees a working result at the end of each phase.
 

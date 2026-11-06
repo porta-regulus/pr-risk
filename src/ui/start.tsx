@@ -445,6 +445,11 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
             </p>
             <div class="button-row">
               <button type="button" onClick={() => {
+                  onOpen(current.id, 'guided');
+                }} disabled={busy}>
+                Guided mode
+              </button>
+              <button type="button" class="quiet" onClick={() => {
                   onOpen(current.id, 'context');
                 }} disabled={busy}>
                 Context and strategy
@@ -482,7 +487,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
       <div class="grid">
         <section aria-labelledby="create-title" class="panel">
           <h2 id="create-title">Create a document</h2>
-          <p class="hint">New here? Type a title and click Create. Then click "Context and strategy" under Your documents. Each screen shows the steps to complete, from the first objective to the printed decision record.</p>
+          <p class="hint">New here? Type a title and click Create. Then click "Guided mode" under Your documents. It takes you step by step from your company to the printed decision record. The other buttons open the full editor.</p>
           <label for="new-title">Title</label>
           <input id="new-title" value={newTitle} onInput={(event) => {
             setNewTitle(event.currentTarget.value);

@@ -155,7 +155,7 @@ function EffectEditor({
   );
 }
 
-function OptionEditor({ doc, option, update }: { readonly doc: RiskDocument; readonly option: ResponseOption; readonly update: Update }) {
+export function OptionEditor({ doc, option, update }: { readonly doc: RiskDocument; readonly option: ResponseOption; readonly update: Update }) {
   const currency = doc.document.currency;
   const id = `option-${option.id}`;
   const set = (change: (option: ResponseOption) => ResponseOption): void => {
@@ -467,8 +467,11 @@ function OptionEditor({ doc, option, update }: { readonly doc: RiskDocument; rea
   );
 }
 
-function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; readonly update: Update; readonly blocked: boolean }) {
-  const currency = doc.document.currency;
+export type PortfolioRun = ReturnType<typeof usePortfolioRun>;
+
+// The optimization run of S5 and of guided step 8. The run starts only on a click, and a
+// document that changed after the run makes the record stale.
+export function usePortfolioRun(doc: RiskDocument, blocked: boolean) {
   const options = doc.responses ?? [];
   const budget = doc.strategy?.budget?.firstYearCash;
   const [run, setRun] = useState(0);
@@ -493,18 +496,179 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
   const valid = useMemo(() => documentErrors(doc).length === 0, [doc]);
   const ready = valid && !blocked;
   const canRun = ready && budget !== undefined && doc.simulation !== undefined && options.some((option) => option.status === 'candidate' || option.status === 'selected');
-  const setBudget = (value: number | undefined): void => {
-    update((current) => withSection(current, 'strategy', withValue(current.strategy, 'budget', withValue(current.strategy?.budget ?? {}, 'firstYearCash', value))));
+  return {
+    job,
+    record,
+    stale,
+    ready,
+    canRun,
+    start: (): void => {
+      setRun((value) => value + 1);
+      setActive(true);
+    },
+    cancel: (): void => {
+      setActive(false);
+    },
   };
-  const residual = record === undefined ? [] : residualRisks(doc, record.best.ids);
+}
+
+export function setBudgetCash(update: Update, value: number | undefined): void {
+  update((current) => withSection(current, 'strategy', withValue(current.strategy, 'budget', withValue(current.strategy?.budget ?? {}, 'firstYearCash', value))));
+}
+
+// A new empty option that acts on the first estimated risk, or on the first driver. The costs
+// and the effect come from the user. Undefined when nothing can be a target yet.
+export function newResponseOption(doc: RiskDocument): ResponseOption | undefined {
+  const options = doc.responses ?? [];
   const firstTarget = doc.risks.find((risk) => risk.estimate !== undefined);
+  const driver = (doc.drivers ?? [])[0];
+  if (firstTarget === undefined && driver === undefined) return undefined;
+  const target: Effect = firstTarget !== undefined ? { targetKind: 'risk', targetId: firstTarget.riskId, rationale: '' } : { targetKind: 'driver', targetId: driver?.id ?? '', rationale: '' };
+  return {
+    id: nextId(
+      'O-',
+      options.map((item) => item.id),
+    ),
+    title: '',
+    responseType: 'Mitigate',
+    status: 'candidate',
+    costs: {},
+    effects: [target],
+  } as unknown as ResponseOption;
+}
+
+export function RunButtons({ run }: { readonly run: PortfolioRun }) {
+  const { job, record, stale, ready, canRun } = run;
+  return (
+    <>
+      <div class="button-row">
+        <button type="button" disabled={!canRun || job.running} onClick={run.start}>
+          Find the best portfolio
+        </button>
+        {job.running && (
+          <button type="button" class="quiet" onClick={run.cancel}>
+            Cancel the run
+          </button>
+        )}
+        {record !== undefined && !job.running && (
+          <button
+            type="button"
+            disabled={stale || !ready}
+            onClick={() => {
+              window.print();
+            }}
+          >
+            Print the decision record
+          </button>
+        )}
+      </div>
+      {!ready && <p class="hint">Correct the errors in the save bar first. A run and a print use only a document that can be saved.</p>}
+      {ready && !canRun && <p class="hint">A run needs a budget, at least one estimate and at least one candidate option.</p>}
+      <p role="status" class={job.error === undefined ? 'muted' : 'save-error'}>
+        {job.running
+          ? `The optimization runs${job.progress === undefined ? '' : `, step ${String(job.progress[0])} of ${String(job.progress[1])}`}.`
+          : job.error !== undefined
+            ? `The run failed. ${job.error}`
+            : stale && ready
+              ? 'The document changed after the run. Run again before you print.'
+              : ''}
+      </p>
+    </>
+  );
+}
+
+export function RankedPortfolios({ record, currency }: { readonly record: NonNullable<PortfolioRun['record']>; readonly currency: string }) {
+  return (
+    <>
+      <div class="table-box" tabIndex={0} role="region" aria-label="Ranked portfolios">
+        <table>
+          <caption>
+            Best portfolio and alternatives at {record.trials.toLocaleString('en')} trials, seed {record.seed}. {record.count} portfolios ranked.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Portfolio</th>
+              <th scope="col">Options</th>
+              <th scope="col">First-year cash ({currency})</th>
+              <th scope="col">Annualised cost</th>
+              <th scope="col">Annual benefit</th>
+              <th scope="col">Net benefit</th>
+              <th scope="col">Tolerance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(
+              [
+                ['Best', record.best],
+                ...record.alternatives.map((row, i) => [`Rank ${String(i + 2)}`, row] as const),
+                ['Fiscal baseline', record.fiscal],
+                [`Best at ${money(record.lower.budget)}`, record.lower.row],
+                [`Best at ${money(record.upper.budget)}`, record.upper.row],
+              ] as const
+            ).map(([label, row]) => (
+              <tr key={label}>
+                <th scope="row">{label}</th>
+                <td>{row.ids.length === 0 ? 'None' : row.ids.join(', ')}</td>
+                <td>{money(row.cash)}</td>
+                <td>{money(row.cost)}</td>
+                <td>
+                  {money(row.benefit)} ± {money(row.benefitSe)}
+                </td>
+                <td>{money(row.net)}</td>
+                <td>
+                  <StatusText status={row.status} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {record.notes.length > 0 && (
+        <ul class="warnings">
+          {record.notes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
+
+export function ResidualAcceptance({ doc, record, update }: { readonly doc: RiskDocument; readonly record: NonNullable<PortfolioRun['record']>; readonly update: Update }) {
+  const residual = residualRisks(doc, record.best.ids);
+  if (residual.length === 0) return null;
+  return (
+    <section aria-labelledby="residual-title" class="panel">
+      <h2 id="residual-title">Accepted residual risk</h2>
+      <p class="hint">Each risk that stays accepted needs an acceptance record before the decision record is final (Sec. 8.12 item 4).</p>
+      {residual.map((risk) => (
+        <div key={risk.riskId}>
+          <p>
+            <strong>{risk.riskId}</strong> {risk.riskDescription.replace(/\.$/, '')}. Owner {risk.riskOwnerPointOfContact}.
+          </p>
+          <AcceptanceEditor risk={risk} update={update} />
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; readonly update: Update; readonly blocked: boolean }) {
+  const currency = doc.document.currency;
+  const options = doc.responses ?? [];
+  const budget = doc.strategy?.budget?.firstYearCash;
+  const run = usePortfolioRun(doc, blocked);
+  const { record, stale, ready } = run;
+  const canAdd = newResponseOption(doc) !== undefined;
   return (
     <>
       <section aria-labelledby="budget-title" class="panel">
         <h2 id="budget-title">Budget and method</h2>
         <div class="field-row">
           <div class="field">
-            <NumberField id="budget-cash" label={`Budget, first-year cash (${currency})`} min={0} value={budget} onChange={setBudget} />
+            <NumberField id="budget-cash" label={`Budget, first-year cash (${currency})`} min={0} value={budget} onChange={(value) => {
+                setBudgetCash(update, value);
+              }} />
           </div>
           <div class="field">
             <SelectField
@@ -538,155 +702,26 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
         <button
           type="button"
           class="quiet"
-          disabled={firstTarget === undefined && (doc.drivers ?? []).length === 0}
+          disabled={!canAdd}
           onClick={() => {
-            const target: Effect =
-              firstTarget !== undefined
-                ? {
-                    targetKind: 'risk',
-                    targetId: firstTarget.riskId,
-                    rationale: '',
-                  }
-                : {
-                    targetKind: 'driver',
-                    targetId: (doc.drivers ?? [])[0]?.id ?? '',
-                    rationale: '',
-                  };
-            // The form only. Costs and effects come from the user.
-            const option = {
-              id: nextId(
-                'O-',
-                options.map((item) => item.id),
-              ),
-              title: '',
-              responseType: 'Mitigate',
-              status: 'candidate',
-              costs: {},
-              effects: [target],
-            } as unknown as ResponseOption;
-            update((current) => withValue(current, 'responses', [...(current.responses ?? []), option]));
+            update((current) => {
+              const option = newResponseOption(current);
+              return option === undefined ? current : withValue(current, 'responses', [...(current.responses ?? []), option]);
+            });
           }}
         >
           Add a response option
         </button>
-        {firstTarget === undefined && (doc.drivers ?? []).length === 0 && <span class="hint">A response option needs a risk with an estimate or a driver to act on.</span>}
+        {!canAdd && <span class="hint">A response option needs a risk with an estimate or a driver to act on.</span>}
       </section>
 
       <section aria-labelledby="run-title" class="panel">
         <h2 id="run-title">Ranked portfolios</h2>
-        <div class="button-row">
-          <button
-            type="button"
-            disabled={!canRun || job.running}
-            onClick={() => {
-              setRun((value) => value + 1);
-              setActive(true);
-            }}
-          >
-            Find the best portfolio
-          </button>
-          {job.running && (
-            <button
-              type="button"
-              class="quiet"
-              onClick={() => {
-                setActive(false);
-              }}
-            >
-              Cancel the run
-            </button>
-          )}
-          {record !== undefined && !job.running && (
-            <button
-              type="button"
-              disabled={stale || !ready}
-              onClick={() => {
-                window.print();
-              }}
-            >
-              Print the decision record
-            </button>
-          )}
-        </div>
-        {!ready && <p class="hint">Correct the errors in the save bar first. A run and a print use only a document that can be saved.</p>}
-        {ready && !canRun && <p class="hint">A run needs a budget, at least one estimate and at least one candidate option.</p>}
-        <p role="status" class={job.error === undefined ? 'muted' : 'save-error'}>
-          {job.running
-            ? `The optimization runs${job.progress === undefined ? '' : `, step ${String(job.progress[0])} of ${String(job.progress[1])}`}.`
-            : job.error !== undefined
-              ? `The run failed. ${job.error}`
-              : stale && ready
-                ? 'The document changed after the run. Run again before you print.'
-                : ''}
-        </p>
-        {record !== undefined && (
-          <div class="table-box" tabIndex={0} role="region" aria-label="Ranked portfolios">
-            <table>
-              <caption>
-                Best portfolio and alternatives at {record.trials.toLocaleString('en')} trials, seed {record.seed}. {record.count} portfolios ranked.
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col">Portfolio</th>
-                  <th scope="col">Options</th>
-                  <th scope="col">First-year cash ({currency})</th>
-                  <th scope="col">Annualised cost</th>
-                  <th scope="col">Annual benefit</th>
-                  <th scope="col">Net benefit</th>
-                  <th scope="col">Tolerance</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(
-                  [
-                    ['Best', record.best],
-                    ...record.alternatives.map((row, i) => [`Rank ${String(i + 2)}`, row] as const),
-                    ['Fiscal baseline', record.fiscal],
-                    [`Best at ${money(record.lower.budget)}`, record.lower.row],
-                    [`Best at ${money(record.upper.budget)}`, record.upper.row],
-                  ] as const
-                ).map(([label, row]) => (
-                  <tr key={label}>
-                    <th scope="row">{label}</th>
-                    <td>{row.ids.length === 0 ? 'None' : row.ids.join(', ')}</td>
-                    <td>{money(row.cash)}</td>
-                    <td>{money(row.cost)}</td>
-                    <td>
-                      {money(row.benefit)} ± {money(row.benefitSe)}
-                    </td>
-                    <td>{money(row.net)}</td>
-                    <td>
-                      <StatusText status={row.status} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-        {record !== undefined && record.notes.length > 0 && (
-          <ul class="warnings">
-            {record.notes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        )}
+        <RunButtons run={run} />
+        {record !== undefined && <RankedPortfolios record={record} currency={currency} />}
       </section>
 
-      {record !== undefined && residual.length > 0 && (
-        <section aria-labelledby="residual-title" class="panel">
-          <h2 id="residual-title">Accepted residual risk</h2>
-          <p class="hint">Each risk that stays accepted needs an acceptance record before the decision record is final (Sec. 8.12 item 4).</p>
-          {residual.map((risk) => (
-            <div key={risk.riskId}>
-              <p>
-                <strong>{risk.riskId}</strong> {risk.riskDescription.replace(/\.$/, '')}. Owner {risk.riskOwnerPointOfContact}.
-              </p>
-              <AcceptanceEditor risk={risk} update={update} />
-            </div>
-          ))}
-        </section>
-      )}
+      {record !== undefined && <ResidualAcceptance doc={doc} record={record} update={update} />}
 
       {record !== undefined && !stale && ready && <DecisionRecordView doc={doc} record={record} />}
     </>

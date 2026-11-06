@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { expectAccessible } from './axe';
 
-// Release 2. The guided questions of screen S2 (SPEC.md Sec. 6.5 item 6,
+// The guided questions of screen S2 (SPEC.md Sec. 6.5 item 6,
 // docs/release-2/appetite-questions.md) under the production CSP. The capacity slider by
 // keyboard, one-click answers, "Do not know", the cross-check flag, the result in the curve and
 // a draft statement, axe-core, the 375 px width, and the help text of decision O4 on S4.

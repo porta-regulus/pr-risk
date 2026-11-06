@@ -16,9 +16,9 @@ import { completionSteps, type StepState } from './steps';
 import { VersionNotice } from './version-notice';
 
 export type Update = (change: (doc: RiskDocument) => RiskDocument) => void;
-export type ScreenName = 'start' | 'context' | 'identify' | 'prioritize' | 'respond' | 'monitor' | 'enterprise';
+export type ScreenName = 'start' | 'guided' | 'context' | 'identify' | 'prioritize' | 'respond' | 'monitor' | 'enterprise';
 
-const SCREENS: readonly (readonly [Exclude<ScreenName, 'start'>, string])[] = [
+const SCREENS: readonly (readonly [Exclude<ScreenName, 'start' | 'guided'>, string])[] = [
   ['context', 'Context and strategy'],
   ['identify', 'Identify and analyze'],
   ['prioritize', 'Prioritize'],
@@ -329,30 +329,56 @@ export function DocumentScreen({
         ? 'Saving.'
         : `Saved as version ${String(stored.version)}.`;
 
+  const guided = screen === 'guided';
   return (
-    <main class="screen">
-      <header class="screen-head">
-        <nav aria-label="Screens" class="button-row">
-          <button type="button" class="quiet" onClick={() => {
-              leave('start');
-            }}>
-            Back to start
-          </button>
-          {SCREENS.map(([name, text]) => (
-            <button type="button" class="quiet" key={name} aria-current={name === screen ? 'page' : undefined} disabled={name === screen} onClick={() => {
-                leave(name);
+    <main class={guided ? 'screen screen-guided' : 'screen'}>
+      {guided ? (
+        <header class="guided-top">
+          <p class="guided-brand">
+            <strong>PortaRegulus Risk</strong> <span class="muted">{draft.document.title}</span>
+          </p>
+          <nav aria-label="Modes" class="button-row">
+            <button type="button" class="quiet" onClick={() => {
+                leave('start');
               }}>
-              {text}
+              Back to start
             </button>
-          ))}
-        </nav>
-        <h1 id="screen-title" tabIndex={-1}>
-          {title}
-        </h1>
-        <p class="lede">
-          {draft.document.title}. {lede}
-        </p>
-      </header>
+            <button type="button" class="quiet" onClick={() => {
+                leave('context');
+              }}>
+              Open the full editor
+            </button>
+          </nav>
+        </header>
+      ) : (
+        <header class="screen-head">
+          <nav aria-label="Screens" class="button-row">
+            <button type="button" class="quiet" onClick={() => {
+                leave('start');
+              }}>
+              Back to start
+            </button>
+            <button type="button" class="quiet" onClick={() => {
+                leave('guided');
+              }}>
+              Guided mode
+            </button>
+            {SCREENS.map(([name, text]) => (
+              <button type="button" class="quiet" key={name} aria-current={name === screen ? 'page' : undefined} disabled={name === screen} onClick={() => {
+                  leave(name);
+                }}>
+                {text}
+              </button>
+            ))}
+          </nav>
+          <h1 id="screen-title" tabIndex={-1}>
+            {title}
+          </h1>
+          <p class="lede">
+            {draft.document.title}. {lede}
+          </p>
+        </header>
+      )}
 
       <VersionNotice />
       {exportOverdue(stored) && (
@@ -380,10 +406,12 @@ export function DocumentScreen({
         )}
       </div>
 
-      <StepsPanel doc={stored.doc} screen={screen} onGo={(target, section) => {
-          if (target === screen) showSection(section);
-          else leave(target, section);
-        }} />
+      {!guided && (
+        <StepsPanel doc={stored.doc} screen={screen} onGo={(target, section) => {
+            if (target === screen) showSection(section);
+            else leave(target, section);
+          }} />
+      )}
 
       <InvalidFields.Provider value={reportInvalid}>
         <Fragment key={revision}>{children(draft, update, { blocked })}</Fragment>

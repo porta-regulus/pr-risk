@@ -1,13 +1,13 @@
-# Release 2. Guided questions for capacity, appetite and tolerance
+# Guided questions for capacity, appetite and tolerance
 
 | Item | Value |
 |---|---|
-| Status | In build for release 2. The code merges to `main` only after the release 1 tag. |
+| Status | In release 1. On 2026-11-06 the product owner moved the questions from release 2 into release 1, as step 3 of the guided mode (`docs/ux/redesign-plan.md`). The file keeps its path, so the links to it stay valid. |
 | Date | 2026-11-06 |
 | Schema | 1.2.0 adds the optional object `appetite.elicitation` (Sec. 8) |
 | Decided by | PortaRegulus (product owner) |
 | ToC | `ictrm.3.2.1`, `ictrm.5.4.2` |
-| Screen | S2 Context and strategy |
+| Screen | Step 3 of the guided mode, and S2 Context and strategy |
 | Replaces | The default tolerance points of SPEC.md Sec. 8.9 for documents that use the questions |
 
 ## 1. Problem
@@ -18,9 +18,9 @@
 
 ## 2. Decision
 
-Release 2 adds a guided question flow to S2. The IT lead runs the flow with the management body in one session of about 30 minutes. The flow goes from wide to narrow in 5 stages. Almost every answer is one tap. The output is a draft. The draft becomes the appetite of the company only when the management body approves it in the existing "Approved by and on" fields.
+Release 1 adds a guided question flow to S2 and to step 3 of the guided mode. The IT lead runs the flow with the management body in one session of about 30 minutes. The flow goes from wide to narrow in 5 stages. Almost every answer is one tap. The output is a draft. The draft becomes the appetite of the company only when the management body approves it in the existing "Approved by and on" fields.
 
-Why release 2 and not release 1. Release 1 is at `1.0.0-rc.3`. New UI on S2 now changes the screens that AT-5 tests and the release checks cover. The calibration training quiz is also out of release 1 (SPEC.md Sec. 3.2) for the same kind of reason.
+Why release 1. The flow was first planned for release 2, because new UI changes the screens that AT-5 tests. Then the product owner decided to redesign the GUI before release 1, so AT-5 tests a new GUI anyway. Step 3 of the guided mode needs exactly this flow.
 
 ## 3. Stages
 

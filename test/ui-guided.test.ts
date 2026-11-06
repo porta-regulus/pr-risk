@@ -1,4 +1,4 @@
-// Guided questions of release 2 (src/ui/guided.ts, docs/release-2/appetite-questions.md).
+// Guided questions (src/ui/guided.ts, docs/release-2/appetite-questions.md).
 // The halving search, V-12 by construction, "Do not know", the cross-check and the result.
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';

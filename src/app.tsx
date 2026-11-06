@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import { ContextScreen } from './ui/context';
 import type { ScreenName } from './ui/editor';
 import { EnterpriseScreen } from './ui/enterprise';
+import { GuidedScreen } from './ui/guided-mode';
 import { IdentifyScreen } from './ui/identify';
 import { MonitorScreen } from './ui/monitor';
 import { PrioritizeScreen } from './ui/prioritize';
@@ -14,6 +15,7 @@ export function App() {
   const navigate = (next: ScreenName): void => {
     setScreen(next);
   };
+  if (id !== undefined && screen === 'guided') return <GuidedScreen id={id} onNavigate={navigate} />;
   if (id !== undefined && screen === 'context') return <ContextScreen id={id} onNavigate={navigate} />;
   if (id !== undefined && screen === 'identify') return <IdentifyScreen id={id} onNavigate={navigate} />;
   if (id !== undefined && screen === 'prioritize') return <PrioritizeScreen id={id} onNavigate={navigate} />;
