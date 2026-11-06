@@ -106,3 +106,43 @@ test('a new deploy shows a ready notice, then activates on the next start with i
     await server.close();
   }
 });
+
+// ADR-0004 T3. "Use the new version now" on S1 activates the waiting version without a close of
+// the tab, but only when no other tab of the app is open.
+test('"Use the new version now" activates the new version in the open tab, and refuses with a second tab', async ({ context }) => {
+  test.skip(process.env.BASE_URL !== undefined, 'Needs a local server that can change the build.');
+  const server = await startServer();
+  const problems: string[] = [];
+  context.on('weberror', (error) => problems.push(error.error().message));
+  context.on('console', (message) => {
+    if (message.type() === 'error' || message.type() === 'warning') problems.push(message.text());
+  });
+  try {
+    const page = await context.newPage();
+    await page.goto(`${server.origin}/`);
+    await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller !== null)).toBe(true);
+    server.next();
+    await page.reload();
+    const ready = page.getByRole('status').filter({ hasText: 'A new version of the app is ready.' });
+    await expect(ready).toBeVisible({ timeout: 15_000 });
+
+    // A second tab of the app blocks the change, so its code is never replaced.
+    const other = await context.newPage();
+    await other.goto(`${server.origin}/`);
+    await ready.getByRole('button', { name: 'Use the new version now' }).click();
+    await expect(ready).toContainText('Another tab of the app is open.');
+    await expect(page.getByText(`Version ${version}, build`)).toBeVisible();
+
+    // With one tab, the new version takes over and the page reloads once.
+    await other.close();
+    await expect(async () => {
+      await ready.getByRole('button', { name: 'Use the new version now' }).click();
+      await expect(page.getByText(`Version ${NEXT}, build`)).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 15_000 });
+    await expect(page.getByRole('status').filter({ hasText: `Version ${NEXT} is now active.` })).toBeVisible();
+    await expectAccessible(page, 'S1 after the new version took over');
+    expect(problems, 'errors, warnings and CSP violations').toEqual([]);
+  } finally {
+    await server.close();
+  }
+});

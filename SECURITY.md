@@ -47,7 +47,7 @@ A security fix comes as its own patch release, with no new functions, when this 
 
 If the vulnerability is in a third-party component, we report it to the maintainers of that component and tell you that we did. We also release a fix or a mitigation for this software.
 
-The app makes no network request, so it cannot tell you about a fix before your browser has it. To learn about fixes, watch the releases of https://github.com/porta-regulus/pr-risk. The hosted app at https://risk.portaregulus.com loads a new version when you next start it. The app then shows a notice with the new version and a link to its release notes.
+The app makes no network request, so it cannot tell you about a fix before your browser has it. To learn about fixes, watch the releases of https://github.com/porta-regulus/pr-risk. The hosted app at https://risk.portaregulus.com loads a new version when you next start it, or when you click "Use the new version now" on the start screen. The app then shows a notice with the new version and a link to its release notes.
 
 If we find that a vulnerability in this software is actively exploited, we report it as Article 14(1) of the Cyber Resilience Act requires, to the extent that Article 24(3) applies it to stewards.
 

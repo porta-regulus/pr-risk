@@ -51,6 +51,9 @@ export interface NoticeState {
   readonly changed: boolean;
   // A new version is installed and waits for the next start.
   readonly ready: boolean;
+  // The user asked for the new version, and the page reloads soon. S1 then offers no action,
+  // so no draft can start before the reload (ADR-0004 T3).
+  readonly activating?: boolean;
 }
 
 // One state for S1 and the editor frame, so a notice closed on one screen stays closed on the next.
