@@ -130,6 +130,7 @@ From the ToC.
 5. Sec. 5.1 Table 8 as a workflow, and Sec. 5.1.2 calendars, reminders and notifications.
 6. Sec. 5.3.2 forced ranking optimization with weighted business drivers.
 7. Appendix C federal content. The target users are in the EU.
+8. Sec. 3.2.1 guided questions that set capacity, appetite statements and tolerance points from the answers of the management body. Planned for release 2 (`docs/release-2/appetite-questions.md`).
 
 Not in the ToC, so out.
 1. Regulation and framework mappings per risk (NIS2, CRA Annex I, CSF 2.0 subcategories). Responses can still name informative references (Sec. 3.6).
@@ -752,7 +753,7 @@ Three measures.
 2. **Clear breach.** LEC(x) minus 2 standard errors is above T(x) at some grid point. The optimization ranks with this test, because the point estimate flips for borderline portfolios.
 3. **Excess area.** Sum over the grid of max(0, LEC(x) - T(x)) times the grid step in log10 loss. It ranks portfolios that all breach.
 
-Default points for a new document, shown as a starting point and not as advice. (2% of capacity, 0.5), (10%, 0.2), (33%, 0.05), (100%, 0.01).
+Default points for a new document, shown as a starting point and not as advice. (2% of capacity, 0.5), (10%, 0.2), (33%, 0.05), (100%, 0.01). Release 2 adds guided questions that replace these points with the answers of the management body (`docs/release-2/appetite-questions.md`).
 
 ### 8.10 Responses
 
