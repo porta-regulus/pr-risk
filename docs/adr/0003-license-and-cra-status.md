@@ -4,14 +4,14 @@
 |---|---|
 | Status | Accepted |
 | Date | 2026-10-27 |
-| Changed | 2026-11-02 by the product owner. The help text is Apache-2.0, not CC BY 4.0 (Decision item 1). |
+| Changed | 2026-11-02 by the product owner. The help text is Apache-2.0, not CC BY 4.0 (Decision item 1). 2026-11-06 by the product owner. Condition C7 from the conclusion of counsel (Annex I self-check, section 5, question 3). |
 | Legal sources | Regulation (EU) 2024/2847 (CRA), consolidated text 02024R2847-20241120, https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R2847. Commission guidance C(2026) 5252 of 27.7.2026 (non-binding). Commission CRA FAQ v1.4 of 4.9.2026. |
 | Not legal advice | Have counsel confirm before launch. The CJEU has the final word on interpretation. |
 
 ## Decision
 
 1. **Licence.** Apache-2.0 for code, for the JSON Schema and for the help text. CC BY 4.0 for the risk catalogue content. No contributor licence agreement. No dual licence and no paid edition, ever. The help text is in the UI source files, so it has the licence of the code. A person who copies the code cannot easily follow 2 licences in 1 file. Apache-2.0 also lets people use the text again with attribution.
-2. **CRA position.** PortaRegulus publishes the app so that it is not "placed on the market" under the CRA. The six conditions below keep it outside. PortaRegulus still applies the open-source steward measures of Art. 24 on a voluntary basis, because they cost little and the acceptance tests need them anyway (SBOM, signed builds, security policy).
+2. **CRA position.** PortaRegulus publishes the app so that it is not "placed on the market" under the CRA. The seven conditions below keep it outside. PortaRegulus still applies the open-source steward measures of Art. 24 on a voluntary basis, because they cost little and the acceptance tests need them anyway (SBOM, signed builds, security policy).
 3. **Sign-up and leads.** The app asks for no e-mail and has no lead form. Lead capture stays on separate marketing pages of www.portaregulus.com.
 
 ## The direct answer to the question
@@ -27,7 +27,7 @@
 
 If PortaRegulus ever becomes the manufacturer, these duties apply. Art. 14 reporting of actively exploited vulnerabilities and severe incidents applies already, from 11 September 2026 (Art. 71(2)). Annex I, technical documentation, conformity assessment and CE marking apply from 11 December 2027. The app is in the default class. Annex III has no risk management category. Its nearest entry, Class I item 7 "Security information and event management (SIEM) systems", needs products that "collect data from multiple sources, analyse and correlate that data" (Implementing Regulation (EU) 2025/2392). A manual register does not do this. So the conformity route would be Module A self-assessment (Art. 32(1)(a)). Re-check the class if the app ever collects log data.
 
-## Six conditions that keep the app outside the CRA
+## Seven conditions that keep the app outside the CRA
 
 | # | Condition | Why |
 |---|---|---|
@@ -37,16 +37,17 @@ If PortaRegulus ever becomes the manufacturer, these duties apply. Art. 14 repor
 | C4 | Paid support only as a separate, optional service. The app and its updates stay free for all. | Guidance para. 55 and 56. |
 | C5 | The app is not the free tier of a paid product. Do not brand it "Risklet", because risklet.com sells paid reports under that name. | Guidance para. 52 and 53 (open-core). A shared brand makes the open-core reading easy for a regulator. |
 | C6 | Donations, if any, do not exceed the costs of design, development and provision. | Recital 15, last sentences. |
+| C7 | PortaRegulus does not market or bundle the app as a feature of CVD Portal or as an inducement to buy it. This covers the CVD Portal website, sales material, offers and contracts, not only the app (C3). A plain statement that both products exist and that the app imports a CVD Portal export is allowed. | The condition of counsel for the conclusion on Recital 15 (2026-11-06). Recital 18 makes the test product by product, so a sales link between the products outside the app can count as monetisation of the app. |
 
 ## Hosted build, self-hosted build and repository
 
 | Distribution | Product with digital elements? | Placed on the market? |
 |---|---|---|
 | Hosted web app, accessed only through a browser | **No**, on that basis alone. Guidance para. 21 and Example 5. "This is typically the case for web applications, including progressive web apps, where they are accessed exclusively through a web browser." | Not applicable |
-| Static bundle (zip) or container image for self-hosting | **Yes.** Guidance para. 20 says that software "supplied for local execution" is a product. | Only if supplied in the course of a commercial activity. Under C1 to C6, it is not. |
+| Static bundle (zip) or container image for self-hosting | **Yes.** Guidance para. 20 says that software "supplied for local execution" is a product. | Only if supplied in the course of a commercial activity. Under C1 to C7, it is not. |
 | Public source repository | Guidance para. 23 says sharing FOSS "on publicly accessible repositories is generally not considered to be placing that code on the EU market". Recital 20 agrees. | No |
 
-There is one grey zone. The hosted app runs fully on the client, so a regulator could read it as "supplied for local execution" (para. 20). Conditions C1 to C6 also cover this reading, so the conclusion does not change.
+There is one grey zone. The hosted app runs fully on the client, so a regulator could read it as "supplied for local execution" (para. 20). Conditions C1 to C7 also cover this reading, so the conclusion does not change.
 
 ## Steward status
 

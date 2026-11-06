@@ -81,13 +81,21 @@ jobs:
         run: |
           prerelease=()
           if [[ "$TAG" == *-* ]]; then prerelease=(--prerelease); fi
+          annex=""
+          if [[ "$TAG" != *-* ]]; then
+            annex="
+          ## CRA Annex I self-check
+
+          The signed self-check of this release is https://github.com/${GITHUB_REPOSITORY}/blob/${TAG}/docs/release/annex-i-self-check.md
+          "
+          fi
           notes="## Verify this release
 
           1. \`sha256sum -c SHA256SUMS\`
           2. \`gh attestation verify pr-risk-${TAG}.tar.gz --repo ${GITHUB_REPOSITORY}\`
           3. With the attached Sigstore bundle, \`gh attestation verify pr-risk-${TAG}.tar.gz --repo ${GITHUB_REPOSITORY} --bundle pr-risk-${TAG}.intoto.jsonl\`
           4. SBOM, \`gh attestation verify pr-risk-${TAG}.tar.gz --repo ${GITHUB_REPOSITORY} --predicate-type https://cyclonedx.org/bom --bundle pr-risk-${TAG}.sbom.intoto.jsonl\`
-          "
+          ${annex}"
           gh release create "$TAG" --verify-tag --title "$TAG" "${prerelease[@]}" \
             --notes "$notes" --generate-notes \
             "pr-risk-${TAG}.tar.gz" "pr-risk-${TAG}.cdx.json" "pr-risk-${TAG}-files.sha256" SHA256SUMS \
