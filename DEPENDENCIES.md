@@ -32,6 +32,15 @@ These are the only packages that reach the user's browser.
 | @axe-core/playwright | 4.14.0 | MPL-2.0 | WCAG 2.2 level A and AA check in the Playwright tests (build task 5, done criterion 3, `e2e/axe.ts`). It pulls `axe-core` 4.14.0 (MPL-2.0). Test only, never in the bundle. |
 | @cyclonedx/cyclonedx-npm | 6.0.1 | Apache-2.0 | CycloneDX 1.6 SBOM on release. It pulls `libxmljs2` and `node-gyp` for XML output. We write JSON only, and `--ignore-scripts` means the native part is never built. |
 
+## Overrides
+
+`package.json` forces these versions under build and test tools, because the parent packages do not accept the fixed major versions yet. Both packages are ESM only. Node 22.12 and later load them with `require()`, and the parents use named exports only. Remove an override when its parents accept the fixed version.
+
+| Package | Version | Licence | Why | Parents |
+|---|---|---|---|---|
+| minimatch | 11.0.1 | BlueOak-1.0.0 | Fixes GHSA-g3hv-75wg-m249, a DoS through glob patterns. Versions 7.0.0 to 11.0.0 have it. | eslint 10.13.0, @eslint/config-array 0.23.5, @typescript-eslint/typescript-estree 8.72.1, glob |
+| glob | 14.0.2 | BlueOak-1.0.0 | Fixes GHSA-3g3m-2fjr-6pw4, an AbortSignal bypass. Versions 9.0.0 to 14.0.1 have it. The code path does not run, because `--ignore-scripts` keeps node-gyp off. | cacache 19.0.1, through make-fetch-happen, node-gyp, libxmljs2 and @cyclonedx/cyclonedx-npm |
+
 ## CI tools that are not npm packages
 
 | Tool | Version | Licence | Why | Pin |
