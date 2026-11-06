@@ -355,7 +355,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
         <p class="lede">A free risk register for the risk components of NIST SP 800-221r1. Your data stays in this browser. The app sends no data to a server.</p>
       </header>
 
-      <VersionNotice />
+      <VersionNotice startScreen />
       {current !== undefined && exportOverdue(current) && (
         <p class="banner" role="status">
           {current.lastExportOn === undefined ? 'You have not saved a copy of this document yet.' : 'Your last copy is more than 7 days old.'} Browsers can delete stored data. Export a copy now.

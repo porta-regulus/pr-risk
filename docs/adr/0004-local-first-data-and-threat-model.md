@@ -5,6 +5,7 @@
 | Status | Accepted |
 | Date | 2026-10-27 |
 | Scope | The app itself, release 1 |
+| Changed | 2026-11-06 by the product owner. T3 also lets the user activate a new version at once ("Use the new version now" on S1). A browser that kept one tab open, or only reloaded, stayed on the old version. |
 
 ## Decision
 
@@ -41,7 +42,7 @@ Trust boundaries. B1 the browser sandbox of the app origin. B2 files that enter 
 | S2 | Spoofing | An import file claims to come from CVD Portal or NIST but was crafted by an attacker. | A1, A5 | The import preview shows source, hash, record count and every defaulted field. The user confirms. Provenance is stored in the document. | Import tests with crafted files. |
 | T1 | Tampering | A compromised npm dependency or build step injects code that reads or changes registers. | A1, A3 | Few runtime dependencies (SPEC.md Sec. 11 item 1). Lockfile with integrity hashes. `npm ci --ignore-scripts`. Pinned GitHub Actions by commit SHA. Build provenance attestation. CSP `connect-src 'none'` blocks exfiltration even if code is injected. | OpenSSF Scorecard Pinned-Dependencies and Dangerous-Workflow checks. CSP test in CI. |
 | T2 | Tampering | A third-party script on the same origin changes IndexedDB. | A1 | Dedicated origin. `script-src 'self'`. No third-party scripts. | CSP header test. Origin check in deployment test. |
-| T3 | Tampering | A stale or poisoned service worker cache serves old code after a security fix. | A3, A5 | Service worker caches only hashed file names. The browser's own service worker update check runs on each start, so the app needs no request of its own. A new version activates on the next start, and the app shows its version. | Update test in Playwright. |
+| T3 | Tampering | A stale or poisoned service worker cache serves old code after a security fix. | A3, A5 | Service worker caches only hashed file names. The browser's own service worker update check runs on each start, so the app needs no request of its own. A new version activates on the next start, or at once when the user clicks "Use the new version now" on S1 and only one tab of the app is open. S1 holds no unsaved draft, and a second tab blocks the change, so the code never changes under open work. The app shows its version. | Update tests in Playwright (`e2e/update.spec.ts`). |
 | T4 | Tampering | A CSV export opened in Excel runs a formula from a risk description (CSV injection). | A2 | Prefix cells that start with `=`, `+`, `-`, `@`, tab or carriage return with a single quote, per OWASP CSV Injection guidance. | Unit test with the six prefixes. |
 | R1 | Repudiation | A user denies that they changed an estimate before the decision. | A5 | Append-only change log in the document with time, field path, old value, new value and a free-text author. No cryptographic guarantee in release 1. | Change log test. Documented limit. |
 | I1 | Information disclosure | A browser extension with "read all sites" rights reads the register from the page. | A1 | Out of the app's control. The help page tells users to use a browser profile with no extensions for sensitive registers. | Help text review. |
