@@ -10,6 +10,7 @@ import { DistributionField, formatNumber } from './distribution';
 import { DriverLinksTab } from './drivers';
 import { draftList, withValue } from './edit';
 import type { Update } from './editor';
+import { More } from './section';
 import { Explain, useExplain } from './explain';
 import { Checkboxes, LinesField, NumberField, SelectField, TextField } from './fields';
 import type { HelpKey } from './help';
@@ -241,7 +242,6 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
   const id = `risk-${risk.riskId}`;
   return (
     <div class="tab-body">
-      {rating}
       <DistributionField
         id={`${id}-frequency`}
         legend="Frequency"
@@ -266,32 +266,6 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
         }}
       />
 
-      <h4>Secondary impacts</h4>
-      <Explain id={`${id}-secondary`} topic="identify.secondary-impacts" name="Secondary impacts" />
-      <p class="hint">Can one event cause a second {word}, for example customer claims after a disclosure? Add a secondary impact with its probability.</p>
-      {secondaries.map((item, i) => (
-        <div class="sub-editor" key={i}>
-          <TextField id={`${id}-sec${String(i)}-description`} label="Secondary impact" help="identify.secondary-description" value={item.description} onChange={(description) => {
-              setEstimate('secondaryImpacts', draftList<Secondary[]>(replaceAt(secondaries, i, { ...item, description })));
-            }} />
-          <NumberField id={`${id}-sec${String(i)}-probability`} label="Probability per event (0 to 1)" help="identify.secondary-probability" min={0} max={1} value={item.probability} onChange={(probability) => {
-              setEstimate('secondaryImpacts', replaceAt(secondaries, i, withValue(item, 'probability', probability)));
-            }} />
-          <DistributionField id={`${id}-sec${String(i)}`} legend="Secondary impact per event" help="identify.secondary-range" question="Give a range you are 90% sure of." unit={currency} value={item.impactPerEvent} onChange={(impactPerEvent) => {
-              setEstimate('secondaryImpacts', replaceAt(secondaries, i, { ...item, impactPerEvent }));
-            }} />
-          <button type="button" class="quiet" onClick={() => {
-              setEstimate('secondaryImpacts', replaceAt(secondaries, i, undefined));
-            }}>
-            Remove secondary impact {i + 1}
-          </button>
-        </div>
-      ))}
-      <button type="button" class="quiet" onClick={() => {
-          setEstimate('secondaryImpacts', [...secondaries, { description: '', impactPerEvent: { type: 'lognormal', confidence: 0.9 } } as Secondary]);
-        }}>
-        Add a secondary impact
-      </button>
 
       <div class="field-row">
         <div class="field">
@@ -310,23 +284,55 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
             }}
           />
         </div>
-        <div class="field">
-          <TextField id={`${id}-estimated-by`} label="Estimated by" help="identify.estimated-by" value={estimate.estimatedBy} onChange={(value) => {
-              setEstimate('estimatedBy', value);
-            }} />
-        </div>
-        <div class="field">
-          <TextField id={`${id}-estimated-on`} label="Estimated on" help="identify.estimated-on" type="date" value={estimate.estimatedOn} onChange={(value) => {
-              setEstimate('estimatedOn', value);
-            }} />
-        </div>
       </div>
       <TextField id={`${id}-rationale`} label="Rationale (10 characters or more)" help="identify.estimate-rationale" multiline value={estimate.rationale} onChange={(rationale) => {
           setRisk((current) => (current.estimate === undefined ? current : { ...current, estimate: { ...current.estimate, rationale } }));
         }} />
-      <LinesField id={`${id}-sources`} label="Sources, one per line" help="identify.estimate-sources" value={estimate.sources ?? []} onChange={(sources) => {
-          setEstimate('sources', sources);
-        }} />
+
+      <More id={`${id}-estimate`}>
+        {rating}
+        <h4>Secondary impacts</h4>
+        <Explain id={`${id}-secondary`} topic="identify.secondary-impacts" name="Secondary impacts" />
+        <p class="hint">Can one event cause a second {word}, for example customer claims after a disclosure? Add a secondary impact with its probability.</p>
+        {secondaries.map((item, i) => (
+          <div class="sub-editor" key={i}>
+            <TextField id={`${id}-sec${String(i)}-description`} label="Secondary impact" help="identify.secondary-description" value={item.description} onChange={(description) => {
+                setEstimate('secondaryImpacts', draftList<Secondary[]>(replaceAt(secondaries, i, { ...item, description })));
+              }} />
+            <NumberField id={`${id}-sec${String(i)}-probability`} label="Probability per event (0 to 1)" help="identify.secondary-probability" min={0} max={1} value={item.probability} onChange={(probability) => {
+                setEstimate('secondaryImpacts', replaceAt(secondaries, i, withValue(item, 'probability', probability)));
+              }} />
+            <DistributionField id={`${id}-sec${String(i)}`} legend="Secondary impact per event" help="identify.secondary-range" question="Give a range you are 90% sure of." unit={currency} value={item.impactPerEvent} onChange={(impactPerEvent) => {
+                setEstimate('secondaryImpacts', replaceAt(secondaries, i, { ...item, impactPerEvent }));
+              }} />
+            <button type="button" class="quiet" onClick={() => {
+                setEstimate('secondaryImpacts', replaceAt(secondaries, i, undefined));
+              }}>
+              Remove secondary impact {i + 1}
+            </button>
+          </div>
+        ))}
+        <button type="button" class="quiet" onClick={() => {
+            setEstimate('secondaryImpacts', [...secondaries, { description: '', impactPerEvent: { type: 'lognormal', confidence: 0.9 } } as Secondary]);
+          }}>
+          Add a secondary impact
+        </button>
+        <div class="field-row">
+          <div class="field">
+            <TextField id={`${id}-estimated-by`} label="Estimated by" help="identify.estimated-by" value={estimate.estimatedBy} onChange={(value) => {
+                setEstimate('estimatedBy', value);
+              }} />
+          </div>
+          <div class="field">
+            <TextField id={`${id}-estimated-on`} label="Estimated on" help="identify.estimated-on" type="date" value={estimate.estimatedOn} onChange={(value) => {
+                setEstimate('estimatedOn', value);
+              }} />
+          </div>
+        </div>
+        <LinesField id={`${id}-sources`} label="Sources, one per line" help="identify.estimate-sources" value={estimate.sources ?? []} onChange={(sources) => {
+            setEstimate('sources', sources);
+          }} />
+      </More>
 
       <FeedbackBox doc={doc} risk={risk} />
 
@@ -538,45 +544,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
                   }}
                 />
               </div>
-              <div class="field">
-                <SelectField
-                  id={`${id}-horizon`}
-                  label="Horizon"
-                  help="identify.horizon"
-                  emptyLabel="Not set"
-                  value={risk.horizon}
-                  options={[
-                    ['current', 'Current'],
-                    ['emerging', 'Emerging'],
-                    ['horizon', 'Horizon'],
-                  ]}
-                  onChange={(value) => {
-                    set('horizon', value);
-                  }}
-                />
-              </div>
-              <div class="field">
-                <SelectField
-                  id={`${id}-threat-type`}
-                  label="Threat source type"
-                  help="identify.threat-source-type"
-                  emptyLabel="Not set"
-                  value={risk.threatSourceType}
-                  options={[
-                    ['adversarial', 'Adversarial'],
-                    ['accidental', 'Accidental'],
-                    ['structural', 'Structural'],
-                    ['environmental', 'Environmental'],
-                  ]}
-                  onChange={(value) => {
-                    set('threatSourceType', value);
-                  }}
-                />
-              </div>
             </div>
-            {(risk.horizon === 'emerging' || risk.horizon === 'horizon') && (
-              <p class="banner">An emerging or horizon risk is a trigger to review appetite and tolerance. Check the statements on the screen Context and strategy.</p>
-            )}
             <div class="field-row">
               <div class="field">
                 <SelectField id={`${id}-code`} label="Category" help="identify.category" value={risk.category.code} options={CODES} onChange={(code) => {
@@ -586,11 +554,6 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
               <div class="field">
                 <SelectField id={`${id}-subcode`} label="Subcategory" help="identify.subcategory" emptyLabel="None" value={subcode} options={subcodeOptions} onChange={(value) => {
                     setRisk((current) => ({ ...current, category: withValue(current.category, 'subcode', value) }));
-                  }} />
-              </div>
-              <div class="field">
-                <TextField id={`${id}-nist-category`} label="NIST risk category (text)" help="identify.nist-category" value={risk.riskCategory} onChange={(value) => {
-                    setRisk((current) => ({ ...current, riskCategory: value }));
                   }} />
               </div>
             </div>
@@ -606,19 +569,66 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
                   }} />
               </div>
             </div>
-            <fieldset class="scenario">
-              <legend class="label-row">
-                <span>Scenario parts</span>
-                {partsHelp.toggle}
-              </legend>
-              {partsHelp.text}
-              {SCENARIO_PARTS.map(([key, label, help]) => (
-                <TextField key={key} id={`${id}-${key}`} label={label} help={help} multiline value={detail[key] as string | undefined} onChange={(value) => {
-                    setDetail(key, value);
-                  }} />
-              ))}
-            </fieldset>
-            <ImpactsFieldset doc={doc} risk={risk} setRisk={setRisk} />
+            <More id={`${id}-scenario`}>
+              <div class="field-row">
+                <div class="field">
+                  <SelectField
+                    id={`${id}-horizon`}
+                    label="Horizon"
+                    help="identify.horizon"
+                    emptyLabel="Not set"
+                    value={risk.horizon}
+                    options={[
+                      ['current', 'Current'],
+                      ['emerging', 'Emerging'],
+                      ['horizon', 'Horizon'],
+                    ]}
+                    onChange={(value) => {
+                      set('horizon', value);
+                    }}
+                  />
+                </div>
+                <div class="field">
+                  <SelectField
+                    id={`${id}-threat-type`}
+                    label="Threat source type"
+                    help="identify.threat-source-type"
+                    emptyLabel="Not set"
+                    value={risk.threatSourceType}
+                    options={[
+                      ['adversarial', 'Adversarial'],
+                      ['accidental', 'Accidental'],
+                      ['structural', 'Structural'],
+                      ['environmental', 'Environmental'],
+                    ]}
+                    onChange={(value) => {
+                      set('threatSourceType', value);
+                    }}
+                  />
+                </div>
+                <div class="field">
+                  <TextField id={`${id}-nist-category`} label="NIST risk category (text)" help="identify.nist-category" value={risk.riskCategory} onChange={(value) => {
+                      setRisk((current) => ({ ...current, riskCategory: value }));
+                    }} />
+                </div>
+              </div>
+              {(risk.horizon === 'emerging' || risk.horizon === 'horizon') && (
+                <p class="banner">An emerging or horizon risk is a trigger to review appetite and tolerance. Check the statements on the screen Context and strategy.</p>
+              )}
+              <fieldset class="scenario">
+                <legend class="label-row">
+                  <span>Scenario parts</span>
+                  {partsHelp.toggle}
+                </legend>
+                {partsHelp.text}
+                {SCENARIO_PARTS.map(([key, label, help]) => (
+                  <TextField key={key} id={`${id}-${key}`} label={label} help={help} multiline value={detail[key] as string | undefined} onChange={(value) => {
+                      setDetail(key, value);
+                    }} />
+                ))}
+              </fieldset>
+              <ImpactsFieldset doc={doc} risk={risk} setRisk={setRisk} />
+            </More>
           </div>
         )}
 

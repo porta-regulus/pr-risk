@@ -8,7 +8,7 @@ import { Explain } from './explain';
 import { Checkboxes, LinesField, SelectField, TextField } from './fields';
 import { GuidedQuestions } from './guided-questions';
 import { StrategySection } from './strategy';
-import { Section } from './section';
+import { More, Section } from './section';
 
 type Context = NonNullable<RiskDocument['context']>;
 type Objective = NonNullable<Context['objectives']>[number];
@@ -56,37 +56,6 @@ function ContextSection({ doc, update }: { readonly doc: RiskDocument; readonly 
 
   return (
     <Section id="context" title="Context" help="context.context">
-      <TextField id="mission" label="Mission" help="context.mission" multiline value={context.mission} onChange={(value) => {
-          set('mission', value);
-        }} />
-      <div class="grid">
-        <div class="field">
-          <TextField id="external-context" label="External context" help="context.external-context" multiline value={context.externalContext} onChange={(value) => {
-              set('externalContext', value);
-            }} />
-        </div>
-        <div class="field">
-          <TextField id="internal-context" label="Internal context" help="context.internal-context" multiline value={context.internalContext} onChange={(value) => {
-              set('internalContext', value);
-            }} />
-        </div>
-      </div>
-      <LinesField id="stakeholders" label="Stakeholders, one per line" help="context.stakeholders" value={context.stakeholders ?? []} onChange={(value) => {
-          set('stakeholders', value);
-        }} />
-      <Checkboxes legend="ICT risk disciplines in scope" name="disciplines" help="context.disciplines" options={DISCIPLINES} value={disciplines} onChange={(value) => {
-          set('disciplines', [...value, ...disciplines.filter((item) => !KNOWN_DISCIPLINES.includes(item))]);
-        }} />
-      <LinesField
-        id="other-disciplines"
-        label="Other disciplines, one per line"
-        help="context.other-disciplines"
-        value={disciplines.filter((item) => !KNOWN_DISCIPLINES.includes(item))}
-        onChange={(value) => {
-          set('disciplines', [...disciplines.filter((item) => KNOWN_DISCIPLINES.includes(item)), ...value.filter((item) => !KNOWN_DISCIPLINES.includes(item))]);
-        }}
-      />
-
       <h3 id="objectives-title">Objectives</h3>
       <p class="muted">The goals that risks can affect. Risks refer to objectives by ID.</p>
       <Explain id="objectives" topic="context.objectives" name="Objectives" />
@@ -150,71 +119,104 @@ function ContextSection({ doc, update }: { readonly doc: RiskDocument; readonly 
         Add an objective
       </button>
 
-      <h3 id="functions-title">Critical business functions</h3>
-      <p class="muted">Assets get the highest criticality of the functions they support.</p>
-      <Explain id="functions" topic="context.functions" name="Critical business functions" />
-      {functions.length > 0 && (
-        <div class="table-box">
-          <table aria-labelledby="functions-title">
-            <thead>
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Function</th>
-                <th scope="col">Criticality</th>
-                <th scope="col">Assets</th>
-                <th scope="col">
-                  <span class="visually-hidden">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {functions.map((item, i) => {
-                const used = functionUse(item.id);
-                const row = `Function ${String(i + 1)}`;
-                const put = (next: BusinessFunction): void => {
-                  set('functions', replaceAt(functions, i, next));
-                };
-                return (
-                  <tr key={i}>
-                    <td>
-                      {used > 0 ? (
-                        item.id
-                      ) : (
-                        <TextField id={`function-${String(i)}-id`} label={`${row} ID`} hiddenLabel value={item.id} onChange={(value) => {
-                            put({ ...item, id: value });
-                          }} />
-                      )}
-                    </td>
-                    <td>
-                      <TextField id={`function-${String(i)}-name`} label={`${row} name`} hiddenLabel value={item.name} onChange={(name) => {
-                          put({ ...item, name });
-                        }} />
-                    </td>
-                    <td>
-                      <TextField id={`function-${String(i)}-criticality`} label={`${row} criticality`} hiddenLabel value={item.criticality} onChange={(criticality) => {
-                          put({ ...item, criticality });
-                        }} />
-                    </td>
-                    <td>{used}</td>
-                    <td>
-                      <button type="button" class="quiet" aria-label={`Remove ${row}`} disabled={used > 0} title={used > 0 ? 'Assets support this function.' : undefined} onClick={() => {
-                          set('functions', replaceAt(functions, i, undefined));
-                        }}>
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      <More id="context">
+        <TextField id="mission" label="Mission" help="context.mission" multiline value={context.mission} onChange={(value) => {
+            set('mission', value);
+          }} />
+        <div class="grid">
+          <div class="field">
+            <TextField id="external-context" label="External context" help="context.external-context" multiline value={context.externalContext} onChange={(value) => {
+                set('externalContext', value);
+              }} />
+          </div>
+          <div class="field">
+            <TextField id="internal-context" label="Internal context" help="context.internal-context" multiline value={context.internalContext} onChange={(value) => {
+                set('internalContext', value);
+              }} />
+          </div>
         </div>
-      )}
-      <button type="button" class="quiet" onClick={() => {
-          set('functions', [...functions, { id: nextId('F-', functions.map((item) => item.id)), name: '', criticality: '' }]);
-        }}>
-        Add a function
-      </button>
+        <LinesField id="stakeholders" label="Stakeholders, one per line" help="context.stakeholders" value={context.stakeholders ?? []} onChange={(value) => {
+            set('stakeholders', value);
+          }} />
+        <Checkboxes legend="ICT risk disciplines in scope" name="disciplines" help="context.disciplines" options={DISCIPLINES} value={disciplines} onChange={(value) => {
+            set('disciplines', [...value, ...disciplines.filter((item) => !KNOWN_DISCIPLINES.includes(item))]);
+          }} />
+        <LinesField
+          id="other-disciplines"
+          label="Other disciplines, one per line"
+          help="context.other-disciplines"
+          value={disciplines.filter((item) => !KNOWN_DISCIPLINES.includes(item))}
+          onChange={(value) => {
+            set('disciplines', [...disciplines.filter((item) => KNOWN_DISCIPLINES.includes(item)), ...value.filter((item) => !KNOWN_DISCIPLINES.includes(item))]);
+          }}
+        />
+
+        <h3 id="functions-title">Critical business functions</h3>
+        <p class="muted">Assets get the highest criticality of the functions they support.</p>
+        <Explain id="functions" topic="context.functions" name="Critical business functions" />
+        {functions.length > 0 && (
+          <div class="table-box">
+            <table aria-labelledby="functions-title">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Function</th>
+                  <th scope="col">Criticality</th>
+                  <th scope="col">Assets</th>
+                  <th scope="col">
+                    <span class="visually-hidden">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {functions.map((item, i) => {
+                  const used = functionUse(item.id);
+                  const row = `Function ${String(i + 1)}`;
+                  const put = (next: BusinessFunction): void => {
+                    set('functions', replaceAt(functions, i, next));
+                  };
+                  return (
+                    <tr key={i}>
+                      <td>
+                        {used > 0 ? (
+                          item.id
+                        ) : (
+                          <TextField id={`function-${String(i)}-id`} label={`${row} ID`} hiddenLabel value={item.id} onChange={(value) => {
+                              put({ ...item, id: value });
+                            }} />
+                        )}
+                      </td>
+                      <td>
+                        <TextField id={`function-${String(i)}-name`} label={`${row} name`} hiddenLabel value={item.name} onChange={(name) => {
+                            put({ ...item, name });
+                          }} />
+                      </td>
+                      <td>
+                        <TextField id={`function-${String(i)}-criticality`} label={`${row} criticality`} hiddenLabel value={item.criticality} onChange={(criticality) => {
+                            put({ ...item, criticality });
+                          }} />
+                      </td>
+                      <td>{used}</td>
+                      <td>
+                        <button type="button" class="quiet" aria-label={`Remove ${row}`} disabled={used > 0} title={used > 0 ? 'Assets support this function.' : undefined} onClick={() => {
+                            set('functions', replaceAt(functions, i, undefined));
+                          }}>
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <button type="button" class="quiet" onClick={() => {
+            set('functions', [...functions, { id: nextId('F-', functions.map((item) => item.id)), name: '', criticality: '' }]);
+          }}>
+          Add a function
+        </button>
+      </More>
     </Section>
   );
 }

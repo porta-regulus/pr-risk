@@ -14,7 +14,7 @@ import { useEngine } from './jobs';
 import { AcceptanceEditor } from './acceptance';
 import { DecisionRecordView, residualRisks } from './record';
 import { money, StatusText } from './report';
-import { Section } from './section';
+import { More, Section } from './section';
 
 type Effect = ResponseOption['effects'][number];
 
@@ -240,16 +240,6 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
           />
         </div>
       </div>
-      <TextField
-        id={`${id}-description`}
-        label="Description"
-        help="respond.option-description"
-        multiline
-        value={option.description}
-        onChange={(description) => {
-          set((current) => withValue(current, 'description', description));
-        }}
-      />
       <fieldset class="distribution">
         <legend>Costs</legend>
         <div class="field-row">
@@ -287,19 +277,6 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
               value={costs.lifetimeYears}
               onChange={(value) => {
                 setCost('lifetimeYears', value);
-              }}
-            />
-          </div>
-          <div class="field">
-            <NumberField
-              id={`${id}-reserve`}
-              label={`Risk reserve (${currency})`}
-              help="respond.cost-reserve"
-              hint="Set aside in year 1, released if no target event occurs."
-              min={0}
-              value={costs.reserveAmount}
-              onChange={(value) => {
-                setCost('reserveAmount', value);
               }}
             />
           </div>
@@ -356,117 +333,144 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
           Two options that change the same target are alternatives. A portfolio never holds both. To combine them, add a bundle option that states the combined effect.
         </p>
       </fieldset>
-      <Checkboxes
-        legend="Control types"
-        help="respond.control-types"
-        name={`${id}-controls`}
-        options={CONTROL_TYPES}
-        value={option.controlTypes ?? []}
-        onChange={(value) => {
-          set((current) => withValue(current, 'controlTypes', value.length === 0 ? undefined : value));
-        }}
-      />
-      <LinesField
-        id={`${id}-references`}
-        label="Informative references, one per line, for example CSF 2.0 PR.AA-03"
-        help="respond.informative-references"
-        value={option.informativeReferences ?? []}
-        onChange={(value) => {
-          set((current) => withValue(current, 'informativeReferences', value.length === 0 ? undefined : value));
-        }}
-      />
-      {others.length > 0 && (
-        <Checkboxes
-          legend="Bundle of these options"
-          help="respond.bundle"
-          name={`${id}-bundle`}
-          options={others.map((item) => [item.id, `${item.id} ${item.title}`] as const)}
-          value={option.bundleOf ?? []}
-          onChange={(value) => {
-            set((current) => withValue(current, 'bundleOf', value.length === 0 ? undefined : value));
+      <More id={`${id}-option`}>
+        <TextField
+          id={`${id}-description`}
+          label="Description"
+          help="respond.option-description"
+          multiline
+          value={option.description}
+          onChange={(description) => {
+            set((current) => withValue(current, 'description', description));
           }}
         />
-      )}
-      {introducible.length > 0 && (
-        <details class="help">
-          <summary>Risks that this option introduces ({(option.introducesRisks ?? []).length})</summary>
-          <Checkboxes
-            legend="Risks that this option introduces. Such a risk enters the simulation only with this option."
-            help="respond.introduces-risks"
-            name={`${id}-introduces`}
-            options={introducible.map((risk) => [risk.riskId, `${risk.riskId} ${risk.riskDescription}`] as const)}
-            value={option.introducesRisks ?? []}
+        <div class="field-row">
+        <div class="field">
+          <NumberField
+            id={`${id}-reserve`}
+            label={`Risk reserve (${currency})`}
+            help="respond.cost-reserve"
+            hint="Set aside in year 1, released if no target event occurs."
+            min={0}
+            value={costs.reserveAmount}
             onChange={(value) => {
-              update((current) => ({
-                ...current,
-                responses: (current.responses ?? []).map((item) => (item.id === option.id ? withValue(item, 'introducesRisks', value.length === 0 ? undefined : value) : item)),
-                risks: current.risks.map((risk) =>
-                  value.includes(risk.riskId)
-                    ? { ...risk, onlyWithResponse: option.id }
-                    : risk.onlyWithResponse === option.id
-                      ? withValue(risk, 'onlyWithResponse', undefined)
-                      : risk,
-                ),
-              }));
+              setCost('reserveAmount', value);
             }}
           />
-        </details>
-      )}
-      <fieldset class="distribution">
-        <legend>Forced choice</legend>
-        <SelectField
-          id={`${id}-forced`}
-          label="Leadership choice"
-          help="respond.forced-choice"
-          emptyLabel="None, the optimization decides"
-          value={option.forced?.action}
-          options={[
-            ['require', 'Require. Always fund it.'],
-            ['exclude', 'Exclude. Never fund it.'],
-          ]}
-          onChange={(action) => {
-            set((current) =>
-              withValue(
-                current,
-                'forced',
-                action === undefined
-                  ? undefined
-                  : {
-                      action,
-                      reason: current.forced?.reason ?? '',
-                      by: current.forced?.by ?? '',
-                    },
-              ),
-            );
+        </div>
+        </div>
+        <Checkboxes
+          legend="Control types"
+          help="respond.control-types"
+          name={`${id}-controls`}
+          options={CONTROL_TYPES}
+          value={option.controlTypes ?? []}
+          onChange={(value) => {
+            set((current) => withValue(current, 'controlTypes', value.length === 0 ? undefined : value));
           }}
         />
-        {option.forced !== undefined && (
-          <div class="field-row">
-            <div class="field wide">
-              <TextField
-                id={`${id}-forced-reason`}
-                label="Reason"
-                help="respond.forced-reason"
-                value={option.forced.reason}
-                onChange={(reason) => {
-                  set((current) => (current.forced === undefined ? current : { ...current, forced: { ...current.forced, reason } }));
-                }}
-              />
-            </div>
-            <div class="field">
-              <TextField
-                id={`${id}-forced-by`}
-                label="Decided by"
-                help="respond.forced-by"
-                value={option.forced.by}
-                onChange={(by) => {
-                  set((current) => (current.forced === undefined ? current : { ...current, forced: { ...current.forced, by } }));
-                }}
-              />
-            </div>
-          </div>
+        <LinesField
+          id={`${id}-references`}
+          label="Informative references, one per line, for example CSF 2.0 PR.AA-03"
+          help="respond.informative-references"
+          value={option.informativeReferences ?? []}
+          onChange={(value) => {
+            set((current) => withValue(current, 'informativeReferences', value.length === 0 ? undefined : value));
+          }}
+        />
+        {others.length > 0 && (
+          <Checkboxes
+            legend="Bundle of these options"
+            help="respond.bundle"
+            name={`${id}-bundle`}
+            options={others.map((item) => [item.id, `${item.id} ${item.title}`] as const)}
+            value={option.bundleOf ?? []}
+            onChange={(value) => {
+              set((current) => withValue(current, 'bundleOf', value.length === 0 ? undefined : value));
+            }}
+          />
         )}
-      </fieldset>
+        {introducible.length > 0 && (
+          <details class="help">
+            <summary>Risks that this option introduces ({(option.introducesRisks ?? []).length})</summary>
+            <Checkboxes
+              legend="Risks that this option introduces. Such a risk enters the simulation only with this option."
+              help="respond.introduces-risks"
+              name={`${id}-introduces`}
+              options={introducible.map((risk) => [risk.riskId, `${risk.riskId} ${risk.riskDescription}`] as const)}
+              value={option.introducesRisks ?? []}
+              onChange={(value) => {
+                update((current) => ({
+                  ...current,
+                  responses: (current.responses ?? []).map((item) => (item.id === option.id ? withValue(item, 'introducesRisks', value.length === 0 ? undefined : value) : item)),
+                  risks: current.risks.map((risk) =>
+                    value.includes(risk.riskId)
+                      ? { ...risk, onlyWithResponse: option.id }
+                      : risk.onlyWithResponse === option.id
+                        ? withValue(risk, 'onlyWithResponse', undefined)
+                        : risk,
+                  ),
+                }));
+              }}
+            />
+          </details>
+        )}
+        <fieldset class="distribution">
+          <legend>Forced choice</legend>
+          <SelectField
+            id={`${id}-forced`}
+            label="Leadership choice"
+            help="respond.forced-choice"
+            emptyLabel="None, the optimization decides"
+            value={option.forced?.action}
+            options={[
+              ['require', 'Require. Always fund it.'],
+              ['exclude', 'Exclude. Never fund it.'],
+            ]}
+            onChange={(action) => {
+              set((current) =>
+                withValue(
+                  current,
+                  'forced',
+                  action === undefined
+                    ? undefined
+                    : {
+                        action,
+                        reason: current.forced?.reason ?? '',
+                        by: current.forced?.by ?? '',
+                      },
+                ),
+              );
+            }}
+          />
+          {option.forced !== undefined && (
+            <div class="field-row">
+              <div class="field wide">
+                <TextField
+                  id={`${id}-forced-reason`}
+                  label="Reason"
+                  help="respond.forced-reason"
+                  value={option.forced.reason}
+                  onChange={(reason) => {
+                    set((current) => (current.forced === undefined ? current : { ...current, forced: { ...current.forced, reason } }));
+                  }}
+                />
+              </div>
+              <div class="field">
+                <TextField
+                  id={`${id}-forced-by`}
+                  label="Decided by"
+                  help="respond.forced-by"
+                  value={option.forced.by}
+                  onChange={(by) => {
+                    set((current) => (current.forced === undefined ? current : { ...current, forced: { ...current.forced, by } }));
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </fieldset>
+      </More>
       <button
         type="button"
         class="danger"
@@ -708,34 +712,17 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
   const shown = options.find((option) => option.id === selected) ?? options[0];
   return (
     <>
-      <Section id="budget" title="Budget and method" help="respond.budget">
+      <Section id="budget" title="Budget" help="respond.budget">
         <div class="field-row">
           <div class="field">
             <NumberField id="budget-cash" label={`Budget, first-year cash (${currency})`} help="respond.budget-cash" min={0} value={budget} onChange={(value) => {
                 setBudgetCash(update, value);
               }} />
           </div>
-          <div class="field">
-            <SelectField
-              id="budget-method"
-              label="Optimization method"
-              help="respond.optimization-method"
-              value={doc.strategy?.optimizationMethod}
-              emptyLabel="Not set"
-              options={[
-                ['algorithmic', 'Algorithmic'],
-                ['fiscal', 'Fiscal'],
-                ['operational', 'Operational'],
-              ]}
-              onChange={(method) => {
-                update((current) => withSection(current, 'strategy', withValue(current.strategy, 'optimizationMethod', method)));
-              }}
-            />
-          </div>
         </div>
         <p class="hint">
-          The algorithmic method compares every affordable set of options. The record always shows the fiscal baseline next to it. For the operational method, mark
-          options as required or excluded.
+          The app compares every portfolio of options that fits the budget. The record also shows the fiscal baseline next to it. To force an option in or out, use
+          its forced choice.
         </p>
       </Section>
 

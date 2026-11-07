@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { expectAccessible } from './axe';
-import { unfold } from './fold';
+import { openMore, unfold } from './fold';
 
 // Screen S3 under the production CSP. A new document gets a quantitative register, an asset
 // and a risk with a calibrated estimate. Rule V-08 holds the save until the estimate is
@@ -36,6 +36,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
   await expect(page.locator('.errors')).toContainText('V-08');
 
   // Scenario tab.
+  await openMore(page);
   await page.getByLabel('Risk owner').fill('Head of IT');
   await page.getByLabel('Subcategory').selectOption('ict.availability');
   await page.getByLabel('Horizon').selectOption('emerging');

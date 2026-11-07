@@ -513,7 +513,7 @@ function NormalizePanel({ doc, update }: { readonly doc: RiskDocument; readonly 
   const [chosen, setChosen] = useState<string>();
   const parent = parents.find((register) => register.id === chosen) ?? parents[0];
   return (
-    <Section id="normalize" title="Aggregate and normalize" help="enterprise.normalize">
+    <Section id="normalize" title="Aggregate and normalize" help="enterprise.normalize" folded>
       <p class="hint">
         A parent register lists the entries of the registers below it, combines identical or similar entries into a summary entry,
         resolves different responses and shows the entries that must go to the parent.
@@ -561,7 +561,7 @@ function PeriodPanel({ doc, update }: { readonly doc: RiskDocument; readonly upd
     setNote(`The current assessment of ${String(count)} ${count === 1 ? 'risk' : 'risks'} is now the previous period, as of ${asOf}.`);
   };
   return (
-    <Section id="period" title="Close the period" help="enterprise.period">
+    <Section id="period" title="Close the period" help="enterprise.period" folded>
       <p class="hint">
         At the end of a period, the current assessment of each open risk becomes its previous assessment. It replaces the previous assessment that the risk has. The column Last of the
         profile and the previous period of the portfolio then show it. Labels and the impact split are copied. Numbers that are placeholders or that come from labels are not copied,

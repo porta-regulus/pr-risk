@@ -32,7 +32,7 @@ describe('steps to complete', () => {
       responses: 'todo',
       print: 'last',
     });
-    expect(missing(doc, 'objectives')).toBe('0 of 2 objectives have a statement.');
+    expect(missing(doc, 'objectives')).toBe('No objective has a statement.');
     expect(missing(doc, 'risk-data')).toBe('Add a risk first.');
     expect(missing(doc, 'print')).toBeUndefined();
   });
@@ -60,12 +60,12 @@ describe('steps to complete', () => {
     expect(states(doc)['risk-data']).toBe('done');
   });
 
-  it('needs 2 responses, 1 of them a candidate or selected', () => {
+  it('needs 1 response that is a candidate or selected', () => {
     const doc = structuredClone(example(EXAMPLE_2));
     doc.responses = (doc.responses ?? []).map((option) => ({ ...option, status: 'rejected' as const }));
     expect(missing(doc, 'responses')).toBe('No response is a candidate or selected.');
-    doc.responses = doc.responses.slice(0, 1);
-    expect(missing(doc, 'responses')).toBe('1 of 2 responses.');
+    doc.responses = [];
+    expect(missing(doc, 'responses')).toBe('No response yet.');
   });
 
   it('keeps the driver optional, so it never blocks the run', () => {
@@ -77,12 +77,15 @@ describe('steps to complete', () => {
     expect(states(doc).print).toBe('next');
   });
 
-  it('needs 3 points on the tolerance curve', () => {
+  it('needs 2 points on the tolerance curve, the schema minimum', () => {
     const doc = structuredClone(example(EXAMPLE_2));
     const curve = doc.appetite?.toleranceCurve;
     if (curve === undefined) throw new Error('example 2 changed');
     curve.points = [curve.points[0], curve.points[1]];
+    expect(states(doc).tolerance).toBe('done');
+    // A curve with 1 point breaks the schema, but a document in progress can have one.
+    (curve as { points: unknown[] }).points = [curve.points[0]];
     expect(states(doc).tolerance).toBe('next');
-    expect(missing(doc, 'tolerance')).toBe('The curve has 2 of 3 points.');
+    expect(missing(doc, 'tolerance')).toBe('The curve has 1 of 2 points.');
   });
 });

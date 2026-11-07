@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { expectAccessible } from './axe';
+import { openMore } from './fold';
 
 // Screen S1 under the production CSP and Trusted Types: open, create, import, export, restore, remove all.
 // Also AT-4 through the screen (OSCAL export and lossless import) and ADR-0004 I5 (remove all leaves
@@ -34,6 +35,7 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
 
   // Save an encrypted copy for the restore below.
   const passphrase = 'correct horse battery staple';
+  await openMore(page);
   await page.getByLabel('Passphrase for an encrypted copy').fill(passphrase);
   const encryptedPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Encrypted copy', exact: true }).click();

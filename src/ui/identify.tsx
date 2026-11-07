@@ -11,7 +11,7 @@ import { Explain, useExplain } from './explain';
 import { Checkboxes, NumberField, SelectField, TextField } from './fields';
 import { DriverPanel } from './drivers';
 import { RiskEditor } from './risk-editor';
-import { Section } from './section';
+import { More, Section } from './section';
 
 type Asset = NonNullable<RiskDocument['assets']>[number];
 
@@ -220,39 +220,43 @@ function RegisterPanel({
             }}
           />
         </div>
-        <div class="field">
-          <NumberField
-            id={`${id}-threshold`}
-            label={`Reportable event threshold (${doc.document.currency})`}
-            help="identify.register-threshold"
-            min={0}
-            value={selected.reportableEventThreshold}
-            onChange={(value) => {
-              setRegister((register) => withValue(register, 'reportableEventThreshold', value));
-            }}
-          />
-        </div>
-        <div class="field">
-          <TextField
-            id={`${id}-owner`}
-            label="Owner"
-            help="identify.register-owner"
-            value={selected.owner}
-            onChange={(owner) => {
-              setRegister((register) => withValue(register, 'owner', owner));
-            }}
-          />
-        </div>
       </div>
-      <TextField
-        id={`${id}-scope`}
-        label="Scope"
-        help="identify.register-scope"
-        value={selected.scope}
-        onChange={(scope) => {
-          setRegister((register) => withValue(register, 'scope', scope));
-        }}
-      />
+      <More id={`${id}-register`}>
+        <div class="field-row">
+          <div class="field">
+            <NumberField
+              id={`${id}-threshold`}
+              label={`Reportable event threshold (${doc.document.currency})`}
+              help="identify.register-threshold"
+              min={0}
+              value={selected.reportableEventThreshold}
+              onChange={(value) => {
+                setRegister((register) => withValue(register, 'reportableEventThreshold', value));
+              }}
+            />
+          </div>
+          <div class="field">
+            <TextField
+              id={`${id}-owner`}
+              label="Owner"
+              help="identify.register-owner"
+              value={selected.owner}
+              onChange={(owner) => {
+                setRegister((register) => withValue(register, 'owner', owner));
+              }}
+            />
+          </div>
+        </div>
+        <TextField
+          id={`${id}-scope`}
+          label="Scope"
+          help="identify.register-scope"
+          value={selected.scope}
+          onChange={(scope) => {
+            setRegister((register) => withValue(register, 'scope', scope));
+          }}
+        />
+      </More>
       <div class="button-row">
         <button
           type="button"

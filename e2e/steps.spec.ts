@@ -19,8 +19,8 @@ test('the steps panel leads a new user, ticks a step and opens the section of a 
   const panel = page.locator('details.steps');
   await expect(panel.locator(':scope > summary')).toHaveText('Steps to complete: 0 of 6 done');
   const next = panel.locator('li[aria-current="step"]');
-  await expect(next).toContainText('Next Add 2 objectives');
-  await expect(next).toContainText('0 of 2 objectives have a statement.');
+  await expect(next).toContainText('Next Add your objectives');
+  await expect(next).toContainText('No objective has a statement.');
   await expectAccessible(page, 'S2 with the steps panel');
 
   // A step on this screen opens its section and moves the focus to the heading.
@@ -35,7 +35,7 @@ test('the steps panel leads a new user, ticks a step and opens the section of a 
   await page.getByRole('button', { name: 'Add an objective', exact: true }).click();
   await page.getByLabel('Objective 2 statement').fill('Keep customer data safe.');
   await expect(panel.locator(':scope > summary')).toHaveText('Steps to complete: 1 of 6 done');
-  await expect(panel.locator('li.step-done')).toContainText('Add 2 objectives');
+  await expect(panel.locator('li.step-done')).toContainText('Add your objectives');
   await expect(next).toContainText('Next Draw your tolerance curve');
 
   // A step on another screen saves, opens that screen and then the section.

@@ -12,11 +12,6 @@ export const RESPOND_HELP = {
     example: 'If the management body gives 60000 EUR for security next year, type 60000.',
     source: 'NIST SP 800-221r1 Sec. 5.4.1.',
   },
-  'respond.optimization-method': {
-    what: 'How the app selects the options to fund. Algorithmic compares every affordable portfolio. Fiscal takes the risks by expected annual loss, highest first, and funds their cheapest options until the money ends. Operational is the algorithmic search inside the options that leadership requires or excludes.',
-    why: 'The decision record always shows the fiscal result next to the best portfolio. You then see what the simple method costs you.',
-    source: 'NIST SP 800-221r1 Sec. 5.3.2.',
-  },
   'respond.options': {
     what: 'The actions that you can take against your risks, each with its cost and its effect on the estimates.',
     why: 'The app uses only these options when it searches for the best portfolio. You cannot compare an option that has no effect or no cost.',

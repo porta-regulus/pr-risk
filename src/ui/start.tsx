@@ -25,6 +25,7 @@ import {
   type StoredDocument,
 } from '../storage/db';
 import type { ScreenName } from './editor';
+import { More } from './section';
 import { Explain, useExplain } from './explain';
 import { downloadText, newDocument, slug } from './files';
 import { CHOICE_TEXT, choicesOf, fieldParts, importChoices, mergeEntities, mergeResultText, unchangedRisks, type MergeEntity } from './merge';
@@ -658,40 +659,44 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                   </button>
                   {helpNative.toggle}
                 </span>
-                <span class="label-row">
-                  <button type="button" class="quiet" onClick={exportAs('ir8286')} disabled={busy}>
-                    NIST IR 8286 register (JSON)
-                  </button>
-                  {helpNist.toggle}
-                </span>
-                <span class="label-row">
-                  <button type="button" class="quiet" onClick={exportAs('csv')} disabled={busy}>
-                    CSV
-                  </button>
-                  {helpCsv.toggle}
-                </span>
-                <span class="label-row">
-                  <button type="button" class="quiet" onClick={exportAs('oscal')} disabled={busy}>
-                    OSCAL POA&amp;M
-                  </button>
-                  {helpOscal.toggle}
-                </span>
               </div>
               {helpNative.text}
-              {helpNist.text}
-              {helpCsv.text}
-              {helpOscal.text}
-              <div class="label-row">
-                <label for="passphrase">Passphrase for an encrypted copy (12 characters or more)</label>
-                {helpPassphrase.toggle}
-              </div>
-              {helpPassphrase.text}
-              <input id="passphrase" type="password" autoComplete="new-password" value={passphrase} onInput={(event) => {
-            setPassphrase(event.currentTarget.value);
-          }} />
-              <button type="button" class="quiet" onClick={exportAs('encrypted')} disabled={busy || passphrase.length < 12}>
-                Encrypted copy
-              </button>
+              <More id="export" label="More export formats (optional)">
+                <div class="button-row">
+                  <span class="label-row">
+                    <button type="button" class="quiet" onClick={exportAs('ir8286')} disabled={busy}>
+                      NIST IR 8286 register (JSON)
+                    </button>
+                    {helpNist.toggle}
+                  </span>
+                  <span class="label-row">
+                    <button type="button" class="quiet" onClick={exportAs('csv')} disabled={busy}>
+                      CSV
+                    </button>
+                    {helpCsv.toggle}
+                  </span>
+                  <span class="label-row">
+                    <button type="button" class="quiet" onClick={exportAs('oscal')} disabled={busy}>
+                      OSCAL POA&amp;M
+                    </button>
+                    {helpOscal.toggle}
+                  </span>
+                </div>
+                {helpNist.text}
+                {helpCsv.text}
+                {helpOscal.text}
+                <div class="label-row">
+                  <label for="passphrase">Passphrase for an encrypted copy (12 characters or more)</label>
+                  {helpPassphrase.toggle}
+                </div>
+                {helpPassphrase.text}
+                <input id="passphrase" type="password" autoComplete="new-password" value={passphrase} onInput={(event) => {
+              setPassphrase(event.currentTarget.value);
+            }} />
+                <button type="button" class="quiet" onClick={exportAs('encrypted')} disabled={busy || passphrase.length < 12}>
+                  Encrypted copy
+                </button>
+              </More>
             </>
           )}
         </section>

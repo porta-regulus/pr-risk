@@ -75,3 +75,41 @@ export function unfold(target: Element): void {
     if (node instanceof HTMLDetailsElement && !node.open) node.open = true;
   }
 }
+
+// Fields that the simulation, the optimization and the decision record do not need. They stay
+// in the document and in the exports, but start folded, so a first-time user sees only what
+// the decision needs. Print opens them, as it opens a section.
+export function More({ id, label = 'More fields (optional)', children }: { readonly id: string; readonly label?: string; readonly children: ComponentChildren }) {
+  const [open, setOpen] = useState(folds.get(`more:${id}`) ?? false);
+  const [printing, setPrinting] = useState(false);
+  useEffect(() => {
+    const before = (): void => {
+      setPrinting(true);
+    };
+    const after = (): void => {
+      setPrinting(false);
+    };
+    window.addEventListener('beforeprint', before);
+    window.addEventListener('afterprint', after);
+    return () => {
+      window.removeEventListener('beforeprint', before);
+      window.removeEventListener('afterprint', after);
+    };
+  }, []);
+  return (
+    <details
+      class="more"
+      id={`${id}-more`}
+      open={open || printing}
+      onToggle={(event) => {
+        if (printing) return;
+        const next = event.currentTarget.open;
+        folds.set(`more:${id}`, next);
+        setOpen(next);
+      }}
+    >
+      <summary>{label}</summary>
+      <div class="more-body">{children}</div>
+    </details>
+  );
+}

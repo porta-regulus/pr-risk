@@ -42,27 +42,22 @@ describe('guided steps', () => {
 
   it('says what is missing in plain words', () => {
     const status = guidedStatus(empty(), false, false);
-    expect(status[1]?.missing).toBe('Add 2 more goals.');
-    expect(status[2]?.missing).toBe('The tolerance curve needs 3 points or more. It has 0.');
-    expect(status[3]?.missing).toBe('Still needed: 5 more risks, 1 from the catalogue, 1 of your own, 1 chance of a gain.');
+    expect(status[1]?.missing).toBe('Add 1 goal.');
+    expect(status[2]?.missing).toBe('The tolerance curve needs 2 points or more. It has 0.');
+    expect(status[3]?.missing).toBe('Add 1 risk of a loss.');
     expect(status[4]?.missing).toBe('Add risks in step 4 first.');
     expect(status[5]).toEqual({ done: false });
-    expect(status[6]?.missing).toBe('Add 2 more options.');
+    expect(status[6]?.missing).toBe('Add 1 option.');
     expect(status[7]?.missing).toBe('Type the budget.');
   });
 
-  it('needs 1 catalogue risk, 1 own risk and 1 opportunity among 5 open risks', () => {
+  it('needs 1 open risk of a loss, not the AT-5 task of 5 risks', () => {
     const base = empty();
     const register = base.registers[0].id;
-    let doc = base;
-    const add = (risk: Risk): void => {
-      doc = { ...doc, risks: [...doc.risks, risk] };
-    };
-    for (let i = 0; i < 4; i++) add(newRisk(doc, register, `If event ${String(i)} occurs, then we lose.`, 'negative'));
-    add({ ...newRisk(doc, register, 'If a tender asks for CRA evidence, then we win.', 'positive'), catalogueRef: { catalogue: 'risklet', id: 'OPP-1' } });
+    let doc = { ...base, risks: [newRisk(base, register, 'If a tender asks for CRA evidence, then we win.', 'positive')] };
+    expect(guidedStatus(doc, false, false)[3]?.missing).toBe('Add 1 risk of a loss.');
+    doc = { ...doc, risks: [...doc.risks, newRisk(doc, register, 'If ransomware hits, then we stop.', 'negative')] };
     expect(guidedStatus(doc, false, false)[3]).toEqual({ done: true });
-    doc = { ...doc, risks: doc.risks.map((risk) => ({ ...risk, catalogueRef: { catalogue: 'risklet', id: '1' } })) };
-    expect(guidedStatus(doc, false, false)[3]?.missing).toBe('Still needed: 1 of your own.');
   });
 
   it('a risk needs a real owner, a goal, both ranges and a rationale', () => {

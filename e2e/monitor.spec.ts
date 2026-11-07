@@ -77,6 +77,7 @@ test('S6 evaluates the Table 9 triggers on recorded observations (G2 b) and star
   await page.getByRole('button', { name: 'Enterprise register in words (example 1)', exact: true }).click();
   await page.getByRole('button', { name: 'Monitor and adjust', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Monitor and adjust' })).toBeFocused();
+  await unfold(page, 'KPIs, KRIs and tolerances');
   await expect(state(page, 'T9-EX1', 'T9-EX1-LKRI')).toHaveText('No data');
   await expect(page.getByText('No review trigger holds today.')).toBeVisible();
   await expectAccessible(page, 'S6 of example 1');
@@ -138,6 +139,7 @@ test('S6 evaluates the Table 9 triggers on recorded observations (G2 b) and star
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
   await page.reload();
   await page.getByRole('button', { name: 'Monitor and adjust', exact: true }).click();
+  await unfold(page, 'KPIs, KRIs and tolerances');
   await expectStates(page, 'T9-EX1', { 'T9-EX1-TOL': 'Breached' });
   await expect(page.locator('[data-statement="T9-EX3"] .banner')).toBeVisible();
   expect(problems).toEqual([]);
@@ -159,6 +161,7 @@ test('S6 tests a tolerance curve, freezes forecasts and scores them after the wi
   // the ict risks to Review needed.
   await expect(state(page, 'AP-1', 'KRI-1')).toHaveText('Fires');
   await expect(page.getByText('The app set R-01, R-02, R-03, R-04, R-07, R-08, R-09 to Review needed. Undo last change takes this back.')).toBeVisible();
+  await unfold(page, 'Acceptance records');
   const acceptances = page.getByRole('region', { name: 'Acceptance records' });
   await expect(acceptances.getByRole('row', { name: /^R-05/ })).toContainText('Valid');
 
