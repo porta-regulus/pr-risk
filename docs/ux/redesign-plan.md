@@ -110,7 +110,7 @@ On 2026-11-06 the product owner looked at the 3 mockups and picked direction B, 
 | 3 | Merge `ed/appetite-questions-r2` (Sec. 6 decision 2). Build the guided mode in the app, with the guided questions as step 3 | All 9 steps work on real documents. The e2e tests, axe-core and 375 px pass. The AT-5 script runs through the guided mode. Built 2026-11-06 (Sec. 5.2) |
 | 4 | Clean up the full editor (Sec. 3.3) with the new style | Every field of today is still reachable. All tests pass. Built 2026-11-07 (Sec. 5.3) |
 | 5 | Plain words (Sec. 2 item 3) on all screens | No NIST section number in a title or in the main text |
-| 6 | Pilot with 1 target user, fix the blockers | No open blocker |
+| 6 | Pilot with 1 target user, fix the blockers (Sec. 5.5) | No open blocker |
 | 7 | AT-5 with 5 users, then AT-6, then the tag | HANDOFF task 12 |
 
 ### 5.1 Phase 2 prototype
@@ -142,6 +142,13 @@ Known limits. A gain counts as a negative loss, so the expected loss can be belo
 5. No field is removed. A folded field is one click away.
 6. Tests. `e2e/editor.spec.ts` tests the menu, the state line, a fold, one option at a time, 375 px and axe-core. `e2e/fold.ts` opens a folded section for the earlier e2e tests.
 7. Not in phase 4. The NIST numbers in titles and leads stay until phase 5 (plain words).
+
+### 5.5 Phase 6 pilot
+
+1. The script, the note sheet and the consent form are in `docs/ux/pilot-script.md`.
+2. The task is the AT-5 task, in the guided mode. Unlike AT-5, the moderator gives a hint after 4 minutes when the user is stuck. Each hint is a blocker.
+3. The pilot user cannot be one of the 5 AT-5 users.
+4. Result. Not run yet.
 
 Phases 2 and 3 are the largest part. The product owner sees a working result at the end of each phase.
 
