@@ -85,6 +85,8 @@ test('S5 finds the best portfolio of example 2 and prints the decision record on
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.save-bar')).toBeHidden();
   await expect(page.getByRole('heading', { level: 2, name: 'Response options' })).toBeHidden();
+  await expect(page.locator('article.record')).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Screens' })).toBeHidden();
   const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true });
   const file = testInfo.outputPath('decision-record.pdf');
   await writeFile(file, pdf);

@@ -1577,7 +1577,7 @@ main.screen-editor {
     max-width: none;
     padding: 0;
   }
-  main.screen > :not(.record):not(.print-view):not(.guided) {
+  main.screen > :not(.record):not(.print-view):not(.guided):not(.editor-shell) {
     display: none !important;
   }
   /* The guided mode prints only its decision record. */
@@ -1591,6 +1591,17 @@ main.screen-editor {
   .guided-page {
     display: block;
     max-width: none;
+  }
+  /* The full editor prints the record (S5) or the print views (S7) inside its page wrapper. */
+  main.screen > .editor-shell {
+    display: block;
+  }
+  .editor-nav,
+  .editor-page > :not(.record):not(.print-view) {
+    display: none !important;
+  }
+  .editor-page {
+    display: block;
   }
   /* Screen S7 prints the register, the profile and the portfolio without the form fields. */
   .print-view .panel {

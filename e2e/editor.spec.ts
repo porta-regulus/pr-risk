@@ -54,5 +54,19 @@ test('the full editor has a side menu, a state line, folded tables and one optio
   await expect(page.getByRole('heading', { level: 1, name: 'Monitor and adjust' })).toBeFocused();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
   await expectAccessible(page, 'S6 at 375 px');
+
+  // S7 prints its folded tables. Print opens every section, and the editor wrapper stays.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await menu.getByRole('button', { name: 'Enterprise view', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Enterprise view' })).toBeFocused();
+  await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('table.portfolio')).toBeVisible();
+  await expect(page.locator('.erp-block').first()).toBeVisible();
+  await expect(menu).toBeHidden();
+  await expect(page.locator('.save-bar')).toBeHidden();
+  await page.emulateMedia({ media: 'screen' });
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+  await expect(page.locator('table.portfolio')).toBeHidden();
   expect(problems).toEqual([]);
 });
