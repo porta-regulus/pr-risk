@@ -10,7 +10,9 @@ import { DistributionField, formatNumber } from './distribution';
 import { DriverLinksTab } from './drivers';
 import { draftList, withValue } from './edit';
 import type { Update } from './editor';
+import { Explain, useExplain } from './explain';
 import { Checkboxes, LinesField, NumberField, SelectField, TextField } from './fields';
+import type { HelpKey } from './help';
 
 type Estimate = NonNullable<Risk['estimate']>;
 type Secondary = NonNullable<Estimate['secondaryImpacts']>[number];
@@ -74,31 +76,31 @@ const RELATIONS: readonly (readonly [Link['relation'], string])[] = [
 ];
 
 // The five scenario parts of Sec. 3.3.5, written into the RDR fields.
-const SCENARIO_PARTS: readonly (readonly [keyof Detail, string])[] = [
-  ['threatSourcesActors', 'Threat source or actor (for a positive risk, the source of the opportunity)'],
-  ['threatEvents', 'Threat event'],
-  ['vulnerabilityPredisposingConditions', 'Vulnerability or predisposing condition'],
-  ['assetsAffected', 'Assets affected'],
-  ['primaryAdverseImpact', 'Harmful impact (for a positive risk, the benefit)'],
+const SCENARIO_PARTS: readonly (readonly [keyof Detail, string, HelpKey])[] = [
+  ['threatSourcesActors', 'Threat source or actor (for a positive risk, the source of the opportunity)', 'identify.threat-source'],
+  ['threatEvents', 'Threat event', 'identify.threat-event'],
+  ['vulnerabilityPredisposingConditions', 'Vulnerability or predisposing condition', 'identify.vulnerability'],
+  ['assetsAffected', 'Assets affected', 'identify.assets-affected'],
+  ['primaryAdverseImpact', 'Harmful impact (for a positive risk, the benefit)', 'identify.primary-impact'],
 ];
-const DETAIL_TEXT: readonly (readonly [keyof Detail, string])[] = [
-  ['systemAffected', 'System affected'],
-  ['organizationOrBusinessUnit', 'Organization or business unit'],
-  ['riskScenarioDescription', 'Risk scenario description'],
-  ['threatVectors', 'Threat vectors'],
-  ['secondaryAdverseImpacts', 'Secondary adverse impacts'],
-  ['otherScenarioDetails', 'Other scenario details'],
-  ['currentRiskAnalysis', 'Current risk analysis'],
-  ['resourceRequirementsForPlannedRisk', 'Resource requirements for the planned response'],
-  ['sourceOfRiskInformation', 'Source of risk information'],
-  ['dependencies', 'Dependencies'],
-  ['comments', 'Comments'],
-  ['implementedResponseDescription', 'Implemented response'],
+const DETAIL_TEXT: readonly (readonly [keyof Detail, string, HelpKey])[] = [
+  ['systemAffected', 'System affected', 'identify.detail-system'],
+  ['organizationOrBusinessUnit', 'Organization or business unit', 'identify.detail-unit'],
+  ['riskScenarioDescription', 'Risk scenario description', 'identify.detail-scenario'],
+  ['threatVectors', 'Threat vectors', 'identify.detail-vectors'],
+  ['secondaryAdverseImpacts', 'Secondary adverse impacts', 'identify.detail-secondary'],
+  ['otherScenarioDetails', 'Other scenario details', 'identify.detail-other'],
+  ['currentRiskAnalysis', 'Current risk analysis', 'identify.detail-analysis'],
+  ['resourceRequirementsForPlannedRisk', 'Resource requirements for the planned response', 'identify.detail-resources'],
+  ['sourceOfRiskInformation', 'Source of risk information', 'identify.detail-source'],
+  ['dependencies', 'Dependencies', 'identify.detail-dependencies'],
+  ['comments', 'Comments', 'identify.detail-comments'],
+  ['implementedResponseDescription', 'Implemented response', 'identify.detail-implemented'],
 ];
-const DETAIL_DATES: readonly (readonly [keyof Detail, string])[] = [
-  ['dateOfRiskIdentification', 'Date of risk identification'],
-  ['currentStatusDate', 'Current status date'],
-  ['followUpDate', 'Follow-up date'],
+const DETAIL_DATES: readonly (readonly [keyof Detail, string, HelpKey])[] = [
+  ['dateOfRiskIdentification', 'Date of risk identification', 'identify.detail-identified'],
+  ['currentStatusDate', 'Current status date', 'identify.detail-status-date'],
+  ['followUpDate', 'Follow-up date', 'identify.detail-follow-up'],
 ];
 
 const TABS = ['Scenario', 'Estimate', 'Drivers', 'Detail', 'Evidence', 'Links'] as const;
@@ -180,9 +182,14 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
   const word = risk.polarity === 'positive' ? 'gain' : 'loss';
   const scales = doc.strategy?.scales;
   const ratingId = `risk-${risk.riskId}-rating`;
+  const ratingHelp = useExplain(ratingId, 'identify.rating', 'Rating on the common scale');
   const rating = (
     <fieldset class="scenario">
-      <legend>Rating on the common scale</legend>
+      <legend class="label-row">
+        <span>Rating on the common scale</span>
+        {ratingHelp.toggle}
+      </legend>
+      {ratingHelp.text}
       {scales === undefined ? (
         <p class="hint">No scales yet. Add them on the screen Context and strategy.</p>
       ) : (
@@ -191,13 +198,13 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
           <div class="field-row">
             {(
               [
-                ['riskLikelihoodLabel', 'Likelihood', scales.likelihood],
-                ['riskImpactLabel', 'Impact', scales.impact],
-                ['exposureRatingLabel', 'Exposure', scales.exposure],
+                ['riskLikelihoodLabel', 'Likelihood', scales.likelihood, 'identify.rating-likelihood'],
+                ['riskImpactLabel', 'Impact', scales.impact, 'identify.rating-impact'],
+                ['exposureRatingLabel', 'Exposure', scales.exposure, 'identify.rating-exposure'],
               ] as const
-            ).map(([key, label, bands]) => (
+            ).map(([key, label, bands, help]) => (
               <div class="field" key={key}>
-                <SelectField id={`${ratingId}-${key}`} label={`${label} label`} emptyLabel="Not rated" value={risk[key]} options={labelOptions(bands, risk[key])} onChange={(value) => {
+                <SelectField id={`${ratingId}-${key}`} label={`${label} label`} help={help} emptyLabel="Not rated" value={risk[key]} options={labelOptions(bands, risk[key])} onChange={(value) => {
                     setRisk((current) => withValue(current, key, value));
                   }} />
               </div>
@@ -212,7 +219,7 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
       <div class="tab-body">
         {rating}
         <p class="muted">
-          No estimate yet. {register?.method === 'quantitative' ? 'This register is quantitative, so the risk needs an estimate before it can be saved (rule V-08).' : 'A qualitative register can take estimates risk by risk (Sec. 6.8).'}
+          No estimate yet. {register?.method === 'quantitative' ? 'This register is quantitative, so the risk needs an estimate before it can be saved (rule V-08).' : 'A qualitative register can take estimates risk by risk.'}
         </p>
         <button type="button" onClick={() => {
             // The form only. The numbers come from the user, never from the app.
@@ -223,6 +230,7 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
           }}>
           Add an estimate
         </button>
+        <Explain id={`${ratingId}-add-estimate`} topic="identify.add-estimate" name="Add an estimate" />
       </div>
     );
   }
@@ -237,6 +245,7 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
       <DistributionField
         id={`${id}-frequency`}
         legend="Frequency"
+        help="identify.frequency"
         question="How many times per year does this happen, not counting events caused through the drivers? Give a range you are 90% sure of."
         unit="events per year"
         frequency
@@ -248,6 +257,7 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
       <DistributionField
         id={`${id}-impact`}
         legend={`Impact per event (${word})`}
+        help="identify.impact-per-event"
         question={`When it happens once, what is the ${word}? Give a range you are 90% sure of.`}
         unit={currency}
         value={estimate.impactPerEvent}
@@ -257,16 +267,17 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
       />
 
       <h4>Secondary impacts</h4>
-      <p class="hint">Can one event cause a second {word}, for example customer claims after a disclosure? Add a secondary impact with its probability (Sec. 3.4.2).</p>
+      <Explain id={`${id}-secondary`} topic="identify.secondary-impacts" name="Secondary impacts" />
+      <p class="hint">Can one event cause a second {word}, for example customer claims after a disclosure? Add a secondary impact with its probability.</p>
       {secondaries.map((item, i) => (
         <div class="sub-editor" key={i}>
-          <TextField id={`${id}-sec${String(i)}-description`} label="Secondary impact" value={item.description} onChange={(description) => {
+          <TextField id={`${id}-sec${String(i)}-description`} label="Secondary impact" help="identify.secondary-description" value={item.description} onChange={(description) => {
               setEstimate('secondaryImpacts', draftList<Secondary[]>(replaceAt(secondaries, i, { ...item, description })));
             }} />
-          <NumberField id={`${id}-sec${String(i)}-probability`} label="Probability per event (0 to 1)" min={0} max={1} value={item.probability} onChange={(probability) => {
+          <NumberField id={`${id}-sec${String(i)}-probability`} label="Probability per event (0 to 1)" help="identify.secondary-probability" min={0} max={1} value={item.probability} onChange={(probability) => {
               setEstimate('secondaryImpacts', replaceAt(secondaries, i, withValue(item, 'probability', probability)));
             }} />
-          <DistributionField id={`${id}-sec${String(i)}`} legend="Secondary impact per event" question="Give a range you are 90% sure of." unit={currency} value={item.impactPerEvent} onChange={(impactPerEvent) => {
+          <DistributionField id={`${id}-sec${String(i)}`} legend="Secondary impact per event" help="identify.secondary-range" question="Give a range you are 90% sure of." unit={currency} value={item.impactPerEvent} onChange={(impactPerEvent) => {
               setEstimate('secondaryImpacts', replaceAt(secondaries, i, { ...item, impactPerEvent }));
             }} />
           <button type="button" class="quiet" onClick={() => {
@@ -287,6 +298,7 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
           <SelectField
             id={`${id}-method`}
             label="Basis of the estimate"
+            help="identify.estimate-method"
             value={estimate.method}
             options={[
               ['expert-calibrated', 'Expert range'],
@@ -299,20 +311,20 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
           />
         </div>
         <div class="field">
-          <TextField id={`${id}-estimated-by`} label="Estimated by" value={estimate.estimatedBy} onChange={(value) => {
+          <TextField id={`${id}-estimated-by`} label="Estimated by" help="identify.estimated-by" value={estimate.estimatedBy} onChange={(value) => {
               setEstimate('estimatedBy', value);
             }} />
         </div>
         <div class="field">
-          <TextField id={`${id}-estimated-on`} label="Estimated on" type="date" value={estimate.estimatedOn} onChange={(value) => {
+          <TextField id={`${id}-estimated-on`} label="Estimated on" help="identify.estimated-on" type="date" value={estimate.estimatedOn} onChange={(value) => {
               setEstimate('estimatedOn', value);
             }} />
         </div>
       </div>
-      <TextField id={`${id}-rationale`} label="Rationale (10 characters or more)" multiline value={estimate.rationale} onChange={(rationale) => {
+      <TextField id={`${id}-rationale`} label="Rationale (10 characters or more)" help="identify.estimate-rationale" multiline value={estimate.rationale} onChange={(rationale) => {
           setRisk((current) => (current.estimate === undefined ? current : { ...current, estimate: { ...current.estimate, rationale } }));
         }} />
-      <LinesField id={`${id}-sources`} label="Sources, one per line" value={estimate.sources ?? []} onChange={(sources) => {
+      <LinesField id={`${id}-sources`} label="Sources, one per line" help="identify.estimate-sources" value={estimate.sources ?? []} onChange={(sources) => {
           setEstimate('sources', sources);
         }} />
 
@@ -333,6 +345,7 @@ function EstimateTab({ doc, risk, setRisk }: { readonly doc: RiskDocument; reado
           Remove the estimate
         </button>
       )}
+      {register?.method !== 'quantitative' && <Explain id={`${id}-remove-estimate`} topic="identify.remove-estimate" name="Remove the estimate" />}
     </div>
   );
 }
@@ -345,37 +358,38 @@ function EvidenceTab({ risk, setRisk }: { readonly risk: Risk; readonly setRisk:
   };
   return (
     <div class="tab-body">
-      <p class="hint">What supports the condition or the estimate, such as a CVD Portal submission, an audit finding or an incident (Sec. 3.3.3). New evidence sets the status to "Review needed" (Sec. 6.11).</p>
+      <Explain id={`${id}-about`} topic="identify.evidence" name="Evidence" />
+      <p class="hint">What supports the condition or the estimate, such as a CVD Portal submission, an audit finding or an incident. New evidence sets the status to "Review needed".</p>
       {items.map((item, i) => (
         <div class="sub-editor" key={i}>
           <div class="field-row">
             <div class="field">
-              <SelectField id={`${id}-${String(i)}-kind`} label={`Evidence ${String(i + 1)} kind`} value={item.kind} options={EVIDENCE_KINDS} onChange={(kind) => {
+              <SelectField id={`${id}-${String(i)}-kind`} label={`Evidence ${String(i + 1)} kind`} help="identify.evidence-kind" value={item.kind} options={EVIDENCE_KINDS} onChange={(kind) => {
                   setItems(replaceAt(items, i, { ...item, kind: kind ?? 'other' }));
                 }} />
             </div>
             <div class="field wide">
-              <TextField id={`${id}-${String(i)}-ref`} label={`Evidence ${String(i + 1)} reference`} hint="An ID, a file name or a link text." value={item.ref} onChange={(ref) => {
+              <TextField id={`${id}-${String(i)}-ref`} label={`Evidence ${String(i + 1)} reference`} help="identify.evidence-ref" hint="An ID, a file name or a link text." value={item.ref} onChange={(ref) => {
                   setItems(replaceAt(items, i, { ...item, ref }));
                 }} />
             </div>
           </div>
-          <TextField id={`${id}-${String(i)}-summary`} label={`Evidence ${String(i + 1)} summary`} multiline value={item.summary} onChange={(summary) => {
+          <TextField id={`${id}-${String(i)}-summary`} label={`Evidence ${String(i + 1)} summary`} help="identify.evidence-summary" multiline value={item.summary} onChange={(summary) => {
               setItems(replaceAt(items, i, withValue(item, 'summary', summary)));
             }} />
           <div class="field-row">
             <div class="field">
-              <TextField id={`${id}-${String(i)}-severity`} label="Severity" value={item.severity} onChange={(severity) => {
+              <TextField id={`${id}-${String(i)}-severity`} label="Severity" help="identify.evidence-severity" value={item.severity} onChange={(severity) => {
                   setItems(replaceAt(items, i, withValue(item, 'severity', severity)));
                 }} />
             </div>
             <div class="field">
-              <TextField id={`${id}-${String(i)}-status`} label="Status of the evidence" value={item.status} onChange={(status) => {
+              <TextField id={`${id}-${String(i)}-status`} label="Status of the evidence" help="identify.evidence-status" value={item.status} onChange={(status) => {
                   setItems(replaceAt(items, i, withValue(item, 'status', status)));
                 }} />
             </div>
             <div class="field">
-              <TextField id={`${id}-${String(i)}-date`} label="Date" type="date" value={item.date} onChange={(date) => {
+              <TextField id={`${id}-${String(i)}-date`} label="Date" help="identify.evidence-date" type="date" value={item.date} onChange={(date) => {
                   setItems(replaceAt(items, i, withValue(item, 'date', date)));
                 }} />
             </div>
@@ -402,6 +416,7 @@ function ImpactsFieldset({ doc, risk, setRisk }: { readonly doc: RiskDocument; r
   const bands = doc.strategy?.scales?.impact;
   const currency = doc.document.currency;
   const id = `risk-${risk.riskId}-impacts`;
+  const explain = useExplain(id, 'identify.consequences', 'Consequences by kind');
   const ratingOf = (key: string): Rating | undefined => (key === 'opex' || key === 'capex' ? impacts.financial?.[key] : impacts[key as 'reputation' | 'mission' | 'safety']);
   const setRating = (key: string, rating: Rating): void => {
     setRisk((current) => {
@@ -412,24 +427,28 @@ function ImpactsFieldset({ doc, risk, setRisk }: { readonly doc: RiskDocument; r
   };
   return (
     <fieldset class="scenario">
-      <legend>Consequences by kind (Table 6)</legend>
-      <p class="hint">A label on the impact scale for each kind of consequence, with an optional amount. The category is the cause. These are the effects (Sec. 6.7.7).</p>
+      <legend class="label-row">
+        <span>Consequences by kind</span>
+        {explain.toggle}
+      </legend>
+      {explain.text}
+      <p class="hint">A label on the impact scale for each kind of consequence, with an optional amount. The category is the cause. These are the effects.</p>
       {IMPACT_ROWS.map(([key, label]) => {
         const rating: Rating = ratingOf(key) ?? {};
         return (
           <div class="field-row" key={key}>
             <div class="field">
-              <SelectField id={`${id}-${key}-label`} label={`${label}, label`} emptyLabel="Not rated" value={rating.label} options={labelOptions(bands, rating.label)} onChange={(value) => {
+              <SelectField id={`${id}-${key}-label`} label={`${label}, label`} help="identify.consequence-label" emptyLabel="Not rated" value={rating.label} options={labelOptions(bands, rating.label)} onChange={(value) => {
                   setRating(key, withValue(rating, 'label', value));
                 }} />
             </div>
             <div class="field">
-              <NumberField id={`${id}-${key}-amount`} label={`${label}, amount (${currency})`} min={0} value={rating.amount} onChange={(amount) => {
+              <NumberField id={`${id}-${key}-amount`} label={`${label}, amount (${currency})`} help="identify.consequence-amount" min={0} value={rating.amount} onChange={(amount) => {
                   setRating(key, withValue(rating, 'amount', amount));
                 }} />
             </div>
             <div class="field">
-              <TextField id={`${id}-${key}-note`} label={`${label}, note`} value={rating.note} onChange={(note) => {
+              <TextField id={`${id}-${key}-note`} label={`${label}, note`} help="identify.consequence-note" value={rating.note} onChange={(note) => {
                   setRating(key, withValue(rating, 'note', note));
                 }} />
             </div>
@@ -443,6 +462,7 @@ function ImpactsFieldset({ doc, risk, setRisk }: { readonly doc: RiskDocument; r
 export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: RiskDocument; readonly risk: Risk; readonly update: Update; readonly onRemoved: () => void }) {
   const [tab, setTab] = useState<Tab>('Scenario');
   const id = `risk-${risk.riskId}`;
+  const partsHelp = useExplain(`${id}-parts`, 'identify.scenario-parts', 'Scenario parts');
   const setRisk = (change: (current: Risk) => Risk): void => {
     update((current) => ({ ...current, risks: current.risks.map((item) => (item.riskId === risk.riskId ? change(item) : item)) }));
   };
@@ -492,13 +512,14 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
       <h2 id={`${id}-title`}>
         Risk {risk.riskId}
       </h2>
+      <Explain id={`${id}-about`} topic="identify.risk-editor" name={`Risk ${risk.riskId}`} visible="About this section" />
       <div role="tablist" aria-label={`Parts of risk ${risk.riskId}`} class="tabs">
         {TABS.map(tabButton)}
       </div>
       <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-tab-${tab}`}>
         {tab === 'Scenario' && (
           <div class="tab-body">
-            <TextField id={`${id}-description`} label="Risk description" hint='Cause and effect, "if X occurs, then Y happens" (Table 3).' multiline value={risk.riskDescription} onChange={(value) => {
+            <TextField id={`${id}-description`} label="Risk description" help="identify.risk-description" hint='Cause and effect, "if X occurs, then Y happens".' multiline value={risk.riskDescription} onChange={(value) => {
                 setRisk((current) => ({ ...current, riskDescription: value }));
               }} />
             <div class="field-row">
@@ -506,6 +527,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
                 <SelectField
                   id={`${id}-polarity`}
                   label="Polarity"
+                  help="identify.polarity"
                   value={risk.polarity}
                   options={[
                     ['negative', 'Negative (threat)'],
@@ -520,6 +542,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
                 <SelectField
                   id={`${id}-horizon`}
                   label="Horizon"
+                  help="identify.horizon"
                   emptyLabel="Not set"
                   value={risk.horizon}
                   options={[
@@ -536,6 +559,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
                 <SelectField
                   id={`${id}-threat-type`}
                   label="Threat source type"
+                  help="identify.threat-source-type"
                   emptyLabel="Not set"
                   value={risk.threatSourceType}
                   options={[
@@ -551,41 +575,45 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
               </div>
             </div>
             {(risk.horizon === 'emerging' || risk.horizon === 'horizon') && (
-              <p class="banner">An emerging or horizon risk is a trigger to review appetite and tolerance (Sec. 3.3). Check the statements on the screen Context and strategy.</p>
+              <p class="banner">An emerging or horizon risk is a trigger to review appetite and tolerance. Check the statements on the screen Context and strategy.</p>
             )}
             <div class="field-row">
               <div class="field">
-                <SelectField id={`${id}-code`} label="Category" value={risk.category.code} options={CODES} onChange={(code) => {
+                <SelectField id={`${id}-code`} label="Category" help="identify.category" value={risk.category.code} options={CODES} onChange={(code) => {
                     setRisk((current) => ({ ...current, category: { code: code ?? 'ict' } }));
                   }} />
               </div>
               <div class="field">
-                <SelectField id={`${id}-subcode`} label="Subcategory" emptyLabel="None" value={subcode} options={subcodeOptions} onChange={(value) => {
+                <SelectField id={`${id}-subcode`} label="Subcategory" help="identify.subcategory" emptyLabel="None" value={subcode} options={subcodeOptions} onChange={(value) => {
                     setRisk((current) => ({ ...current, category: withValue(current.category, 'subcode', value) }));
                   }} />
               </div>
               <div class="field">
-                <TextField id={`${id}-nist-category`} label="NIST risk category (text)" value={risk.riskCategory} onChange={(value) => {
+                <TextField id={`${id}-nist-category`} label="NIST risk category (text)" help="identify.nist-category" value={risk.riskCategory} onChange={(value) => {
                     setRisk((current) => ({ ...current, riskCategory: value }));
                   }} />
               </div>
             </div>
             <div class="field-row">
               <div class="field">
-                <TextField id={`${id}-owner`} label="Risk owner" value={risk.riskOwnerPointOfContact} onChange={(value) => {
+                <TextField id={`${id}-owner`} label="Risk owner" help="identify.risk-owner" value={risk.riskOwnerPointOfContact} onChange={(value) => {
                     setRisk((current) => ({ ...current, riskOwnerPointOfContact: value }));
                   }} />
               </div>
               <div class="field">
-                <SelectField id={`${id}-status`} label="Status" value={risk.status} options={STATUSES} onChange={(value) => {
+                <SelectField id={`${id}-status`} label="Status" help="identify.risk-status" value={risk.status} options={STATUSES} onChange={(value) => {
                     setRisk((current) => ({ ...current, status: value ?? 'Open' }));
                   }} />
               </div>
             </div>
             <fieldset class="scenario">
-              <legend>Scenario parts (Sec. 3.3.5)</legend>
-              {SCENARIO_PARTS.map(([key, label]) => (
-                <TextField key={key} id={`${id}-${key}`} label={label} multiline value={detail[key] as string | undefined} onChange={(value) => {
+              <legend class="label-row">
+                <span>Scenario parts</span>
+                {partsHelp.toggle}
+              </legend>
+              {partsHelp.text}
+              {SCENARIO_PARTS.map(([key, label, help]) => (
+                <TextField key={key} id={`${id}-${key}`} label={label} help={help} multiline value={detail[key] as string | undefined} onChange={(value) => {
                     setDetail(key, value);
                   }} />
               ))}
@@ -607,6 +635,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
             ) : (
               <Checkboxes
                 legend="Objectives this risk affects"
+                help="identify.objectives"
                 name={`${id}-objectives`}
                 options={(doc.context?.objectives ?? []).map((objective) => [objective.id, `${objective.id} ${objective.statement}`] as const)}
                 value={risk.objectiveIds ?? []}
@@ -620,6 +649,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
             ) : (
               <Checkboxes
                 legend="Assets this risk affects"
+                help="identify.risk-assets"
                 name={`${id}-assets`}
                 options={(doc.assets ?? []).map((asset) => [asset.id, `${asset.id} ${asset.name}`] as const)}
                 value={risk.assetIds ?? []}
@@ -629,11 +659,12 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
               />
             )}
             <h4>Linked risks</h4>
-            <p class="hint">A cascade inside one risk is a secondary impact. Use a link for a cascade to another risk, and a driver for a shared cause (Sec. 6.7.3).</p>
+            <Explain id={`${id}-linked`} topic="identify.linked-risks" name="Linked risks" />
+            <p class="hint">A cascade inside one risk is a secondary impact. Use a link for a cascade to another risk, and a driver for a shared cause.</p>
             {links.map((link, i) => (
               <div class="field-row" key={i}>
                 <div class="field">
-                  <SelectField id={`${id}-link${String(i)}-relation`} label={`Link ${String(i + 1)} relation`} value={link.relation} options={RELATIONS} onChange={(relation) => {
+                  <SelectField id={`${id}-link${String(i)}-relation`} label={`Link ${String(i + 1)} relation`} help="identify.link-relation" value={link.relation} options={RELATIONS} onChange={(relation) => {
                       set('linkedRisks', replaceAt(links, i, { ...link, relation: relation ?? 'cascades-to' }));
                     }} />
                 </div>
@@ -641,6 +672,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
                   <SelectField
                     id={`${id}-link${String(i)}-risk`}
                     label={`Link ${String(i + 1)} risk`}
+                    help="identify.link-risk"
                     emptyLabel="Choose a risk"
                     value={link.riskId === '' ? undefined : link.riskId}
                     options={others.map((item) => [item.riskId, `${item.riskId} ${item.riskDescription.slice(0, 60)}`] as const)}
@@ -650,7 +682,7 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
                   />
                 </div>
                 <div class="field">
-                  <TextField id={`${id}-link${String(i)}-note`} label={`Link ${String(i + 1)} note`} value={link.note} onChange={(note) => {
+                  <TextField id={`${id}-link${String(i)}-note`} label={`Link ${String(i + 1)} note`} help="identify.link-note" value={link.note} onChange={(note) => {
                       set('linkedRisks', replaceAt(links, i, withValue(link, 'note', note)));
                     }} />
                 </div>
@@ -671,16 +703,17 @@ export function RiskEditor({ doc, risk, update, onRemoved }: { readonly doc: Ris
 
         {tab === 'Detail' && (
           <div class="tab-body">
-            <p class="muted">The fields of the NIST risk detail record (IR 8286 Appendix B). The scenario parts are on the tab Scenario.</p>
-            {DETAIL_TEXT.map(([key, label]) => (
-              <TextField key={key} id={`${id}-${key}`} label={label} multiline value={detail[key] as string | undefined} onChange={(value) => {
+            <Explain id={`${id}-detail`} topic="identify.detail" name="Detail" />
+            <p class="muted">The fields of the NIST risk detail record. The scenario parts are on the tab Scenario.</p>
+            {DETAIL_TEXT.map(([key, label, help]) => (
+              <TextField key={key} id={`${id}-${key}`} label={label} help={help} multiline value={detail[key] as string | undefined} onChange={(value) => {
                   setDetail(key, value);
                 }} />
             ))}
             <div class="field-row">
-              {DETAIL_DATES.map(([key, label]) => (
+              {DETAIL_DATES.map(([key, label, help]) => (
                 <div class="field" key={key}>
-                  <TextField id={`${id}-${key}`} label={label} type="date" value={detail[key] as string | undefined} onChange={(value) => {
+                  <TextField id={`${id}-${key}`} label={label} help={help} type="date" value={detail[key] as string | undefined} onChange={(value) => {
                       setDetail(key, value);
                     }} />
                 </div>

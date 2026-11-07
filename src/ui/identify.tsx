@@ -7,6 +7,7 @@ import { CATALOGUE, CATALOGUE_GROUPS, fromCatalogue, RISKLET_ATTRIBUTION } from 
 import { formatNumber } from './distribution';
 import { nextId, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
+import { Explain, useExplain } from './explain';
 import { Checkboxes, NumberField, SelectField, TextField } from './fields';
 import { DriverPanel } from './drivers';
 import { RiskEditor } from './risk-editor';
@@ -91,7 +92,7 @@ function RegisterPanel({
   };
   const id = 'register';
   return (
-    <Section id="registers" title="Registers">
+    <Section id="registers" title="Registers" help="identify.registers">
       <ul class="tree">
         {tree.map(({ register, depth }) => (
           <li key={register.id} style={{ paddingLeft: `${String(depth * 1.25)}rem` }}>
@@ -140,6 +141,7 @@ function RegisterPanel({
           <TextField
             id={`${id}-title`}
             label="Title"
+            help="identify.register-title"
             value={selected.title}
             onChange={(title) => {
               setRegister((register) => ({ ...register, title }));
@@ -150,6 +152,7 @@ function RegisterPanel({
           <SelectField
             id={`${id}-level`}
             label="Level"
+            help="identify.register-level"
             value={selected.level}
             options={[
               ['system', 'System'],
@@ -165,6 +168,7 @@ function RegisterPanel({
           <SelectField
             id={`${id}-parent`}
             label="Parent register"
+            help="identify.register-parent"
             emptyLabel="None (top level)"
             value={selected.parentRegisterId}
             options={doc.registers.filter((register) => !descendants.has(register.id)).map((register) => [register.id, register.title] as const)}
@@ -177,6 +181,7 @@ function RegisterPanel({
           <SelectField
             id={`${id}-method`}
             label="Method"
+            help="identify.register-method"
             hint="Quantitative needs an estimate for every risk (rule V-08)."
             value={selected.method}
             options={[
@@ -193,6 +198,7 @@ function RegisterPanel({
           <NumberField
             id={`${id}-timeframe`}
             label="Timeframe (months)"
+            help="identify.register-timeframe"
             integer
             min={1}
             max={60}
@@ -206,6 +212,7 @@ function RegisterPanel({
           <TextField
             id={`${id}-as-of`}
             label="As of"
+            help="identify.register-as-of"
             type="date"
             value={selected.asOf}
             onChange={(asOf) => {
@@ -217,6 +224,7 @@ function RegisterPanel({
           <NumberField
             id={`${id}-threshold`}
             label={`Reportable event threshold (${doc.document.currency})`}
+            help="identify.register-threshold"
             min={0}
             value={selected.reportableEventThreshold}
             onChange={(value) => {
@@ -228,6 +236,7 @@ function RegisterPanel({
           <TextField
             id={`${id}-owner`}
             label="Owner"
+            help="identify.register-owner"
             value={selected.owner}
             onChange={(owner) => {
               setRegister((register) => withValue(register, 'owner', owner));
@@ -238,6 +247,7 @@ function RegisterPanel({
       <TextField
         id={`${id}-scope`}
         label="Scope"
+        help="identify.register-scope"
         value={selected.scope}
         onChange={(scope) => {
           setRegister((register) => withValue(register, 'scope', scope));
@@ -280,8 +290,9 @@ function RiskTable({
   const entry = CATALOGUE.find((item) => item.id === entryId);
   const risks = doc.risks.filter((risk) => risk.registerId === register.id);
   const currency = doc.document.currency;
+  const catalogueHelp = useExplain('catalogue-entry', 'identify.catalogue', 'Template');
   return (
-    <Section id="risks" title={<>Risks in {register.title}</>}>
+    <Section id="risks" title={<>Risks in {register.title}</>} help="identify.risks" helpName="Risks in the register">
       {risks.length === 0 ? (
         <p class="muted">No risk in this register yet.</p>
       ) : (
@@ -347,6 +358,7 @@ function RiskTable({
       <TextField
         id="new-risk-description"
         label="Risk description"
+        help="identify.risk-description"
         hint='Cause and effect, "if X occurs, then Y happens".'
         multiline
         value={description}
@@ -357,6 +369,7 @@ function RiskTable({
           <SelectField
             id="new-risk-polarity"
             label="Polarity"
+            help="identify.polarity"
             value={polarity}
             options={[
               ['negative', 'Negative (threat)'],
@@ -384,7 +397,11 @@ function RiskTable({
       <p class="hint">A template gives the text and the category. You still give the frequency, the impact and the owner.</p>
       <div class="field-row">
         <div class="field wide">
-          <label for="catalogue-entry">Template</label>
+          <div class="label-row">
+            <label for="catalogue-entry">Template</label>
+            {catalogueHelp.toggle}
+          </div>
+          {catalogueHelp.text}
           <select
             id="catalogue-entry"
             value={entryId ?? ''}
@@ -425,6 +442,7 @@ function RiskTable({
       >
         Add the template to {register.title}
       </button>
+      <Explain id="catalogue-add" topic="identify.add-template" name="Add the template" />
     </Section>
   );
 }
@@ -458,9 +476,9 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
   };
   const usedBy = (id: string): string[] => doc.risks.filter((risk) => (risk.assetIds ?? []).includes(id)).map((risk) => risk.riskId);
   return (
-    <Section id="assets" title="Asset inventory" folded>
+    <Section id="assets" title="Asset inventory" folded help="identify.assets">
       <p class="muted">
-        "The value of an asset extends beyond its replacement cost" (Sec. 3.3.1), so a value needs a basis. Assets inherit the criticality of the functions they support.
+        "The value of an asset extends beyond its replacement cost", so a value needs a basis. Assets inherit the criticality of the functions they support.
       </p>
       {assets.map((asset, i) => {
         const risks = usedBy(asset.id);
@@ -470,7 +488,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
             <summary>
               {asset.id} {asset.name || 'New asset'}, {asset.kind}, used by {risks.length} risks
             </summary>
-            {risks.length >= 2 && <p class="banner">Risks {risks.join(', ')} share this asset. A shared cause is a candidate driver (Sec. 8.7).</p>}
+            {risks.length >= 2 && <p class="banner">Risks {risks.join(', ')} share this asset. A shared cause is a candidate driver.</p>}
             <div class="field-row">
               <div class="field">
                 {risks.length > 0 ? (
@@ -481,6 +499,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                   <TextField
                     id={`${id}-id`}
                     label="ID"
+                    help="identify.asset-id"
                     value={asset.id}
                     onChange={(value) => {
                       setAsset(i, { ...asset, id: value });
@@ -492,6 +511,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                 <TextField
                   id={`${id}-name`}
                   label="Name"
+                  help="identify.asset-name"
                   value={asset.name}
                   onChange={(name) => {
                     setAsset(i, { ...asset, name });
@@ -502,6 +522,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                 <SelectField
                   id={`${id}-kind`}
                   label="Kind"
+                  help="identify.asset-kind"
                   value={asset.kind}
                   options={ASSET_KINDS}
                   onChange={(kind) => {
@@ -513,6 +534,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                 <TextField
                   id={`${id}-owner`}
                   label="Owner"
+                  help="identify.asset-owner"
                   value={asset.owner}
                   onChange={(owner) => {
                     setAsset(i, withValue(asset, 'owner', owner));
@@ -523,6 +545,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                 <TextField
                   id={`${id}-criticality`}
                   label="Criticality"
+                  help="identify.asset-criticality"
                   value={asset.criticality}
                   onChange={(value) => {
                     setAsset(i, withValue(asset, 'criticality', value));
@@ -533,6 +556,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                 <TextField
                   id={`${id}-sensitivity`}
                   label="Sensitivity"
+                  help="identify.asset-sensitivity"
                   value={asset.sensitivity}
                   onChange={(value) => {
                     setAsset(i, withValue(asset, 'sensitivity', value));
@@ -550,10 +574,12 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
               />
               Outside direct control (external)
             </label>
+            <Explain id={`${id}-external`} topic="identify.asset-external" name="Outside direct control" />
             {asset.external === true && (
               <TextField
                 id={`${id}-provider`}
                 label="Provider"
+                help="identify.asset-provider"
                 value={asset.provider}
                 onChange={(provider) => {
                   setAsset(i, withValue(asset, 'provider', provider));
@@ -563,6 +589,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
             {(doc.context?.functions ?? []).length > 0 && (
               <Checkboxes
                 legend="Functions this asset supports"
+                help="identify.asset-functions"
                 name={`${id}-functions`}
                 options={(doc.context?.functions ?? []).map((item) => [item.id, `${item.name} (${item.criticality})`] as const)}
                 value={asset.supportsFunctionIds ?? []}
@@ -576,6 +603,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                 <NumberField
                   id={`${id}-value`}
                   label={`Value (${currency})`}
+                  help="identify.asset-value"
                   min={0}
                   value={asset.value?.amount}
                   onChange={(amount) => {
@@ -590,6 +618,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                     <SelectField
                       id={`${id}-basis`}
                       label="Basis of the value"
+                      help="identify.asset-basis"
                       value={asset.value.basis}
                       options={BASES}
                       onChange={(basis) => {
@@ -601,6 +630,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
                     <TextField
                       id={`${id}-rationale`}
                       label="Rationale of the value"
+                      help="identify.asset-rationale"
                       value={asset.value.rationale}
                       onChange={(rationale) => {
                         if (asset.value !== undefined) setAsset(i, { ...asset, value: withValue(asset.value, 'rationale', rationale) });
@@ -693,7 +723,7 @@ export function IdentifyScreen({ id, onNavigate }: { readonly id: string; readon
       id={id}
       screen="identify"
       title="Identify and analyze"
-      lede="Steps 2 and 3 of the life cycle, identify and analyze the risks (Sec. 3.3 and 3.4). Changes are saved in this browser."
+      lede="Steps 2 and 3 of the life cycle. Find the risks and estimate how often they happen and what they cost. Changes are saved in this browser."
       onNavigate={onNavigate}
     >
       {(draft, update) => <IdentifyBody doc={draft} update={update} />}

@@ -10,6 +10,7 @@ import type { Risk, RiskDocument } from '../schema/types';
 import { numbersSource } from './analysis';
 import { withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
+import { Explain } from './explain';
 import { Checkboxes, NumberField, TextField } from './fields';
 import { ErrView } from './err';
 import { registerTree } from './identify';
@@ -111,7 +112,7 @@ function Matrix({ doc, capacity, flagged }: { readonly doc: RiskDocument; readon
   return (
     <div class="table-box" tabIndex={0} role="region" aria-label="Two-sided matrix">
       <table class="matrix">
-        <caption>Table 3. Two-sided matrix (SP 800-221r1 Fig. 8). Display only. Ranking and funding use the simulation (Cox 2008).</caption>
+        <caption>Table 3. Two-sided matrix. Display only. Ranking and funding use the simulation (Cox 2008).</caption>
         <thead>
           <tr>
             <th scope="col" rowSpan={2}>
@@ -180,12 +181,13 @@ function OverrideEditor({ risk, proposed, update }: { readonly risk: Risk; reado
   }
   return (
     <fieldset class="sub-editor override">
-      <legend>Priority override of {risk.riskId} (Sec. 5.3.1)</legend>
+      <legend>Priority override of {risk.riskId}</legend>
       <div class="field-row">
         <div class="field">
           <NumberField
             id={`${id}-priority`}
             label="Priority"
+            help="prioritize.override-priority"
             integer
             min={1}
             value={override.priority}
@@ -198,6 +200,7 @@ function OverrideEditor({ risk, proposed, update }: { readonly risk: Risk; reado
           <TextField
             id={`${id}-by`}
             label="Set by"
+            help="prioritize.override-set-by"
             value={override.setBy}
             onChange={(setBy) => {
               set({ ...override, setBy });
@@ -208,6 +211,7 @@ function OverrideEditor({ risk, proposed, update }: { readonly risk: Risk; reado
           <TextField
             id={`${id}-on`}
             label="Set on"
+            help="prioritize.override-set-on"
             type="date"
             value={override.setOn}
             onChange={(setOn) => {
@@ -219,6 +223,7 @@ function OverrideEditor({ risk, proposed, update }: { readonly risk: Risk; reado
       <TextField
         id={`${id}-reason`}
         label="Reason"
+        help="prioritize.override-reason"
         value={override.reason}
         onChange={(reason) => {
           set({ ...override, reason });
@@ -226,6 +231,7 @@ function OverrideEditor({ risk, proposed, update }: { readonly risk: Risk; reado
       />
       <Checkboxes
         legend="Factors"
+        help="prioritize.override-factors"
         name={`${id}-factors`}
         options={FACTORS}
         value={override.factors ?? []}
@@ -265,9 +271,9 @@ function RiskTables({ doc, update, numbers }: { readonly doc: RiskDocument; read
   const months = (risk: Risk): number => doc.registers.find((register) => register.id === risk.registerId)?.timeframeMonths ?? 12;
   return (
     <>
-      <Section id="ranking" title="Risks by expected annual loss">
+      <Section id="ranking" title="Risks by expected annual loss" help="prioritize.ranking">
         <p class="hint">
-          The app proposes priorities from the expected annual loss, highest first, within each register (Sec. 3.5 and 5.3.3). The contribution is the share of the loss in the
+          The app proposes priorities from the expected annual loss, highest first, within each register. The contribution is the share of the loss in the
           worst 5% of years. A risk alone against the tolerance curve shows if it breaches the curve by itself.
         </p>
         <div class="button-row">
@@ -284,7 +290,9 @@ function RiskTables({ doc, update, numbers }: { readonly doc: RiskDocument; read
             Use the proposed priorities
           </button>
           {!differs && <span class="hint">The priorities are equal to the proposal.</span>}
+          <Explain id="use-proposed" topic="prioritize.use-proposed" name="Use the proposed priorities" />
         </div>
+        <Explain id="ranking-table" topic="prioritize.ranking-table" name="the columns of the table of risks" visible="How to read this table" />
         <div class="table-box" tabIndex={0} role="region" aria-labelledby="ranking-title">
           <table>
             <caption>Table 2. Negative risks, simulated with seed {numbers.seed}.</caption>
@@ -330,7 +338,8 @@ function RiskTables({ doc, update, numbers }: { readonly doc: RiskDocument; read
         </div>
         <details class="help">
           <summary>Override a priority</summary>
-          <p class="hint">Leadership can set a priority with a reason and the factors of Sec. 5.3.1. The decision record lists every override.</p>
+          <p class="hint">Leadership can set a priority with a reason and the factors below. The decision record lists every override.</p>
+          <Explain id="override" topic="prioritize.override" name="Override a priority" />
           {ordered.map((risk) => (
             <OverrideEditor key={risk.riskId} risk={risk} proposed={proposed.get(risk.riskId)} update={update} />
           ))}
@@ -338,8 +347,8 @@ function RiskTables({ doc, update, numbers }: { readonly doc: RiskDocument; read
       </Section>
 
       {positive.length > 0 && (
-        <Section id="opportunities" title="Opportunities by expected annual gain">
-          <p class="hint">Positive risks never enter the loss curve. Their gain counts in the net benefit of a portfolio (Sec. 6.12).</p>
+        <Section id="opportunities" title="Opportunities by expected annual gain" help="prioritize.opportunities">
+          <p class="hint">Positive risks never enter the loss curve. Their gain counts in the net benefit of a portfolio.</p>
           <div class="table-box" tabIndex={0} role="region" aria-labelledby="opportunities-title">
             <table>
               <thead>
@@ -419,7 +428,7 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
       </p>
       {numbers !== undefined && (
         <>
-          <Section id="lec" title="Loss exceedance">
+          <Section id="lec" title="Loss exceedance" help="prioritize.lec">
             <p>
               Roll-up of all registers: <StatusText status={points.length === 0 ? undefined : numbers.state.status} />. Expected annual loss {money(numbers.state.eal)} ±{' '}
               {money(numbers.state.ealSe)} {currency}.{numbers.state.pAboveCapacity !== undefined && <> P(loss above capacity) {probability(numbers.state.pAboveCapacity)}.</>}
@@ -441,6 +450,8 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
               currency={currency}
               source={sourceLine(numbers)}
             />
+            <Explain id="lec-chart" topic="prioritize.lec-chart" name="the loss exceedance chart" visible="How to read this chart" />
+            <Explain id="percentiles" topic="prioritize.percentiles" name="the percentiles" visible="How to read the percentiles" />
             <div class="table-box" tabIndex={0} role="region" aria-label="Percentiles">
               <table>
                 <caption>Table 1. Percentiles of the annual loss of the roll-up ({currency}).</caption>
@@ -475,11 +486,12 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
             <NotAcceptableEvents doc={doc} />
           </Section>
           <RiskTables doc={doc} update={update} numbers={numbers} />
-          <Section id="matrix" title="Matrix, display only" folded>
+          <Section id="matrix" title="Matrix, display only" folded help="prioritize.matrix">
             <p class="hint">
               Users and auditors expect a matrix, so the app shows it. A matrix can rank a smaller risk above a larger one (Cox 2008). A mark ! shows a pair that lint L-01 or L-03
               finds.
             </p>
+            <Explain id="matrix-table" topic="prioritize.matrix-table" name="the matrix" visible="How to read the matrix" />
             <Matrix doc={doc} capacity={capacity} flagged={flagged} />
             {findings.length > 0 && (
               <ul class="warnings">

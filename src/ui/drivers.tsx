@@ -5,6 +5,7 @@ import type { Risk, RiskDocument } from '../schema/types';
 import { DistributionField } from './distribution';
 import { nextId, withValue } from './edit';
 import type { Update } from './editor';
+import { Explain } from './explain';
 import { NumberField, SelectField, TextField } from './fields';
 
 type Driver = NonNullable<RiskDocument['drivers']>[number];
@@ -31,7 +32,8 @@ export function DriverPanel({ doc, update }: { readonly doc: RiskDocument; reado
   return (
     <section aria-labelledby="drivers-title" class="panel">
       <h2 id="drivers-title">Drivers</h2>
-      <p class="muted">A driver is a shared cause of several risks, for example an outage of one supplier. Its events reach each linked risk with a trigger probability, so joint losses show in the simulation without a double count (Sec. 8.7).</p>
+      <Explain id="drivers-section" topic="identify.drivers" name="Drivers" visible="About this section" />
+      <p class="muted">A driver is a shared cause of several risks, for example an outage of one supplier. Its events reach each linked risk with a trigger probability, so joint losses show in the simulation without a double count.</p>
       {drivers.map((driver, i) => {
         const risks = linksTo(doc, driver.id);
         const targeted = (doc.responses ?? []).some((option) => option.effects.some((effect) => effect.targetKind === 'driver' && effect.targetId === driver.id));
@@ -49,28 +51,29 @@ export function DriverPanel({ doc, update }: { readonly doc: RiskDocument; reado
                     <strong>ID</strong> {driver.id}
                   </p>
                 ) : (
-                  <TextField id={`${id}-id`} label="ID" value={driver.id} onChange={(value) => {
+                  <TextField id={`${id}-id`} label="ID" help="identify.driver-id" value={driver.id} onChange={(value) => {
                       setDriver(i, { ...driver, id: value });
                     }} />
                 )}
               </div>
               <div class="field wide">
-                <TextField id={`${id}-name`} label="Name" value={driver.name} onChange={(name) => {
+                <TextField id={`${id}-name`} label="Name" help="identify.driver-name" value={driver.name} onChange={(name) => {
                     setDriver(i, { ...driver, name });
                   }} />
               </div>
               <div class="field">
-                <SelectField id={`${id}-kind`} label="Kind" value={driver.kind} options={KINDS} onChange={(kind) => {
+                <SelectField id={`${id}-kind`} label="Kind" help="identify.driver-kind" value={driver.kind} options={KINDS} onChange={(kind) => {
                     setDriver(i, { ...driver, kind: kind ?? 'other' });
                   }} />
               </div>
             </div>
-            <TextField id={`${id}-description`} label="Description" multiline value={driver.description} onChange={(description) => {
+            <TextField id={`${id}-description`} label="Description" help="identify.driver-description" multiline value={driver.description} onChange={(description) => {
                 setDriver(i, withValue(driver, 'description', description));
               }} />
             <DistributionField
               id={`${id}-frequency`}
               legend="Driver frequency"
+              help="identify.driver-frequency"
               question="How many driver events happen per year? For a control, one event is one failure of the control. Give a range you are 90% sure of."
               unit="events per year"
               frequency
@@ -79,7 +82,7 @@ export function DriverPanel({ doc, update }: { readonly doc: RiskDocument; reado
                 setDriver(i, { ...driver, frequency });
               }}
             />
-            <TextField id={`${id}-rationale`} label="Rationale (10 characters or more)" multiline value={driver.rationale} onChange={(rationale) => {
+            <TextField id={`${id}-rationale`} label="Rationale (10 characters or more)" help="identify.driver-rationale" multiline value={driver.rationale} onChange={(rationale) => {
                 setDriver(i, { ...driver, rationale });
               }} />
             <button type="button" class="quiet" disabled={risks.length > 0 || targeted} onClick={() => {
@@ -117,7 +120,7 @@ export function DriverLinksTab({ doc, risk, setRisk }: { readonly doc: RiskDocum
   const free = drivers.filter((driver) => !links.some((link) => link.driverId === driver.id));
   return (
     <div class="tab-body">
-      <p class="hint">The frequency on the tab Estimate counts only the events that the drivers do not cause (Sec. 8.3). A trigger probability is the chance that one driver event causes one event of this risk.</p>
+      <p class="hint">The frequency on the tab Estimate counts only the events that the drivers do not cause. A trigger probability is the chance that one driver event causes one event of this risk.</p>
       {links.map((link, i) => (
         <div class="sub-editor" key={i}>
           <div class="field-row">
@@ -125,6 +128,7 @@ export function DriverLinksTab({ doc, risk, setRisk }: { readonly doc: RiskDocum
               <SelectField
                 id={`${id}-${String(i)}-driver`}
                 label={`Driver of link ${String(i + 1)}`}
+                help="identify.driver-link"
                 value={link.driverId}
                 options={drivers.filter((driver) => driver.id === link.driverId || !links.some((other) => other.driverId === driver.id)).map((driver) => [driver.id, `${driver.id} ${driver.name}`] as const)}
                 onChange={(driverId) => {
@@ -133,12 +137,12 @@ export function DriverLinksTab({ doc, risk, setRisk }: { readonly doc: RiskDocum
               />
             </div>
             <div class="field">
-              <NumberField id={`${id}-${String(i)}-q`} label="Trigger probability (0 to 1)" min={0} max={1} value={link.triggerProbability} onChange={(q) => {
+              <NumberField id={`${id}-${String(i)}-q`} label="Trigger probability (0 to 1)" help="identify.trigger-probability" min={0} max={1} value={link.triggerProbability} onChange={(q) => {
                   setLinks(replaceAt(links, i, withValue(link, 'triggerProbability', q)));
                 }} />
             </div>
           </div>
-          <TextField id={`${id}-${String(i)}-rationale`} label="Rationale of the link" value={link.rationale} onChange={(rationale) => {
+          <TextField id={`${id}-${String(i)}-rationale`} label="Rationale of the link" help="identify.driver-link-rationale" value={link.rationale} onChange={(rationale) => {
               setLinks(replaceAt(links, i, withValue(link, 'rationale', rationale)));
             }} />
           <button type="button" class="quiet" onClick={() => {

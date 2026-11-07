@@ -25,6 +25,7 @@ import {
   type StoredDocument,
 } from '../storage/db';
 import type { ScreenName } from './editor';
+import { Explain, useExplain } from './explain';
 import { downloadText, newDocument, slug } from './files';
 import { CHOICE_TEXT, choicesOf, fieldParts, importChoices, mergeEntities, mergeResultText, unchangedRisks, type MergeEntity } from './merge';
 import { noticeState, onNoticeState } from './version';
@@ -32,8 +33,8 @@ import { VersionNotice } from './version-notice';
 
 const EXAMPLES = {
   'example-2': { label: 'SME with numbers (example 2)', load: () => import('../../docs/schema/examples/example-2-sme-quantitative.json') },
-  'example-1': { label: 'NIST Fig. 10 and Table 9 (example 1)', load: () => import('../../docs/schema/examples/example-1-sp800-221r1-fig10-table9.json') },
-  'example-3': { label: 'Table 10 imports (example 3)', load: () => import('../../docs/schema/examples/example-3-imports-table10.json') },
+  'example-1': { label: 'Enterprise register in words (example 1)', load: () => import('../../docs/schema/examples/example-1-sp800-221r1-fig10-table9.json') },
+  'example-3': { label: 'Registers from other tools (example 3)', load: () => import('../../docs/schema/examples/example-3-imports-table10.json') },
 } as const;
 
 const dateText = (iso: string | undefined): string => (iso === undefined ? 'never' : new Date(iso).toLocaleString());
@@ -93,6 +94,7 @@ function MergeChoices({
   return (
     <section class="merge" aria-labelledby="merge-title">
       <h4 id="merge-title">Ids that {title} already uses</h4>
+      <Explain id="merge-choices" topic="start.merge" name="Ids that the document already uses" />
       {risks.length > 0 && (
         <p class="hint">
           {risks.length} {risks.length === 1 ? 'risk has' : 'risks have'} other values in the file. Choose what to keep for each risk. Keep both adds the incoming risk with a new id.
@@ -195,6 +197,24 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   const [newTitle, setNewTitle] = useState('');
   const [newOrganization, setNewOrganization] = useState('');
   const [newCurrency, setNewCurrency] = useState('EUR');
+  // The explanations of the panels and of the raw fields of this screen.
+  const helpApp = useExplain('start-app', 'start.app', 'PortaRegulus Risk');
+  const helpDocs = useExplain('docs', 'start.documents', 'Your documents');
+  const helpCreate = useExplain('create', 'start.create', 'Create a document');
+  const helpTitle = useExplain('new-title', 'start.title', 'Title');
+  const helpOrganization = useExplain('new-organization', 'start.organization', 'Organization');
+  const helpCurrency = useExplain('new-currency', 'start.currency', 'Currency');
+  const helpImport = useExplain('import', 'start.import', 'Import a file');
+  const helpOpenPassphrase = useExplain('open-passphrase', 'start.open-passphrase', 'Passphrase, only for an encrypted file');
+  const helpFile = useExplain('import-file', 'start.import-file', 'File');
+  const helpExport = useExplain('export', 'start.export', 'Export');
+  const helpNative = useExplain('export-native', 'start.export-native', 'App file (JSON)');
+  const helpNist = useExplain('export-nist', 'start.export-ir8286', 'NIST IR 8286 register (JSON)');
+  const helpCsv = useExplain('export-csv', 'start.export-csv', 'CSV');
+  const helpOscal = useExplain('export-oscal', 'start.export-oscal', 'OSCAL POA&M');
+  const helpPassphrase = useExplain('passphrase', 'start.export-passphrase', 'Passphrase for an encrypted copy');
+  const helpStorage = useExplain('storage', 'start.storage', 'Storage in this browser');
+  const helpRemove = useExplain('remove-confirm', 'start.remove-all', 'Remove all data');
 
   const current = documents.find((item) => item.id === currentId) ?? documents[0];
   // A damaged record is shown, but not opened, merged into or exported (gap F4).
@@ -360,8 +380,12 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
   return (
     <main class="screen">
       <header class="screen-head">
-        <h1>PortaRegulus Risk</h1>
-        <p class="lede">A free risk register for the risk components of NIST SP 800-221r1. Your data stays in this browser. The app sends no data to a server.</p>
+        <div class="label-row">
+          <h1>PortaRegulus Risk</h1>
+          {helpApp.toggle}
+        </div>
+        {helpApp.text}
+        <p class="lede">A free risk register that measures your ICT risks in money. Your data stays in this browser. The app sends no data to a server.</p>
       </header>
 
       <VersionNotice startScreen />
@@ -383,7 +407,11 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
       )}
 
       <section aria-labelledby="docs-title" class="panel">
-        <h2 id="docs-title">Your documents</h2>
+        <div class="label-row">
+          <h2 id="docs-title">Your documents</h2>
+          {helpDocs.toggle}
+        </div>
+        {helpDocs.text}
         {documents.length === 0 ? (
           <p class="muted">No document is stored in this browser. Create one, open an example, or import a file.</p>
         ) : (
@@ -436,6 +464,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                 Restore the last valid version
               </button>
             </div>
+            <Explain id="restore-valid" topic="start.restore-valid" name="Restore the last valid version" />
           </>
         )}
         {current !== undefined && damaged === undefined && (
@@ -480,23 +509,40 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                 Enterprise view
               </button>
             </div>
+            <Explain id="open-modes" topic="start.modes" name="Guided mode and full editor" />
           </>
         )}
       </section>
 
       <div class="grid">
         <section aria-labelledby="create-title" class="panel">
-          <h2 id="create-title">Create a document</h2>
+          <div class="label-row">
+            <h2 id="create-title">Create a document</h2>
+            {helpCreate.toggle}
+          </div>
+          {helpCreate.text}
           <p class="hint">New here? Type a title and click Create. Then click "Guided mode" under Your documents. It takes you step by step from your company to the printed decision record. The other buttons open the full editor.</p>
-          <label for="new-title">Title</label>
+          <div class="label-row">
+            <label for="new-title">Title</label>
+            {helpTitle.toggle}
+          </div>
+          {helpTitle.text}
           <input id="new-title" value={newTitle} onInput={(event) => {
             setNewTitle(event.currentTarget.value);
           }} />
-          <label for="new-organization">Organization</label>
+          <div class="label-row">
+            <label for="new-organization">Organization</label>
+            {helpOrganization.toggle}
+          </div>
+          {helpOrganization.text}
           <input id="new-organization" value={newOrganization} onInput={(event) => {
             setNewOrganization(event.currentTarget.value);
           }} />
-          <label for="new-currency">Currency</label>
+          <div class="label-row">
+            <label for="new-currency">Currency</label>
+            {helpCurrency.toggle}
+          </div>
+          {helpCurrency.text}
           <input id="new-currency" value={newCurrency} maxLength={3} onInput={(event) => {
             setNewCurrency(event.currentTarget.value.toUpperCase());
           }} />
@@ -511,16 +557,29 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
               </button>
             ))}
           </div>
+          <Explain id="examples" topic="start.examples" name="Examples" />
         </section>
 
         <section aria-labelledby="import-title" class="panel">
-          <h2 id="import-title">Import a file</h2>
+          <div class="label-row">
+            <h2 id="import-title">Import a file</h2>
+            {helpImport.toggle}
+          </div>
+          {helpImport.text}
           <p class="muted">CSV, XLSX, NIST IR 8286 JSON, OSCAL POA&amp;M, a CVD Portal export, or a file from this app. The import shows a preview first.</p>
-          <label for="open-passphrase">Passphrase, only for an encrypted file</label>
+          <div class="label-row">
+            <label for="open-passphrase">Passphrase, only for an encrypted file</label>
+            {helpOpenPassphrase.toggle}
+          </div>
+          {helpOpenPassphrase.text}
           <input id="open-passphrase" type="password" autoComplete="current-password" value={openPassphrase} onInput={(event) => {
               setOpenPassphrase(event.currentTarget.value);
             }} />
-          <label for="import-file">File</label>
+          <div class="label-row">
+            <label for="import-file">File</label>
+            {helpFile.toggle}
+          </div>
+          {helpFile.text}
           <input id="import-file" type="file" accept=".csv,.tsv,.txt,.xlsx,.json" onChange={(event) => {
               void onFile(event);
             }} disabled={busy} />
@@ -560,6 +619,7 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
                   }}
                 />
               )}
+              <Explain id="import-save" topic="start.import-save" name="Save the import" />
               <div class="button-row">
                 <button type="button" onClick={commit('merge')} disabled={busy || (restoreOnly ? restoreErrors : preview.preview.errors.length) > 0}>
                   {current === undefined ? 'Save as a new document' : fresh ? 'Save the file as a document' : `Add to ${current.title}`}
@@ -581,27 +641,51 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
         </section>
 
         <section aria-labelledby="export-title" class="panel">
-          <h2 id="export-title">Export</h2>
+          <div class="label-row">
+            <h2 id="export-title">Export</h2>
+            {helpExport.toggle}
+          </div>
+          {helpExport.text}
           {current === undefined || damaged !== undefined ? (
             <p class="muted">{current === undefined ? 'Select a document first.' : 'Restore a valid version of the selected document first.'}</p>
           ) : (
             <>
               <p class="muted">Files go to your downloads. Keep a copy, because browsers can delete stored data.</p>
               <div class="button-row">
-                <button type="button" onClick={exportAs('native')} disabled={busy}>
-                  App file (JSON)
-                </button>
-                <button type="button" class="quiet" onClick={exportAs('ir8286')} disabled={busy}>
-                  NIST IR 8286 JSON
-                </button>
-                <button type="button" class="quiet" onClick={exportAs('csv')} disabled={busy}>
-                  CSV
-                </button>
-                <button type="button" class="quiet" onClick={exportAs('oscal')} disabled={busy}>
-                  OSCAL POA&amp;M
-                </button>
+                <span class="label-row">
+                  <button type="button" onClick={exportAs('native')} disabled={busy}>
+                    App file (JSON)
+                  </button>
+                  {helpNative.toggle}
+                </span>
+                <span class="label-row">
+                  <button type="button" class="quiet" onClick={exportAs('ir8286')} disabled={busy}>
+                    NIST IR 8286 register (JSON)
+                  </button>
+                  {helpNist.toggle}
+                </span>
+                <span class="label-row">
+                  <button type="button" class="quiet" onClick={exportAs('csv')} disabled={busy}>
+                    CSV
+                  </button>
+                  {helpCsv.toggle}
+                </span>
+                <span class="label-row">
+                  <button type="button" class="quiet" onClick={exportAs('oscal')} disabled={busy}>
+                    OSCAL POA&amp;M
+                  </button>
+                  {helpOscal.toggle}
+                </span>
               </div>
-              <label for="passphrase">Passphrase for an encrypted copy (12 characters or more)</label>
+              {helpNative.text}
+              {helpNist.text}
+              {helpCsv.text}
+              {helpOscal.text}
+              <div class="label-row">
+                <label for="passphrase">Passphrase for an encrypted copy (12 characters or more)</label>
+                {helpPassphrase.toggle}
+              </div>
+              {helpPassphrase.text}
               <input id="passphrase" type="password" autoComplete="new-password" value={passphrase} onInput={(event) => {
             setPassphrase(event.currentTarget.value);
           }} />
@@ -613,7 +697,11 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
         </section>
 
         <section aria-labelledby="storage-title" class="panel">
-          <h2 id="storage-title">Storage in this browser</h2>
+          <div class="label-row">
+            <h2 id="storage-title">Storage in this browser</h2>
+            {helpStorage.toggle}
+          </div>
+          {helpStorage.text}
           <p>
             {status?.persisted === true ? 'The browser keeps this data.' : 'The browser can delete this data when space is low or after 7 days without a visit (Safari).'} Used{' '}
             {megabytes(status?.usage)}.
@@ -621,7 +709,11 @@ export function StartScreen({ selectedId, onOpen }: { readonly selectedId?: stri
           {/* ADR-0004 decision 5 and threat I1 (docs/release/annex-i-self-check.md, gaps F1 and F2). */}
           <p>The app does not encrypt the data in this browser. Turn on the disk encryption of this computer, for example BitLocker or FileVault.</p>
           <p>A browser extension that can read all sites can also read this page. For a sensitive register, use a browser profile with no extensions.</p>
-          <label for="remove-confirm">Type REMOVE to delete every document, cache and the offline copy from this browser</label>
+          <div class="label-row">
+            <label for="remove-confirm">Type REMOVE to delete every document, cache and the offline copy from this browser</label>
+            {helpRemove.toggle}
+          </div>
+          {helpRemove.text}
           <input id="remove-confirm" value={confirmText} onInput={(event) => {
             setConfirmText(event.currentTarget.value);
           }} />

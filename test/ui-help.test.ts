@@ -4,6 +4,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { HELP } from '../src/ui/help';
+import type { HelpText } from '../src/ui/help/types';
 
 const UI = join(__dirname, '../src/ui');
 const files = readdirSync(UI)
@@ -58,7 +59,7 @@ describe('help on click', () => {
   });
 
   it('each help text is Simplified Technical English prose with no em dash, semicolon or colon', () => {
-    for (const [key, text] of Object.entries(HELP)) {
+    for (const [key, text] of Object.entries(HELP) as [string, HelpText][]) {
       for (const part of [text.what, text.why, text.example, text.source]) {
         if (part === undefined) continue;
         expect(part, key).not.toMatch(/[—–;:]/);

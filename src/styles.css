@@ -294,8 +294,9 @@ textarea:hover {
 input[type='checkbox'],
 input[type='radio'] {
   accent-color: var(--green);
-  width: 1.1rem;
-  height: 1.1rem;
+  /* 24 px, the minimum target of WCAG 2.2 SC 2.5.8, also next to a "?" toggle. */
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 /* Moulded keys: the primary is a tangerine fill with ink on it, the quiet one is paper. */
@@ -1562,9 +1563,11 @@ legend.label-row {
 }
 .explain-toggle,
 .explain-toggle:hover:not(:disabled) {
-  min-width: 44px;
-  min-height: 44px;
-  margin: -12px -8px -12px 0;
+  /* 24 px with a mouse, the WCAG 2.2 AA minimum, so a label row does not grow and the toggle
+     never covers a check box. 44 px on a touch screen (redesign plan Sec. 4.1). */
+  min-width: 24px;
+  min-height: 24px;
+  margin: 0;
   padding: 0;
   display: inline-grid;
   place-items: center;
@@ -1586,12 +1589,18 @@ legend.label-row {
   font-size: 0.75rem;
   line-height: 1;
 }
+@media (pointer: coarse) {
+  .explain-toggle,
+  .explain-toggle:hover:not(:disabled) {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
 .explain-toggle[aria-expanded='true'] {
   color: var(--focus);
 }
 .explain-toggle.explain-words,
 .explain-toggle.explain-words:hover:not(:disabled) {
-  margin: -10px 0;
   justify-content: start;
   font-weight: 400;
   font-size: 0.85rem;

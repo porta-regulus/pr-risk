@@ -17,14 +17,14 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   await expect(page.getByText('No document is stored in this browser.')).toBeVisible();
 
   // Open an example.
-  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
   await expect(page.getByText('You have not saved a copy of this document yet.')).toBeVisible();
   await expectAccessible(page, 'S1 with a document');
 
   // Export the app file. The reminder goes away.
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'App file (JSON)' }).click();
+  await page.getByRole('button', { name: 'App file (JSON)', exact: true }).click();
   const download = await downloadPromise;
   const exported = JSON.parse(readFileSync(await download.path(), 'utf8')) as { schemaVersion: string; risks: unknown[] };
   // The example file is 1.0.0. The app writes 1.2.0 when it saves (SPEC.md Sec. 7.7).
@@ -36,12 +36,12 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   const passphrase = 'correct horse battery staple';
   await page.getByLabel('Passphrase for an encrypted copy').fill(passphrase);
   const encryptedPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Encrypted copy' }).click();
+  await page.getByRole('button', { name: 'Encrypted copy', exact: true }).click();
   const encrypted = readFileSync(await (await encryptedPromise).path());
 
   // Save an OSCAL POA&M copy for the AT-4 import below.
   const oscalPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'OSCAL POA&M' }).click();
+  await page.getByRole('button', { name: 'OSCAL POA&M', exact: true }).click();
   const oscal = readFileSync(await (await oscalPromise).path());
   expect((JSON.parse(oscal.toString('utf8')) as Record<string, unknown>)['plan-of-action-and-milestones']).toBeDefined();
 
@@ -53,14 +53,14 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   const csv = fileURLToPath(new URL('../docs/schema/fixtures/table10-system-registers.csv', import.meta.url));
   await page.setInputFiles('#import-file', csv);
   await expect(page.getByText('Format csv. 3 risks, 3 new registers')).toBeVisible();
-  await page.getByRole('button', { name: 'Add to Test register' }).click();
+  await page.getByRole('button', { name: 'Add to Test register', exact: true }).click();
   await expect(page.getByText('3 risks from table10-system-registers.csv are saved.')).toBeVisible();
   await expect(page.getByText('4 registers, 3 risks')).toBeVisible();
 
   // Remove everything after a typed confirmation (ADR-0004 I5). The service worker and its cache exist first.
   await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBeGreaterThan(0);
   await expect.poll(() => page.evaluate(async () => (await caches.keys()).length)).toBeGreaterThan(0);
-  const remove = page.getByRole('button', { name: 'Remove all data from this browser' });
+  const remove = page.getByRole('button', { name: 'Remove all data from this browser', exact: true });
   await expect(remove).toBeDisabled();
   await page.getByLabel(/Type REMOVE/).fill('REMOVE');
   await remove.click();
@@ -72,7 +72,7 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   await page.getByLabel('Passphrase, only for an encrypted file').fill(passphrase);
   await page.setInputFiles('#import-file', { name: 'backup.encrypted.json', mimeType: 'application/json', buffer: encrypted });
   await expect(page.getByText('Format native. 9 risks')).toBeVisible();
-  await page.getByRole('button', { name: 'Save as a new document' }).click();
+  await page.getByRole('button', { name: 'Save as a new document', exact: true }).click();
   await expect(page.getByText('9 risks from backup.encrypted.json are saved.')).toBeVisible();
   await page.getByLabel(/Type REMOVE/).fill('REMOVE');
   await remove.click();
@@ -81,7 +81,7 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   // AT-4 through the screen. In an empty browser, the OSCAL copy restores example 2 by the lossless path.
   await page.setInputFiles('#import-file', { name: 'example-2.oscal-poam.json', mimeType: 'application/json', buffer: oscal });
   await expect(page.getByText('Format oscal-poam. 9 risks')).toBeVisible();
-  await page.getByRole('button', { name: 'Save as a new document' }).click();
+  await page.getByRole('button', { name: 'Save as a new document', exact: true }).click();
   await expect(page.getByText('9 risks from example-2.oscal-poam.json are saved.')).toBeVisible();
   // Lossless means the whole document, not only the risks: the native path restores the risks too.
   const original = JSON.parse(readFileSync(fileURLToPath(new URL('../docs/schema/examples/example-2-sme-quantitative.json', import.meta.url)), 'utf8')) as Record<string, unknown>;
@@ -94,7 +94,7 @@ test('start screen works end to end with no CSP violation', async ({ page }) => 
   // In an empty browser, import a CSV without a register column.
   await page.setInputFiles('#import-file', fileURLToPath(new URL('../docs/schema/fixtures/sp800-221r1-fig10.csv', import.meta.url)));
   await expect(page.getByText('Format csv. 10 risks')).toBeVisible();
-  await page.getByRole('button', { name: 'Save as a new document' }).click();
+  await page.getByRole('button', { name: 'Save as a new document', exact: true }).click();
   await expect(page.getByText('10 risks from sp800-221r1-fig10.csv are saved.')).toBeVisible();
   await page.getByLabel(/Type REMOVE/).fill('REMOVE');
   await remove.click();
@@ -113,7 +113,7 @@ test('import into an open document shows the diff and takes one choice per risk'
   });
 
   await page.goto('/');
-  await page.getByRole('button', { name: 'Table 10 imports (example 3)' }).click();
+  await page.getByRole('button', { name: 'Registers from other tools (example 3)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
   const original = await page.evaluate(storedDocument);
   const originalRisk = (id: string) => (original['risks'] as Risk[]).find((risk) => risk.riskId === id);
@@ -178,7 +178,7 @@ test('import into an open document shows the diff and takes one choice per risk'
 // keep current or take incoming. A register has no keep both.
 test('import of a native file takes one choice per changed register', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Table 10 imports (example 3)' }).click();
+  await page.getByRole('button', { name: 'Registers from other tools (example 3)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
   const original = await page.evaluate(storedDocument);
   const registers = original['registers'] as Register[];
@@ -225,17 +225,17 @@ test('import of a native file takes one choice per changed register', async ({ p
 // document closes the preview, so no choice is committed against the wrong diff.
 test('selecting another document closes the import preview', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Table 10 imports (example 3)' }).click();
+  await page.getByRole('button', { name: 'Registers from other tools (example 3)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
-  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
-  await expect(page.getByRole('row', { name: /Example Machinery/ }).getByRole('button', { name: 'Selected' })).toBeVisible();
-  await page.getByRole('row', { name: /Import adapters/ }).getByRole('button', { name: 'Select' }).click();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)', exact: true }).click();
+  await expect(page.getByRole('row', { name: /Example Machinery/ }).getByRole('button', { name: 'Selected', exact: true })).toBeVisible();
+  await page.getByRole('row', { name: /Import adapters/ }).getByRole('button', { name: 'Select', exact: true }).click();
 
   const table10 = readFileSync(fileURLToPath(new URL('../docs/schema/fixtures/table10-system-registers.csv', import.meta.url)), 'utf8');
   await page.setInputFiles('#import-file', { name: 'table10-newer.csv', mimeType: 'text/csv', buffer: Buffer.from(table10.replace(',0.1,2000000,', ',0.15,2000000,'), 'utf8') });
   await expect(page.getByRole('group', { name: 'Risk A-1' })).toBeVisible();
 
-  await page.getByRole('row', { name: /Example Machinery/ }).getByRole('button', { name: 'Select' }).click();
+  await page.getByRole('row', { name: /Example Machinery/ }).getByRole('button', { name: 'Select', exact: true }).click();
   await expect(page.getByText('The selected document changed, so the preview is closed. Choose the file again.')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Preview of table10-newer.csv' })).toBeHidden();
   await expect(page.getByRole('button', { name: /^Add to / })).toBeHidden();
@@ -246,16 +246,16 @@ test('selecting another document closes the import preview', async ({ page }) =>
 // result of the last action, so selecting another document removes it.
 test('selecting another document removes the message of the last action', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Table 10 imports (example 3)' }).click();
+  await page.getByRole('button', { name: 'Registers from other tools (example 3)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
-  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
-  await expect(page.getByRole('row', { name: /Example Machinery/ }).getByRole('button', { name: 'Selected' })).toBeVisible();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)', exact: true }).click();
+  await expect(page.getByRole('row', { name: /Example Machinery/ }).getByRole('button', { name: 'Selected', exact: true })).toBeVisible();
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'App file (JSON)' }).click();
+  await page.getByRole('button', { name: 'App file (JSON)', exact: true }).click();
   await downloadPromise;
   await expect(page.getByText('The file is saved to your downloads.')).toBeVisible();
 
-  await page.getByRole('row', { name: /Import adapters/ }).getByRole('button', { name: 'Select' }).click();
+  await page.getByRole('row', { name: /Import adapters/ }).getByRole('button', { name: 'Select', exact: true }).click();
   await expect(page.getByText('You have not saved a copy of this document yet.')).toBeVisible();
   await expect(page.getByText('The file is saved to your downloads.')).toBeHidden();
 });
@@ -263,7 +263,7 @@ test('selecting another document removes the message of the last action', async 
 // CRA Annex I Part I points 2(e) and 2(f) (docs/release/annex-i-self-check.md, gaps F1, F2 and F4).
 test('a damaged stored record is not opened or exported, and its last valid version comes back', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
   await expect(page.getByText('The app does not encrypt the data in this browser.')).toBeVisible();
   await expect(page.getByText('use a browser profile with no extensions')).toBeVisible();
@@ -276,38 +276,38 @@ test('a damaged stored record is not opened or exported, and its last valid vers
   await expect(page.getByRole('alert')).toContainText('The stored copy of this document is damaged, so this screen does not open it.');
   await expectAccessible(page, 'editor with a damaged document');
 
-  await page.getByRole('button', { name: 'Back to start' }).click();
+  await page.getByRole('button', { name: 'Back to start', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('is damaged. Rule ');
   await expect(page.getByText('The stored copy is damaged.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Context and strategy', exact: true })).toBeHidden();
-  await expect(page.getByRole('button', { name: 'App file (JSON)' })).toBeHidden();
+  await expect(page.getByRole('button', { name: 'App file (JSON)', exact: true })).toBeHidden();
   await expectAccessible(page, 'S1 with a damaged document');
 
-  await page.getByRole('button', { name: 'Restore the last valid version' }).click();
+  await page.getByRole('button', { name: 'Restore the last valid version', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Version 1 is restored.' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Context and strategy', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'App file (JSON)' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'App file (JSON)', exact: true })).toBeVisible();
   expect((await page.evaluate(storedDocument))['risks']).toHaveLength(9);
 });
 
 // Codex review of pull request 17. With no valid kept version, a saved copy still restores the document.
 test('a saved copy restores a damaged document that has no valid kept version', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'App file (JSON)' }).click();
+  await page.getByRole('button', { name: 'App file (JSON)', exact: true }).click();
   const copy = readFileSync(await (await downloadPromise).path());
 
   await page.evaluate(damageStoredDocument, true);
   await page.reload();
-  await page.getByRole('button', { name: 'Restore the last valid version' }).click();
+  await page.getByRole('button', { name: 'Restore the last valid version', exact: true }).click();
   await expect(page.getByRole('alert').filter({ hasText: 'No kept version of this document is valid.' })).toBeVisible();
 
   await page.setInputFiles('#import-file', { name: 'copy.json', mimeType: 'application/json', buffer: copy });
   await expect(page.getByRole('heading', { name: 'Preview of copy.json' })).toBeVisible();
   await expect(page.getByRole('button', { name: /^Add to / })).toBeHidden();
-  await page.getByRole('button', { name: 'Save the file as a document' }).click();
+  await page.getByRole('button', { name: 'Save the file as a document', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'risks from copy.json are saved.' })).toBeVisible();
   await expect(page.getByText('The stored copy is damaged.')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Context and strategy', exact: true })).toBeVisible();

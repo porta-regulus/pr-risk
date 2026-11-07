@@ -13,6 +13,7 @@ import type { Risk, RiskDocument } from '../schema/types';
 import { AcceptanceEditor } from './acceptance';
 import { withSection } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
+import { Explain, useExplain } from './explain';
 import { InvalidFields, NumberField, SelectField, TextField, useInvalid } from './fields';
 import { useEngine } from './jobs';
 import { LecChart, money, percent, probability, sourceLine, StatusText } from './report';
@@ -74,6 +75,7 @@ function ObservationForm({ statement, update }: { readonly statement: Statement;
   // A new key remounts the fields, so they are empty after a record.
   const [round, setRound] = useState(0);
   const id = `obs-${statement.id}`;
+  const explain = useExplain(`${id}-record`, 'monitor.record-observation', `Record the observation of ${statement.id}`);
   if (metrics.length === 0) return <p class="muted">This statement has no machine-readable trigger, so it takes no observation.</p>;
   const ready = isDate(observedOn) && Object.keys(values).length > 0 && !invalid;
   return (
@@ -82,13 +84,14 @@ function ObservationForm({ statement, update }: { readonly statement: Statement;
       <InvalidFields.Provider value={report}>
         <div class="field-row">
           <div class="field">
-            <TextField id={`${id}-on`} label="Observed on" type="date" value={observedOn} onChange={setObservedOn} />
+            <TextField id={`${id}-on`} label="Observed on" help="monitor.observed-on" type="date" value={observedOn} onChange={setObservedOn} />
           </div>
           {metrics.map(({ metric, unit }) => (
             <div class="field" key={metric}>
               <NumberField
                 id={`${id}-${metric}`}
                 label={unit === undefined ? metric : `${metric} (${unit})`}
+                help="monitor.observation-value"
                 value={values[metric]}
                 onChange={(value) => {
                   const others = Object.entries(values).filter(([name]) => name !== metric);
@@ -99,7 +102,7 @@ function ObservationForm({ statement, update }: { readonly statement: Statement;
           ))}
         </div>
       </InvalidFields.Provider>
-      <TextField id={`${id}-note`} label="Note" value={note} onChange={setNote} />
+      <TextField id={`${id}-note`} label="Note" help="monitor.observation-note" value={note} onChange={setNote} />
       <div class="button-row">
         <button
           type="button"
@@ -119,8 +122,10 @@ function ObservationForm({ statement, update }: { readonly statement: Statement;
         >
           Record the observation of {statement.id}
         </button>
+        {explain.toggle}
         {!ready && <span class="hint">Give a date and at least one value.</span>}
       </div>
+      {explain.text}
     </fieldset>
   );
 }
@@ -135,6 +140,7 @@ function StatementMonitor({ statement, number, update }: { readonly statement: S
   return (
     <div class="statement" data-statement={statement.id}>
       <h3>{title}</h3>
+      <Explain id={`indicators-${statement.id}`} topic="monitor.indicator-table" name={`Indicators of ${statement.id}`} visible="About this table" />
       <div class="table-box" tabIndex={0} role="region" aria-label={`Indicators of ${statement.id}`}>
         <table>
           <caption>
@@ -189,9 +195,9 @@ function StatementMonitor({ statement, number, update }: { readonly statement: S
 function IndicatorsPanel({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
   const statements = doc.appetite?.statements ?? [];
   return (
-    <Section id="indicators" title="KPIs, KRIs and tolerances">
+    <Section id="indicators" title="KPIs, KRIs and tolerances" help="monitor.indicators">
       <p class="hint">
-        Record what you measure. The app checks each trigger on its latest observation and shows "Fires", "Does not fire" or "No data" (Sec. 3.7). A KRI that fires starts a review of
+        Record what you measure. The app checks each trigger on its latest observation and shows "Fires", "Does not fire" or "No data". A KRI that fires starts a review of
         the risks in the categories of its statement.
       </p>
       {statements.length === 0 ? (
@@ -214,10 +220,10 @@ function ReviewPanel({ doc, openedAt }: { readonly doc: RiskDocument; readonly o
   const byId = new Map(doc.risks.map((risk) => [risk.riskId, risk]));
   const set = automaticSince(doc, openedAt);
   return (
-    <Section id="review" title="Review triggers">
+    <Section id="review" title="Review triggers" help="monitor.review">
       <p class="hint">
         A risk needs a review when a tolerance of its appetite statement breaches or a KRI fires, when its review date passes, when its acceptance expires, or when a new emerging or
-        horizon risk appears in its category after the as-of date of its register (Sec. 3.7.1 and 5.1.2). The app then sets the status "Review needed" itself. It checks when this screen
+        horizon risk appears in its category after the as-of date of its register. The app then sets the status "Review needed" itself. It checks when this screen
         opens and after each saved change on it. The change log entry has the app as actor and lists the reasons. Each reason acts once, so a person ends the review with another status.
         New evidence sets "Review needed" when it comes in.
       </p>
@@ -280,9 +286,9 @@ function AcceptancePanel({ doc, update }: { readonly doc: RiskDocument; readonly
     );
   };
   return (
-    <Section id="acceptance" title="Acceptance records">
+    <Section id="acceptance" title="Acceptance records" help="monitor.acceptance">
       <p class="hint">
-        A record states who accepted the risk or the exception to a tolerance, when, until when and why (Sec. 5.1.2). An acceptance past its end date needs a review.
+        A record states who accepted the risk or the exception to a tolerance, when, until when and why. An acceptance past its end date needs a review.
       </p>
       {risks.length === 0 ? (
         <p class="muted">No risk is accepted and no risk has the response Accept.</p>
@@ -341,10 +347,11 @@ function WhatIfPanel({ doc, update, numbers }: { readonly doc: RiskDocument; rea
   const [note, setNote] = useState<string>();
   const [round, setRound] = useState(0);
   const [report, invalid] = useInvalid();
+  const saveExplain = useExplain('whatif-save', 'monitor.whatif-save', 'Save the what-if curve');
   const currency = doc.document.currency;
   if (saved.length === 0) {
     return (
-      <Section id="whatif" title="Tolerance what-if" folded>
+      <Section id="whatif" title="Tolerance what-if" help="monitor.whatif" folded>
         <p class="muted">There is no tolerance curve. Set one on the screen Context and strategy first.</p>
       </Section>
     );
@@ -367,11 +374,12 @@ function WhatIfPanel({ doc, update, numbers }: { readonly doc: RiskDocument; rea
     </tr>
   );
   return (
-    <Section id="whatif" title="Tolerance what-if" folded>
+    <Section id="whatif" title="Tolerance what-if" help="monitor.whatif" folded>
       <p class="hint">
-        Change the points to see the result with another tolerance curve. The app keeps the annual losses of the last run, so no new simulation is necessary (Sec. 5.4.2). A saved change
+        Change the points to see the result with another tolerance curve. The app keeps the annual losses of the last run, so no new simulation is necessary. A saved change
         moves the old curve into the history with the date, the person and the reason.
       </p>
+      <Explain id="whatif-points" topic="monitor.whatif-points" name="What-if points" visible="About this table" />
       <InvalidFields.Provider value={report}>
         <div class="table-box" tabIndex={0} role="region" aria-label="What-if points" key={round}>
           <table>
@@ -461,6 +469,7 @@ function WhatIfPanel({ doc, update, numbers }: { readonly doc: RiskDocument; rea
         <p class="muted">The result shows after the simulation.</p>
       ) : (
         <>
+          <Explain id="whatif-result" topic="monitor.whatif-result" name="What-if result" visible="About this table" />
           <div class="table-box" tabIndex={0} role="region" aria-label="What-if result">
             <table>
               <caption>Table {(doc.appetite?.statements ?? []).length + 1}. The roll-up against the saved curve and against the what-if curve, without a new simulation.</caption>
@@ -499,10 +508,10 @@ function WhatIfPanel({ doc, update, numbers }: { readonly doc: RiskDocument; rea
         <legend>Save the what-if curve</legend>
         <div class="field-row">
           <div class="field">
-            <TextField id="whatif-by" label="Changed by" value={changedBy} onChange={setChangedBy} />
+            <TextField id="whatif-by" label="Changed by" help="monitor.whatif-by" value={changedBy} onChange={setChangedBy} />
           </div>
           <div class="field">
-            <TextField id="whatif-reason" label="Reason for the change" value={reason} onChange={setReason} />
+            <TextField id="whatif-reason" label="Reason for the change" help="monitor.whatif-reason" value={reason} onChange={setReason} />
           </div>
         </div>
         <div class="button-row">
@@ -517,8 +526,10 @@ function WhatIfPanel({ doc, update, numbers }: { readonly doc: RiskDocument; rea
           >
             Save the what-if curve
           </button>
+          {saveExplain.toggle}
           {!ready && <span class="hint">Change the curve and give your name and the reason.</span>}
         </div>
+        {saveExplain.text}
         {note !== undefined && <p role="status">{note}</p>}
       </fieldset>
       {(doc.appetite?.history ?? []).length > 0 && (
@@ -557,6 +568,7 @@ function OutcomeForm({ forecast, update }: { readonly forecast: Forecast; readon
   const [impact, setImpact] = useState<number>();
   const [evidence, setEvidence] = useState('');
   const [report, invalid] = useInvalid();
+  const explain = useExplain(`${id}-record`, 'monitor.record-outcome', `Record the outcome of ${forecast.id}`);
   const ready = occurred !== undefined && isDate(recordedOn) && recordedOn >= forecast.windowEnd && !invalid && (impact === undefined || impact >= 0);
   return (
     <fieldset class="sub-editor">
@@ -567,6 +579,7 @@ function OutcomeForm({ forecast, update }: { readonly forecast: Forecast; readon
             <SelectField
               id={`${id}-occurred`}
               label="Did the event occur?"
+              help="monitor.outcome-occurred"
               value={occurred}
               emptyLabel="Choose"
               options={[
@@ -577,36 +590,41 @@ function OutcomeForm({ forecast, update }: { readonly forecast: Forecast; readon
             />
           </div>
           <div class="field">
-            <TextField id={`${id}-on`} label="Recorded on" type="date" value={recordedOn} onChange={setRecordedOn} />
+            <TextField id={`${id}-on`} label="Recorded on" help="monitor.outcome-on" type="date" value={recordedOn} onChange={setRecordedOn} />
           </div>
           <div class="field">
-            <NumberField id={`${id}-impact`} label="Observed annual impact (optional)" min={0} value={impact} onChange={setImpact} />
+            <NumberField id={`${id}-impact`} label="Observed annual impact (optional)" help="monitor.outcome-impact" min={0} value={impact} onChange={setImpact} />
           </div>
         </div>
       </InvalidFields.Provider>
-      <TextField id={`${id}-evidence`} label="Evidence" value={evidence} onChange={setEvidence} />
-      <button
-        type="button"
-        disabled={!ready}
-        onClick={() => {
-          update((current) =>
-            withOutcome(current, forecast.id, {
-              occurred: occurred === 'yes',
-              recordedOn,
-              ...(impact === undefined ? {} : { observedAnnualImpact: impact }),
-              ...(evidence.trim() === '' ? {} : { evidence: evidence.trim() }),
-            }),
-          );
-        }}
-      >
-        Record the outcome of {forecast.id}
-      </button>
+      <TextField id={`${id}-evidence`} label="Evidence" help="monitor.outcome-evidence" value={evidence} onChange={setEvidence} />
+      <div class="button-row">
+        <button
+          type="button"
+          disabled={!ready}
+          onClick={() => {
+            update((current) =>
+              withOutcome(current, forecast.id, {
+                occurred: occurred === 'yes',
+                recordedOn,
+                ...(impact === undefined ? {} : { observedAnnualImpact: impact }),
+                ...(evidence.trim() === '' ? {} : { evidence: evidence.trim() }),
+              }),
+            );
+          }}
+        >
+          Record the outcome of {forecast.id}
+        </button>
+        {explain.toggle}
+      </div>
+      {explain.text}
     </fieldset>
   );
 }
 
 function ForecastPanel({ doc, update, numbers, simulated }: { readonly doc: RiskDocument; readonly update: Update; readonly numbers: MonitorNumbers | undefined; readonly simulated: boolean }) {
   const day = today();
+  const freezeExplain = useExplain('forecasts-freeze', 'monitor.freeze-forecasts', 'Freeze forecasts');
   const forecasts = doc.forecasts ?? [];
   const taken = new Set(forecasts.map((forecast) => forecast.id));
   const candidates = (numbers?.forecasts ?? []).filter((forecast) => !taken.has(forecast.id) && forecast.windowEnd >= day);
@@ -621,10 +639,10 @@ function ForecastPanel({ doc, update, numbers, simulated }: { readonly doc: Risk
         ? 'Due. Record the outcome.'
         : `Open until ${forecast.windowEnd}.`;
   return (
-    <Section id="forecasts" title="Forecasts and Brier score" folded>
+    <Section id="forecasts" title="Forecasts and Brier score" help="monitor.forecasts" folded>
       <p class="hint">
         "Freeze forecasts" stores one forecast per leaf risk. The window starts on the as-of date of the register and lasts its timeframe. The event is at least one event with an impact at
-        or above the reportable threshold. A frozen forecast is never changed. After the window ends, record what happened (Sec. 8.14).
+        or above the reportable threshold. A frozen forecast is never changed. After the window ends, record what happened.
       </p>
       {noThreshold.length > 0 && (
         <p class="hint">{noThreshold.map((register) => register.id).join(', ')} has no reportable event threshold, so every event counts. Set the threshold on the screen Identify and analyze.</p>
@@ -639,46 +657,52 @@ function ForecastPanel({ doc, update, numbers, simulated }: { readonly doc: Risk
         >
           Freeze {candidates.length} {candidates.length === 1 ? 'forecast' : 'forecasts'}
         </button>
+        {freezeExplain.toggle}
         {!simulated && <span class="hint">Freezing needs a risk with an estimate and a finished simulation.</span>}
         {simulated && numbers !== undefined && candidates.length === 0 && <span class="hint">Every simulated risk has a forecast for its current window.</span>}
       </div>
+      {freezeExplain.text}
       {forecasts.length === 0 ? (
         <p class="muted">No forecast yet.</p>
       ) : (
-        <div class="table-box" tabIndex={0} role="region" aria-label="Forecast log">
-          <table>
-            <caption>Forecast log. f is the probability of at least one event in the window.</caption>
-            <thead>
-              <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Risk</th>
-                <th scope="col">Window</th>
-                <th scope="col">f</th>
-                <th scope="col">90% interval of annual impact ({currency})</th>
-                <th scope="col">Outcome</th>
-              </tr>
-            </thead>
-            <tbody>
-              {forecasts.map((forecast) => (
-                <tr key={forecast.id}>
-                  <th scope="row" class="id">{forecast.id}</th>
-                  <td class="id">{forecast.riskId}</td>
-                  <td>
-                    {forecast.windowStart} to {forecast.windowEnd}
-                  </td>
-                  <td>{forecast.probability.toFixed(4)}</td>
-                  <td>{forecast.annualImpactInterval90 === undefined ? '' : `${money(forecast.annualImpactInterval90.lower)} to ${money(forecast.annualImpactInterval90.upper)}`}</td>
-                  <td>{outcomeText(forecast)}</td>
+        <>
+          <Explain id="forecast-log" topic="monitor.forecast-log" name="Forecast log" visible="About this table" />
+          <div class="table-box" tabIndex={0} role="region" aria-label="Forecast log">
+            <table>
+              <caption>Forecast log. f is the probability of at least one event in the window.</caption>
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Risk</th>
+                  <th scope="col">Window</th>
+                  <th scope="col">f</th>
+                  <th scope="col">90% interval of annual impact ({currency})</th>
+                  <th scope="col">Outcome</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {forecasts.map((forecast) => (
+                  <tr key={forecast.id}>
+                    <th scope="row" class="id">{forecast.id}</th>
+                    <td class="id">{forecast.riskId}</td>
+                    <td>
+                      {forecast.windowStart} to {forecast.windowEnd}
+                    </td>
+                    <td>{forecast.probability.toFixed(4)}</td>
+                    <td>{forecast.annualImpactInterval90 === undefined ? '' : `${money(forecast.annualImpactInterval90.lower)} to ${money(forecast.annualImpactInterval90.upper)}`}</td>
+                    <td>{outcomeText(forecast)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
       {due.map((forecast) => (
         <OutcomeForm key={forecast.id} forecast={forecast} update={update} />
       ))}
       <h3>Brier score</h3>
+      <Explain id="brier" topic="monitor.brier" name="Brier score" visible="About the score" />
       {scores === undefined ? (
         <p class="muted">No forecast has an outcome yet.</p>
       ) : (

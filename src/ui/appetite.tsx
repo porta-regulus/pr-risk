@@ -2,6 +2,7 @@
 // statements with tolerances, controls and indicators in the shape of Table 9.
 import type { RiskDocument } from '../schema/types';
 import { defaultTolerancePoints, draftList, nextId, type TolerancePoint, withSection, withValue } from './edit';
+import { Explain } from './explain';
 import { Checkboxes, LinesField, NumberField, SelectField, TextField } from './fields';
 import { Table9View, TriggerCheck } from './table9';
 import { TABLE_2, templateStatement } from './templates';
@@ -63,6 +64,7 @@ function TriggerEditor({ id, label, trigger, onChange }: { readonly id: string; 
       <SelectField
         id={`${id}-combine`}
         label={`Trigger of ${label} fires when`}
+        help="context.trigger-combine"
         value={trigger.combine}
         options={[
           ['all', 'all conditions hold'],
@@ -72,6 +74,7 @@ function TriggerEditor({ id, label, trigger, onChange }: { readonly id: string; 
           onChange({ ...trigger, combine: combine ?? 'all' });
         }}
       />
+      <Explain id={`${id}-conditions`} topic="context.trigger-conditions" name={`Conditions of ${label}`} />
       <div class="table-box">
         <table>
           <thead>
@@ -135,7 +138,7 @@ function TriggerEditor({ id, label, trigger, onChange }: { readonly id: string; 
           Remove the trigger
         </button>
       </div>
-      <TextField id={`${id}-note`} label="Interpretation note" value={trigger.interpretationNote} onChange={(note) => {
+      <TextField id={`${id}-note`} label="Interpretation note" help="context.trigger-note" value={trigger.interpretationNote} onChange={(note) => {
           onChange(withValue(trigger, 'interpretationNote', note));
         }} />
     </div>
@@ -152,23 +155,23 @@ function StatementEditor({ statement, onChange }: { readonly statement: Statemen
   return (
     <details class="editor">
       <summary>Edit {statement.title ?? statement.id}</summary>
-      <TextField id={`${id}-title`} label="Title" value={statement.title} onChange={(title) => {
+      <TextField id={`${id}-title`} label="Title" help="context.statement-title" value={statement.title} onChange={(title) => {
           set('title', title);
         }} />
-      <TextField id={`${id}-appetite`} label="Risk appetite statement" multiline value={statement.appetite} onChange={(appetite) => {
+      <TextField id={`${id}-appetite`} label="Risk appetite statement" help="context.statement-appetite" multiline value={statement.appetite} onChange={(appetite) => {
           onChange({ ...statement, appetite });
         }} />
-      <Checkboxes legend="Risk categories" name={`${id}-categories`} options={CATEGORIES} value={statement.categoryCodes ?? []} onChange={(codes) => {
+      <Checkboxes legend="Risk categories" name={`${id}-categories`} help="context.statement-categories" options={CATEGORIES} value={statement.categoryCodes ?? []} onChange={(codes) => {
           set('categoryCodes', codes);
         }} />
 
       <h4>Risk tolerance statements</h4>
       {tolerances.map((tolerance, i) => (
         <div class="sub-editor" key={i}>
-          <TextField id={`${id}-tol${String(i)}-id`} label="Tolerance ID" value={tolerance.id} onChange={(value) => {
+          <TextField id={`${id}-tol${String(i)}-id`} label="Tolerance ID" help="context.tolerance-id" value={tolerance.id} onChange={(value) => {
               set('tolerances', replaceAt(tolerances, i, { ...tolerance, id: value }));
             }} />
-          <TextField id={`${id}-tol${String(i)}-text`} label="Tolerance statement" multiline value={tolerance.text} onChange={(text) => {
+          <TextField id={`${id}-tol${String(i)}-text`} label="Tolerance statement" help="context.tolerance-text" multiline value={tolerance.text} onChange={(text) => {
               set('tolerances', replaceAt(tolerances, i, { ...tolerance, text }));
             }} />
           <TriggerEditor id={`${id}-tol${String(i)}-trigger`} label={`tolerance ${tolerance.id}`} trigger={tolerance.breachWhen} onChange={(breachWhen) => {
@@ -187,7 +190,7 @@ function StatementEditor({ statement, onChange }: { readonly statement: Statemen
         Add a tolerance
       </button>
 
-      <LinesField id={`${id}-controls`} label="Controls, one per line" value={statement.controls ?? []} onChange={(controls) => {
+      <LinesField id={`${id}-controls`} label="Controls, one per line" help="context.controls" value={statement.controls ?? []} onChange={(controls) => {
           set('controls', controls);
         }} />
 
@@ -196,17 +199,17 @@ function StatementEditor({ statement, onChange }: { readonly statement: Statemen
         <div class="sub-editor" key={i}>
           <div class="field-row">
             <div class="field">
-              <TextField id={`${id}-ind${String(i)}-id`} label="Indicator ID" value={indicator.id} onChange={(value) => {
+              <TextField id={`${id}-ind${String(i)}-id`} label="Indicator ID" help="context.indicator-id" value={indicator.id} onChange={(value) => {
                   set('indicators', replaceAt(indicators, i, { ...indicator, id: value }));
                 }} />
             </div>
             <div class="field">
-              <SelectField id={`${id}-ind${String(i)}-kind`} label="Kind" value={indicator.kind} options={KINDS} onChange={(kind) => {
+              <SelectField id={`${id}-ind${String(i)}-kind`} label="Kind" help="context.indicator-kind" value={indicator.kind} options={KINDS} onChange={(kind) => {
                   set('indicators', replaceAt(indicators, i, { ...indicator, kind: kind ?? 'kpi' }));
                 }} />
             </div>
           </div>
-          <TextField id={`${id}-ind${String(i)}-text`} label="Indicator" multiline value={indicator.text} onChange={(text) => {
+          <TextField id={`${id}-ind${String(i)}-text`} label="Indicator" help="context.indicator-text" multiline value={indicator.text} onChange={(text) => {
               set('indicators', replaceAt(indicators, i, { ...indicator, text }));
             }} />
           <TriggerEditor id={`${id}-ind${String(i)}-trigger`} label={`indicator ${indicator.id}`} trigger={indicator.firesWhen} onChange={(firesWhen) => {
@@ -262,17 +265,18 @@ export function AppetiteSection({ doc, update }: { readonly doc: RiskDocument; r
   return (
     <section aria-labelledby="appetite-title" class="panel">
       <h2 id="appetite-title">Capacity, appetite and tolerance</h2>
+      <Explain id="appetite-section" topic="context.appetite" name="Capacity, appetite and tolerance" visible="About this section" />
 
       <h3>Risk capacity</h3>
-      <p class="muted">The maximum amount of risk that the organization can absorb (Sec. 3.2.1). Screen S4 shows the probability of an annual loss above it.</p>
+      <p class="muted">The maximum amount of risk that the organization can absorb. Screen S4 shows the probability of an annual loss above it.</p>
       <div class="field-row">
         <div class="field">
-          <NumberField id="capacity-amount" label={`Capacity (${currency})`} min={0} value={capacity} onChange={(amount) => {
+          <NumberField id="capacity-amount" label={`Capacity (${currency})`} help="context.capacity" min={0} value={capacity} onChange={(amount) => {
               setCapacity({ amount });
             }} />
         </div>
         <div class="field wide">
-          <TextField id="capacity-rationale" label="Rationale for the capacity" value={appetite.capacity?.rationale} onChange={(rationale) => {
+          <TextField id="capacity-rationale" label="Rationale for the capacity" help="context.capacity-rationale" value={appetite.capacity?.rationale} onChange={(rationale) => {
               setCapacity({ rationale });
             }} />
         </div>
@@ -282,6 +286,7 @@ export function AppetiteSection({ doc, update }: { readonly doc: RiskDocument; r
       <p class="muted" id="curve-help">
         The highest probability per year that you accept for an annual loss above each amount. Losses go up and probabilities go down from row to row (rule V-12). The curve sets no limit below its first point.
       </p>
+      <Explain id="tolerance-curve" topic="context.tolerance-curve" name="Tolerance curve" />
       <div class="table-box">
         <table aria-describedby="curve-help">
           <thead>
@@ -330,16 +335,17 @@ export function AppetiteSection({ doc, update }: { readonly doc: RiskDocument; r
           Use the starting points from capacity
         </button>
       </div>
-      <p class="hint">The starting points are 2%, 10%, 33% and 100% of capacity at probabilities 0.5, 0.2, 0.05 and 0.01 (SPEC.md Sec. 8.9). They are a starting point, not advice.</p>
+      <Explain id="curve-starting-points" topic="context.curve-starting-points" name="Use the starting points from capacity" />
+      <p class="hint">The starting points are 2%, 10%, 33% and 100% of capacity at probabilities 0.5, 0.2, 0.05 and 0.01. They are a starting point, not advice.</p>
       {points.length > 0 && (
         <div class="field-row">
           <div class="field">
-            <TextField id="curve-approved-by" label="Approved by" value={appetite.toleranceCurve?.approvedBy} onChange={(approvedBy) => {
+            <TextField id="curve-approved-by" label="Approved by" help="context.curve-approved-by" value={appetite.toleranceCurve?.approvedBy} onChange={(approvedBy) => {
                 setCurve({ approvedBy });
               }} />
           </div>
           <div class="field">
-            <TextField id="curve-approved-on" label="Approved on" type="date" value={appetite.toleranceCurve?.approvedOn} onChange={(approvedOn) => {
+            <TextField id="curve-approved-on" label="Approved on" help="context.curve-approved-on" type="date" value={appetite.toleranceCurve?.approvedOn} onChange={(approvedOn) => {
                 setCurve({ approvedOn });
               }} />
           </div>
@@ -347,8 +353,9 @@ export function AppetiteSection({ doc, update }: { readonly doc: RiskDocument; r
       )}
 
       <h3>Appetite and tolerance statements</h3>
+      <Explain id="statements" topic="context.statements" name="Appetite and tolerance statements" />
       {statements.length === 0 ? (
-        <p class="muted">No statement yet. Each statement holds tolerances, controls and indicators in the shape of Table 9.</p>
+        <p class="muted">No statement yet. Each statement holds tolerances, controls and indicators in one table.</p>
       ) : (
         <Table9View statements={statements} />
       )}
@@ -368,11 +375,12 @@ export function AppetiteSection({ doc, update }: { readonly doc: RiskDocument; r
         Add a statement
       </button>
       <details class="help">
-        <summary>Examples from SP 800-221r1 Table 2</summary>
+        <summary>Example statements to start from</summary>
         <p class="hint">
-          The five example pairs of Table 2 (SP 800-221r1, p. 17, line 654), quoted exactly. Use one as a starting point, then change the words to fit your organization and add the
-          triggers that measure the tolerance. Table 9 example 3 gives 2 hours for a similar website tolerance (NIST comment N24).
+          Five example pairs from NIST, quoted exactly. Use one as a starting point, then change the words to fit your organization and add the triggers that measure the
+          tolerance.
         </p>
+        <Explain id="use-example" topic="context.use-example" name="Example statements" />
         {TABLE_2.map((template) => (
           <div class="sub-editor" key={template.enterprise}>
             <p>

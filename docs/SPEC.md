@@ -216,6 +216,12 @@ Full editor layout (S2 to S7, docs/ux/redesign-plan.md Sec. 3.3).
 3. Each section can fold. A large table that few users need starts folded. These are the roles (S2), the asset inventory (S3), the matrix (S4 and display only), the tolerance what-if and the forecasts (S6), and the Fig. 10 register, the Fig. 11 profile and the portfolio (S7). A fold stays as the user left it until the page loads again. Print opens every section.
 4. S5 shows one response option at a time. A row of option buttons picks the option, and a new option shows at once.
 
+Help on click (all screens, docs/ux/redesign-plan.md Sec. 5.4).
+1. Each field with a visible label, each section and each button with a result that is not obvious has a "?" toggle. It opens a short explanation below the item. The explanation says what the item is, why it matters, an example where one helps, and the source.
+2. Titles, leads, labels and legends use plain words. The NIST references (SP 800-221r1, IR 8286 Rev. 1) and the other sources are in the explanations, so the app keeps its references.
+3. The texts are in `src/ui/help/`, one file for each area. `test/ui-help.test.ts` fails when a field or section has no explanation, when a text is not used, when a text has an em dash, a semicolon or a colon, or when a title, lead, label or legend has a NIST section, figure or table number.
+4. The toggle is 24 by 24 px with a mouse and 44 by 44 px on a touch screen. Check boxes are 24 by 24 px (WCAG 2.2 SC 2.5.8).
+
 Estimate entry words (S3). From the calibration method of Hubbard and Seiersen, *How to Measure Anything in Cybersecurity Risk*, 2nd ed., Wiley 2023.
 1. "How many times per year does this happen, not counting events caused through the drivers below? Give a range you are 90% sure of." A toggle allows "once every N years". The app converts and swaps the bounds.
 2. "When it happens once, what is the loss? Give a range you are 90% sure of." For a positive risk the word is "gain".

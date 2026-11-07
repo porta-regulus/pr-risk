@@ -24,22 +24,22 @@ test('the steps panel leads a new user, ticks a step and opens the section of a 
   await expectAccessible(page, 'S2 with the steps panel');
 
   // A step on this screen opens its section and moves the focus to the heading.
-  await next.getByRole('button', { name: 'Show me where' }).click();
+  await next.getByRole('button', { name: 'Show me where', exact: true }).click();
   await expect(page.locator('#objectives-title')).toBeFocused();
   // The sticky save bar does not cover the heading.
   const gap = await page.evaluate(() => (document.getElementById('objectives-title')?.getBoundingClientRect().top ?? 0) - (document.querySelector('.save-bar')?.getBoundingClientRect().bottom ?? 0));
   expect(gap).toBeGreaterThanOrEqual(0);
 
-  await page.getByRole('button', { name: 'Add an objective' }).click();
+  await page.getByRole('button', { name: 'Add an objective', exact: true }).click();
   await page.getByLabel('Objective 1 statement').fill('Deliver every order on time.');
-  await page.getByRole('button', { name: 'Add an objective' }).click();
+  await page.getByRole('button', { name: 'Add an objective', exact: true }).click();
   await page.getByLabel('Objective 2 statement').fill('Keep customer data safe.');
   await expect(panel.locator(':scope > summary')).toHaveText('Steps to complete: 1 of 6 done');
   await expect(panel.locator('li.step-done')).toContainText('Add 2 objectives');
   await expect(next).toContainText('Next Draw your tolerance curve');
 
   // A step on another screen saves, opens that screen and then the section.
-  await panel.locator('li').filter({ hasText: 'Set your budget' }).getByRole('button', { name: 'Go to Respond and optimize' }).click();
+  await panel.locator('li').filter({ hasText: 'Set your budget' }).getByRole('button', { name: 'Go to Respond and optimize', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Respond and optimize' })).toBeVisible();
   await expect(page.locator('#budget-title')).toBeFocused();
 
