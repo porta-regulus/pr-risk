@@ -3,6 +3,7 @@
 import type { RiskDocument } from '../schema/types';
 import { draftList, withSection, withValue } from './edit';
 import { NumberField, SelectField, TextField } from './fields';
+import { Section } from './section';
 
 type Strategy = NonNullable<RiskDocument['strategy']>;
 type Scales = NonNullable<Strategy['scales']>;
@@ -97,8 +98,7 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
   );
 
   return (
-    <section aria-labelledby="strategy-title" class="panel">
-      <h2 id="strategy-title">Risk management strategy</h2>
+    <Section id="strategy" title="Risk management strategy">
 
       <h3>Scales</h3>
       <p class="muted">"Establishing a common scale for assessing levels of risk will support consistent risk estimation" (Sec. 3.2.2). Labels map to numbers through the representative value.</p>
@@ -178,6 +178,6 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
           />
         </div>
       </div>
-    </section>
+    </Section>
   );
 }

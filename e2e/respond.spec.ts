@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import { expectAccessible } from './axe';
+import { unfold } from './fold';
 
 function watchProblems(page: Page): string[] {
   const problems: string[] = [];
@@ -29,6 +30,7 @@ test('S4 shows the loss exceedance, the ranking and the display-only matrix of e
   await expect(page.getByRole('figure', { name: /Loss exceedance of the roll-up/ })).toBeVisible();
   const ranking = page.getByRole('region', { name: 'Risks by expected annual loss' });
   await expect(ranking.locator('tbody tr').first()).toContainText('R-01');
+  await unfold(page, 'Matrix, display only');
   await expect(page.getByText('Display only. Ranking and funding use the simulation (Cox 2008).')).toBeVisible();
   // R-09 exists only with O-3, so the matrix leaves it out.
   await expect(page.locator('table.matrix')).not.toContainText('R-09');
@@ -49,7 +51,8 @@ test('S5 finds the best portfolio of example 2 and prints the decision record on
   await openExample2(page);
   await page.getByRole('button', { name: 'Respond and optimize', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Respond and optimize' })).toBeFocused();
-  await page.locator('summary', { hasText: /^O-4 Cyber insurance/ }).click();
+  // S5 shows one option at a time. The tab of an option opens its editor.
+  await page.getByRole('group', { name: 'Response options to edit' }).getByRole('button', { name: /^O-4 Cyber insurance/ }).click();
   await expect(page.locator('#option-O-4-oneoff')).toBeVisible();
   await expectAccessible(page, 'S5 with an option editor open');
 

@@ -10,6 +10,7 @@ import { DocumentScreen, type ScreenName, type Update } from './editor';
 import { Checkboxes, NumberField, SelectField, TextField } from './fields';
 import { DriverPanel } from './drivers';
 import { RiskEditor } from './risk-editor';
+import { Section } from './section';
 
 type Asset = NonNullable<RiskDocument['assets']>[number];
 
@@ -90,8 +91,7 @@ function RegisterPanel({
   };
   const id = 'register';
   return (
-    <section aria-labelledby="registers-title" class="panel">
-      <h2 id="registers-title">Registers</h2>
+    <Section id="registers" title="Registers">
       <ul class="tree">
         {tree.map(({ register, depth }) => (
           <li key={register.id} style={{ paddingLeft: `${String(depth * 1.25)}rem` }}>
@@ -257,7 +257,7 @@ function RegisterPanel({
         </button>
         {used && <span class="hint">A register with risks or child registers cannot be removed.</span>}
       </div>
-    </section>
+    </Section>
   );
 }
 
@@ -281,8 +281,7 @@ function RiskTable({
   const risks = doc.risks.filter((risk) => risk.registerId === register.id);
   const currency = doc.document.currency;
   return (
-    <section aria-labelledby="risks-title" class="panel">
-      <h2 id="risks-title">Risks in {register.title}</h2>
+    <Section id="risks" title={<>Risks in {register.title}</>}>
       {risks.length === 0 ? (
         <p class="muted">No risk in this register yet.</p>
       ) : (
@@ -426,7 +425,7 @@ function RiskTable({
       >
         Add the template to {register.title}
       </button>
-    </section>
+    </Section>
   );
 }
 
@@ -459,8 +458,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
   };
   const usedBy = (id: string): string[] => doc.risks.filter((risk) => (risk.assetIds ?? []).includes(id)).map((risk) => risk.riskId);
   return (
-    <section aria-labelledby="assets-title" class="panel">
-      <h2 id="assets-title">Asset inventory</h2>
+    <Section id="assets" title="Asset inventory" folded>
       <p class="muted">
         "The value of an asset extends beyond its replacement cost" (Sec. 3.3.1), so a value needs a basis. Assets inherit the criticality of the functions they support.
       </p>
@@ -646,7 +644,7 @@ function AssetPanel({ doc, update }: { readonly doc: RiskDocument; readonly upda
       >
         Add an asset
       </button>
-    </section>
+    </Section>
   );
 }
 

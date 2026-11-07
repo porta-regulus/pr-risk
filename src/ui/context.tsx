@@ -7,6 +7,7 @@ import { DocumentScreen, type ScreenName, type Update } from './editor';
 import { Checkboxes, LinesField, SelectField, TextField } from './fields';
 import { GuidedQuestions } from './guided-questions';
 import { StrategySection } from './strategy';
+import { Section } from './section';
 
 type Context = NonNullable<RiskDocument['context']>;
 type Objective = NonNullable<Context['objectives']>[number];
@@ -53,8 +54,7 @@ function ContextSection({ doc, update }: { readonly doc: RiskDocument; readonly 
   const functionUse = (id: string): number => (doc.assets ?? []).filter((asset) => (asset.supportsFunctionIds ?? []).includes(id)).length;
 
   return (
-    <section aria-labelledby="context-title" class="panel">
-      <h2 id="context-title">Context</h2>
+    <Section id="context" title="Context">
       <TextField id="mission" label="Mission" multiline value={context.mission} onChange={(value) => {
           set('mission', value);
         }} />
@@ -211,7 +211,7 @@ function ContextSection({ doc, update }: { readonly doc: RiskDocument; readonly 
         }}>
         Add a function
       </button>
-    </section>
+    </Section>
   );
 }
 
@@ -221,8 +221,7 @@ function GovernanceSection({ doc, update }: { readonly doc: RiskDocument; readon
     update((current) => withSection(current, 'governance', withValue(current.governance, 'roles', next)));
   };
   return (
-    <section aria-labelledby="governance-title" class="panel">
-      <h2 id="governance-title">Roles</h2>
+    <Section id="governance" title="Roles" folded>
       <p class="muted">The roles of Table 1 that exist in your organization. A company of 50 people usually fills 3 or 4 rows.</p>
       {roles.length > 0 && (
         <div class="table-box">
@@ -285,7 +284,7 @@ function GovernanceSection({ doc, update }: { readonly doc: RiskDocument; readon
         }}>
         Add a role
       </button>
-    </section>
+    </Section>
   );
 }
 

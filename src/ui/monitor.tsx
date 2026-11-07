@@ -17,6 +17,7 @@ import { InvalidFields, NumberField, SelectField, TextField, useInvalid } from '
 import { useEngine } from './jobs';
 import { LecChart, money, percent, probability, sourceLine, StatusText } from './report';
 import { KIND_TEXT, metricsOf } from './table9';
+import { Section } from './section';
 
 type Statement = NonNullable<NonNullable<RiskDocument['appetite']>['statements']>[number];
 type Trigger = NonNullable<NonNullable<Statement['tolerances']>[number]['breachWhen']>;
@@ -188,8 +189,7 @@ function StatementMonitor({ statement, number, update }: { readonly statement: S
 function IndicatorsPanel({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
   const statements = doc.appetite?.statements ?? [];
   return (
-    <section aria-labelledby="indicators-title" class="panel">
-      <h2 id="indicators-title">KPIs, KRIs and tolerances</h2>
+    <Section id="indicators" title="KPIs, KRIs and tolerances">
       <p class="hint">
         Record what you measure. The app checks each trigger on its latest observation and shows "Fires", "Does not fire" or "No data" (Sec. 3.7). A KRI that fires starts a review of
         the risks in the categories of its statement.
@@ -199,7 +199,7 @@ function IndicatorsPanel({ doc, update }: { readonly doc: RiskDocument; readonly
       ) : (
         statements.map((statement, i) => <StatementMonitor key={statement.id} statement={statement} number={i + 1} update={update} />)
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -214,8 +214,7 @@ function ReviewPanel({ doc, openedAt }: { readonly doc: RiskDocument; readonly o
   const byId = new Map(doc.risks.map((risk) => [risk.riskId, risk]));
   const set = automaticSince(doc, openedAt);
   return (
-    <section aria-labelledby="review-title" class="panel">
-      <h2 id="review-title">Review triggers</h2>
+    <Section id="review" title="Review triggers">
       <p class="hint">
         A risk needs a review when a tolerance of its appetite statement breaches or a KRI fires, when its review date passes, when its acceptance expires, or when a new emerging or
         horizon risk appears in its category after the as-of date of its register (Sec. 3.7.1 and 5.1.2). The app then sets the status "Review needed" itself. It checks when this screen
@@ -259,7 +258,7 @@ function ReviewPanel({ doc, openedAt }: { readonly doc: RiskDocument; readonly o
           </table>
         </div>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -281,8 +280,7 @@ function AcceptancePanel({ doc, update }: { readonly doc: RiskDocument; readonly
     );
   };
   return (
-    <section aria-labelledby="acceptance-title" class="panel">
-      <h2 id="acceptance-title">Acceptance records</h2>
+    <Section id="acceptance" title="Acceptance records">
       <p class="hint">
         A record states who accepted the risk or the exception to a tolerance, when, until when and why (Sec. 5.1.2). An acceptance past its end date needs a review.
       </p>
@@ -329,7 +327,7 @@ function AcceptancePanel({ doc, update }: { readonly doc: RiskDocument; readonly
           </details>
         </>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -346,10 +344,9 @@ function WhatIfPanel({ doc, update, numbers }: { readonly doc: RiskDocument; rea
   const currency = doc.document.currency;
   if (saved.length === 0) {
     return (
-      <section aria-labelledby="whatif-title" class="panel">
-        <h2 id="whatif-title">Tolerance what-if</h2>
+      <Section id="whatif" title="Tolerance what-if" folded>
         <p class="muted">There is no tolerance curve. Set one on the screen Context and strategy first.</p>
-      </section>
+      </Section>
     );
   }
   const problems = curveProblems(points);
@@ -370,8 +367,7 @@ function WhatIfPanel({ doc, update, numbers }: { readonly doc: RiskDocument; rea
     </tr>
   );
   return (
-    <section aria-labelledby="whatif-title" class="panel">
-      <h2 id="whatif-title">Tolerance what-if</h2>
+    <Section id="whatif" title="Tolerance what-if" folded>
       <p class="hint">
         Change the points to see the result with another tolerance curve. The app keeps the annual losses of the last run, so no new simulation is necessary (Sec. 5.4.2). A saved change
         moves the old curve into the history with the date, the person and the reason.
@@ -550,7 +546,7 @@ function WhatIfPanel({ doc, update, numbers }: { readonly doc: RiskDocument; rea
           </table>
         </div>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -625,8 +621,7 @@ function ForecastPanel({ doc, update, numbers, simulated }: { readonly doc: Risk
         ? 'Due. Record the outcome.'
         : `Open until ${forecast.windowEnd}.`;
   return (
-    <section aria-labelledby="forecasts-title" class="panel">
-      <h2 id="forecasts-title">Forecasts and Brier score</h2>
+    <Section id="forecasts" title="Forecasts and Brier score" folded>
       <p class="hint">
         "Freeze forecasts" stores one forecast per leaf risk. The window starts on the as-of date of the register and lasts its timeframe. The event is at least one event with an impact at
         or above the reportable threshold. A frozen forecast is never changed. After the window ends, record what happened (Sec. 8.14).
@@ -727,7 +722,7 @@ function ForecastPanel({ doc, update, numbers, simulated }: { readonly doc: Risk
         Weak point. 15 risks with a base rate of 5 to 10% give about one event per year, so the score of one company is noise for years. The app keeps every forecast, so the data is
         ready when scores of many companies can be pooled.
       </p>
-    </section>
+    </Section>
   );
 }
 

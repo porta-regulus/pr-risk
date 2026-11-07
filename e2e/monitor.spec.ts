@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { expectAccessible } from './axe';
+import { unfold } from './fold';
 
 // Screen S6 Monitor and adjust under the production CSP (build task 6). Golden test G2 (b) on
 // recorded observations, the automatic review triggers, acceptance records, the tolerance
@@ -151,6 +152,8 @@ test('S6 tests a tolerance curve, freezes forecasts and scores them after the wi
   await page.getByRole('button', { name: 'Prioritize' }).click();
   await page.getByRole('navigation', { name: 'Screens' }).getByRole('button', { name: 'Monitor and adjust' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Monitor and adjust' })).toBeFocused();
+  await unfold(page, 'Tolerance what-if');
+  await unfold(page, 'Forecasts and Brier score');
 
   // KRI-1 of example 2 fires (210 days since the last restore test), so on opening the app sets
   // the ict risks to Review needed.

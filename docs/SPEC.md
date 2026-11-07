@@ -200,7 +200,7 @@ Steps to complete (S2 to S7). A panel under the save bar leads a first-time user
 1. The steps, in this order. 2 objectives with a statement. A tolerance curve with 3 or more points. 1 or more risks that are not Closed. An owner, an estimate and 1 or more objectives for each risk that is not Closed. A driver that 2 risks link to (optional). The first-year budget. 2 or more response options, 1 of them a candidate or selected. The run and the print of the decision record.
 2. The app ticks a step from the saved document. It cannot tick the run and the print, because they do not change the document. The first required step that is not done is "Next" and shows how to do it. The other steps show it on request. The state of each step is also a word, so colour is never the only signal.
 3. Each step has a button that saves, opens the screen of the step, and moves the focus to the heading of its section.
-4. A closed panel stays closed on the other screens until the page loads again. The panel does not print. It shows no number for an estimate (hard rule 2).
+4. A closed panel stays closed on the other screens until the page loads again. When every required step is done, the panel starts closed. The panel does not print. It shows no number for an estimate (hard rule 2).
 5. S1 tells a new user to create a document and then open "Guided mode".
 
 Guided mode (docs/ux/redesign-plan.md Sec. 3). The same document in 9 steps, one task on each page, in the order of the AT-5 task. Your company, Your goals, Loss you can take (the guided questions of Sec. 6.5 item 6), Your risks, Size each risk, Shared causes (optional), What you can do, Budget and best plan, Decision record.
@@ -209,6 +209,12 @@ Guided mode (docs/ux/redesign-plan.md Sec. 3). The same document in 9 steps, one
 3. The steps use the edit functions of S2 to S5, so the guided mode and the full editor (S2 to S7) never differ. "Open the full editor" and "Guided mode" switch between them with a save first.
 4. The NIST references are in the help text "Why we ask this" of each step, not in the titles.
 5. Step 9 prints only the decision record, as S5 does.
+
+Full editor layout (S2 to S7, docs/ux/redesign-plan.md Sec. 3.3).
+1. A numbered side menu lists the 6 screens and marks the current one. At a width of 760 px or less it becomes a menu button. "Back to start" and "Guided mode" are above it.
+2. Each screen starts with a state line in plain words, counted from the document. An example is "9 open risks in 2 registers. 2 risks need an estimate."
+3. Each section can fold. A large table that few users need starts folded. These are the roles (S2), the asset inventory (S3), the matrix (S4 and display only), the tolerance what-if and the forecasts (S6), and the Fig. 10 register, the Fig. 11 profile and the portfolio (S7). A fold stays as the user left it until the page loads again. Print opens every section.
+4. S5 shows one response option at a time. A row of option buttons picks the option, and a new option shows at once.
 
 Estimate entry words (S3). From the calibration method of Hubbard and Seiersen, *How to Measure Anything in Cybersecurity Risk*, 2nd ed., Wiley 2023.
 1. "How many times per year does this happen, not counting events caused through the drivers below? Give a range you are 90% sure of." A toggle allows "once every N years". The app converts and swaps the bounds.

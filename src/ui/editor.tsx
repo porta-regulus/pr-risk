@@ -12,13 +12,15 @@ import type { RiskNumbers } from '../engine/numbers';
 import { simulationTargets, withNistNumbers, withNumbersFrom, withSimulationSettings } from './analysis';
 import { documentChanges, withChangeLog } from './edit';
 import { InvalidFields } from './fields';
+import { screenSummary, type EditorScreen } from './screen-summary';
+import { unfold } from './section';
 import { completionSteps, type StepState } from './steps';
 import { VersionNotice } from './version-notice';
 
 export type Update = (change: (doc: RiskDocument) => RiskDocument) => void;
 export type ScreenName = 'start' | 'guided' | 'context' | 'identify' | 'prioritize' | 'respond' | 'monitor' | 'enterprise';
 
-const SCREENS: readonly (readonly [Exclude<ScreenName, 'start' | 'guided'>, string])[] = [
+const SCREENS: readonly (readonly [EditorScreen, string])[] = [
   ['context', 'Context and strategy'],
   ['identify', 'Identify and analyze'],
   ['prioritize', 'Prioritize'],
@@ -42,6 +44,7 @@ let pendingSection: string | undefined;
 function showSection(id: string): boolean {
   const target = document.getElementById(id);
   if (target === null) return false;
+  unfold(target);
   if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
   const bar = document.querySelector('.save-bar')?.getBoundingClientRect().height ?? 0;
   window.scrollTo(0, target.getBoundingClientRect().top + window.scrollY - bar - 8);
@@ -52,8 +55,9 @@ function showSection(id: string): boolean {
 // SPEC.md Sec. 5. The steps of the AT-5 task in plain words, ticked from the saved document.
 // Colour is never the only signal, so each step also has its state as a word.
 function StepsPanel({ doc, screen, onGo }: { readonly doc: RiskDocument; readonly screen: Exclude<ScreenName, 'start'>; readonly onGo: (screen: Exclude<ScreenName, 'start'>, section: string) => void }) {
-  const [open, setOpen] = useState(!stepsClosed);
   const { steps, done, required } = completionSteps(doc);
+  // When every step is done, the panel starts closed, so the screen starts with its own work.
+  const [open, setOpen] = useState(!stepsClosed && done < required);
   return (
     <details
       class="steps panel"
@@ -107,6 +111,38 @@ const isoSeconds = (date = new Date()): string => date.toISOString().replace(/\.
 // engine worker. Without them, the simulations run here.
 export function prepareSave(saved: RiskDocument, draft: RiskDocument, at: string, simulated?: Readonly<Record<string, RiskNumbers>>): RiskDocument {
   return withChangeLog(saved, withNistNumbers(saved, withSimulationSettings(draft), simulated), at);
+}
+
+// The side menu of the full editor (docs/ux/redesign-plan.md Sec. 3.3 item 1). On a narrow
+// screen it folds into one menu button. The number is decoration, so the button name is the
+// screen name only.
+function ScreenMenu({ screen, onGo }: { readonly screen: EditorScreen; readonly onGo: (screen: ScreenName) => void }) {
+  const [open, setOpen] = useState(false);
+  const index = SCREENS.findIndex(([name]) => name === screen);
+  return (
+    <nav class="guided-nav editor-nav" aria-label="Screens">
+      <button type="button" class="guided-menu" aria-expanded={open} aria-controls="screen-list" onClick={() => {
+          setOpen(!open);
+        }}>
+        Screen {index + 1} of {SCREENS.length}, {SCREENS[index]?.[1]}
+      </button>
+      <ol id="screen-list" class={open ? 'guided-steps open' : 'guided-steps'}>
+        {SCREENS.map(([name, text], i) => (
+          <li key={name}>
+            <button type="button" class={`guided-step${name === screen ? ' is-now' : ''}`} aria-current={name === screen ? 'page' : undefined} disabled={name === screen} onClick={() => {
+                setOpen(false);
+                onGo(name);
+              }}>
+              <span class="guided-num" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span class="guided-name">{text}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
 }
 
 export function DocumentScreen({
@@ -329,57 +365,23 @@ export function DocumentScreen({
         ? 'Saving.'
         : `Saved as version ${String(stored.version)}.`;
 
-  const guided = screen === 'guided';
-  return (
-    <main class={guided ? 'screen screen-guided' : 'screen'}>
-      {guided ? (
-        <header class="guided-top">
-          <p class="guided-brand">
-            <strong>PortaRegulus Risk</strong> <span class="muted">{draft.document.title}</span>
-          </p>
-          <nav aria-label="Modes" class="button-row">
-            <button type="button" class="quiet" onClick={() => {
-                leave('start');
-              }}>
-              Back to start
-            </button>
-            <button type="button" class="quiet" onClick={() => {
-                leave('context');
-              }}>
-              Open the full editor
-            </button>
-          </nav>
-        </header>
-      ) : (
-        <header class="screen-head">
-          <nav aria-label="Screens" class="button-row">
-            <button type="button" class="quiet" onClick={() => {
-                leave('start');
-              }}>
-              Back to start
-            </button>
-            <button type="button" class="quiet" onClick={() => {
-                leave('guided');
-              }}>
-              Guided mode
-            </button>
-            {SCREENS.map(([name, text]) => (
-              <button type="button" class="quiet" key={name} aria-current={name === screen ? 'page' : undefined} disabled={name === screen} onClick={() => {
-                  leave(name);
-                }}>
-                {text}
-              </button>
-            ))}
-          </nav>
-          <h1 id="screen-title" tabIndex={-1}>
-            {title}
-          </h1>
-          <p class="lede">
-            {draft.document.title}. {lede}
-          </p>
-        </header>
-      )}
-
+  const editorScreen = screen === 'guided' ? undefined : screen;
+  const guided = editorScreen === undefined;
+  const head = editorScreen === undefined ? null : (
+    <header class="screen-head">
+      <h1 id="screen-title" tabIndex={-1}>
+        {title}
+      </h1>
+      <p class="lede">{lede}</p>
+      <ul class="screen-summary" aria-label="State of this screen">
+        {screenSummary(draft, editorScreen, isoSeconds().slice(0, 10)).map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
+    </header>
+  );
+  const body = (
+    <>
       <VersionNotice />
       {exportOverdue(stored) && (
         <p class="banner" role="status">
@@ -416,6 +418,39 @@ export function DocumentScreen({
       <InvalidFields.Provider value={reportInvalid}>
         <Fragment key={revision}>{children(draft, update, { blocked })}</Fragment>
       </InvalidFields.Provider>
+    </>
+  );
+
+  return (
+    <main class={guided ? 'screen screen-guided' : 'screen screen-editor'}>
+      <header class="guided-top">
+        <p class="guided-brand">
+          <strong>PortaRegulus Risk</strong> <span class="muted">{draft.document.title}</span>
+        </p>
+        <nav aria-label="Modes" class="button-row">
+          <button type="button" class="quiet" onClick={() => {
+              leave('start');
+            }}>
+            Back to start
+          </button>
+          <button type="button" class="quiet" onClick={() => {
+              leave(guided ? 'context' : 'guided');
+            }}>
+            {guided ? 'Open the full editor' : 'Guided mode'}
+          </button>
+        </nav>
+      </header>
+      {editorScreen === undefined ? (
+        body
+      ) : (
+        <div class="editor-shell">
+          <ScreenMenu screen={editorScreen} onGo={leave} />
+          <div class="editor-page">
+            {head}
+            {body}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -2,7 +2,7 @@
 
 | Item | Value |
 |---|---|
-| Status | Phase 0 is done (pull request 52). Phase 1 is done. The product owner picked direction B with a sans font on 2026-11-06 (Sec. 4.1). The product owner passed the phase 2 prototype on 2026-11-06. Phase 3 is built (Sec. 5.2) and waits for review. |
+| Status | Phase 0 is done (pull request 52). Phase 1 is done. The product owner picked direction B with a sans font on 2026-11-06 (Sec. 4.1). The product owner passed the phase 2 prototype on 2026-11-06. Phase 3 is merged (pull request 55). Phase 4 is built (Sec. 5.3) and waits for review. |
 | Date | 2026-11-06 |
 | Decided by the product owner | Guided mode plus the full editor. The redesign ships before release 1, so release 1 and AT-5 wait. Claude proposes 2 or 3 visual directions as mockups first. |
 | Changes | HANDOFF task 12 (the order before the tag), SPEC.md Sec. 5 (screens), Sec. 10 (UI) and Sec. 12.5 (AT-5 uses the new GUI) |
@@ -108,7 +108,7 @@ On 2026-11-06 the product owner looked at the 3 mockups and picked direction B, 
 | 1 | 3 visual mockups (Sec. 4) | The product owner picks one. Done 2026-11-06, direction B with a sans font (Sec. 4.1) |
 | 2 | Clickable prototype of the guided mode, steps 1 to 9, with the chosen style, on example data | The product owner can go from step 1 to the record without help. Passed 2026-11-06 (Sec. 5.1) |
 | 3 | Merge `ed/appetite-questions-r2` (Sec. 6 decision 2). Build the guided mode in the app, with the guided questions as step 3 | All 9 steps work on real documents. The e2e tests, axe-core and 375 px pass. The AT-5 script runs through the guided mode. Built 2026-11-06 (Sec. 5.2) |
-| 4 | Clean up the full editor (Sec. 3.3) with the new style | Every field of today is still reachable. All tests pass |
+| 4 | Clean up the full editor (Sec. 3.3) with the new style | Every field of today is still reachable. All tests pass. Built 2026-11-07 (Sec. 5.3) |
 | 5 | Plain words (Sec. 2 item 3) on all screens | No NIST section number in a title or in the main text |
 | 6 | Pilot with 1 target user, fix the blockers | No open blocker |
 | 7 | AT-5 with 5 users, then AT-6, then the tag | HANDOFF task 12 |
@@ -132,6 +132,16 @@ Known limits. A gain counts as a negative loss, so the expected loss can be belo
 3. S1 has "Guided mode" as the main button of a selected document. The full editor has "Guided mode" in its row of screens.
 4. The whole app has the colors and the font of Sec. 4.1. Phase 4 cleans up the layout of the full editor.
 5. Tests. `e2e/guided-mode.spec.ts` runs the AT-5 task through the guided mode, with axe-core and 375 px on the steps, the print of the record on 2 pages or fewer, and the step menu at 375 px. `test/ui-guided-steps.test.ts` tests the done rules. All earlier e2e tests pass with the new style.
+
+### 5.3 Phase 4 build
+
+1. `DocumentScreen` in `src/ui/editor.tsx` has a top bar with "Back to start" and "Guided mode", and the side menu `ScreenMenu`. The menu reuses the step list of the guided mode.
+2. `src/ui/screen-summary.ts` writes the state line of each screen. `test/ui-screen-summary.test.ts` tests it.
+3. `src/ui/section.tsx` is the section that folds. The heading stays a level 2 heading in the summary, with the same id, so the steps panel and the e2e tests still find it. `unfold` opens a folded section before the steps panel moves the focus into it. Sections are rules, not boxes (Sec. 4.1).
+4. S5 shows one response option at a time (`OptionEditor` with `alone`). The guided mode keeps its folded options, because the product owner passed it in phase 2.
+5. No field is removed. A folded field is one click away.
+6. Tests. `e2e/editor.spec.ts` tests the menu, the state line, a fold, one option at a time, 375 px and axe-core. `e2e/fold.ts` opens a folded section for the earlier e2e tests.
+7. Not in phase 4. The NIST numbers in titles and leads stay until phase 5 (plain words).
 
 Phases 2 and 3 are the largest part. The product owner sees a working result at the end of each phase.
 
