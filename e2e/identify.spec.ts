@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { expectAccessible } from './axe';
+import { unfold } from './fold';
 
 // Screen S3 under the production CSP. A new document gets a quantitative register, an asset
 // and a risk with a calibrated estimate. Rule V-08 holds the save until the estimate is
@@ -21,6 +22,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
 
   // The register becomes quantitative, and an asset joins the inventory.
   await page.getByLabel('Method').selectOption('quantitative');
+  await unfold(page, 'Asset inventory');
   await page.getByRole('button', { name: 'Add an asset' }).click();
   await page.getByText(/^A-1 New asset/).click();
   await page.getByLabel('Name', { exact: true }).fill('Web shop');

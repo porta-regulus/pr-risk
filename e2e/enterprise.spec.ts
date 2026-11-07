@@ -3,6 +3,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { parseCsv } from '../src/import/csv';
 import type { RiskDocument } from '../src/schema/types';
 import { expectAccessible } from './axe';
+import { unfold } from './fold';
 
 // Screen S7 Enterprise view under the production CSP (build task 7). Golden tests G1 (b), G3 and
 // G5 of SPEC.md Sec. 12.2, with the axe check and the 375 px width.
@@ -73,6 +74,7 @@ const FIG_11 = {
 test('G5. S7 shows the profile of example 1 by objective in the layout of Fig. 11', async ({ page }) => {
   const problems = watchProblems(page);
   await open(page, EXAMPLE_1, 'Enterprise view');
+  await unfold(page, /^Risk profile by objective/);
   const scope = page.getByLabel('Registers in the profile');
   await expect(scope).toHaveValue('');
   const blocks = page.locator('.erp-block');
@@ -103,6 +105,7 @@ test('G5. S7 shows the profile of example 1 by objective in the layout of Fig. 1
 test('S7 shows the simulated expected annual loss of example 2 with its standard error', async ({ page }) => {
   const problems = watchProblems(page);
   await open(page, 'SME with numbers (example 2)', 'Enterprise view');
+  await unfold(page, 'Portfolio by register and period');
   const corp = page.locator('table.portfolio tr[data-register="CORP"] td.current');
   await expect(corp.locator('.se')).toHaveText(/^Simulated, standard error [\d,]+$/, { timeout: 30_000 });
   const eal = Number((await corp.evaluate((cell) => cell.firstChild?.textContent ?? '')).replaceAll(',', ''));

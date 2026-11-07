@@ -15,6 +15,7 @@ import { ErrView } from './err';
 import { registerTree } from './identify';
 import { useEngine } from './jobs';
 import { LecChart, money, percent, probability, short, sourceLine, StatusText } from './report';
+import { Section } from './section';
 
 type Override = NonNullable<Risk['priorityOverride']>;
 
@@ -264,8 +265,7 @@ function RiskTables({ doc, update, numbers }: { readonly doc: RiskDocument; read
   const months = (risk: Risk): number => doc.registers.find((register) => register.id === risk.registerId)?.timeframeMonths ?? 12;
   return (
     <>
-      <section aria-labelledby="ranking-title" class="panel">
-        <h2 id="ranking-title">Risks by expected annual loss</h2>
+      <Section id="ranking" title="Risks by expected annual loss">
         <p class="hint">
           The app proposes priorities from the expected annual loss, highest first, within each register (Sec. 3.5 and 5.3.3). The contribution is the share of the loss in the
           worst 5% of years. A risk alone against the tolerance curve shows if it breaches the curve by itself.
@@ -335,11 +335,10 @@ function RiskTables({ doc, update, numbers }: { readonly doc: RiskDocument; read
             <OverrideEditor key={risk.riskId} risk={risk} proposed={proposed.get(risk.riskId)} update={update} />
           ))}
         </details>
-      </section>
+      </Section>
 
       {positive.length > 0 && (
-        <section aria-labelledby="opportunities-title" class="panel">
-          <h2 id="opportunities-title">Opportunities by expected annual gain</h2>
+        <Section id="opportunities" title="Opportunities by expected annual gain">
           <p class="hint">Positive risks never enter the loss curve. Their gain counts in the net benefit of a portfolio (Sec. 6.12).</p>
           <div class="table-box" tabIndex={0} role="region" aria-labelledby="opportunities-title">
             <table>
@@ -368,7 +367,7 @@ function RiskTables({ doc, update, numbers }: { readonly doc: RiskDocument; read
               </tbody>
             </table>
           </div>
-        </section>
+        </Section>
       )}
     </>
   );
@@ -420,8 +419,7 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
       </p>
       {numbers !== undefined && (
         <>
-          <section aria-labelledby="lec-title" class="panel">
-            <h2 id="lec-title">Loss exceedance</h2>
+          <Section id="lec" title="Loss exceedance">
             <p>
               Roll-up of all registers: <StatusText status={points.length === 0 ? undefined : numbers.state.status} />. Expected annual loss {money(numbers.state.eal)} ±{' '}
               {money(numbers.state.ealSe)} {currency}.{numbers.state.pAboveCapacity !== undefined && <> P(loss above capacity) {probability(numbers.state.pAboveCapacity)}.</>}
@@ -475,10 +473,9 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
             )}
             {numbers.clippedShare > 0.05 && <p class="banner">{percent(numbers.clippedShare)} of the trials have a clipped rate (lint L-08). Check the widest frequency ranges.</p>}
             <NotAcceptableEvents doc={doc} />
-          </section>
+          </Section>
           <RiskTables doc={doc} update={update} numbers={numbers} />
-          <section aria-labelledby="matrix-title" class="panel">
-            <h2 id="matrix-title">Matrix, display only</h2>
+          <Section id="matrix" title="Matrix, display only" folded>
             <p class="hint">
               Users and auditors expect a matrix, so the app shows it. A matrix can rank a smaller risk above a larger one (Cox 2008). A mark ! shows a pair that lint L-01 or L-03
               finds.
@@ -493,7 +490,7 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
                 ))}
               </ul>
             )}
-          </section>
+          </Section>
         </>
       )}
       <ErrView doc={doc} number={4} />

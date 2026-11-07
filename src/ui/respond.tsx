@@ -13,6 +13,7 @@ import { useEngine } from './jobs';
 import { AcceptanceEditor } from './acceptance';
 import { DecisionRecordView, residualRisks } from './record';
 import { money, StatusText } from './report';
+import { Section } from './section';
 
 type Effect = ResponseOption['effects'][number];
 
@@ -155,7 +156,9 @@ function EffectEditor({
   );
 }
 
-export function OptionEditor({ doc, option, update }: { readonly doc: RiskDocument; readonly option: ResponseOption; readonly update: Update }) {
+// alone shows the option as the one open editor of S5 (docs/ux/redesign-plan.md Sec. 3.3 item 3).
+// Without it, the option is a folded part, as in the guided mode.
+export function OptionEditor({ doc, option, update, alone = false }: { readonly doc: RiskDocument; readonly option: ResponseOption; readonly update: Update; readonly alone?: boolean }) {
   const currency = doc.document.currency;
   const id = `option-${option.id}`;
   const set = (change: (option: ResponseOption) => ResponseOption): void => {
@@ -177,11 +180,9 @@ export function OptionEditor({ doc, option, update }: { readonly doc: RiskDocume
   const others = (doc.responses ?? []).filter((item) => item.id !== option.id);
   const usedBy = others.filter((item) => (item.bundleOf ?? []).includes(option.id)).map((item) => item.id);
   const introducible = doc.risks.filter((risk) => risk.onlyWithResponse === undefined || risk.onlyWithResponse === option.id);
-  return (
-    <details class="editor" open={startsOpen}>
-      <summary>
-        {option.id} {option.title || 'New option'}, {option.status}, first-year cash {money((costs.oneOff ?? 0) + (costs.annual ?? 0) + (costs.reserveAmount ?? 0))} {currency}
-      </summary>
+  const head = `${option.id} ${option.title || 'New option'}, ${option.status}, first-year cash ${money((costs.oneOff ?? 0) + (costs.annual ?? 0) + (costs.reserveAmount ?? 0))} ${currency}`;
+  const fields = (
+    <>
       <div class="field-row">
         <div class="field wide">
           <TextField
@@ -463,6 +464,17 @@ export function OptionEditor({ doc, option, update }: { readonly doc: RiskDocume
         Remove option {option.id}
       </button>
       {(usedBy.length > 0 || (option.introducesRisks ?? []).length > 0) && <span class="hint">A bundle or an introduced risk uses this option, so it cannot be removed.</span>}
+    </>
+  );
+  return alone ? (
+    <div class="editor editor-one" role="group" aria-labelledby={`${id}-head`}>
+      <h3 id={`${id}-head`}>{head}</h3>
+      {fields}
+    </div>
+  ) : (
+    <details class="editor" open={startsOpen}>
+      <summary>{head}</summary>
+      {fields}
     </details>
   );
 }
@@ -661,10 +673,13 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
   const run = usePortfolioRun(doc, blocked);
   const { record, stale, ready } = run;
   const canAdd = newResponseOption(doc) !== undefined;
+  // One option at a time (docs/ux/redesign-plan.md Sec. 3.3 item 3). The first one shows until
+  // the user picks another, and a new option shows at once.
+  const [selected, setSelected] = useState<string>();
+  const shown = options.find((option) => option.id === selected) ?? options[0];
   return (
     <>
-      <section aria-labelledby="budget-title" class="panel">
-        <h2 id="budget-title">Budget and method</h2>
+      <Section id="budget" title="Budget and method">
         <div class="field-row">
           <div class="field">
             <NumberField id="budget-cash" label={`Budget, first-year cash (${currency})`} min={0} value={budget} onChange={(value) => {
@@ -692,14 +707,23 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
           The algorithmic method compares every affordable set of options. The record always shows the fiscal baseline next to it (Sec. 8.12). For the operational method, mark
           options as required or excluded.
         </p>
-      </section>
+      </Section>
 
-      <section aria-labelledby="options-title" class="panel">
-        <h2 id="options-title">Response options</h2>
-        {options.length === 0 && <p class="muted">No response option yet.</p>}
-        {options.map((option) => (
-          <OptionEditor key={option.id} doc={doc} option={option} update={update} />
-        ))}
+      <Section id="options" title="Response options">
+        {options.length === 0 ? (
+          <p class="muted">No response option yet.</p>
+        ) : (
+          <div class="guided-tabs" role="group" aria-label="Response options to edit">
+            {options.map((option) => (
+              <button type="button" key={option.id} class="guided-tab" aria-pressed={option.id === shown?.id} onClick={() => {
+                  setSelected(option.id);
+                }}>
+                {option.id} {option.title || 'New option'}
+              </button>
+            ))}
+          </div>
+        )}
+        {shown !== undefined && <OptionEditor key={shown.id} doc={doc} option={shown} update={update} alone />}
         <button
           type="button"
           class="quiet"
@@ -707,6 +731,7 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
           onClick={() => {
             update((current) => {
               const option = newResponseOption(current);
+              if (option !== undefined) setSelected(option.id);
               return option === undefined ? current : withValue(current, 'responses', [...(current.responses ?? []), option]);
             });
           }}
@@ -714,13 +739,12 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
           Add a response option
         </button>
         {!canAdd && <span class="hint">A response option needs a risk with an estimate or a driver to act on.</span>}
-      </section>
+      </Section>
 
-      <section aria-labelledby="run-title" class="panel">
-        <h2 id="run-title">Ranked portfolios</h2>
+      <Section id="run" title="Ranked portfolios">
         <RunButtons run={run} />
         {record !== undefined && <RankedPortfolios record={record} currency={currency} />}
-      </section>
+      </Section>
 
       {record !== undefined && <ResidualAcceptance doc={doc} record={record} update={update} />}
 

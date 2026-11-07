@@ -1442,7 +1442,117 @@ main.screen-guided {
   }
 }
 
+/* Full editor (docs/ux/redesign-plan.md Sec. 3.3, phase 4). The side menu reuses the step list
+   of the guided mode. Sections are rules, not boxes, and each one can fold. */
+main.screen-editor {
+  max-width: 84rem;
+}
+.editor-shell {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+}
+.editor-nav {
+  position: sticky;
+  top: 1rem;
+}
+.editor-page {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+.editor-nav .guided-step:disabled {
+  background: transparent;
+  color: var(--text);
+  cursor: default;
+}
+.screen-editor .screen-head h1 {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0;
+}
+.screen-summary {
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+}
+.screen-editor .panel {
+  background: transparent;
+  border: 0;
+  border-top: 2px solid var(--text);
+  border-radius: 0;
+  padding: 1rem 0 0;
+}
+.screen-editor .save-bar.panel {
+  background: var(--background);
+  border-top: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 0;
+}
+.fold > details {
+  display: grid;
+  gap: 0.6rem;
+}
+.fold > details > summary {
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  min-height: 44px;
+}
+.fold > details > summary::-webkit-details-marker {
+  display: none;
+}
+.fold > details > summary::after {
+  /* The words are for the eye. The summary already tells assistive technology that it is open or closed. */
+  content: 'Show' / '';
+  margin-left: auto;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--muted);
+  text-decoration: underline;
+}
+.fold > details[open] > summary::after {
+  content: 'Hide' / '';
+}
+.fold > details > summary > h2 {
+  margin: 0;
+}
+.fold-body {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.fold-body > * {
+  min-width: 0;
+}
+.editor-one {
+  display: grid;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+}
+@media (max-width: 760px) {
+  .editor-shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+  .editor-nav {
+    position: static;
+  }
+}
+
 @media print {
+  .fold > details > summary::after {
+    display: none;
+  }
   :root {
     --text: var(--print-ink);
     --muted: var(--print-muted);
@@ -1467,7 +1577,7 @@ main.screen-guided {
     max-width: none;
     padding: 0;
   }
-  main.screen > :not(.record):not(.print-view):not(.guided) {
+  main.screen > :not(.record):not(.print-view):not(.guided):not(.editor-shell) {
     display: none !important;
   }
   /* The guided mode prints only its decision record. */
@@ -1481,6 +1591,17 @@ main.screen-guided {
   .guided-page {
     display: block;
     max-width: none;
+  }
+  /* The full editor prints the record (S5) or the print views (S7) inside its page wrapper. */
+  main.screen > .editor-shell {
+    display: block;
+  }
+  .editor-nav,
+  .editor-page > :not(.record):not(.print-view) {
+    display: none !important;
+  }
+  .editor-page {
+    display: block;
   }
   /* Screen S7 prints the register, the profile and the portfolio without the form fields. */
   .print-view .panel {

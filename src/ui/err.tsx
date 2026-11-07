@@ -5,6 +5,7 @@ import { useState } from 'preact/hooks';
 import type { Risk, RiskDocument } from '../schema/types';
 import { SelectField } from './fields';
 import { registerTree } from './identify';
+import { Section } from './section';
 
 export const ERR_COLUMNS = [
   'ID',
@@ -48,8 +49,7 @@ export function ErrView({ doc, number }: { readonly doc: RiskDocument; readonly 
   const register = doc.registers.find((item) => item.id === chosen) ?? doc.registers[0];
   const risks = doc.risks.filter((risk) => risk.registerId === register.id && risk.onlyWithResponse === undefined);
   return (
-    <section aria-labelledby="err-title" class="panel">
-      <h2 id="err-title">Register in the layout of Fig. 10</h2>
+    <Section id="err" title="Register in the layout of Fig. 10" folded>
       <div class="field">
         <SelectField
           id="err-register"
@@ -98,6 +98,6 @@ export function ErrView({ doc, number }: { readonly doc: RiskDocument; readonly 
           </table>
         </div>
       )}
-    </section>
+    </Section>
   );
 }

@@ -20,6 +20,7 @@ import { useEngine } from './jobs';
 import { simulationKey } from './prioritize';
 import { money, probability, sourceLine } from './report';
 import { CODES } from './risk-editor';
+import { Section } from './section';
 
 const CODE_TEXT: ReadonlyMap<string, string> = new Map(CODES);
 
@@ -125,8 +126,7 @@ function ErpView({ doc }: { readonly doc: RiskDocument }) {
   const blocks = erpBlocks(doc, scope);
   const missing = withoutObjective(doc, scope);
   return (
-    <section aria-labelledby="erp-title" class="panel">
-      <h2 id="erp-title">Risk profile by objective in the layout of Fig. 11</h2>
+    <Section id="erp" title="Risk profile by objective in the layout of Fig. 11" folded>
       <div class="field">
         <SelectField id="erp-register" label="Registers in the profile" value={scope} emptyLabel="All registers" options={registerOptions(doc)} onChange={setChosen} />
       </div>
@@ -145,7 +145,7 @@ function ErpView({ doc }: { readonly doc: RiskDocument }) {
           {missing.length === 1 ? 'it' : 'them'}.
         </p>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -500,8 +500,7 @@ function NormalizePanel({ doc, update }: { readonly doc: RiskDocument; readonly 
   const [chosen, setChosen] = useState<string>();
   const parent = parents.find((register) => register.id === chosen) ?? parents[0];
   return (
-    <section aria-labelledby="normalize-title" class="panel">
-      <h2 id="normalize-title">Aggregate and normalize</h2>
+    <Section id="normalize" title="Aggregate and normalize">
       <p class="hint">
         SP 800-221r1 Sec. 5.2 and Table 10 (p. 53, line 1617). A parent register lists the entries of the registers below it, combines identical or similar entries into a summary entry,
         resolves different responses and shows the entries that must go to the parent.
@@ -525,7 +524,7 @@ function NormalizePanel({ doc, update }: { readonly doc: RiskDocument; readonly 
           <SummaryTable doc={doc} parent={parent} update={update} />
         </>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -548,8 +547,7 @@ function PeriodPanel({ doc, update }: { readonly doc: RiskDocument; readonly upd
     setNote(`The current assessment of ${String(count)} ${count === 1 ? 'risk' : 'risks'} is now the previous period, as of ${asOf}.`);
   };
   return (
-    <section aria-labelledby="period-title" class="panel">
-      <h2 id="period-title">Close the period</h2>
+    <Section id="period" title="Close the period">
       <p class="hint">
         At the end of a period, the current assessment of each open risk becomes its previous assessment. It replaces the previous assessment that the risk has. The column Last of the
         profile and the previous period of the portfolio then show it. Labels and the impact split are copied. Numbers that are placeholders or that come from labels are not copied,
@@ -590,7 +588,7 @@ function PeriodPanel({ doc, update }: { readonly doc: RiskDocument; readonly upd
       <p role="status" class="muted">
         {note}
       </p>
-    </section>
+    </Section>
   );
 }
 
@@ -611,8 +609,7 @@ function PortfolioView({ doc, simulation }: { readonly doc: RiskDocument; readon
   ];
   const currency = doc.document.currency;
   return (
-    <section aria-labelledby="portfolio-title" class="panel">
-      <h2 id="portfolio-title">Portfolio by register and period</h2>
+    <Section id="portfolio" title="Portfolio by register and period" folded>
       <p class="hint">
         After SP 800-221r1 Table 7 (p. 44, line 1429), without its sub-columns. A register includes the registers below it. The financial profile is the expected annual loss of the
         negative risks. With a simulation it is the simulated value with its standard error, as on the screen Prioritize, and the entries without an estimate show apart. Without a
@@ -705,7 +702,7 @@ function PortfolioView({ doc, simulation }: { readonly doc: RiskDocument; readon
       </div>
       {simulation.error !== undefined && <p class="save-error">The simulation failed. {simulation.error}</p>}
       {numbers !== undefined && <p class="source">{sourceLine(numbers)}</p>}
-    </section>
+    </Section>
   );
 }
 

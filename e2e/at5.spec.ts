@@ -98,7 +98,7 @@ async function addOption(page: Page, n: number, title: string, target: string, c
   await page.locator(`#${id}-annual`).fill(String(costs[1]));
   await page.locator(`#${id}-lifetime`).fill(String(costs[2]));
   await page.locator(`#${id}-effect0-target`).selectOption(target);
-  const editor = page.locator('details.editor').filter({ has: page.locator(`#${id}-title`) });
+  const editor = page.getByRole('group', { name: new RegExp(`^O-${String(n)} `) });
   await editor.getByLabel('The response changes the loss per event').check();
   await page.locator(`#${id}-effect0-impact-lower`).fill(String(impact[0]));
   await page.locator(`#${id}-effect0-impact-upper`).fill(String(impact[1]));
