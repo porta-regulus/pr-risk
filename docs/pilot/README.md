@@ -19,7 +19,7 @@ The AT-5 kit in [`docs/usability/`](../usability/README.md) uses the same consen
 
 ## 2. Before the session
 
-1. Use the hosted app if it is live, or build it on the facilitator laptop.
+1. Build main on the facilitator laptop. Do not use https://risk.portaregulus.com before the release tag. It deploys only on a `v*` tag, so until then it has rc.3, without the guided mode and the help on click (docs/ux/redesign-plan.md).
 
 ```bash
 npm ci --ignore-scripts && GITHUB_SHA=$(git rev-parse HEAD) npm run build && npm run preview
@@ -35,10 +35,11 @@ npm ci --ignore-scripts && GITHUB_SHA=$(git rev-parse HEAD) npm run build && npm
 ## 3. During the session
 
 1. Read this text to the participant. "Please do the task on the sheet. Say aloud what you think and what you look for. I cannot help you. The help text in the app is allowed. Stop when the decision record is printed."
-2. Start the clock when the participant first sees the start screen.
-3. Do not answer questions about the app. If the participant asks, say "What would you do if I was not here?"
-4. Any help from the facilitator ends the session as a fail (SPEC.md Sec. 12.5). Write the moment and the reason in the log.
-5. Stop the clock when the print dialog or the PDF of the decision record shows.
+2. Start the clock when the participant first sees the start screen. The participant starts in the guided mode and may open the full editor (SPEC.md Sec. 12.5).
+3. Do not answer questions about the app and do not explain a word. If the participant asks, say "What would you do if I was not here?" Write each word that the participant asks about in the log.
+4. Any help from the facilitator makes the session a fail (SPEC.md Sec. 12.5). Write the moment and the reason in the log. Help only when the participant is stuck for 4 minutes, and then give the smallest hint that lets them continue. The session then goes on, so it can find more blockers, but it stays a fail.
+5. Stop the clock when the print dialog or the PDF of the decision record shows. Stop the task at 45 minutes and write the step where the participant stopped.
+6. Fill in the step table of the log. Mark each "?" explanation that the participant opens.
 
 ## 4. What a blocker is
 
@@ -57,5 +58,5 @@ All other findings are major or minor. A major finding costs the participant mor
 1. Ask the 3 questions at the end of the log, and write the answers down.
 2. Fill in the result table of the log.
 3. For each blocker, open an issue with the log line, the screen and the fix proposal. Fix it before the 5 AT-5 sessions start.
-4. Write the result into done criterion 5 of `docs/HANDOFF.md`, with the date, the role of the participant, the time and the blocker count.
+4. Write the result into done criterion 5 of `docs/HANDOFF.md` and into docs/ux/redesign-plan.md Sec. 5.5 (phase 6), with the date, the role of the participant, the time and the blocker count.
 5. Delete the recording after 90 days (SPEC.md Sec. 12.5).

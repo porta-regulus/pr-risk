@@ -2,7 +2,7 @@
 
 | Item | Value |
 |---|---|
-| Status | Phase 0 is done (pull request 52). Phase 1 is done. The product owner picked direction B with a sans font on 2026-11-06 (Sec. 4.1). The product owner passed the phase 2 prototype on 2026-11-06. Phase 3 is merged (pull request 55). Phase 4 is merged (pull request 56). Phase 5 is built (Sec. 5.4) and waits for review. |
+| Status | Phase 0 is done (pull request 52). Phase 1 is done. The product owner picked direction B with a sans font on 2026-11-06 (Sec. 4.1). The product owner passed the phase 2 prototype on 2026-11-06. Phase 3 is merged (pull request 55). Phase 4 is merged (pull request 56). Phase 5 is merged (pull request 57). The phase 6 pilot kit is ready (Sec. 5.5). |
 | Date | 2026-11-06 |
 | Decided by the product owner | Guided mode plus the full editor. The redesign ships before release 1, so release 1 and AT-5 wait. Claude proposes 2 or 3 visual directions as mockups first. |
 | Changes | HANDOFF task 12 (the order before the tag), SPEC.md Sec. 5 (screens), Sec. 10 (UI) and Sec. 12.5 (AT-5 uses the new GUI) |
@@ -110,7 +110,7 @@ On 2026-11-06 the product owner looked at the 3 mockups and picked direction B, 
 | 3 | Merge `ed/appetite-questions-r2` (Sec. 6 decision 2). Build the guided mode in the app, with the guided questions as step 3 | All 9 steps work on real documents. The e2e tests, axe-core and 375 px pass. The AT-5 script runs through the guided mode. Built 2026-11-06 (Sec. 5.2) |
 | 4 | Clean up the full editor (Sec. 3.3) with the new style | Every field of today is still reachable. All tests pass. Built 2026-11-07 (Sec. 5.3) |
 | 5 | Plain words (Sec. 2 item 3) on all screens, and an explanation on click for each field, section and key button (Sec. 5.4) | No NIST section number in a title, lead, label or legend. Each field, section and key button has an explanation that gives plain words and the reference. `test/ui-help.test.ts` passes. Built 2026-11-07 with about 300 texts (Sec. 5.4) |
-| 6 | Pilot with 1 target user, fix the blockers | No open blocker |
+| 6 | Pilot with 1 target user, fix the blockers (Sec. 5.5) | No open blocker |
 | 7 | AT-5 with 5 users, then AT-6, then the tag | HANDOFF task 12 |
 
 ### 5.1 Phase 2 prototype
@@ -150,6 +150,14 @@ Decided by the product owner on 2026-11-07.
 2. Each field with a visible label, each section and each button with a result that is not obvious has an explanation that opens on click. A plain button such as Back, Delete or Undo has none, because the text would only add noise.
 3. Each explanation says what the item is, why it matters, an example where one helps, and the source. The texts are in `src/ui/help/`, one file for each area. `src/ui/explain.tsx` shows them.
 4. `test/ui-help.test.ts` fails when a field or section has no explanation, when a text is not used, when a text has an em dash, a semicolon or a colon, and when a title, lead, label or legend has a NIST section, figure or table number.
+
+### 5.5 Phase 6 pilot
+
+1. The pilot uses the kit in `docs/pilot/` (build task 5, done criterion 5). It has the consent form, the task sheet with a fictitious company, and the log. The log has a row for each step of the guided mode.
+2. The app is built from main on the facilitator laptop, because the hosted site has rc.3 until the release tag.
+3. As in AT-5, any help makes the session a fail. The facilitator helps only after 4 minutes, and the session then goes on to find more blockers.
+4. The pilot user cannot be one of the 5 AT-5 users.
+5. Result. Not run yet.
 
 Phases 2 and 3 are the largest part. The product owner sees a working result at the end of each phase.
 
