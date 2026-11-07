@@ -1549,7 +1549,87 @@ main.screen-editor {
   }
 }
 
+/* Explanations on click (redesign phase 5). A small "?" after a label, with a 44 px target
+   that does not make the label row higher. The text opens below the label. */
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+legend.label-row {
+  padding: 0;
+}
+.explain-toggle,
+.explain-toggle:hover:not(:disabled) {
+  min-width: 44px;
+  min-height: 44px;
+  margin: -12px -8px -12px 0;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted);
+  font-weight: 600;
+  flex: none;
+}
+.explain-toggle > span[aria-hidden='true'] {
+  display: inline-grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+.explain-toggle[aria-expanded='true'] {
+  color: var(--focus);
+}
+.explain-toggle.explain-words,
+.explain-toggle.explain-words:hover:not(:disabled) {
+  margin: -10px 0;
+  justify-content: start;
+  font-weight: 400;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+.explain-toggle.explain-words > span[aria-hidden='true'] {
+  width: auto;
+  height: auto;
+  border: 0;
+  font-size: inherit;
+}
+.explain-text {
+  border-left: 2px solid var(--focus);
+  padding: 0.25rem 0 0.25rem 0.75rem;
+  font-size: 0.9rem;
+  max-width: 60ch;
+  display: grid;
+  gap: 0.35rem;
+}
+.explain-text[hidden] {
+  display: none;
+}
+.explain-text p {
+  margin: 0;
+}
+.help-source {
+  color: var(--muted);
+}
+.explain {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+}
+
 @media print {
+  .explain-toggle {
+    display: none !important;
+  }
   .fold > details > summary::after {
     display: none;
   }
