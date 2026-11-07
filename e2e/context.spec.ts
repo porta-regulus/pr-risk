@@ -45,7 +45,7 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
   });
 
   await page.goto('/');
-  await page.getByRole('button', { name: 'NIST Fig. 10 and Table 9 (example 1)' }).click();
+  await page.getByRole('button', { name: 'Enterprise register in words (example 1)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
   await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Context and strategy' })).toBeFocused();
@@ -53,7 +53,7 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
   await expectAccessible(page, 'S2');
 
   // G2 (a). 6 rows by 3 examples, text equal to the fixture.
-  const table = page.getByRole('table', { name: 'Appetite statements in the layout of Table 9' });
+  const table = page.getByRole('table', { name: 'Appetite statements side by side' });
   await expect(table.locator('tbody tr')).toHaveCount(6);
   await expect(table.locator('thead th')).toHaveCount(1 + statements.length);
   for (const [row, items] of expectedRows.entries()) {
@@ -93,7 +93,7 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
   // Capacity and the starting points of SPEC.md Sec. 8.9.
   await page.getByLabel('Capacity (USD)').fill('1000000');
   await page.getByLabel('Rationale for the capacity').fill('One year of free cash flow.');
-  await page.getByRole('button', { name: 'Use the starting points from capacity' }).click();
+  await page.getByRole('button', { name: 'Use the starting points from capacity', exact: true }).click();
   await expect(page.getByLabel('Point 1 loss')).toHaveValue('20000');
   await expect(page.getByLabel('Point 4 probability')).toHaveValue('0.01');
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
@@ -108,15 +108,15 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
   // Text that is not a number refuses the save, and leaving is refused until it is discarded.
   await page.getByLabel('Capacity (USD)').fill('1e');
   await expect(page.getByText('Not saved. These fields do not hold a number: Capacity (USD).')).toBeVisible();
-  await page.getByRole('button', { name: 'Back to start' }).click();
+  await page.getByRole('button', { name: 'Back to start', exact: true }).click();
   await expect(page.getByText('Correct the changes, or discard them, before you go to another screen.')).toBeVisible();
-  await page.getByRole('button', { name: 'Discard unsaved changes' }).click();
+  await page.getByRole('button', { name: 'Discard unsaved changes', exact: true }).click();
   await expect(page.getByLabel('Capacity (USD)')).toHaveValue('1000000');
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
 
   // Leaving at once after an edit saves the edit first.
   await page.getByLabel('Mission', { exact: true }).fill('Keep the plant safe.');
-  await page.getByRole('button', { name: 'Back to start' }).click();
+  await page.getByRole('button', { name: 'Back to start', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'PortaRegulus Risk' })).toBeVisible();
 
   // The edits survive a reload.
@@ -127,10 +127,10 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
 
   // Undo goes back one saved version at a time.
   const version = Number((await page.getByText(/^Saved as version \d+\./).textContent())?.match(/\d+/)?.[0]);
-  await page.getByRole('button', { name: 'Undo last change' }).click();
+  await page.getByRole('button', { name: 'Undo last change', exact: true }).click();
   await expect(page.getByText(`Version ${String(version - 1)} is back.`)).toBeVisible();
 
-  await page.getByRole('button', { name: 'Back to start' }).click();
+  await page.getByRole('button', { name: 'Back to start', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'PortaRegulus Risk' })).toBeVisible();
   expect(problems, 'errors, warnings and CSP violations').toEqual([]);
 });
@@ -142,10 +142,10 @@ test('S2 adds a statement from a Table 2 template', async ({ page }) => {
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is created.' })).toBeVisible();
   await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
-  await page.getByText('Examples from SP 800-221r1 Table 2').click();
+  await page.getByText('Example statements to start from', { exact: true }).click();
   await expectAccessible(page, 'S2 with the Table 2 examples open');
-  await page.getByRole('button', { name: 'Use the Government Agency example as a new statement' }).click();
-  const table = page.getByRole('table', { name: 'Appetite statements in the layout of Table 9' });
+  await page.getByRole('button', { name: 'Use the Government Agency example as a new statement', exact: true }).click();
+  const table = page.getByRole('table', { name: 'Appetite statements side by side' });
   await expect(table).toContainText('Mission-critical systems must be protected from known ICT vulnerabilities.');
   await expect(table).toContainText('within 14 days of discovery');
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();

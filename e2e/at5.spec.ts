@@ -71,7 +71,7 @@ async function addRisk(page: Page, n: number, risk: RiskInput): Promise<void> {
   await page.getByRole('tab', { name: 'Scenario' }).click();
   await page.locator(`#${id}-owner`).fill(risk.owner);
   await page.getByRole('tab', { name: 'Estimate' }).click();
-  await page.getByRole('button', { name: 'Add an estimate' }).click();
+  await page.getByRole('button', { name: 'Add an estimate', exact: true }).click();
   await page.locator(`#${id}-frequency-lower`).fill(String(risk.frequency[0]));
   await page.locator(`#${id}-frequency-upper`).fill(String(risk.frequency[1]));
   await page.locator(`#${id}-impact-lower`).fill(String(risk.impact[0]));
@@ -85,14 +85,14 @@ async function addRisk(page: Page, n: number, risk: RiskInput): Promise<void> {
 async function linkDriver(page: Page, riskId: string, trigger: number): Promise<void> {
   await page.getByRole('button', { name: `Edit ${riskId}` }).click();
   await page.getByRole('tab', { name: 'Drivers' }).click();
-  await page.getByRole('button', { name: 'Link a driver' }).click();
+  await page.getByRole('button', { name: 'Link a driver', exact: true }).click();
   await page.getByLabel('Trigger probability (0 to 1)').fill(String(trigger));
   await saved(page);
 }
 
 async function addOption(page: Page, n: number, title: string, target: string, costs: readonly [number, number, number], impact: readonly [number, number]): Promise<void> {
   const id = `option-O-${String(n)}`;
-  await page.getByRole('button', { name: 'Add a response option' }).click();
+  await page.getByRole('button', { name: 'Add a response option', exact: true }).click();
   await page.locator(`#${id}-title`).fill(title);
   await page.locator(`#${id}-oneoff`).fill(String(costs[0]));
   await page.locator(`#${id}-annual`).fill(String(costs[1]));
@@ -126,15 +126,15 @@ test('AT-5 task from an empty browser to the printed decision record in under 10
 
   // Context with 2 objectives, and a tolerance curve with 4 points.
   await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
-  await page.getByRole('button', { name: 'Add an objective' }).click();
+  await page.getByRole('button', { name: 'Add an objective', exact: true }).click();
   await page.getByLabel('Objective 1 kind').selectOption('operations');
   await page.getByLabel('Objective 1 statement').fill('Deliver every order on time.');
-  await page.getByRole('button', { name: 'Add an objective' }).click();
+  await page.getByRole('button', { name: 'Add an objective', exact: true }).click();
   await page.getByLabel('Objective 2 kind').selectOption('compliance');
   await page.getByLabel('Objective 2 statement').fill('Meet the GDPR and payment rules.');
   await page.getByLabel('Capacity (EUR)').fill('1500000');
   await page.getByLabel('Rationale for the capacity').fill('Cash reserve and the unused credit line.');
-  await page.getByRole('button', { name: 'Use the starting points from capacity' }).click();
+  await page.getByRole('button', { name: 'Use the starting points from capacity', exact: true }).click();
   await expect(page.getByLabel('Point 4 probability')).toHaveValue('0.01');
   await saved(page);
 
@@ -150,7 +150,7 @@ test('AT-5 task from an empty browser to the printed decision record in under 10
   await expect(page.getByRole('row').filter({ hasText: 'Privacy Regulation Violation' })).toContainText('legal.privacy');
 
   // 1 driver with 2 links.
-  await page.getByRole('button', { name: 'Add a driver' }).click();
+  await page.getByRole('button', { name: 'Add a driver', exact: true }).click();
   await page.getByText(/^D-1 New driver/).click();
   await page.locator('#driver-0-name').fill('Cloud hosting outage');
   await page.locator('#driver-0-kind').selectOption('supplier');
@@ -169,7 +169,7 @@ test('AT-5 task from an empty browser to the printed decision record in under 10
   // The steps panel sees every step of the task, so the run and the print are next.
   await expect(page.locator('details.steps > summary')).toHaveText('Steps to complete: 6 of 6 done');
   await expect(page.locator('details.steps li[aria-current="step"]')).toContainText('Find the best portfolio and print the decision record');
-  await page.getByRole('button', { name: 'Find the best portfolio' }).click();
+  await page.getByRole('button', { name: 'Find the best portfolio', exact: true }).click();
   const record = page.locator('article.record');
   await expect(record.getByRole('heading', { level: 3, name: '04 Funded portfolio' })).toBeVisible({ timeout: 60_000 });
   await expect(page.getByRole('region', { name: 'Ranked portfolios' }).getByRole('row', { name: /^Best O-/ })).toBeVisible();

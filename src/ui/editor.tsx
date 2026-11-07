@@ -11,6 +11,7 @@ import { runJob } from '../engine/client';
 import type { RiskNumbers } from '../engine/numbers';
 import { simulationTargets, withNistNumbers, withNumbersFrom, withSimulationSettings } from './analysis';
 import { documentChanges, withChangeLog } from './edit';
+import { Explain } from './explain';
 import { InvalidFields } from './fields';
 import { screenSummary, type EditorScreen } from './screen-summary';
 import { unfold } from './section';
@@ -71,6 +72,7 @@ function StepsPanel({ doc, screen, onGo }: { readonly doc: RiskDocument; readonl
       <summary>
         Steps to complete: {done} of {required} done
       </summary>
+      <Explain id="steps-panel" topic="common.steps" name="Steps to complete" visible="About these steps" />
       <p class="muted">Do the steps in this order. The app ticks a step when the saved document shows it.</p>
       <ol role="list">
         {steps.map((step, index) => (
@@ -397,6 +399,7 @@ export function DocumentScreen({
         <button type="button" class="quiet" onClick={undoLast}>
           {dirty || blocked ? 'Discard unsaved changes' : 'Undo last change'}
         </button>
+        <Explain id="save-state" topic="common.save-state" name="Saving and undo" />
         {errors.length > 0 && (
           <ul class="errors">
             {errors.slice(0, 8).map((error, i) => (

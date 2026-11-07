@@ -2,7 +2,9 @@
 // thresholds and the optimization method.
 import type { RiskDocument } from '../schema/types';
 import { draftList, withSection, withValue } from './edit';
+import { Explain } from './explain';
 import { NumberField, SelectField, TextField } from './fields';
+import type { HelpKey } from './help';
 import { Section } from './section';
 
 type Strategy = NonNullable<RiskDocument['strategy']>;
@@ -25,6 +27,7 @@ function ScaleEditor({ name, label, help, bands, onChange }: { readonly name: st
     <div class="scale">
       <h4 id={`${name}-title`}>{label}</h4>
       <p class="hint">{help} A scale needs 2 bands or more. A label in use by a risk must stay (rule V-11).</p>
+      <Explain id={`${name}-bands`} topic="context.scale-bands" name={`${label} bands`} />
       {bands.length > 0 && (
         <div class="table-box">
           <table aria-labelledby={`${name}-title`}>
@@ -89,19 +92,19 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
   const setBudget = <K extends keyof Budget>(key: K, value: Budget[K] | undefined): void => {
     update((current) => withSection(current, 'strategy', withValue(current.strategy, 'budget', withValue(current.strategy?.budget, key, value))));
   };
-  const money = (key: 'firstYearCash' | 'capexCeiling' | 'opexCeiling', label: string) => (
+  const money = (key: 'firstYearCash' | 'capexCeiling' | 'opexCeiling', label: string, help: HelpKey) => (
     <div class="field">
-      <NumberField id={`budget-${key}`} label={`${label} (${currency})`} min={0} value={strategy.budget?.[key]} onChange={(value) => {
+      <NumberField id={`budget-${key}`} label={`${label} (${currency})`} help={help} min={0} value={strategy.budget?.[key]} onChange={(value) => {
           setBudget(key, value);
         }} />
     </div>
   );
 
   return (
-    <Section id="strategy" title="Risk management strategy">
+    <Section id="strategy" title="Risk management strategy" help="context.strategy">
 
       <h3>Scales</h3>
-      <p class="muted">"Establishing a common scale for assessing levels of risk will support consistent risk estimation" (Sec. 3.2.2). Labels map to numbers through the representative value.</p>
+      <p class="muted">One scale for each measure, so that all risks are rated the same way. Labels map to numbers through the representative value.</p>
       {SCALES.map(([key, label, help]) => (
         <ScaleEditor key={key} name={`scale-${key}`} label={label} help={help} bands={strategy.scales?.[key] ?? []} onChange={(bands) => {
             set('scales', withValue(strategy.scales, key, draftList<NonNullable<Scales['likelihood']>>(bands)));
@@ -111,12 +114,12 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
       <h3>Review and reporting</h3>
       <div class="field-row">
         <div class="field">
-          <NumberField id="review-months" label="Review every (months)" integer min={1} max={36} value={strategy.reviewFrequencyMonths} onChange={(value) => {
+          <NumberField id="review-months" label="Review every (months)" help="context.review-months" integer min={1} max={36} value={strategy.reviewFrequencyMonths} onChange={(value) => {
               set('reviewFrequencyMonths', value);
             }} />
         </div>
         <div class="field">
-          <NumberField id="reporting-months" label="Report every (months)" integer min={1} max={36} value={strategy.reportingFrequencyMonths} onChange={(value) => {
+          <NumberField id="reporting-months" label="Report every (months)" help="context.reporting-months" integer min={1} max={36} value={strategy.reportingFrequencyMonths} onChange={(value) => {
               set('reportingFrequencyMonths', value);
             }} />
         </div>
@@ -124,11 +127,11 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
 
       <h3>Budget</h3>
       <div class="field-row">
-        {money('firstYearCash', 'First-year cash for responses')}
-        {money('capexCeiling', 'CapEx ceiling')}
-        {money('opexCeiling', 'OpEx ceiling')}
+        {money('firstYearCash', 'First-year cash for responses', 'context.budget-first-year-cash')}
+        {money('capexCeiling', 'CapEx ceiling', 'context.budget-capex')}
+        {money('opexCeiling', 'OpEx ceiling', 'context.budget-opex')}
         <div class="field">
-          <TextField id="budget-fiscal-start" label="Fiscal year start" type="date" value={strategy.budget?.fiscalYearStart} onChange={(value) => {
+          <TextField id="budget-fiscal-start" label="Fiscal year start" help="context.budget-fiscal-start" type="date" value={strategy.budget?.fiscalYearStart} onChange={(value) => {
               setBudget('fiscalYearStart', value);
             }} />
         </div>
@@ -140,7 +143,8 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
           <NumberField
             id="inclusion-threshold"
             label={`Inclusion threshold (${currency})`}
-            hint="Exposure below which a risk need not stay in the register (Sec. 3.5)."
+            hint="Exposure below which a risk need not stay in the register."
+            help="context.inclusion-threshold"
             min={0}
             value={strategy.inclusionThreshold}
             onChange={(value) => {
@@ -152,7 +156,8 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
           <NumberField
             id="escalation-threshold"
             label={`Escalation threshold (${currency})`}
-            hint="Exposure at or above which a risk must appear in the parent register (Sec. 5.2.2)."
+            hint="Exposure at or above which a risk must appear in the parent register."
+            help="context.escalation-threshold"
             min={0}
             value={strategy.escalationThreshold}
             onChange={(value) => {
@@ -164,7 +169,8 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
           <SelectField
             id="optimization-method"
             label="Optimization method"
-            hint="Sec. 5.3.2. Algorithmic ranks every affordable portfolio by simulation."
+            hint="Algorithmic ranks every affordable portfolio by simulation."
+            help="context.optimization-method"
             emptyLabel="Not set"
             value={strategy.optimizationMethod}
             options={[

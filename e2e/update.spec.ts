@@ -83,7 +83,7 @@ test('a new deploy shows a ready notice, then activates on the next start with i
     await expect(ready).toBeVisible({ timeout: 15_000 });
     await expect(first.getByText(`Version ${version}, build`)).toBeVisible();
     await expectAccessible(first, 'S1 with the notice that a new version is ready');
-    await ready.getByRole('button', { name: 'Close notice' }).click();
+    await ready.getByRole('button', { name: 'Close notice', exact: true }).click();
     await expect(ready).toHaveCount(0);
 
     // Close all tabs of the app and open it again. The new version is active.
@@ -129,14 +129,14 @@ test('"Use the new version now" activates the new version in the open tab, and r
     // A second tab of the app blocks the change, so its code is never replaced.
     const other = await context.newPage();
     await other.goto(`${server.origin}/`);
-    await ready.getByRole('button', { name: 'Use the new version now' }).click();
+    await ready.getByRole('button', { name: 'Use the new version now', exact: true }).click();
     await expect(ready).toContainText('Another tab of the app is open.');
     await expect(page.getByText(`Version ${version}, build`)).toBeVisible();
 
     // With one tab, the new version takes over and the page reloads once.
     await other.close();
     await expect(async () => {
-      await ready.getByRole('button', { name: 'Use the new version now' }).click();
+      await ready.getByRole('button', { name: 'Use the new version now', exact: true }).click();
       await expect(page.getByText(`Version ${NEXT}, build`)).toBeVisible({ timeout: 2_000 });
     }).toPass({ timeout: 15_000 });
     await expect(page.getByRole('status').filter({ hasText: `Version ${NEXT} is now active.` })).toBeVisible();

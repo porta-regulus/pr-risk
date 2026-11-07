@@ -10,6 +10,7 @@ import { DistributionField, formatNumber } from './distribution';
 import { DriverPanel } from './drivers';
 import { nextId, withSection, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
+import { Explain, useExplain } from './explain';
 import { Checkboxes, NumberField, SelectField, TextField } from './fields';
 import { GuidedQuestions } from './guided-questions';
 import { GUIDED_STEPS, guidedStatus, hasOwner, riskComplete } from './guided-steps';
@@ -50,17 +51,17 @@ function CompanyStep({ doc, update }: { readonly doc: RiskDocument; readonly upd
   return (
     <div class="guided-fields">
       <div class="field">
-        <TextField id="guided-title" label="Name of the risk register" value={doc.document.title} onChange={(value) => {
+        <TextField id="guided-title" label="Name of the risk register" help="guided.register-name" value={doc.document.title} onChange={(value) => {
             setInfo('title', value);
           }} />
       </div>
       <div class="field">
-        <TextField id="guided-organization" label="Company name" value={doc.document.organization} onChange={(value) => {
+        <TextField id="guided-organization" label="Company name" help="guided.company" value={doc.document.organization} onChange={(value) => {
             setInfo('organization', value);
           }} />
       </div>
       <div class="field">
-        <TextField id="guided-mission" label="What does your company do?" hint="One sentence. For example, we build controllers for industrial machines." value={doc.context?.mission} onChange={(value) => {
+        <TextField id="guided-mission" label="What does your company do?" help="guided.mission" hint="One sentence. For example, we build controllers for industrial machines." value={doc.context?.mission} onChange={(value) => {
             update((current) => withSection(current, 'context', withValue(current.context, 'mission', value.trim() === '' ? undefined : value)));
           }} />
       </div>
@@ -89,6 +90,7 @@ function GoalsStep({ doc, update }: { readonly doc: RiskDocument; readonly updat
     <div class="guided-fields">
       <fieldset class="guided-choices">
         <legend>Pick from the examples</legend>
+        <Explain id="guided-example-goals" topic="guided.example-goals" name="Pick from the examples" />
         {EXAMPLE_GOALS.map(([k, statement]) => {
           const found = objectives.find((objective) => objective.statement === statement);
           const locked = found !== undefined && usedObjective(doc, found.id);
@@ -112,10 +114,10 @@ function GoalsStep({ doc, update }: { readonly doc: RiskDocument; readonly updat
       </fieldset>
       <div class="guided-row">
         <div class="field wide">
-          <TextField id="guided-own-goal" label="Or write your own goal" value={text} onChange={setText} />
+          <TextField id="guided-own-goal" label="Or write your own goal" help="guided.own-goal" value={text} onChange={setText} />
         </div>
         <div class="field">
-          <SelectField id="guided-own-goal-kind" label="Kind of goal" value={kind} options={KINDS} onChange={(value) => {
+          <SelectField id="guided-own-goal-kind" label="Kind of goal" help="guided.goal-kind" value={kind} options={KINDS} onChange={(value) => {
               setKind(value ?? 'operations');
             }} />
         </div>
@@ -169,6 +171,7 @@ function ToleranceStep({ doc, update }: { readonly doc: RiskDocument; readonly u
   return (
     <div class="guided-fields">
       <GuidedQuestions doc={doc} update={update} />
+      {points.length > 0 && <Explain id="guided-tolerance-table" topic="guided.tolerance-table" name="Your tolerance curve now" />}
       {points.length > 0 && (
         <div class="table-box">
           <table>
@@ -203,6 +206,8 @@ function RisksStep({ doc, update }: { readonly doc: RiskDocument; readonly updat
   const [entryId, setEntryId] = useState<string>();
   const [description, setDescription] = useState('');
   const [positive, setPositive] = useState(false);
+  const helpCatalogue = useExplain('guided-catalogue', 'guided.catalogue', 'Pick a risk from the catalogue');
+  const helpOpportunity = useExplain('guided-opportunity', 'guided.opportunity', 'Chance of a gain');
   if (register === undefined) return <p class="muted">The document has no register.</p>;
   const entry = CATALOGUE.find((item) => item.id === entryId);
   const addRisk = (make: (current: RiskDocument) => Risk): void => {
@@ -213,7 +218,11 @@ function RisksStep({ doc, update }: { readonly doc: RiskDocument; readonly updat
     <div class="guided-fields">
       <div class="guided-row">
         <div class="field wide">
-          <label for="guided-catalogue">Pick a risk from the catalogue</label>
+          <div class="label-row">
+            <label for="guided-catalogue">Pick a risk from the catalogue</label>
+            {helpCatalogue.toggle}
+          </div>
+          {helpCatalogue.text}
           <select id="guided-catalogue" value={entryId ?? ''} onChange={(event) => {
               const next = event.currentTarget.value;
               setEntryId(next === '' ? undefined : next);
@@ -240,14 +249,18 @@ function RisksStep({ doc, update }: { readonly doc: RiskDocument; readonly updat
       </div>
       <p class="source">{RISKLET_ATTRIBUTION}.</p>
       <div class="field">
-        <TextField id="guided-own-risk" label="Or describe your own risk" hint='Write it as "If X occurs, then Y happens".' value={description} onChange={setDescription} />
+        <TextField id="guided-own-risk" label="Or describe your own risk" help="guided.own-risk" hint='Write it as "If X occurs, then Y happens".' value={description} onChange={setDescription} />
       </div>
-      <label class="check">
-        <input type="checkbox" checked={positive} onChange={(event) => {
-            setPositive(event.currentTarget.checked);
-          }} />
-        This is a chance of a gain (an opportunity)
-      </label>
+      <div class="label-row">
+        <label class="check">
+          <input type="checkbox" checked={positive} onChange={(event) => {
+              setPositive(event.currentTarget.checked);
+            }} />
+          This is a chance of a gain (an opportunity)
+        </label>
+        {helpOpportunity.toggle}
+      </div>
+      {helpOpportunity.text}
       <div>
         <button type="button" class="quiet" disabled={description.trim() === ''} onClick={() => {
             const text = description.trim();
@@ -344,7 +357,7 @@ function SizeStep({ doc, update }: { readonly doc: RiskDocument; readonly update
       </h2>
       <div class="guided-row">
         <div class="field wide">
-          <TextField id={`${id}-owner`} label="Who owns this risk?" hint="A role, for example IT lead." value={hasOwner(risk) ? risk.riskOwnerPointOfContact : ''} onChange={(value) => {
+          <TextField id={`${id}-owner`} label="Who owns this risk?" help="guided.owner" hint="A role, for example IT lead." value={hasOwner(risk) ? risk.riskOwnerPointOfContact : ''} onChange={(value) => {
               setRisk((current) => ({ ...current, riskOwnerPointOfContact: value.trim() === '' ? 'Unassigned' : value }));
             }} />
         </div>
@@ -354,6 +367,7 @@ function SizeStep({ doc, update }: { readonly doc: RiskDocument; readonly update
       ) : (
         <Checkboxes
           legend="Which goals does it hit?"
+          help="guided.risk-goals"
           name={`${id}-objectives`}
           options={objectives.map((objective) => [objective.id, `${objective.id} ${objective.statement}`] as const)}
           value={risk.objectiveIds ?? []}
@@ -373,12 +387,14 @@ function SizeStep({ doc, update }: { readonly doc: RiskDocument; readonly update
             }}>
             Give the ranges
           </button>
+          <Explain id={`${id}-give-ranges`} topic="guided.give-ranges" name="Give the ranges" />
         </div>
       ) : (
         <>
           <DistributionField
             id={`${id}-frequency`}
             legend="How often per year?"
+            help="identify.frequency"
             question="Give a range you are 90% sure of. Use decimals for rare events. 0.1 means once in 10 years."
             unit="events per year"
             frequency
@@ -390,6 +406,7 @@ function SizeStep({ doc, update }: { readonly doc: RiskDocument; readonly update
           <DistributionField
             id={`${id}-impact`}
             legend={`How much ${word} from one event?`}
+            help="identify.impact-per-event"
             question="Give a range you are 90% sure of."
             unit={currency}
             value={estimate.impactPerEvent}
@@ -397,7 +414,7 @@ function SizeStep({ doc, update }: { readonly doc: RiskDocument; readonly update
               setRisk((current) => (current.estimate === undefined ? current : { ...current, estimate: { ...current.estimate, impactPerEvent } }));
             }}
           />
-          <TextField id={`${id}-rationale`} label="Why these ranges? (10 characters or more)" multiline value={estimate.rationale} onChange={(rationale) => {
+          <TextField id={`${id}-rationale`} label="Why these ranges? (10 characters or more)" help="guided.rationale" multiline value={estimate.rationale} onChange={(rationale) => {
               setRisk((current) => (current.estimate === undefined ? current : { ...current, estimate: { ...current.estimate, rationale } }));
             }} />
         </>
@@ -447,6 +464,7 @@ function DriversStep({ doc, update }: { readonly doc: RiskDocument; readonly upd
           <legend>
             Risks that {driver.id} {driver.name || 'the new cause'} can cause
           </legend>
+          <Explain id={`guided-links-${driver.id}`} topic="guided.driver-links" name={`Risks that ${driver.id} can cause`} />
           {risks.map((risk) => {
             const link = (risk.driverLinks ?? []).find((item) => item.driverId === driver.id);
             const fieldId = `guided-link-${driver.id}-${risk.riskId}`;
@@ -466,7 +484,7 @@ function DriversStep({ doc, update }: { readonly doc: RiskDocument; readonly upd
                 </label>
                 {link !== undefined && (
                   <div class="field">
-                    <NumberField id={fieldId} label={`Chance that one event of ${driver.id} causes ${risk.riskId} (0 to 1)`} min={0} max={1} value={link.triggerProbability} onChange={(q) => {
+                    <NumberField id={fieldId} label={`Chance that one event of ${driver.id} causes ${risk.riskId} (0 to 1)`} help="guided.trigger-probability" min={0} max={1} value={link.triggerProbability} onChange={(q) => {
                         setLinks(risk.riskId, (links) => links.map((item) => (item.driverId === driver.id ? withValue(item, 'triggerProbability', q) : item)));
                       }} />
                   </div>
@@ -510,7 +528,7 @@ function PlanStep({ doc, update, run }: { readonly doc: RiskDocument; readonly u
     <div class="guided-fields">
       <div class="guided-row">
         <div class="field">
-          <NumberField id="budget-cash" label={`Cash you can spend in the first year (${currency})`} min={0} value={doc.strategy?.budget?.firstYearCash} onChange={(value) => {
+          <NumberField id="budget-cash" label={`Cash you can spend in the first year (${currency})`} help="guided.budget" min={0} value={doc.strategy?.budget?.firstYearCash} onChange={(value) => {
               setBudgetCash(update, value);
             }} />
         </div>

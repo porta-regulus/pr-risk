@@ -44,6 +44,7 @@ export function AcceptanceEditor({ risk, update }: { readonly risk: Risk; readon
           <SelectField
             id={`${id}-kind`}
             label="Kind"
+            help="monitor.acceptance-kind"
             value={acceptance.kind}
             options={[
               ['acceptance', 'Acceptance of the risk'],
@@ -58,6 +59,7 @@ export function AcceptanceEditor({ risk, update }: { readonly risk: Risk; readon
           <TextField
             id={`${id}-by`}
             label="Accepted by"
+            help="monitor.acceptance-by"
             value={acceptance.acceptedBy}
             onChange={(acceptedBy) => {
               set({ ...acceptance, acceptedBy });
@@ -68,6 +70,7 @@ export function AcceptanceEditor({ risk, update }: { readonly risk: Risk; readon
           <TextField
             id={`${id}-on`}
             label="Accepted on"
+            help="monitor.acceptance-on"
             type="date"
             value={acceptance.acceptedOn}
             onChange={(acceptedOn) => {
@@ -79,6 +82,7 @@ export function AcceptanceEditor({ risk, update }: { readonly risk: Risk; readon
           <TextField
             id={`${id}-until`}
             label="Valid until"
+            help="monitor.acceptance-until"
             type="date"
             value={acceptance.validUntil}
             onChange={(validUntil) => {
@@ -90,6 +94,7 @@ export function AcceptanceEditor({ risk, update }: { readonly risk: Risk; readon
       <TextField
         id={`${id}-rationale`}
         label="Rationale"
+        help="monitor.acceptance-rationale"
         value={acceptance.rationale}
         onChange={(rationale) => {
           set({ ...acceptance, rationale });

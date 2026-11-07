@@ -38,14 +38,14 @@ test('shows the notice of a new version on S1 and in the editor frame until the 
   expect(await seen()).toBe('0.9.0');
 
   // The editor frame shows the same notice. Closing it there closes it on S1 too.
-  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)', exact: true }).click();
   await page.getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Identify and analyze' })).toBeFocused();
   await expect(notice).toBeVisible();
-  await notice.getByRole('button', { name: 'Close notice' }).click();
+  await notice.getByRole('button', { name: 'Close notice', exact: true }).click();
   await expect(notice).toHaveCount(0);
   expect(await seen()).toBe(version);
-  await page.getByRole('button', { name: 'Back to start' }).click();
+  await page.getByRole('button', { name: 'Back to start', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('PortaRegulus Risk');
   await expect(notice).toHaveCount(0);
 
@@ -68,7 +68,7 @@ test('closes the notice of a new version on S1', async ({ page }) => {
   await page.goto('/');
   const notice = page.getByRole('status').filter({ hasText: 'is now active' });
   await expect(notice).toBeVisible();
-  await notice.getByRole('button', { name: 'Close notice' }).click();
+  await notice.getByRole('button', { name: 'Close notice', exact: true }).click();
   await expect(notice).toHaveCount(0);
   await page.reload();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('PortaRegulus Risk');

@@ -14,7 +14,7 @@ function watchProblems(page: Page): string[] {
 
 async function openExample2(page: Page): Promise<void> {
   await page.goto('/');
-  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Respond and optimize', exact: true })).toBeEnabled();
 }
 
@@ -23,7 +23,7 @@ async function openExample2(page: Page): Promise<void> {
 test('S4 shows the loss exceedance, the ranking and the display-only matrix of example 2', async ({ page }) => {
   const problems = watchProblems(page);
   await openExample2(page);
-  await page.getByRole('button', { name: 'Prioritize' }).click();
+  await page.getByRole('button', { name: 'Prioritize', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Prioritize' })).toBeFocused();
   await expect(page.getByText('Simulated with 100,000 trials.')).toBeVisible();
   await expect(page.getByText(/^Roll-up of all registers/)).toContainText('Clear breach');
@@ -34,11 +34,11 @@ test('S4 shows the loss exceedance, the ranking and the display-only matrix of e
   await expect(page.getByText('Display only. Ranking and funding use the simulation (Cox 2008).')).toBeVisible();
   // R-09 exists only with O-3, so the matrix leaves it out.
   await expect(page.locator('table.matrix')).not.toContainText('R-09');
-  await page.getByText('Override a priority').click();
+  await page.getByText('Override a priority', { exact: true }).click();
   await expectAccessible(page, 'S4 of example 2');
 
   // The proposal ranks within each register. Example 2 has R-05 at 6, so the button applies 5.
-  await page.getByRole('button', { name: 'Use the proposed priorities' }).click();
+  await page.getByRole('button', { name: 'Use the proposed priorities', exact: true }).click();
   await expect(page.getByText('The priorities are equal to the proposal.')).toBeVisible();
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
   expect(problems).toEqual([]);
@@ -56,7 +56,7 @@ test('S5 finds the best portfolio of example 2 and prints the decision record on
   await expect(page.locator('#option-O-4-oneoff')).toBeVisible();
   await expectAccessible(page, 'S5 with an option editor open');
 
-  await page.getByRole('button', { name: 'Find the best portfolio' }).click();
+  await page.getByRole('button', { name: 'Find the best portfolio', exact: true }).click();
   const ranked = page.getByRole('region', { name: 'Ranked portfolios' });
   await expect(ranked.getByRole('row', { name: /^Best O-4, O-5/ })).toBeVisible({ timeout: 30_000 });
   await expect(ranked.getByRole('row', { name: /^Fiscal baseline O-1, O-3, O-4/ })).toBeVisible();
@@ -107,17 +107,17 @@ test('S5 finds the best portfolio of example 2 and prints the decision record on
   await page.emulateMedia({ media: 'screen' });
 
   // An acceptance changes the document, so the record waits for a new run.
-  await page.getByRole('button', { name: 'Record the acceptance of R-02' }).click();
+  await page.getByRole('button', { name: 'Record the acceptance of R-02', exact: true }).click();
   // An empty acceptance cannot be saved, so it can neither run nor print a record.
   await expect(page.getByText('Correct the errors in the save bar first.', { exact: false })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Find the best portfolio' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Find the best portfolio', exact: true })).toBeDisabled();
   await expect(record).toBeHidden();
   await page.locator('#accept-R-02-by').fill('Managing directors');
   await page.locator('#accept-R-02-rationale').fill('The loss stays below the tolerance at every point.');
   await expect(page.getByText('The document changed after the run. Run again before you print.')).toBeVisible();
   await expect(record).toBeHidden();
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
-  await page.getByRole('button', { name: 'Find the best portfolio' }).click();
+  await page.getByRole('button', { name: 'Find the best portfolio', exact: true }).click();
   await expect(record).toContainText('Draft. 3 accepted residual risks need an acceptance record', { timeout: 30_000 });
   await expect(record).toContainText('Accepted by Managing directors');
   expect(problems).toEqual([]);
