@@ -17,7 +17,13 @@
 ## 2. Before the session
 
 1. Get written consent (Sec. 7). Send the form one day before.
-2. Use the current build of main on https://risk.portaregulus.com. Write the version from the app footer on the note sheet.
+2. Build main on the laptop of the moderator. Do not use https://risk.portaregulus.com. It deploys only on a `v*` tag, so it still has rc.3, without the redesign.
+
+   ```bash
+   npm ci --ignore-scripts && GITHUB_SHA=$(git rev-parse HEAD) npm run build && npm run preview
+   ```
+
+   Open `http://localhost:4173`. The start screen shows the commit. Write it on the note sheet. If the start screen shows "build local", `GITHUB_SHA` was not set.
 3. Use a clean browser profile, so that no earlier document is in the app. The app keeps all data in the browser.
 4. Start a screen recording on the computer of the moderator or the user. Use a local recorder. Do not use a cloud meeting tool that keeps a copy.
 5. Print the note sheet (Sec. 6). Have a clock that shows the minutes.
@@ -84,7 +90,7 @@ Write the minute when the user starts each step. Mark each "?" that the user ope
 
 | Measure | Value |
 |---|---|
-| App version | |
+| Commit on the start screen | |
 | Minute of the printed record | |
 | Hints given | |
 | Full editor opened (yes or no, and why) | |
