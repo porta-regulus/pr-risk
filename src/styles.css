@@ -1534,6 +1534,27 @@ main.screen-editor {
 .fold-body > * {
   min-width: 0;
 }
+details.more {
+  border-left: 2px solid var(--border);
+  padding-left: 0.75rem;
+  margin: 0.25rem 0;
+}
+details.more > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+details.more[open] > summary {
+  margin-bottom: 0.5rem;
+}
+.more-body {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
 .editor-one {
   display: grid;
   gap: 0.5rem;

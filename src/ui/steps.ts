@@ -46,26 +46,26 @@ const openRisks = (doc: RiskDocument) => doc.risks.filter((risk) => risk.status 
 const DEFINITIONS: readonly Definition[] = [
   {
     key: 'objectives',
-    title: 'Add 2 objectives',
-    how: 'An objective is a goal of your company, for example "Deliver every order on time". Under Objectives, click "Add an objective". Select the kind and type the statement. Do this 2 times.',
+    title: 'Add your objectives',
+    how: 'An objective is a goal of your company, for example "Deliver every order on time". Under Objectives, click "Add an objective". Select the kind and type the statement. Add 1 objective or more.',
     screen: 'context',
     section: 'objectives-title',
     kind: 'required',
     check: (doc) => {
       const count = (doc.context?.objectives ?? []).filter((objective) => filled(objective.statement)).length;
-      return count >= 2 ? undefined : `${String(count)} of 2 objectives have a statement.`;
+      return count >= 1 ? undefined : 'No objective has a statement.';
     },
   },
   {
     key: 'tolerance',
     title: 'Draw your tolerance curve',
-    how: 'The curve shows how much loss per year your company can accept. Each point is an amount of loss and the highest chance per year that you accept for a loss above that amount. Click "Add a point" and type the 2 values. Add 3 points or more. If you know your capacity, type it and click "Use the starting points from capacity". Then check the points. You can also click "Start the guided questions" and answer them with your management body. The answers set the points.',
+    how: 'The curve shows how much loss per year your company can accept. Each point is an amount of loss and the highest chance per year that you accept for a loss above that amount. Click "Add a point" and type the 2 values. Add 2 points or more. If you know your capacity, type it and click "Use the starting points from capacity". Then check the points. You can also click "Start the guided questions" and answer them with your management body. The answers set the points.',
     screen: 'context',
     section: 'appetite-title',
     kind: 'required',
     check: (doc) => {
       const count = doc.appetite?.toleranceCurve?.points.length ?? 0;
-      return count >= 3 ? undefined : `The curve has ${String(count)} of 3 points.`;
+      return count >= 2 ? undefined : `The curve has ${String(count)} of 2 points.`;
     },
   },
   {
@@ -116,14 +116,14 @@ const DEFINITIONS: readonly Definition[] = [
   },
   {
     key: 'responses',
-    title: 'Add 2 responses',
-    how: 'A response is an action that changes a risk, for example offline backups. Click "Add a response option". Type the title and the costs. Select the risk that the response changes, and say what changes. Add 2 responses or more, so that the app can compare them.',
+    title: 'Add your responses',
+    how: 'A response is an action that changes a risk, for example offline backups. Click "Add a response option". Type the title and the costs. Select the risk that the response changes, and say what changes. Add 1 response or more. The app compares each mix that fits the budget with doing nothing.',
     screen: 'respond',
     section: 'options-title',
     kind: 'required',
     check: (doc) => {
       const options = doc.responses ?? [];
-      if (options.length < 2) return `${String(options.length)} of 2 responses.`;
+      if (options.length === 0) return 'No response yet.';
       return options.some((option) => option.status === 'candidate' || option.status === 'selected') ? undefined : 'No response is a candidate or selected.';
     },
   },

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, type Page, test } from '@playwright/test';
 import { expectAccessible } from './axe';
+import { openMore } from './fold';
 
 // Screen S2 under the production CSP. Golden test G2 parts (a) and (b), autosave, rule V-12,
 // undo and the tolerance curve starting points.
@@ -51,6 +52,7 @@ test('S2 shows Table 9, checks triggers, autosaves, refuses V-12 and undoes', as
   await expect(page.getByRole('heading', { level: 1, name: 'Context and strategy' })).toBeFocused();
   await expect(page.getByText('Saved as version 1.')).toBeVisible();
   await expectAccessible(page, 'S2');
+  await openMore(page);
 
   // G2 (a). 6 rows by 3 examples, text equal to the fixture.
   const table = page.getByRole('table', { name: 'Appetite statements side by side' });
@@ -142,6 +144,7 @@ test('S2 adds a statement from a Table 2 template', async ({ page }) => {
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is created.' })).toBeVisible();
   await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
+  await openMore(page);
   await page.getByText('Example statements to start from', { exact: true }).click();
   await expectAccessible(page, 'S2 with the Table 2 examples open');
   await page.getByRole('button', { name: 'Use the Government Agency example as a new statement', exact: true }).click();

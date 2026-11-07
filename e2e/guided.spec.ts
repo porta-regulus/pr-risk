@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { expectAccessible } from './axe';
+import { openMore } from './fold';
 
 // The guided questions of screen S2 (SPEC.md Sec. 6.5 item 6,
 // docs/release-2/appetite-questions.md) under the production CSP. The capacity slider by
@@ -88,6 +89,7 @@ test('S2 guided questions set the tolerance curve and a draft statement from one
   await expect(panel.getByRole('status')).toHaveText('3 points are in the tolerance curve below. It needs approval. 1 draft statement is added. Complete its trigger.');
 
   // The curve has the 3 points, loss ascending, and no approval. The old curve is in the history.
+  await openMore(page);
   await expect(page.getByLabel('Point 1 loss')).toHaveValue('70000');
   await expect(page.getByLabel('Point 1 probability')).toHaveValue('0.5');
   await expect(page.getByLabel('Point 2 loss')).toHaveValue('1700000');

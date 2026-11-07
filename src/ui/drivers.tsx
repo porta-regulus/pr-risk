@@ -7,6 +7,7 @@ import { nextId, withValue } from './edit';
 import type { Update } from './editor';
 import { Explain } from './explain';
 import { NumberField, SelectField, TextField } from './fields';
+import { More } from './section';
 
 type Driver = NonNullable<RiskDocument['drivers']>[number];
 type DriverLink = NonNullable<Risk['driverLinks']>[number];
@@ -67,9 +68,6 @@ export function DriverPanel({ doc, update }: { readonly doc: RiskDocument; reado
                   }} />
               </div>
             </div>
-            <TextField id={`${id}-description`} label="Description" help="identify.driver-description" multiline value={driver.description} onChange={(description) => {
-                setDriver(i, withValue(driver, 'description', description));
-              }} />
             <DistributionField
               id={`${id}-frequency`}
               legend="Driver frequency"
@@ -85,6 +83,11 @@ export function DriverPanel({ doc, update }: { readonly doc: RiskDocument; reado
             <TextField id={`${id}-rationale`} label="Rationale (10 characters or more)" help="identify.driver-rationale" multiline value={driver.rationale} onChange={(rationale) => {
                 setDriver(i, { ...driver, rationale });
               }} />
+            <More id={`${id}-driver`}>
+              <TextField id={`${id}-description`} label="Description" help="identify.driver-description" multiline value={driver.description} onChange={(description) => {
+                  setDriver(i, withValue(driver, 'description', description));
+                }} />
+            </More>
             <button type="button" class="quiet" disabled={risks.length > 0 || targeted} onClick={() => {
                 setDriver(i, undefined);
               }}>

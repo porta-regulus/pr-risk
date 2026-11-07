@@ -5,7 +5,7 @@ import { draftList, withSection, withValue } from './edit';
 import { Explain } from './explain';
 import { NumberField, SelectField, TextField } from './fields';
 import type { HelpKey } from './help';
-import { Section } from './section';
+import { More, Section } from './section';
 
 type Strategy = NonNullable<RiskDocument['strategy']>;
 type Scales = NonNullable<Strategy['scales']>;
@@ -103,33 +103,9 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
   return (
     <Section id="strategy" title="Risk management strategy" help="context.strategy">
 
-      <h3>Scales</h3>
-      <p class="muted">One scale for each measure, so that all risks are rated the same way. Labels map to numbers through the representative value.</p>
-      {SCALES.map(([key, label, help]) => (
-        <ScaleEditor key={key} name={`scale-${key}`} label={label} help={help} bands={strategy.scales?.[key] ?? []} onChange={(bands) => {
-            set('scales', withValue(strategy.scales, key, draftList<NonNullable<Scales['likelihood']>>(bands)));
-          }} />
-      ))}
-
-      <h3>Review and reporting</h3>
-      <div class="field-row">
-        <div class="field">
-          <NumberField id="review-months" label="Review every (months)" help="context.review-months" integer min={1} max={36} value={strategy.reviewFrequencyMonths} onChange={(value) => {
-              set('reviewFrequencyMonths', value);
-            }} />
-        </div>
-        <div class="field">
-          <NumberField id="reporting-months" label="Report every (months)" help="context.reporting-months" integer min={1} max={36} value={strategy.reportingFrequencyMonths} onChange={(value) => {
-              set('reportingFrequencyMonths', value);
-            }} />
-        </div>
-      </div>
-
       <h3>Budget</h3>
       <div class="field-row">
         {money('firstYearCash', 'First-year cash for responses', 'context.budget-first-year-cash')}
-        {money('capexCeiling', 'CapEx ceiling', 'context.budget-capex')}
-        {money('opexCeiling', 'OpEx ceiling', 'context.budget-opex')}
         <div class="field">
           <TextField id="budget-fiscal-start" label="Fiscal year start" help="context.budget-fiscal-start" type="date" value={strategy.budget?.fiscalYearStart} onChange={(value) => {
               setBudget('fiscalYearStart', value);
@@ -137,53 +113,83 @@ export function StrategySection({ doc, update }: { readonly doc: RiskDocument; r
         </div>
       </div>
 
-      <h3>Thresholds and method</h3>
-      <div class="field-row">
-        <div class="field">
-          <NumberField
-            id="inclusion-threshold"
-            label={`Inclusion threshold (${currency})`}
-            hint="Exposure below which a risk need not stay in the register."
-            help="context.inclusion-threshold"
-            min={0}
-            value={strategy.inclusionThreshold}
-            onChange={(value) => {
-              set('inclusionThreshold', value);
-            }}
-          />
+      <More id="strategy">
+        <h3>Scales</h3>
+        <p class="muted">One scale for each measure, so that all risks are rated the same way. Labels map to numbers through the representative value.</p>
+        {SCALES.map(([key, label, help]) => (
+          <ScaleEditor key={key} name={`scale-${key}`} label={label} help={help} bands={strategy.scales?.[key] ?? []} onChange={(bands) => {
+              set('scales', withValue(strategy.scales, key, draftList<NonNullable<Scales['likelihood']>>(bands)));
+            }} />
+        ))}
+
+        <h3>Review and reporting</h3>
+        <div class="field-row">
+          <div class="field">
+            <NumberField id="review-months" label="Review every (months)" help="context.review-months" integer min={1} max={36} value={strategy.reviewFrequencyMonths} onChange={(value) => {
+                set('reviewFrequencyMonths', value);
+              }} />
+          </div>
+          <div class="field">
+            <NumberField id="reporting-months" label="Report every (months)" help="context.reporting-months" integer min={1} max={36} value={strategy.reportingFrequencyMonths} onChange={(value) => {
+                set('reportingFrequencyMonths', value);
+              }} />
+          </div>
         </div>
-        <div class="field">
-          <NumberField
-            id="escalation-threshold"
-            label={`Escalation threshold (${currency})`}
-            hint="Exposure at or above which a risk must appear in the parent register."
-            help="context.escalation-threshold"
-            min={0}
-            value={strategy.escalationThreshold}
-            onChange={(value) => {
-              set('escalationThreshold', value);
-            }}
-          />
+
+        <h3>Budget ceilings</h3>
+        <div class="field-row">
+          {money('capexCeiling', 'CapEx ceiling', 'context.budget-capex')}
+          {money('opexCeiling', 'OpEx ceiling', 'context.budget-opex')}
         </div>
-        <div class="field">
-          <SelectField
-            id="optimization-method"
-            label="Optimization method"
-            hint="Algorithmic ranks every affordable portfolio by simulation."
-            help="context.optimization-method"
-            emptyLabel="Not set"
-            value={strategy.optimizationMethod}
-            options={[
-              ['algorithmic', 'Algorithmic'],
-              ['fiscal', 'Fiscal'],
-              ['operational', 'Operational'],
-            ]}
-            onChange={(value) => {
-              set('optimizationMethod', value);
-            }}
-          />
+
+        <h3>Thresholds and method</h3>
+        <div class="field-row">
+          <div class="field">
+            <NumberField
+              id="inclusion-threshold"
+              label={`Inclusion threshold (${currency})`}
+              hint="Exposure below which a risk need not stay in the register."
+              help="context.inclusion-threshold"
+              min={0}
+              value={strategy.inclusionThreshold}
+              onChange={(value) => {
+                set('inclusionThreshold', value);
+              }}
+            />
+          </div>
+          <div class="field">
+            <NumberField
+              id="escalation-threshold"
+              label={`Escalation threshold (${currency})`}
+              hint="Exposure at or above which a risk must appear in the parent register."
+              help="context.escalation-threshold"
+              min={0}
+              value={strategy.escalationThreshold}
+              onChange={(value) => {
+                set('escalationThreshold', value);
+              }}
+            />
+          </div>
+          <div class="field">
+            <SelectField
+              id="optimization-method"
+              label="Optimization method"
+              hint="Algorithmic ranks every affordable portfolio by simulation."
+              help="context.optimization-method"
+              emptyLabel="Not set"
+              value={strategy.optimizationMethod}
+              options={[
+                ['algorithmic', 'Algorithmic'],
+                ['fiscal', 'Fiscal'],
+                ['operational', 'Operational'],
+              ]}
+              onChange={(value) => {
+                set('optimizationMethod', value);
+              }}
+            />
+          </div>
         </div>
-      </div>
+      </More>
     </Section>
   );
 }

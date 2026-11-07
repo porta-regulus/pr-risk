@@ -192,6 +192,12 @@ function CriteriaStage({ doc, update }: { readonly doc: RiskDocument; readonly u
   );
 }
 
+// A set point in plain words for the management body. A point means that the chance in one
+// year of a total loss above the amount must not be higher than 1 in N.
+export function pointSentence(oneIn: number, loss: number, currency: string): string {
+  return `We do not accept more than a ${chance(oneIn)} chance in one year that losses from ICT risks go above ${amount(loss)} ${currency}.`;
+}
+
 function pointText(state: PointState, currency: string): string {
   switch (state.status) {
     case 'set':
@@ -245,7 +251,7 @@ function ToleranceStage({ doc, update }: { readonly doc: RiskDocument; readonly 
       <ul class="cell-list">
         {states.map((state) => (
           <li key={state.oneIn}>
-            {chance(state.oneIn)}. {pointText(state, currency)}
+            {state.status === 'set' && state.loss !== undefined ? pointSentence(state.oneIn, state.loss, currency) : `${chance(state.oneIn)}. ${pointText(state, currency)}`}
           </li>
         ))}
       </ul>
@@ -309,7 +315,7 @@ function ResultStage({ doc, update }: { readonly doc: RiskDocument; readonly upd
   const preview = withGuidedResult(doc);
   const participants = elicitation?.participants ?? '';
   const [note, setNote] = useState<string>();
-  const missing = set === 0 ? 'No tolerance point is set.' : set === 1 ? 'Only 1 tolerance point is set. The schema needs 2, so the app does not change the curve. Type this point in the tolerance curve below and add more points.' : set < 3 ? `${String(set)} tolerance points are set. The curve needs 3 points or more. Add the missing points in the tolerance curve below.` : undefined;
+  const missing = set === 0 ? 'No tolerance point is set.' : set === 1 ? 'Only 1 tolerance point is set. The schema needs 2, so the app does not change the curve. Type this point in the tolerance curve below and add more points.' : undefined;
   return (
     <>
       <p>
@@ -337,6 +343,14 @@ function ResultStage({ doc, update }: { readonly doc: RiskDocument; readonly upd
             </tbody>
           </table>
         </div>
+      )}
+      {set > 0 && (
+        <>
+          <p>In words for the management body.</p>
+          <ul class="cell-list" aria-label="Tolerance points in words">
+            {states.map((state) => (state.status === 'set' && state.loss !== undefined ? <li key={state.oneIn}>{pointSentence(state.oneIn, state.loss, currency)}</li> : null))}
+          </ul>
+        </>
       )}
       {missing !== undefined && <p class="hint">{missing}</p>}
       {preview.statementsAdded > 0 && <p>{preview.statementsAdded === 1 ? '1 event is' : `${String(preview.statementsAdded)} events are`} not acceptable. Each gets a draft appetite statement.</p>}

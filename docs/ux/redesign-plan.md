@@ -50,17 +50,17 @@ The start screen asks one question. "Start a new risk register" opens the guided
 
 ### 3.2 The guided steps
 
-The steps follow the AT-5 task (SPEC.md Sec. 12.5) and `src/ui/steps.ts`.
+The steps follow the order of the AT-5 task (SPEC.md Sec. 12.5) and `src/ui/steps.ts`. "Done when" is the minimum that the simulation and the decision record need. The AT-5 task asks for more, for example 5 risks, but a real company must not invent risks to finish a step. Decided by the product owner on 2026-11-07.
 
 | # | Step | What the page asks | Done when |
 |---|---|---|---|
 | 1 | Your company | Name, currency, size, one sentence on what the company does | A title and a currency |
-| 2 | Your goals | 2 objectives, with examples to pick from | 2 objectives with a statement |
-| 3 | How much loss you can take | Capacity, then the tolerance curve | A curve with 3 points or more |
-| 4 | Your risks | Pick from the catalogue, add your own, add 1 opportunity | 5 risks, with 1 from the catalogue, 1 own and 1 positive |
+| 2 | Your goals | Objectives, with examples to pick from | 1 objective with a statement |
+| 3 | How much loss you can take | Capacity, then the tolerance curve | A curve with 2 points or more |
+| 4 | Your risks | Pick from the catalogue, add your own, add 1 opportunity | 1 open risk of a loss |
 | 5 | Size each risk | One risk at a time. Owner, objective, how often, how much, as ranges, with a short calibration help (SPEC assumption A1) | Each risk has an owner, an objective and both ranges |
 | 6 | Shared causes | Drivers, for example one supplier behind several risks | 1 driver with 2 links |
-| 7 | What you can do | Response options with cost and effect | 2 options |
+| 7 | What you can do | Response options with cost and effect | 1 option |
 | 8 | Budget and best plan | Budget, then run the optimization | A run result |
 | 9 | Decision record | Preview, print, export a copy | The record printed or saved as PDF |
 

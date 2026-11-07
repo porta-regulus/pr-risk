@@ -195,7 +195,7 @@ function StatementMonitor({ statement, number, update }: { readonly statement: S
 function IndicatorsPanel({ doc, update }: { readonly doc: RiskDocument; readonly update: Update }) {
   const statements = doc.appetite?.statements ?? [];
   return (
-    <Section id="indicators" title="KPIs, KRIs and tolerances" help="monitor.indicators">
+    <Section id="indicators" title="KPIs, KRIs and tolerances" help="monitor.indicators" folded>
       <p class="hint">
         Record what you measure. The app checks each trigger on its latest observation and shows "Fires", "Does not fire" or "No data". A KRI that fires starts a review of
         the risks in the categories of its statement.
@@ -286,7 +286,7 @@ function AcceptancePanel({ doc, update }: { readonly doc: RiskDocument; readonly
     );
   };
   return (
-    <Section id="acceptance" title="Acceptance records" help="monitor.acceptance">
+    <Section id="acceptance" title="Acceptance records" help="monitor.acceptance" folded>
       <p class="hint">
         A record states who accepted the risk or the exception to a tolerance, when, until when and why. An acceptance past its end date needs a review.
       </p>

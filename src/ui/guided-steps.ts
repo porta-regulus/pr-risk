@@ -23,7 +23,7 @@ export const GUIDED_STEPS: readonly GuidedStep[] = [
     key: 'goals',
     title: 'Your goals',
     heading: 'Your goals',
-    lead: 'Pick 2 goals or more. Your risks link to these goals.',
+    lead: 'Pick 1 goal or more. Your risks link to these goals.',
     why: 'Each risk links to one goal or more. The decision record then shows which goals each risk threatens. NIST IR 8286 calls these enterprise objectives.',
   },
   {
@@ -37,7 +37,7 @@ export const GUIDED_STEPS: readonly GuidedStep[] = [
     key: 'risks',
     title: 'Your risks',
     heading: 'Your risks',
-    lead: 'Add 5 risks or more. Take 1 from the catalogue, write 1 yourself, and add 1 chance of a gain.',
+    lead: 'Start with the risks that worry you most. You can add more later. Take ideas from the catalogue, write your own, and add chances of a gain.',
     why: 'A short sentence "If X occurs, then Y happens" makes each risk clear. The catalogue gives a text and a category only. It never gives numbers, because only you know your company.',
   },
   {
@@ -59,7 +59,7 @@ export const GUIDED_STEPS: readonly GuidedStep[] = [
     key: 'options',
     title: 'What you can do',
     heading: 'What you can do',
-    lead: 'Add 2 options or more, so that the app can compare them.',
+    lead: 'Add 1 option or more. The app compares each mix of options that fits the budget with doing nothing.',
     why: 'Each option changes how often a risk happens or how much one event costs. NIST SP 800-221r1 calls these risk responses.',
   },
   {
@@ -104,18 +104,15 @@ export function riskComplete(risk: Risk): boolean {
   return hasOwner(risk) && (risk.objectiveIds ?? []).length > 0 && estimate !== undefined && hasRange(estimate.frequency) && hasRange(estimate.impactPerEvent) && estimate.rationale.trim().length >= 10;
 }
 
-const plural = (n: number, word: string): string => `${String(n)} ${word}${n === 1 ? '' : 's'}`;
 
 // planDone: a run gave a record of the current document. printed: the user printed it.
 export function guidedStatus(doc: RiskDocument, planDone: boolean, printed: boolean): StepStatus[] {
   const objectives = (doc.context?.objectives ?? []).filter((objective) => filled(objective.statement)).length;
   const points = doc.appetite?.toleranceCurve?.points.length ?? 0;
   const risks = openRisks(doc);
-  const need: string[] = [];
-  if (risks.length < 5) need.push(plural(5 - risks.length, 'more risk'));
-  if (!risks.some((risk) => risk.catalogueRef !== undefined)) need.push('1 from the catalogue');
-  if (!risks.some((risk) => risk.catalogueRef === undefined)) need.push('1 of your own');
-  if (!risks.some((risk) => risk.polarity === 'positive')) need.push('1 chance of a gain');
+  // The minimum that the simulation and the record need, not the AT-5 task. The AT-5 task
+  // sheet asks for more (SPEC.md Sec. 12.5).
+  const losses = risks.filter((risk) => risk.polarity !== 'positive').length;
   const incomplete = risks.filter((risk) => !riskComplete(risk)).map((risk) => risk.riskId);
   const linked = (doc.drivers ?? []).some((driver) => doc.risks.filter((risk) => (risk.driverLinks ?? []).some((link) => link.driverId === driver.id)).length >= 2);
   const options = (doc.responses ?? []).filter((option) => option.status === 'candidate' || option.status === 'selected').length;
@@ -123,12 +120,12 @@ export function guidedStatus(doc: RiskDocument, planDone: boolean, printed: bool
   const result = (missing: string | undefined): StepStatus => (missing === undefined ? { done: true } : { done: false, missing });
   return [
     result(filled(doc.document.title) ? undefined : 'Type the name of the register.'),
-    result(objectives >= 2 ? undefined : `Add ${plural(2 - objectives, 'more goal')}.`),
-    result(points >= 3 ? undefined : `The tolerance curve needs 3 points or more. It has ${String(points)}.`),
-    result(need.length === 0 ? undefined : `Still needed: ${need.join(', ')}.`),
+    result(objectives >= 1 ? undefined : 'Add 1 goal.'),
+    result(points >= 2 ? undefined : `The tolerance curve needs 2 points or more. It has ${String(points)}.`),
+    result(losses >= 1 ? undefined : 'Add 1 risk of a loss.'),
     result(risks.length === 0 ? 'Add risks in step 4 first.' : incomplete.length === 0 ? undefined : `These risks need data: ${incomplete.join(', ')}.`),
     linked ? { done: true } : { done: false },
-    result(options >= 2 ? undefined : `Add ${plural(2 - options, 'more option')}.`),
+    result(options >= 1 ? undefined : 'Add 1 option.'),
     result(budget === undefined ? 'Type the budget.' : planDone ? undefined : 'Click "Find the best portfolio".'),
     printed ? { done: true } : { done: false },
   ];

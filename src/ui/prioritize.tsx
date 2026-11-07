@@ -16,7 +16,7 @@ import { ErrView } from './err';
 import { registerTree } from './identify';
 import { useEngine } from './jobs';
 import { LecChart, money, percent, probability, short, sourceLine, StatusText } from './report';
-import { Section } from './section';
+import { More, Section } from './section';
 
 type Override = NonNullable<Risk['priorityOverride']>;
 
@@ -451,28 +451,30 @@ function PrioritizeBody({ doc, update }: { readonly doc: RiskDocument; readonly 
               source={sourceLine(numbers)}
             />
             <Explain id="lec-chart" topic="prioritize.lec-chart" name="the loss exceedance chart" visible="How to read this chart" />
-            <Explain id="percentiles" topic="prioritize.percentiles" name="the percentiles" visible="How to read the percentiles" />
-            <div class="table-box" tabIndex={0} role="region" aria-label="Percentiles">
-              <table>
-                <caption>Table 1. Percentiles of the annual loss of the roll-up ({currency}).</caption>
-                <thead>
-                  <tr>
-                    {numbers.state.percentiles.map((item) => (
-                      <th scope="col" key={item.q}>
-                        P{String(Math.round(item.q * 1000) / 10)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    {numbers.state.percentiles.map((item) => (
-                      <td key={item.q}>{short(item.loss)}</td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <More id="percentiles" label="Percentiles of the annual loss (optional)">
+              <Explain id="percentiles" topic="prioritize.percentiles" name="the percentiles" visible="How to read the percentiles" />
+              <div class="table-box" tabIndex={0} role="region" aria-label="Percentiles">
+                <table>
+                  <caption>Table 1. Percentiles of the annual loss of the roll-up ({currency}).</caption>
+                  <thead>
+                    <tr>
+                      {numbers.state.percentiles.map((item) => (
+                        <th scope="col" key={item.q}>
+                          P{String(Math.round(item.q * 1000) / 10)}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      {numbers.state.percentiles.map((item) => (
+                        <td key={item.q}>{short(item.loss)}</td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </More>
             {numbers.registers.length > 1 && (
               <ul class="register-status">
                 {numbers.registers.map((register) => (

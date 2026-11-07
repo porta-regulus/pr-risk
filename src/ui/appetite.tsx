@@ -4,6 +4,7 @@ import type { RiskDocument } from '../schema/types';
 import { defaultTolerancePoints, draftList, nextId, type TolerancePoint, withSection, withValue } from './edit';
 import { Explain } from './explain';
 import { Checkboxes, LinesField, NumberField, SelectField, TextField } from './fields';
+import { More } from './section';
 import { Table9View, TriggerCheck } from './table9';
 import { TABLE_2, templateStatement } from './templates';
 
@@ -352,50 +353,52 @@ export function AppetiteSection({ doc, update }: { readonly doc: RiskDocument; r
         </div>
       )}
 
-      <h3>Appetite and tolerance statements</h3>
-      <Explain id="statements" topic="context.statements" name="Appetite and tolerance statements" />
-      {statements.length === 0 ? (
-        <p class="muted">No statement yet. Each statement holds tolerances, controls and indicators in one table.</p>
-      ) : (
-        <Table9View statements={statements} />
-      )}
-      {statements.map((statement, i) => (
-        <div class="statement" key={i}>
-          <h4>Check values for {statement.title ?? statement.id}</h4>
-          <TriggerCheck statement={statement} />
-          <StatementEditor statement={statement} onChange={(next) => {
-              setAppetite('statements', replaceAt(statements, i, next));
-            }} />
-        </div>
-      ))}
-      <button type="button" class="quiet" onClick={() => {
-          const id = nextId('AS-', statements.map((item) => item.id));
-          setAppetite('statements', [...statements, unfilled<Statement>({ id, title: `Statement ${id}` })]);
-        }}>
-        Add a statement
-      </button>
-      <details class="help">
-        <summary>Example statements to start from</summary>
-        <p class="hint">
-          Five example pairs from NIST, quoted exactly. Use one as a starting point, then change the words to fit your organization and add the triggers that measure the
-          tolerance.
-        </p>
-        <Explain id="use-example" topic="context.use-example" name="Example statements" />
-        {TABLE_2.map((template) => (
-          <div class="sub-editor" key={template.enterprise}>
-            <p>
-              <strong>{template.enterprise}</strong>
-            </p>
-            <p>Risk appetite. {template.appetite}</p>
-            <p>Risk tolerance. {template.tolerance}</p>
-            <button type="button" class="quiet" onClick={() => {
-                setAppetite('statements', [...statements, templateStatement(statements, template)]);
-              }}>
-              Use the {template.enterprise} example as a new statement
-            </button>
+      <More id="statements" label={`Appetite and tolerance statements (optional, ${String(statements.length)})`}>
+        <h3>Appetite and tolerance statements</h3>
+        <Explain id="statements" topic="context.statements" name="Appetite and tolerance statements" />
+        {statements.length === 0 ? (
+          <p class="muted">No statement yet. Each statement holds tolerances, controls and indicators in one table.</p>
+        ) : (
+          <Table9View statements={statements} />
+        )}
+        {statements.map((statement, i) => (
+          <div class="statement" key={i}>
+            <h4>Check values for {statement.title ?? statement.id}</h4>
+            <TriggerCheck statement={statement} />
+            <StatementEditor statement={statement} onChange={(next) => {
+                setAppetite('statements', replaceAt(statements, i, next));
+              }} />
           </div>
         ))}
-      </details>
+        <button type="button" class="quiet" onClick={() => {
+            const id = nextId('AS-', statements.map((item) => item.id));
+            setAppetite('statements', [...statements, unfilled<Statement>({ id, title: `Statement ${id}` })]);
+          }}>
+          Add a statement
+        </button>
+        <details class="help">
+          <summary>Example statements to start from</summary>
+          <p class="hint">
+            Five example pairs from NIST, quoted exactly. Use one as a starting point, then change the words to fit your organization and add the triggers that measure the
+            tolerance.
+          </p>
+          <Explain id="use-example" topic="context.use-example" name="Example statements" />
+          {TABLE_2.map((template) => (
+            <div class="sub-editor" key={template.enterprise}>
+              <p>
+                <strong>{template.enterprise}</strong>
+              </p>
+              <p>Risk appetite. {template.appetite}</p>
+              <p>Risk tolerance. {template.tolerance}</p>
+              <button type="button" class="quiet" onClick={() => {
+                  setAppetite('statements', [...statements, templateStatement(statements, template)]);
+                }}>
+                Use the {template.enterprise} example as a new statement
+              </button>
+            </div>
+          ))}
+        </details>
+      </More>
     </section>
   );
 }

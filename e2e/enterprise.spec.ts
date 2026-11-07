@@ -140,6 +140,7 @@ test('G3. S7 merges A-1, B-1 and C-1 of example 3 with both layouts of Table 10'
   await expect(page.getByLabel('Parent register')).toHaveValue('ORG');
   await expect(page.locator('table.entries[data-category="ict"] tbody tr')).toHaveCount(6);
   await expect(page.locator('table.entries tr[data-risk="A-1"] .note')).toHaveText('In ORG-1');
+  await unfold(page, 'Aggregate and normalize');
   const warning = page.locator('.warnings').filter({ hasText: 'L-10 ORG-1' });
   await expect(warning).toBeVisible();
 
@@ -212,6 +213,7 @@ test('S7 closes the period of example 1, the portfolio shows the previous labels
   await expect(err.locator('td.reputation-previous')).toHaveText('No label');
   await expect(err.locator('td.mission-previous')).toHaveText('No label');
 
+  await unfold(page, 'Close the period');
   await page.getByLabel('Registers', { exact: true }).selectOption({ label: 'Notional Enterprise Risk Register' });
   await page.getByLabel('End of the period').fill('2026-10-31');
   await page.getByRole('button', { name: 'Close the period for 9 open risks', exact: true }).click();

@@ -8,3 +8,12 @@ export async function unfold(page: Page, heading: string | RegExp): Promise<void
   const open = await summary.evaluate((node) => (node.parentElement as HTMLDetailsElement).open);
   if (!open) await summary.click();
 }
+
+// Opens every "More fields (optional)" fold on the page. A fold that the page adds later starts
+// closed, so call this again after such a change.
+export async function openMore(page: Page): Promise<void> {
+  await page.locator('details.more').first().waitFor({ state: 'attached' });
+  await page.evaluate(() => {
+    for (const node of document.querySelectorAll<HTMLDetailsElement>('details.more')) node.open = true;
+  });
+}
