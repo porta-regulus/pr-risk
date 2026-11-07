@@ -1,6 +1,7 @@
 // The notice of a new version on S1 and in the editor frame (gap F5). See ./version.ts.
 import { useEffect, useState } from 'preact/hooks';
 import { activateNewVersion, type ActivateResult } from '../service-worker';
+import { Explain } from './explain';
 import { noticeState, onNoticeState, recordVersion, releaseUrl, setNoticeState } from './version';
 
 const RESULT_TEXT: Readonly<Record<Exclude<ActivateResult, 'activated'>, string>> = {
@@ -73,6 +74,7 @@ export function VersionNotice({ startScreen = false }: { readonly startScreen?: 
               Close notice
             </button>
           </div>
+          {startScreen && <Explain id="new-version" topic="common.new-version" name="Use the new version now" />}
         </div>
       )}
     </>

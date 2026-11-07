@@ -3,6 +3,7 @@
 import { useState } from 'preact/hooks';
 import { boundaryGaps, evaluateStatement, type Values } from '../monitor/triggers';
 import type { RiskDocument } from '../schema/types';
+import { Explain } from './explain';
 import { IgnoreInvalid, NumberField } from './fields';
 
 type Statement = NonNullable<NonNullable<RiskDocument['appetite']>['statements']>[number];
@@ -31,9 +32,11 @@ function Cell({ items }: { readonly items: readonly string[] }) {
 
 export function Table9View({ statements }: { readonly statements: readonly Statement[] }) {
   return (
-    // Focusable, so a keyboard can scroll the table on a narrow screen (WCAG 2.1.1).
-    <div class="table-box" tabIndex={0} role="region" aria-label="Table 9 view">
-      <table class="table9" aria-label="Appetite statements in the layout of Table 9">
+    <>
+    <Explain id="appetite-table" topic="context.appetite-table" name="the table of appetite statements" visible="How to read this table" />
+    {/* Focusable, so a keyboard can scroll the table on a narrow screen (WCAG 2.1.1). */}
+    <div class="table-box" tabIndex={0} role="region" aria-label="Appetite statements, scroll box">
+      <table class="table9" aria-label="Appetite statements side by side">
         <thead>
           <tr>
             <th scope="col">Row</th>
@@ -58,6 +61,7 @@ export function Table9View({ statements }: { readonly statements: readonly State
         </tbody>
       </table>
     </div>
+    </>
   );
 }
 
@@ -99,6 +103,7 @@ export function TriggerCheck({ statement }: { readonly statement: Statement }) {
               <NumberField
                 id={`check-${statement.id}-${metric}`}
                 label={unit === undefined ? metric : `${metric} (${unit})`}
+                help="context.trigger-value"
                 value={values[metric]}
                 onChange={(value) => {
                   const others = Object.entries(values).filter(([name]) => name !== metric);

@@ -13,10 +13,10 @@ test('S2 guided questions set the tolerance curve and a draft statement from one
   });
 
   await page.goto('/');
-  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
   await page.getByRole('button', { name: 'Context and strategy', exact: true }).click();
-  await page.getByRole('button', { name: 'Start the guided questions' }).click();
+  await page.getByRole('button', { name: 'Start the guided questions', exact: true }).click();
   const panel = page.locator('section[aria-labelledby="guided-title"]');
   const next = panel.getByRole('button', { name: 'Next', exact: true });
 
@@ -34,7 +34,7 @@ test('S2 guided questions set the tolerance curve and a draft statement from one
   // Stage 2. One event for an objective and one click.
   await expect(page.getByRole('heading', { name: 'Stage 2 of 5. Criteria' })).toBeFocused();
   const orders = panel.getByRole('group', { name: /^OBJ-O1\./ });
-  const notAcceptable = orders.getByRole('button', { name: 'Not acceptable' });
+  const notAcceptable = orders.getByRole('button', { name: 'Not acceptable', exact: true });
   await expect(notAcceptable).toBeDisabled();
   await orders.getByLabel('Event for this objective').fill('Orders stop for 3 days.');
   await notAcceptable.click();
@@ -49,7 +49,7 @@ test('S2 guided questions set the tolerance curve and a draft statement from one
     for (const name of answers) await panel.getByRole('button', { name, exact: true }).click();
   };
   await answer('Accept', 'Accept');
-  await panel.getByRole('button', { name: 'Take back the last answer' }).click();
+  await panel.getByRole('button', { name: 'Take back the last answer', exact: true }).click();
   await expect(question).toHaveText('Do you accept a 1 in 100 chance this year that losses from ICT risks reach 2,600,000 EUR or more?');
   await answer('Not accept', 'Accept');
   // "Do not know" leaves 1 in 20 empty. 1 in 5 searches below 1 in 100.
@@ -68,7 +68,7 @@ test('S2 guided questions set the tolerance curve and a draft statement from one
   // Stage 4. 1 in 20 is empty, so the cross-check asks about 1 in 100. E is 21 000.
   await expect(page.getByRole('heading', { name: 'Stage 4 of 5. Cross-check' })).toBeFocused();
   await expect(panel.locator('#guided-cross-check-question')).toHaveText('How much per year would you pay to remove a 1 in 100 chance of losing 2,100,000 EUR or more?');
-  await panel.getByRole('button', { name: 'More than 42,000 EUR' }).click();
+  await panel.getByRole('button', { name: 'More than 42,000 EUR', exact: true }).click();
   await expect(panel.getByRole('status')).toContainText('This is a flag, not an error.');
   await next.click();
 
@@ -80,7 +80,7 @@ test('S2 guided questions set the tolerance curve and a draft statement from one
   await expect(rows.nth(1)).toContainText('Not set');
   await expect(rows.nth(2)).toContainText('1,700,000');
   await expect(rows.nth(3)).toContainText('70,000');
-  const use = panel.getByRole('button', { name: 'Use these answers' });
+  const use = panel.getByRole('button', { name: 'Use these answers', exact: true });
   await expect(use).toBeDisabled();
   await panel.getByLabel('Who took part').fill('Managing directors and IT lead');
   await expectAccessible(page, 'S2 guided questions, stage 5');
@@ -94,7 +94,7 @@ test('S2 guided questions set the tolerance curve and a draft statement from one
   await expect(page.getByLabel('Point 3 loss')).toHaveValue('2100000');
   await expect(page.getByLabel('Point 3 probability')).toHaveValue('0.01');
   await expect(page.getByLabel('Approved by')).toHaveValue('');
-  await expect(page.getByRole('table', { name: 'Appetite statements in the layout of Table 9' })).toContainText('The management body does not accept this event. Orders stop for 3 days.');
+  await expect(page.getByRole('table', { name: 'Appetite statements side by side' })).toContainText('The management body does not accept this event. Orders stop for 3 days.');
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
 
   // Decision O4. S4 lists the event and points to the tolerance what-if.

@@ -49,11 +49,12 @@ export function ErrView({ doc, number }: { readonly doc: RiskDocument; readonly 
   const register = doc.registers.find((item) => item.id === chosen) ?? doc.registers[0];
   const risks = doc.risks.filter((risk) => risk.registerId === register.id && risk.onlyWithResponse === undefined);
   return (
-    <Section id="err" title="Register in the layout of Fig. 10" folded>
+    <Section id="err" title="Enterprise risk register" folded help="prioritize.err">
       <div class="field">
         <SelectField
           id="err-register"
           label="Register"
+          help="prioritize.err-register"
           value={register.id}
           options={tree.map((item) => [item.register.id, item.register.title] as const)}
           onChange={(id) => {
@@ -67,7 +68,7 @@ export function ErrView({ doc, number }: { readonly doc: RiskDocument; readonly 
         <div class="table-box" tabIndex={0} role="region" aria-labelledby="err-title">
           <table class="err">
             <caption>
-              Table {number}. {register.title} in the layout of the enterprise risk register of SP 800-221r1 Fig. 10.
+              Table {number}. {register.title}, one row per risk.
             </caption>
             <thead>
               <tr>

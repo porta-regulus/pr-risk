@@ -8,8 +8,8 @@ import { unfold } from './fold';
 // Screen S7 Enterprise view under the production CSP (build task 7). Golden tests G1 (b), G3 and
 // G5 of SPEC.md Sec. 12.2, with the axe check and the 375 px width.
 
-const EXAMPLE_1 = 'NIST Fig. 10 and Table 9 (example 1)';
-const EXAMPLE_3 = 'Table 10 imports (example 3)';
+const EXAMPLE_1 = 'Enterprise register in words (example 1)';
+const EXAMPLE_3 = 'Registers from other tools (example 3)';
 
 function watchProblems(page: Page): string[] {
   const problems: string[] = [];
@@ -74,7 +74,7 @@ const FIG_11 = {
 test('G5. S7 shows the profile of example 1 by objective in the layout of Fig. 11', async ({ page }) => {
   const problems = watchProblems(page);
   await open(page, EXAMPLE_1, 'Enterprise view');
-  await unfold(page, /^Risk profile by objective/);
+  await unfold(page, /^Enterprise risk profile by objective/);
   const scope = page.getByLabel('Registers in the profile');
   await expect(scope).toHaveValue('');
   const blocks = page.locator('.erp-block');
@@ -127,7 +127,7 @@ async function merge(page: Page, layout: string, added: string, cost = 'Total of
   await page.getByLabel('Combined risk description').fill(ORG_1);
   await page.getByLabel('Different responses').selectOption({ label: layout });
   await page.getByLabel('Response cost').selectOption({ label: cost });
-  await page.getByRole('button', { name: 'Merge the 3 selected entries' }).click();
+  await page.getByRole('button', { name: 'Merge the 3 selected entries', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: added })).toBeVisible();
   await expect(page.locator('section[aria-labelledby="normalize-title"] ul.errors')).toHaveCount(0);
 }
@@ -152,12 +152,12 @@ test('G3. S7 merges A-1, B-1 and C-1 of example 3 with both layouts of Table 10'
   const errors = page.locator('section[aria-labelledby="normalize-title"] ul.errors');
   await page.getByRole('checkbox', { name: 'Select GW-1' }).check();
   await page.getByLabel('Combined risk description').fill('Gateway X1 vulnerabilities.');
-  await page.getByRole('button', { name: 'Merge the selected entry' }).click();
+  await page.getByRole('button', { name: 'Merge the selected entry', exact: true }).click();
   await expect(errors).toHaveText('GW-1 has no estimate yet. Estimate it on the screen Identify and analyze, or do not select it.');
   await expect(page.locator('table.summaries tbody tr')).toHaveCount(1);
   await page.getByRole('checkbox', { name: 'Select GW-1' }).uncheck();
 
-  await page.getByRole('button', { name: 'Remove ORG-1' }).click();
+  await page.getByRole('button', { name: 'Remove ORG-1', exact: true }).click();
   await expect(page.getByText('This register has no summary entry.')).toBeVisible();
   await expect(page.locator('table.entries tr[data-risk="A-1"] .note')).toHaveText('');
 
@@ -176,7 +176,7 @@ test('G3. S7 merges A-1, B-1 and C-1 of example 3 with both layouts of Table 10'
   await expectAccessible(page, 'S7 of example 3 with a summary entry');
 
   // (c) and (d). One row per response, with the n = 2 and n = 1 rules of Sec. 8.15.
-  await org1.getByRole('button', { name: 'Remove ORG-1' }).click();
+  await org1.getByRole('button', { name: 'Remove ORG-1', exact: true }).click();
   await merge(page, 'One row per response', 'ORG-1 and ORG-1.2 are added to Business unit risk register.', 'Average weighted by exposure rating');
   const mitigate = page.locator('table.summaries tr[data-risk="ORG-1"]');
   const accept = page.locator('table.summaries tr[data-risk="ORG-1.2"]');
@@ -198,7 +198,7 @@ test('G3. S7 merges A-1, B-1 and C-1 of example 3 with both layouts of Table 10'
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
   await page.getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Identify and analyze' })).toBeFocused();
-  await page.getByRole('button', { name: 'Enterprise view' }).click();
+  await page.getByRole('button', { name: 'Enterprise view', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Enterprise view' })).toBeFocused();
   await expect(page.locator('table.summaries tbody tr')).toHaveCount(2);
   expect(problems).toEqual([]);
@@ -214,7 +214,7 @@ test('S7 closes the period of example 1, the portfolio shows the previous labels
 
   await page.getByLabel('Registers', { exact: true }).selectOption({ label: 'Notional Enterprise Risk Register' });
   await page.getByLabel('End of the period').fill('2026-10-31');
-  await page.getByRole('button', { name: 'Close the period for 9 open risks' }).click();
+  await page.getByRole('button', { name: 'Close the period for 9 open risks', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'The current assessment of 9 risks is now the previous period, as of 2026-10-31.' })).toBeVisible();
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
   await expect(err.locator('td.reputation-previous')).toHaveText('High');
@@ -224,7 +224,7 @@ test('S7 closes the period of example 1, the portfolio shows the previous labels
   await expectAccessible(page, 'S7 after the close of a period');
   await expectNoOverflow(page);
 
-  await page.getByRole('button', { name: 'Undo last change' }).click();
+  await page.getByRole('button', { name: 'Undo last change', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: /Version \d+ is back\./ })).toBeVisible();
   await expect(err.locator('td.reputation-previous')).toHaveText('No label');
   expect(problems).toEqual([]);

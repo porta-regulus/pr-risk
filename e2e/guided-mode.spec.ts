@@ -33,7 +33,7 @@ async function sizeRisk(page: Page, n: number, risk: RiskInput): Promise<void> {
   await page.getByRole('group', { name: 'Risks' }).getByRole('button', { name: new RegExp(`^R-${String(n)}\\b`) }).click();
   await page.locator(`#${id}-owner`).fill(risk.owner);
   await page.getByRole('group', { name: 'Which goals does it hit?' }).getByLabel(new RegExp(`^${risk.objective} `)).check();
-  await page.getByRole('button', { name: 'Give the ranges' }).click();
+  await page.getByRole('button', { name: 'Give the ranges', exact: true }).click();
   await page.locator(`#${id}-frequency-lower`).fill(String(risk.frequency[0]));
   await page.locator(`#${id}-frequency-upper`).fill(String(risk.frequency[1]));
   await page.locator(`#${id}-impact-lower`).fill(String(risk.impact[0]));
@@ -44,7 +44,7 @@ async function sizeRisk(page: Page, n: number, risk: RiskInput): Promise<void> {
 
 async function addOption(page: Page, n: number, title: string, target: string, costs: readonly [number, number, number], impact: readonly [number, number]): Promise<void> {
   const id = `option-O-${String(n)}`;
-  await page.getByRole('button', { name: 'Add a response option' }).click();
+  await page.getByRole('button', { name: 'Add a response option', exact: true }).click();
   await page.locator(`#${id}-title`).fill(title);
   await page.locator(`#${id}-oneoff`).fill(String(costs[0]));
   await page.locator(`#${id}-annual`).fill(String(costs[1]));
@@ -94,7 +94,7 @@ test('guided mode takes the AT-5 task from an empty browser to the printed decis
 
   // Step 3. The guided questions give 4 tolerance points.
   await step(page, 3, 'How much loss you can take');
-  await page.getByRole('button', { name: 'Start the guided questions' }).click();
+  await page.getByRole('button', { name: 'Start the guided questions', exact: true }).click();
   const panel = page.locator('section[aria-labelledby="guided-title"]');
   const stageNext = panel.getByRole('button', { name: 'Next', exact: true });
   await page.getByLabel('Or type the amount (EUR)').fill('1500000');
@@ -107,7 +107,7 @@ test('guided mode takes the AT-5 task from an empty browser to the printed decis
   await stageNext.click();
   await stageNext.click();
   await panel.getByLabel('Who took part').fill('Managing director and finance lead');
-  await panel.getByRole('button', { name: 'Use these answers' }).click();
+  await panel.getByRole('button', { name: 'Use these answers', exact: true }).click();
   await saved(page);
   await expect(page.getByRole('table', { name: 'Your tolerance curve now' }).locator('tbody tr')).toHaveCount(4);
   await expectAccessible(page, 'guided step 3');
@@ -116,7 +116,7 @@ test('guided mode takes the AT-5 task from an empty browser to the printed decis
   // Step 4. 2 risks from the catalogue, 1 of them positive, and 3 own risks.
   await step(page, 4, 'Your risks');
   const catalogue = page.getByLabel('Pick a risk from the catalogue');
-  const fromCatalogue = page.getByRole('button', { name: 'Add from the catalogue' });
+  const fromCatalogue = page.getByRole('button', { name: 'Add from the catalogue', exact: true });
   await catalogue.selectOption('61');
   await fromCatalogue.click();
   await catalogue.selectOption('OPP-3');
@@ -127,7 +127,7 @@ test('guided mode takes the AT-5 task from an empty browser to the printed decis
     'If a phishing mail changes a supplier bank account, then we pay a fraudster.',
   ]) {
     await page.getByLabel('Or describe your own risk').fill(text);
-    await page.getByRole('button', { name: 'Add your risk' }).click();
+    await page.getByRole('button', { name: 'Add your risk', exact: true }).click();
   }
   await saved(page);
   const risks = page.getByRole('table', { name: 'Your risks' });
@@ -158,7 +158,7 @@ test('guided mode takes the AT-5 task from an empty browser to the printed decis
 
   // Step 6. 1 shared cause with 2 links.
   await step(page, 6, 'Shared causes');
-  await page.getByRole('button', { name: 'Add a driver' }).click();
+  await page.getByRole('button', { name: 'Add a driver', exact: true }).click();
   await page.getByText(/^D-1 New driver/).click();
   await page.locator('#driver-0-name').fill('Cloud hosting outage');
   await page.locator('#driver-0-kind').selectOption('supplier');
@@ -185,7 +185,7 @@ test('guided mode takes the AT-5 task from an empty browser to the printed decis
   await step(page, 8, 'Budget and best plan');
   await page.getByLabel('Cash you can spend in the first year (EUR)').fill('40000');
   await saved(page);
-  await page.getByRole('button', { name: 'Find the best portfolio' }).click();
+  await page.getByRole('button', { name: 'Find the best portfolio', exact: true }).click();
   await expect(page.getByRole('region', { name: 'Ranked portfolios' }).getByRole('row', { name: /^Best O-/ })).toBeVisible({ timeout: 60_000 });
   await expect(page.locator('.guided-missing')).toHaveCount(0);
   await expectAccessible(page, 'guided step 8');
@@ -193,7 +193,7 @@ test('guided mode takes the AT-5 task from an empty browser to the printed decis
   // Steps 1 to 8 are done, the optional step 6 too.
   for (const i of [0, 1, 2, 3, 4, 5, 6]) await expect(page.locator('.guided-step').nth(i)).toContainText('Done');
   // Step 8 has no record on the page, so it offers no print.
-  await expect(page.getByRole('button', { name: 'Print the decision record' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Print the decision record', exact: true })).toHaveCount(0);
   // A number field with text that is not a number keeps the step open.
   const budget = page.getByLabel('Cash you can spend in the first year (EUR)');
   await budget.fill('40k');
@@ -222,7 +222,7 @@ test('guided mode takes the AT-5 task from an empty browser to the printed decis
   await page.emulateMedia({ media: 'screen' });
 
   // The full editor opens the same document.
-  await page.getByRole('button', { name: 'Open the full editor' }).click();
+  await page.getByRole('button', { name: 'Open the full editor', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Context and strategy' })).toBeFocused();
   await expect(page.getByLabel('Objective 2 statement')).toHaveValue('Keep customer data private.');
   expect(problems, 'errors, warnings and CSP violations').toEqual([]);
@@ -234,7 +234,7 @@ test('the guided step list becomes a menu button at 375 px', async ({ page }) =>
   await page.getByLabel('Title', { exact: true }).fill('Phone register');
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await page.getByRole('button', { name: 'Guided mode', exact: true }).click();
-  const menu = page.getByRole('button', { name: 'Step 1 of 9, Your company' });
+  const menu = page.getByRole('button', { name: 'Step 1 of 9, Your company', exact: true });
   await expect(menu).toHaveAttribute('aria-expanded', 'false');
   await expect(page.locator('#guided-step-list')).toBeHidden();
   await menu.click();

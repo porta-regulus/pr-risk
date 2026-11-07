@@ -11,7 +11,7 @@ test('the full editor has a side menu, a state line, folded tables and one optio
   });
 
   await page.goto('/');
-  await page.getByRole('button', { name: 'SME with numbers (example 2)' }).click();
+  await page.getByRole('button', { name: 'SME with numbers (example 2)', exact: true }).click();
   await page.getByRole('button', { name: 'Prioritize', exact: true }).click();
   const menu = page.getByRole('navigation', { name: 'Screens' });
   await expect(menu.getByRole('button', { name: 'Prioritize', exact: true })).toHaveAttribute('aria-current', 'page');
@@ -46,7 +46,7 @@ test('the full editor has a side menu, a state line, folded tables and one optio
 
   // At 375 px the menu is one button that opens the list of screens.
   await page.setViewportSize({ width: 375, height: 812 });
-  const button = menu.getByRole('button', { name: 'Screen 4 of 6, Respond and optimize' });
+  const button = menu.getByRole('button', { name: 'Screen 4 of 6, Respond and optimize', exact: true });
   await expect(button).toHaveAttribute('aria-expanded', 'false');
   await expect(menu.getByRole('button', { name: 'Monitor and adjust', exact: true })).toBeHidden();
   await button.click();

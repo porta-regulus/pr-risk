@@ -8,6 +8,7 @@ import type { ResponseOption, RiskDocument } from '../schema/types';
 import { DistributionField, formatNumber } from './distribution';
 import { nextId, withSection, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
+import { Explain, useExplain } from './explain';
 import { Checkboxes, LinesField, NumberField, SelectField, TextField } from './fields';
 import { useEngine } from './jobs';
 import { AcceptanceEditor } from './acceptance';
@@ -76,6 +77,7 @@ function EffectEditor({
       <SelectField
         id={`${id}-target`}
         label="Target"
+        help="respond.effect-target"
         value={`${effect.targetKind}|${effect.targetId}`}
         options={targets}
         onChange={(value) => {
@@ -90,7 +92,7 @@ function EffectEditor({
       />
       <p class="hint">
         Now: frequency {describe(risk?.estimate?.frequency ?? driver?.frequency)} events per year
-        {risk !== undefined && `, ${word} per event ${describe(risk.estimate?.impactPerEvent)} ${currency}`}. An effect gives the estimate after the response (Sec. 8.10).
+        {risk !== undefined && `, ${word} per event ${describe(risk.estimate?.impactPerEvent)} ${currency}`}. An effect gives the estimate after the response.
       </p>
       <label class="check">
         <input
@@ -106,6 +108,7 @@ function EffectEditor({
         <DistributionField
           id={`${id}-frequency`}
           legend="Frequency after the response"
+          help="respond.effect-frequency"
           question="How many events per year with the response in place? Give a range you are 90% sure of."
           unit="events per year"
           frequency
@@ -131,6 +134,7 @@ function EffectEditor({
         <DistributionField
           id={`${id}-impact`}
           legend={`${word === 'gain' ? 'Gain' : 'Loss'} per event after the response`}
+          help="respond.effect-impact"
           question="For insurance, give the retained loss after deductible and limit. Give a range you are 90% sure of."
           unit={currency}
           value={effect.impactPerEvent}
@@ -142,6 +146,7 @@ function EffectEditor({
       <TextField
         id={`${id}-rationale`}
         label="Rationale of the effect (10 characters or more)"
+        help="respond.effect-rationale"
         value={effect.rationale}
         onChange={(rationale) => {
           onChange({ ...effect, rationale });
@@ -188,6 +193,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
           <TextField
             id={`${id}-title`}
             label="Title"
+            help="respond.option-title"
             value={option.title}
             onChange={(title) => {
               set((current) => ({ ...current, title }));
@@ -198,7 +204,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
           <SelectField
             id={`${id}-type`}
             label="Response type"
-            hint="Table 4 for negative risks, Table 5 for positive risks."
+            help="respond.option-type"
             value={option.responseType}
             options={RESPONSE_TYPES}
             onChange={(responseType) => {
@@ -213,6 +219,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
           <SelectField
             id={`${id}-status`}
             label="Status"
+            help="respond.option-status"
             hint="Only candidates and selected options compete for the budget."
             value={option.status}
             options={STATUSES}
@@ -225,6 +232,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
           <TextField
             id={`${id}-owner`}
             label="Owner"
+            help="respond.option-owner"
             value={option.owner}
             onChange={(owner) => {
               set((current) => withValue(current, 'owner', owner));
@@ -235,6 +243,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
       <TextField
         id={`${id}-description`}
         label="Description"
+        help="respond.option-description"
         multiline
         value={option.description}
         onChange={(description) => {
@@ -242,12 +251,13 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
         }}
       />
       <fieldset class="distribution">
-        <legend>Costs (Table 3 risk response cost)</legend>
+        <legend>Costs</legend>
         <div class="field-row">
           <div class="field">
             <NumberField
               id={`${id}-oneoff`}
               label={`One-off cost (${currency})`}
+              help="respond.cost-oneoff"
               min={0}
               value={costs.oneOff}
               onChange={(value) => {
@@ -259,6 +269,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
             <NumberField
               id={`${id}-annual`}
               label={`Annual cost (${currency})`}
+              help="respond.cost-annual"
               min={0}
               value={costs.annual}
               onChange={(value) => {
@@ -270,6 +281,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
             <NumberField
               id={`${id}-lifetime`}
               label="Lifetime (years, up to 20)"
+              help="respond.cost-lifetime"
               min={0}
               max={20}
               value={costs.lifetimeYears}
@@ -282,6 +294,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
             <NumberField
               id={`${id}-reserve`}
               label={`Risk reserve (${currency})`}
+              help="respond.cost-reserve"
               hint="Set aside in year 1, released if no target event occurs."
               min={0}
               value={costs.reserveAmount}
@@ -340,11 +353,12 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
           Add an effect
         </button>
         <p class="hint">
-          Two options that change the same target are alternatives. A portfolio never holds both. To combine them, add a bundle option that states the combined effect (Sec. 8.10).
+          Two options that change the same target are alternatives. A portfolio never holds both. To combine them, add a bundle option that states the combined effect.
         </p>
       </fieldset>
       <Checkboxes
-        legend="Control types (Sec. 3.6)"
+        legend="Control types"
+        help="respond.control-types"
         name={`${id}-controls`}
         options={CONTROL_TYPES}
         value={option.controlTypes ?? []}
@@ -355,6 +369,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
       <LinesField
         id={`${id}-references`}
         label="Informative references, one per line, for example CSF 2.0 PR.AA-03"
+        help="respond.informative-references"
         value={option.informativeReferences ?? []}
         onChange={(value) => {
           set((current) => withValue(current, 'informativeReferences', value.length === 0 ? undefined : value));
@@ -363,6 +378,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
       {others.length > 0 && (
         <Checkboxes
           legend="Bundle of these options"
+          help="respond.bundle"
           name={`${id}-bundle`}
           options={others.map((item) => [item.id, `${item.id} ${item.title}`] as const)}
           value={option.bundleOf ?? []}
@@ -375,7 +391,8 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
         <details class="help">
           <summary>Risks that this option introduces ({(option.introducesRisks ?? []).length})</summary>
           <Checkboxes
-            legend="Risks that this option introduces (Sec. 3.6). Such a risk enters the simulation only with this option."
+            legend="Risks that this option introduces. Such a risk enters the simulation only with this option."
+            help="respond.introduces-risks"
             name={`${id}-introduces`}
             options={introducible.map((risk) => [risk.riskId, `${risk.riskId} ${risk.riskDescription}`] as const)}
             value={option.introducesRisks ?? []}
@@ -396,10 +413,11 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
         </details>
       )}
       <fieldset class="distribution">
-        <legend>Forced choice (Sec. 5.3.2 operational method)</legend>
+        <legend>Forced choice</legend>
         <SelectField
           id={`${id}-forced`}
           label="Leadership choice"
+          help="respond.forced-choice"
           emptyLabel="None, the optimization decides"
           value={option.forced?.action}
           options={[
@@ -428,6 +446,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
               <TextField
                 id={`${id}-forced-reason`}
                 label="Reason"
+                help="respond.forced-reason"
                 value={option.forced.reason}
                 onChange={(reason) => {
                   set((current) => (current.forced === undefined ? current : { ...current, forced: { ...current.forced, reason } }));
@@ -438,6 +457,7 @@ export function OptionEditor({ doc, option, update, alone = false }: { readonly 
               <TextField
                 id={`${id}-forced-by`}
                 label="Decided by"
+                help="respond.forced-by"
                 value={option.forced.by}
                 onChange={(by) => {
                   set((current) => (current.forced === undefined ? current : { ...current, forced: { ...current.forced, by } }));
@@ -552,18 +572,22 @@ export function newResponseOption(doc: RiskDocument): ResponseOption | undefined
 // print is false where the decision record is not on the page, so a print would be empty.
 export function RunButtons({ run, print = true }: { readonly run: PortfolioRun; readonly print?: boolean }) {
   const { job, record, stale, ready, canRun } = run;
+  const find = useExplain('run-find', 'respond.find-best-portfolio', 'Find the best portfolio');
+  const printing = useExplain('run-print', 'respond.print-record', 'Print the decision record');
+  const showPrint = print && record !== undefined && !job.running;
   return (
     <>
       <div class="button-row">
         <button type="button" disabled={!canRun || job.running} onClick={run.start}>
           Find the best portfolio
         </button>
+        {find.toggle}
         {job.running && (
           <button type="button" class="quiet" onClick={run.cancel}>
             Cancel the run
           </button>
         )}
-        {print && record !== undefined && !job.running && (
+        {showPrint && (
           <button
             type="button"
             disabled={stale || !ready}
@@ -574,7 +598,10 @@ export function RunButtons({ run, print = true }: { readonly run: PortfolioRun; 
             Print the decision record
           </button>
         )}
+        {showPrint && printing.toggle}
       </div>
+      {find.text}
+      {showPrint && printing.text}
       {!ready && <p class="hint">Correct the errors in the save bar first. A run and a print use only a document that can be saved.</p>}
       {ready && !canRun && <p class="hint">A run needs a budget, at least one estimate and at least one candidate option.</p>}
       <p role="status" class={job.error === undefined ? 'muted' : 'save-error'}>
@@ -593,6 +620,7 @@ export function RunButtons({ run, print = true }: { readonly run: PortfolioRun; 
 export function RankedPortfolios({ record, currency }: { readonly record: NonNullable<PortfolioRun['record']>; readonly currency: string }) {
   return (
     <>
+      <Explain id="ranked" topic="respond.ranked-table" name="Ranked portfolios" visible="About this table" />
       <div class="table-box" tabIndex={0} role="region" aria-label="Ranked portfolios">
         <table>
           <caption>
@@ -653,7 +681,8 @@ export function ResidualAcceptance({ doc, record, update }: { readonly doc: Risk
   return (
     <section aria-labelledby="residual-title" class="panel">
       <h2 id="residual-title">Accepted residual risk</h2>
-      <p class="hint">Each risk that stays accepted needs an acceptance record before the decision record is final (Sec. 8.12 item 4).</p>
+      <Explain id="residual" topic="respond.residual" name="Accepted residual risk" visible="About this part" />
+      <p class="hint">Each risk that stays accepted needs an acceptance record before the decision record is final.</p>
       {residual.map((risk) => (
         <div key={risk.riskId}>
           <p>
@@ -679,10 +708,10 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
   const shown = options.find((option) => option.id === selected) ?? options[0];
   return (
     <>
-      <Section id="budget" title="Budget and method">
+      <Section id="budget" title="Budget and method" help="respond.budget">
         <div class="field-row">
           <div class="field">
-            <NumberField id="budget-cash" label={`Budget, first-year cash (${currency})`} min={0} value={budget} onChange={(value) => {
+            <NumberField id="budget-cash" label={`Budget, first-year cash (${currency})`} help="respond.budget-cash" min={0} value={budget} onChange={(value) => {
                 setBudgetCash(update, value);
               }} />
           </div>
@@ -690,6 +719,7 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
             <SelectField
               id="budget-method"
               label="Optimization method"
+              help="respond.optimization-method"
               value={doc.strategy?.optimizationMethod}
               emptyLabel="Not set"
               options={[
@@ -704,12 +734,12 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
           </div>
         </div>
         <p class="hint">
-          The algorithmic method compares every affordable set of options. The record always shows the fiscal baseline next to it (Sec. 8.12). For the operational method, mark
+          The algorithmic method compares every affordable set of options. The record always shows the fiscal baseline next to it. For the operational method, mark
           options as required or excluded.
         </p>
       </Section>
 
-      <Section id="options" title="Response options">
+      <Section id="options" title="Response options" help="respond.options">
         {options.length === 0 ? (
           <p class="muted">No response option yet.</p>
         ) : (
@@ -741,7 +771,7 @@ function RespondBody({ doc, update, blocked }: { readonly doc: RiskDocument; rea
         {!canAdd && <span class="hint">A response option needs a risk with an estimate or a driver to act on.</span>}
       </Section>
 
-      <Section id="run" title="Ranked portfolios">
+      <Section id="run" title="Ranked portfolios" help="respond.run">
         <RunButtons run={run} />
         {record !== undefined && <RankedPortfolios record={record} currency={currency} />}
       </Section>

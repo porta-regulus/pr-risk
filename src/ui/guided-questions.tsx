@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { RiskDocument } from '../schema/types';
 import type { Update } from './editor';
+import { Explain } from './explain';
 import { NumberField, TextField } from './fields';
 import {
   CAPACITY_STEPS,
@@ -123,10 +124,10 @@ function CapacityStage({ doc, update, onNext }: { readonly doc: RiskDocument; re
       </div>
       <div class="field-row">
         <div class="field">
-          <NumberField id="guided-capacity" label={`Or type the amount (${currency})`} min={0} value={value} onChange={setValue} />
+          <NumberField id="guided-capacity" label={`Or type the amount (${currency})`} help="context.guided-capacity" min={0} value={value} onChange={setValue} />
         </div>
         <div class="field">
-          <TextField id="guided-rationale" label="How did you find this amount? (optional)" value={rationale} onChange={setRationale} />
+          <TextField id="guided-rationale" label="How did you find this amount? (optional)" help="context.guided-rationale" value={rationale} onChange={setRationale} />
         </div>
       </div>
       {clears && <p class="hint">A new capacity clears the answers to the tolerance questions, because their amounts come from the capacity.</p>}
@@ -144,6 +145,7 @@ function CapacityStage({ doc, update, onNext }: { readonly doc: RiskDocument; re
           Do not know yet
         </button>
       </div>
+      <Explain id="guided-capacity-unknown" topic="context.guided-capacity-unknown" name="Do not know yet" />
     </>
   );
 }
@@ -157,7 +159,7 @@ function CriterionEditor({ objective, doc, update }: { readonly objective: Objec
       <legend>
         {objective.id}. {objective.statement}
       </legend>
-      <TextField id={id} label="Event for this objective" hint="One event that hurts this objective. Example. Your main customer system is down for 3 days." value={event} onChange={(text) => {
+      <TextField id={id} label="Event for this objective" help="context.guided-event" hint="One event that hurts this objective. Example. Your main customer system is down for 3 days." value={event} onChange={(text) => {
           setEvent(text);
           update((current) => withEventText(current, objective.id, text));
         }} />
@@ -182,7 +184,7 @@ function CriteriaStage({ doc, update }: { readonly doc: RiskDocument; readonly u
   return (
     <>
       <p class="question">For each objective, write one event that hurts it. Then ask the management body if the event is acceptable.</p>
-      <p class="hint">A "Not acceptable" answer gives a draft appetite statement in stage 5. The examples of SP 800-221r1 Table 2 are under the appetite statements below.</p>
+      <p class="hint">A "Not acceptable" answer gives a draft appetite statement in stage 5. Example statements to start from are under the appetite statements below.</p>
       {objectives.map((objective) => (
         <CriterionEditor key={objective.id} objective={objective} doc={doc} update={update} />
       ))}
@@ -234,6 +236,7 @@ function ToleranceStage({ doc, update }: { readonly doc: RiskDocument; readonly 
           <p class="question" id="guided-tolerance-question" aria-live="polite">
             Do you accept a {chance(open.oneIn)} chance this year that losses from ICT risks reach {amount(open.question ?? 0)} {currency} or more?
           </p>
+          <Explain id="guided-tolerance" topic="context.guided-tolerance-question" name="Tolerance questions" />
           <AnswerKeys labelledBy="guided-tolerance-question" options={SEARCH_LABELS} onAnswer={(answer) => {
               update((current) => withSearchAnswer(current, answer));
             }} />
@@ -279,6 +282,7 @@ function CrossCheckStage({ doc, update }: { readonly doc: RiskDocument; readonly
       <p class="question" id="guided-cross-check-question">
         How much per year would you pay to remove a {chance(point.oneIn)} chance of losing {amount(point.loss)} {currency} or more?
       </p>
+      <Explain id="guided-cross-check" topic="context.guided-cross-check" name="Cross-check" />
       <AnswerKeys
         labelledBy="guided-cross-check-question"
         options={CROSS_CHECK_LABELS(`${amount(half)} ${currency}`, `${amount(double)} ${currency}`)}
@@ -338,12 +342,12 @@ function ResultStage({ doc, update }: { readonly doc: RiskDocument; readonly upd
       {preview.statementsAdded > 0 && <p>{preview.statementsAdded === 1 ? '1 event is' : `${String(preview.statementsAdded)} events are`} not acceptable. Each gets a draft appetite statement.</p>}
       <div class="field-row">
         <div class="field">
-          <TextField id="guided-held-on" label="Date of the session" type="date" value={elicitation?.heldOn} onChange={(heldOn) => {
+          <TextField id="guided-held-on" label="Date of the session" help="context.guided-held-on" type="date" value={elicitation?.heldOn} onChange={(heldOn) => {
               update((current) => withSessionNote(current, { heldOn }));
             }} />
         </div>
         <div class="field wide">
-          <TextField id="guided-participants" label="Who took part" hint="Names and roles, for example the managing directors and the IT lead." value={participants} onChange={(text) => {
+          <TextField id="guided-participants" label="Who took part" help="context.guided-participants" hint="Names and roles, for example the managing directors and the IT lead." value={participants} onChange={(text) => {
               update((current) => withSessionNote(current, { participants: text }));
             }} />
         </div>
@@ -364,6 +368,7 @@ function ResultStage({ doc, update }: { readonly doc: RiskDocument; readonly upd
         </button>
         {participants.trim() === '' && <span class="hint">Type who took part first.</span>}
       </div>
+      <Explain id="guided-use-answers" topic="context.guided-use-answers" name="Use these answers" />
       {note !== undefined && <p role="status">{note}</p>}
     </>
   );
@@ -390,6 +395,7 @@ export function GuidedQuestions({ doc, update }: { readonly doc: RiskDocument; r
   return (
     <section aria-labelledby="guided-title" class="panel">
       <h2 id="guided-title">Guided questions for the management body</h2>
+      <Explain id="guided-section" topic="context.guided-questions" name="Guided questions for the management body" visible="About this section" />
       {stage === 'intro' ? (
         <>
           <p class="muted">
@@ -419,6 +425,7 @@ export function GuidedQuestions({ doc, update }: { readonly doc: RiskDocument; r
                   Start again without the answers
                 </button>
               </div>
+              <Explain id="guided-start-again" topic="context.guided-start-again" name="Start again without the answers" />
             </>
           )}
         </>

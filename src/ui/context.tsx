@@ -4,6 +4,7 @@ import type { RiskDocument } from '../schema/types';
 import { AppetiteSection } from './appetite';
 import { nextId, withSection, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
+import { Explain } from './explain';
 import { Checkboxes, LinesField, SelectField, TextField } from './fields';
 import { GuidedQuestions } from './guided-questions';
 import { StrategySection } from './strategy';
@@ -54,31 +55,32 @@ function ContextSection({ doc, update }: { readonly doc: RiskDocument; readonly 
   const functionUse = (id: string): number => (doc.assets ?? []).filter((asset) => (asset.supportsFunctionIds ?? []).includes(id)).length;
 
   return (
-    <Section id="context" title="Context">
-      <TextField id="mission" label="Mission" multiline value={context.mission} onChange={(value) => {
+    <Section id="context" title="Context" help="context.context">
+      <TextField id="mission" label="Mission" help="context.mission" multiline value={context.mission} onChange={(value) => {
           set('mission', value);
         }} />
       <div class="grid">
         <div class="field">
-          <TextField id="external-context" label="External context" multiline value={context.externalContext} onChange={(value) => {
+          <TextField id="external-context" label="External context" help="context.external-context" multiline value={context.externalContext} onChange={(value) => {
               set('externalContext', value);
             }} />
         </div>
         <div class="field">
-          <TextField id="internal-context" label="Internal context" multiline value={context.internalContext} onChange={(value) => {
+          <TextField id="internal-context" label="Internal context" help="context.internal-context" multiline value={context.internalContext} onChange={(value) => {
               set('internalContext', value);
             }} />
         </div>
       </div>
-      <LinesField id="stakeholders" label="Stakeholders, one per line" value={context.stakeholders ?? []} onChange={(value) => {
+      <LinesField id="stakeholders" label="Stakeholders, one per line" help="context.stakeholders" value={context.stakeholders ?? []} onChange={(value) => {
           set('stakeholders', value);
         }} />
-      <Checkboxes legend="ICT risk disciplines in scope" name="disciplines" options={DISCIPLINES} value={disciplines} onChange={(value) => {
+      <Checkboxes legend="ICT risk disciplines in scope" name="disciplines" help="context.disciplines" options={DISCIPLINES} value={disciplines} onChange={(value) => {
           set('disciplines', [...value, ...disciplines.filter((item) => !KNOWN_DISCIPLINES.includes(item))]);
         }} />
       <LinesField
         id="other-disciplines"
         label="Other disciplines, one per line"
+        help="context.other-disciplines"
         value={disciplines.filter((item) => !KNOWN_DISCIPLINES.includes(item))}
         onChange={(value) => {
           set('disciplines', [...disciplines.filter((item) => KNOWN_DISCIPLINES.includes(item)), ...value.filter((item) => !KNOWN_DISCIPLINES.includes(item))]);
@@ -86,7 +88,8 @@ function ContextSection({ doc, update }: { readonly doc: RiskDocument; readonly 
       />
 
       <h3 id="objectives-title">Objectives</h3>
-      <p class="muted">The four kinds of the enterprise risk profile (Sec. 2.3). Risks refer to objectives by ID.</p>
+      <p class="muted">The goals that risks can affect. Risks refer to objectives by ID.</p>
+      <Explain id="objectives" topic="context.objectives" name="Objectives" />
       {objectives.length > 0 && (
         <div class="table-box">
           <table aria-labelledby="objectives-title">
@@ -147,8 +150,9 @@ function ContextSection({ doc, update }: { readonly doc: RiskDocument; readonly 
         Add an objective
       </button>
 
-      <h3 id="functions-title">Mission- and business-critical functions</h3>
-      <p class="muted">Assets inherit the highest criticality of the functions they support (Sec. 5.1.1).</p>
+      <h3 id="functions-title">Critical business functions</h3>
+      <p class="muted">Assets get the highest criticality of the functions they support.</p>
+      <Explain id="functions" topic="context.functions" name="Critical business functions" />
       {functions.length > 0 && (
         <div class="table-box">
           <table aria-labelledby="functions-title">
@@ -221,8 +225,8 @@ function GovernanceSection({ doc, update }: { readonly doc: RiskDocument; readon
     update((current) => withSection(current, 'governance', withValue(current.governance, 'roles', next)));
   };
   return (
-    <Section id="governance" title="Roles" folded>
-      <p class="muted">The roles of Table 1 that exist in your organization. A company of 50 people usually fills 3 or 4 rows.</p>
+    <Section id="governance" title="Roles" help="context.roles" folded>
+      <p class="muted">The risk roles that exist in your organization. A company of 50 people usually fills 3 or 4 rows.</p>
       {roles.length > 0 && (
         <div class="table-box">
           <table aria-labelledby="governance-title">
@@ -290,7 +294,7 @@ function GovernanceSection({ doc, update }: { readonly doc: RiskDocument; readon
 
 export function ContextScreen({ id, onNavigate }: { readonly id: string; readonly onNavigate: (screen: ScreenName) => void }) {
   return (
-    <DocumentScreen id={id} screen="context" title="Context and strategy" lede="Step 1 of the life cycle, identify the context (Sec. 3.1 and 3.2). Changes are saved in this browser." onNavigate={onNavigate}>
+    <DocumentScreen id={id} screen="context" title="Context and strategy" lede="Step 1 of the life cycle. Describe your company, its goals and the loss it can take. Changes are saved in this browser." onNavigate={onNavigate}>
       {(draft, update) => (
         <>
           <ContextSection doc={draft} update={update} />

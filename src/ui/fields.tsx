@@ -3,6 +3,8 @@
 import { type ComponentChildren, createContext } from 'preact';
 import { useCallback, useContext, useEffect, useState } from 'preact/hooks';
 import { lines } from './edit';
+import { useExplain } from './explain';
+import type { HelpKey } from './help';
 
 interface Base {
   readonly id: string;
@@ -10,18 +12,26 @@ interface Base {
   // Inside a table row the column header is the visible label.
   readonly hiddenLabel?: boolean;
   readonly hint?: string;
+  // The explanation that opens on click. test/ui-help.test.ts requires it on each field with
+  // a visible label. A field in a table gets it on the table instead.
+  readonly help?: HelpKey;
 }
 
-function Label({ id, label, hiddenLabel, hint }: Base) {
+function Label({ id, label, hiddenLabel, hint, help }: Base) {
+  const explain = useExplain(id, hiddenLabel === true ? undefined : help, label);
   if (hiddenLabel === true) return null;
   return (
     <>
-      <label for={id}>{label}</label>
+      <div class="label-row">
+        <label for={id}>{label}</label>
+        {explain.toggle}
+      </div>
       {hint !== undefined && (
         <span class="hint" id={`${id}-hint`}>
           {hint}
         </span>
       )}
+      {explain.text}
     </>
   );
 }
@@ -153,16 +163,23 @@ export function Checkboxes<T extends string>({
   options,
   value,
   onChange,
+  help,
 }: {
+  readonly help?: HelpKey;
   readonly legend: string;
   readonly name: string;
   readonly options: readonly (readonly [T, string])[];
   readonly value: readonly string[];
   readonly onChange: (value: T[]) => void;
 }) {
+  const explain = useExplain(`checks-${name}`, help, legend);
   return (
     <fieldset class="checks">
-      <legend>{legend}</legend>
+      <legend class="label-row">
+        <span>{legend}</span>
+        {explain.toggle}
+      </legend>
+      {explain.text}
       {options.map(([key, text]) => (
         <label key={key} class="check">
           <input

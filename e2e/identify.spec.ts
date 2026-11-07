@@ -23,7 +23,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
   // The register becomes quantitative, and an asset joins the inventory.
   await page.getByLabel('Method').selectOption('quantitative');
   await unfold(page, 'Asset inventory');
-  await page.getByRole('button', { name: 'Add an asset' }).click();
+  await page.getByRole('button', { name: 'Add an asset', exact: true }).click();
   await page.getByText(/^A-1 New asset/).click();
   await page.getByLabel('Name', { exact: true }).fill('Web shop');
   await page.getByLabel('Kind', { exact: true }).selectOption('service');
@@ -31,7 +31,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
 
   // A new risk. Without an estimate a quantitative register refuses the save (V-08).
   await page.getByLabel('Risk description').fill('If the web shop is down for a day, then orders are lost.');
-  await page.getByRole('button', { name: 'Add risk to Pilot GmbH register' }).click();
+  await page.getByRole('button', { name: 'Add risk to Pilot GmbH register', exact: true }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Risk R-1' })).toBeVisible();
   await expect(page.locator('.errors')).toContainText('V-08');
 
@@ -45,7 +45,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
   await page.getByRole('tab', { name: 'Scenario' }).focus();
   await page.keyboard.press('ArrowRight');
   await expect(page.getByRole('tab', { name: 'Estimate' })).toBeFocused();
-  await page.getByRole('button', { name: 'Add an estimate' }).click();
+  await page.getByRole('button', { name: 'Add an estimate', exact: true }).click();
   await page.locator('#risk-R-1-frequency-form').selectOption('every');
   await page.getByLabel('Shortest time between events (years)').fill('2');
   await page.getByLabel('Longest time between events (years)').fill('10');
@@ -63,7 +63,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
 
   // A driver in the panel, linked on the tab Drivers (Sec. 8.7).
-  await page.getByRole('button', { name: 'Add a driver' }).click();
+  await page.getByRole('button', { name: 'Add a driver', exact: true }).click();
   await page.getByText(/^D-1 New driver/).click();
   await page.locator('#driver-0-name').fill('Hosting provider outage');
   await page.locator('#driver-0-kind').selectOption('supplier');
@@ -71,7 +71,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
   await page.locator('#driver-0-frequency-upper').fill('0.5');
   await page.locator('#driver-0-rationale').fill('The provider reported two regional outages in four years.');
   await page.getByRole('tab', { name: 'Drivers' }).click();
-  await page.getByRole('button', { name: 'Link a driver' }).click();
+  await page.getByRole('button', { name: 'Link a driver', exact: true }).click();
   await page.getByLabel('Trigger probability (0 to 1)').fill('0.5');
   await expect(page.getByText('A driver with fewer than 2 links')).toBeVisible();
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
@@ -79,7 +79,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
 
   // New evidence sets the status to Review needed (Sec. 6.7.4).
   await page.getByRole('tab', { name: 'Evidence' }).click();
-  await page.getByRole('button', { name: 'Add evidence' }).click();
+  await page.getByRole('button', { name: 'Add evidence', exact: true }).click();
   await page.getByLabel('Evidence 1 reference').fill('Incident 2026-07-14');
   await expect(page.getByText(/^Saved as version \d+\./)).toBeVisible();
   await expect(page.getByRole('row').filter({ hasText: 'R-1' })).toContainText('Review needed');
@@ -102,7 +102,7 @@ test('S3 adds a risk with an estimate and saves its simulated numbers', async ({
 
 test('S3 shows the exposures that come from labels in example 1', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'NIST Fig. 10 and Table 9 (example 1)' }).click();
+  await page.getByRole('button', { name: 'Enterprise register in words (example 1)', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'is open' })).toBeVisible();
   await page.getByRole('button', { name: 'Identify and analyze', exact: true }).click();
   await page.getByRole('button', { name: 'Notional Enterprise Risk Register', exact: true }).click();

@@ -14,6 +14,7 @@ import type { Register, Risk, RiskDocument } from '../schema/types';
 import { nextId, withValue } from './edit';
 import { DocumentScreen, type ScreenName, type Update } from './editor';
 import { ErrView } from './err';
+import { Explain } from './explain';
 import { InvalidFields, NumberField, SelectField, TextField, useInvalid } from './fields';
 import { registerTree } from './identify';
 import { useEngine } from './jobs';
@@ -126,14 +127,15 @@ function ErpView({ doc }: { readonly doc: RiskDocument }) {
   const blocks = erpBlocks(doc, scope);
   const missing = withoutObjective(doc, scope);
   return (
-    <Section id="erp" title="Risk profile by objective in the layout of Fig. 11" folded>
+    <Section id="erp" title="Enterprise risk profile by objective" folded help="enterprise.erp">
       <div class="field">
-        <SelectField id="erp-register" label="Registers in the profile" value={scope} emptyLabel="All registers" options={registerOptions(doc)} onChange={setChosen} />
+        <SelectField id="erp-register" label="Registers in the profile" help="enterprise.erp-register" value={scope} emptyLabel="All registers" options={registerOptions(doc)} onChange={setChosen} />
       </div>
       <p class="hint">
         A register includes the registers below it, and a summary entry stands for its sources. Last comes from the previous assessment, Current from the register entry and Residual
         from the planned values in the Detail tab. Closed risks are not in the profile.
       </p>
+      <Explain id="erp-table" topic="enterprise.erp-table" name="the profile tables" visible="How to read the profile" />
       {blocks.length === 0 ? (
         <p class="muted">No risk of these registers supports an objective. Link the risks to the objectives in the Links tab on the screen Identify and analyze.</p>
       ) : (
@@ -275,14 +277,16 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
       <h3>Entries of the child registers by category</h3>
       {threshold !== undefined && (
         <p class="hint">
-          The escalation threshold is {money(threshold)} {doc.document.currency}. An entry with an exposure at or above it must appear in the parent register (Sec. 5.2.2).{' '}
+          The escalation threshold is {money(threshold)} {doc.document.currency}. An entry with an exposure at or above it must appear in the parent register.{' '}
           {escalations === 0 ? 'No entry needs a summary entry.' : `${String(escalations)} ${escalations === 1 ? 'entry needs' : 'entries need'} a summary entry.`}
         </p>
       )}
       {groups.length === 0 ? (
         <p class="muted">The child registers hold no entry.</p>
       ) : (
-        groups.map((group) => (
+        <>
+          <Explain id="entries-table" topic="enterprise.entries-table" name="the tables of child entries" visible="How to read these tables" />
+          {groups.map((group) => (
           <EntryTable
             key={group.code}
             doc={doc}
@@ -298,23 +302,25 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
               });
             }}
           />
-        ))
+          ))}
+        </>
       )}
       <h3>De-duplicate and combine</h3>
       <p class="hint">
-        Merge the selected entries into one summary entry of {parent.title}. Likelihood and impact take the three-point roll-up of SP 800-221r1 lines 1637 to 1641. The response cost
-        is the total of the sources, or their average weighted by exposure rating (lines 1661 to 1664). Summary entries never enter the simulation, so no risk counts twice.
+        Merge the selected entries into one summary entry of {parent.title}. Likelihood and impact take the optimistic, most likely and pessimistic values of the sources. The response
+        cost is the total of the sources, or their average weighted by exposure rating. Summary entries never enter the simulation, so no risk counts twice.
       </p>
       <InvalidFields.Provider value={report}>
         <div class="field-row">
           <div class="field">
-            <TextField id="merge-id" label="Id of the summary entry" value={id ?? defaultId} onChange={setId} />
+            <TextField id="merge-id" label="Id of the summary entry" help="enterprise.merge-id" value={id ?? defaultId} onChange={setId} />
           </div>
           <div class="field">
             <TextField
               id="merge-owner"
               label="Risk owner"
               hint="A person at the level of this register with the accountability and authority to manage the risk."
+              help="enterprise.merge-owner"
               value={owner ?? parent.owner ?? ''}
               onChange={setOwner}
             />
@@ -323,7 +329,8 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
             <SelectField
               id="merge-layout"
               label="Different responses"
-              hint="Resolve risk register disparities (Table 10)."
+              hint="Choose how to show entries that have different responses."
+              help="enterprise.merge-layout"
               value={layout}
               options={LAYOUTS}
               onChange={(value) => {
@@ -336,6 +343,7 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
               id="merge-cost"
               label="Response cost"
               hint="The weighted average counts a source with a larger exposure rating more. When every exposure rating is 0, it is the plain mean."
+              help="enterprise.merge-cost"
               value={costRule}
               options={COST_RULES}
               onChange={(value) => {
@@ -344,20 +352,21 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
             />
           </div>
           <div class="field">
-            <NumberField id="merge-priority" label="Priority" integer min={1} value={priority} onChange={setPriority} />
+            <NumberField id="merge-priority" label="Priority" help="enterprise.merge-priority" integer min={1} value={priority} onChange={setPriority} />
           </div>
           <div class="field wide">
             <TextField
               id="merge-description"
               label="Combined risk description"
-              hint="One description for the scenario that the entries describe in different words (lines 1622 to 1625)."
+              hint="One description for the scenario that the entries describe in different words."
+              help="enterprise.merge-description"
               multiline
               value={description}
               onChange={setDescription}
             />
           </div>
           <div class="field wide">
-            <TextField id="merge-response" label="Risk response description" hint="Leave it empty to name the sources." multiline value={response} onChange={setResponse} />
+            <TextField id="merge-response" label="Risk response description" hint="Leave it empty to name the sources." help="enterprise.merge-response" multiline value={response} onChange={setResponse} />
           </div>
         </div>
       </InvalidFields.Provider>
@@ -365,6 +374,7 @@ function MergeForm({ doc, parent, update }: { readonly doc: RiskDocument; readon
         <button type="button" disabled={invalid} onClick={merge}>
           Merge the {selected.size === 0 ? 'selected entries' : selected.size === 1 ? 'selected entry' : `${String(selected.size)} selected entries`}
         </button>
+        <Explain id="merge" topic="enterprise.merge" name="Merge the selected entries" />
       </div>
       {problems.length > 0 && (
         <ul class="errors">
@@ -395,6 +405,8 @@ function SummaryTable({ doc, parent, update }: { readonly doc: RiskDocument; rea
       {summaries.length === 0 ? (
         <p class="muted">This register has no summary entry.</p>
       ) : (
+        <>
+        <Explain id="summary-table" topic="enterprise.summary-table" name="the table of summary entries" visible="How to read this table" />
         <div class="table-box" tabIndex={0} role="region" aria-labelledby="summary-caption">
           <table class="summaries">
             <caption id="summary-caption">
@@ -480,17 +492,18 @@ function SummaryTable({ doc, parent, update }: { readonly doc: RiskDocument; rea
             </tbody>
           </table>
         </div>
+        </>
       )}
       {findings.length > 0 && (
         <ul class="warnings">
           {findings.map((finding, i) => (
             <li key={i}>
-              {finding.rule} {finding.message}. Leaders clarify which treatment is the appropriate response (Sec. 5.3).
+              {finding.rule} {finding.message}. Leaders clarify which treatment is the appropriate response.
             </li>
           ))}
         </ul>
       )}
-      <p class="hint">A priority in a child register is provisional (Sec. 5.3.3). A summary entry carries its own priority. Leadership overrides a priority on the screen Prioritize.</p>
+      <p class="hint">A priority in a child register is provisional. A summary entry carries its own priority. Leadership overrides a priority on the screen Prioritize.</p>
     </>
   );
 }
@@ -500,9 +513,9 @@ function NormalizePanel({ doc, update }: { readonly doc: RiskDocument; readonly 
   const [chosen, setChosen] = useState<string>();
   const parent = parents.find((register) => register.id === chosen) ?? parents[0];
   return (
-    <Section id="normalize" title="Aggregate and normalize">
+    <Section id="normalize" title="Aggregate and normalize" help="enterprise.normalize">
       <p class="hint">
-        SP 800-221r1 Sec. 5.2 and Table 10 (p. 53, line 1617). A parent register lists the entries of the registers below it, combines identical or similar entries into a summary entry,
+        A parent register lists the entries of the registers below it, combines identical or similar entries into a summary entry,
         resolves different responses and shows the entries that must go to the parent.
       </p>
       {parent === undefined ? (
@@ -513,6 +526,7 @@ function NormalizePanel({ doc, update }: { readonly doc: RiskDocument; readonly 
             <SelectField
               id="normalize-parent"
               label="Parent register"
+              help="enterprise.normalize-parent"
               value={parent.id}
               options={parents.map((register) => [register.id, register.title] as const)}
               onChange={(value) => {
@@ -547,7 +561,7 @@ function PeriodPanel({ doc, update }: { readonly doc: RiskDocument; readonly upd
     setNote(`The current assessment of ${String(count)} ${count === 1 ? 'risk' : 'risks'} is now the previous period, as of ${asOf}.`);
   };
   return (
-    <Section id="period" title="Close the period">
+    <Section id="period" title="Close the period" help="enterprise.period">
       <p class="hint">
         At the end of a period, the current assessment of each open risk becomes its previous assessment. It replaces the previous assessment that the risk has. The column Last of the
         profile and the previous period of the portfolio then show it. Labels and the impact split are copied. Numbers that are placeholders or that come from labels are not copied,
@@ -559,6 +573,7 @@ function PeriodPanel({ doc, update }: { readonly doc: RiskDocument; readonly upd
             id="period-scope"
             label="Registers"
             hint="A register includes the registers below it."
+            help="enterprise.period-scope"
             value={scope}
             options={[[ALL, 'All registers'] as const, ...tree.map(({ register, depth }) => [register.id, `${'. '.repeat(depth)}${register.title}`] as const)]}
             onChange={(value) => {
@@ -571,6 +586,7 @@ function PeriodPanel({ doc, update }: { readonly doc: RiskDocument; readonly upd
           <TextField
             id="period-as-of"
             label="End of the period"
+            help="enterprise.period-as-of"
             type="date"
             value={asOf}
             onChange={(value) => {
@@ -584,6 +600,7 @@ function PeriodPanel({ doc, update }: { readonly doc: RiskDocument; readonly upd
         <button type="button" disabled={count === 0 || !DATE.test(asOf)} onClick={close}>
           Close the period for {count} open {count === 1 ? 'risk' : 'risks'}
         </button>
+        <Explain id="close-period" topic="enterprise.close-period" name="Close the period" />
       </div>
       <p role="status" class="muted">
         {note}
@@ -609,13 +626,14 @@ function PortfolioView({ doc, simulation }: { readonly doc: RiskDocument; readon
   ];
   const currency = doc.document.currency;
   return (
-    <Section id="portfolio" title="Portfolio by register and period" folded>
+    <Section id="portfolio" title="Portfolio by register and period" folded help="enterprise.portfolio">
       <p class="hint">
-        After SP 800-221r1 Table 7 (p. 44, line 1429), without its sub-columns. A register includes the registers below it. The financial profile is the expected annual loss of the
+        A register includes the registers below it. The financial profile is the expected annual loss of the
         negative risks. With a simulation it is the simulated value with its standard error, as on the screen Prioritize, and the entries without an estimate show apart. Without a
         simulation it is the sum of the exposure ratings, because expected values add up. The previous period comes from the previous assessments. The reputation and mission
         profiles give the highest label on the impact scale.
       </p>
+      <Explain id="portfolio-table" topic="enterprise.portfolio-table" name="the portfolio table" visible="How to read this table" />
       <div class="table-box" tabIndex={0} role="region" aria-labelledby="portfolio-caption">
         <table class="portfolio">
           <caption id="portfolio-caption">Risk profile of each register. Money in {currency}.</caption>
@@ -743,6 +761,7 @@ function EnterpriseBody({ doc, update }: { readonly doc: RiskDocument; readonly 
         >
           Print the register, the profile and the portfolio
         </button>
+        <Explain id="print" topic="enterprise.print" name="Print the register, the profile and the portfolio" />
       </div>
     </>
   );
@@ -754,7 +773,7 @@ export function EnterpriseScreen({ id, onNavigate }: { readonly id: string; read
       id={id}
       screen="enterprise"
       title="Enterprise view"
-      lede="See the registers in the layouts of SP 800-221r1, merge the entries of child registers and compare the registers by period."
+      lede="See the registers as tables, merge the entries of child registers and compare the registers by period."
       onNavigate={onNavigate}
     >
       {(doc, update) => <EnterpriseBody doc={doc} update={update} />}
