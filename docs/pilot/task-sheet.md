@@ -2,7 +2,7 @@
 
 You are the IT lead of Example Valves GmbH. The company is fictitious. Your managing directors want a decision record for the 2027 budget. They will approve which risk responses to fund and which risks to accept.
 
-Use the app on the screen. Use the help text in the app when you need it. Say aloud what you think.
+Use the app on the screen. Start with "Guided mode". Use the help text in the app when you need it. A "?" opens an explanation. Say aloud what you think.
 
 ## The company
 

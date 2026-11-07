@@ -2,7 +2,7 @@
 
 | Item | Value |
 |---|---|
-| Status | Phase 0 is done (pull request 52). Phase 1 is done. The product owner picked direction B with a sans font on 2026-11-06 (Sec. 4.1). The product owner passed the phase 2 prototype on 2026-11-06. Phase 3 is merged (pull request 55). Phase 4 is merged (pull request 56). Phase 5 is merged (pull request 57). The phase 6 pilot script is ready (Sec. 5.5). |
+| Status | Phase 0 is done (pull request 52). Phase 1 is done. The product owner picked direction B with a sans font on 2026-11-06 (Sec. 4.1). The product owner passed the phase 2 prototype on 2026-11-06. Phase 3 is merged (pull request 55). Phase 4 is merged (pull request 56). Phase 5 is merged (pull request 57). The phase 6 pilot kit is ready (Sec. 5.5). |
 | Date | 2026-11-06 |
 | Decided by the product owner | Guided mode plus the full editor. The redesign ships before release 1, so release 1 and AT-5 wait. Claude proposes 2 or 3 visual directions as mockups first. |
 | Changes | HANDOFF task 12 (the order before the tag), SPEC.md Sec. 5 (screens), Sec. 10 (UI) and Sec. 12.5 (AT-5 uses the new GUI) |
@@ -153,10 +153,11 @@ Decided by the product owner on 2026-11-07.
 
 ### 5.5 Phase 6 pilot
 
-1. The script, the note sheet and the consent form are in `docs/ux/pilot-script.md`.
-2. The task is the AT-5 task, in the guided mode. Unlike AT-5, the moderator gives a hint after 4 minutes when the user is stuck. Each hint is a blocker.
-3. The pilot user cannot be one of the 5 AT-5 users.
-4. Result. Not run yet.
+1. The pilot uses the kit in `docs/pilot/` (build task 5, done criterion 5). It has the consent form, the task sheet with a fictitious company, and the log. The log has a row for each step of the guided mode.
+2. The app is built from main on the facilitator laptop, because the hosted site has rc.3 until the release tag.
+3. As in AT-5, any help makes the session a fail. The facilitator helps only after 4 minutes, and the session then goes on to find more blockers.
+4. The pilot user cannot be one of the 5 AT-5 users.
+5. Result. Not run yet.
 
 Phases 2 and 3 are the largest part. The product owner sees a working result at the end of each phase.
 
